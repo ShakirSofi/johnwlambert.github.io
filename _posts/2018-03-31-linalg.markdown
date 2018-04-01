@@ -1,0 +1,200 @@
+---
+layout: post
+comments: true
+title:  "Essential Linear Algebra Overview"
+excerpt: "Necessary Linear Algebra Overview"
+date:   2018-03-31 11:00:00
+mathjax: true
+---
+
+<!-- 
+<svg width="800" height="200">
+	<rect width="800" height="200" style="fill:rgb(98,51,20)" />
+	<rect width="20" height="50" x="20" y="100" style="fill:rgb(189,106,53)" />
+	<rect width="20" height="50" x="760" y="30" style="fill:rgb(77,175,75)" />
+	<rect width="10" height="10" x="400" y="60" style="fill:rgb(225,229,224)" />
+</svg>
+ -->
+### Linear Algebra Definitions
+Before we do anything interesting with machine learning or optimization, we'll need to review some absolutely **essential** linear algebra concepts.
+## Matrix Rank
+
+## Vector Space
+
+## Null Space of a Matrix
+
+Given \\(A \in \mathbb{R}^{m \times n}\\), the **null space** of \\(A\\) is the set of vectors which are sent to the zero vector:
+
+$$
+\mathcal{N}(A) = \{ x \in \mathbb{R}^n \mid Ax = 0 \}
+$$
+
+Multiplication by \\(A\\) can be seen as a function which sends a vector \\(x \in \mathbb{R}^n\\) to a vector \\(Ax \in \mathbb{R}^m\\).
+
+Of course, \\(\mathcal{N}(A)\\) always contains the zero vector, i.e. \\({0} \in \mathcal{N}(A)\\). But the question is, does it contain any other vectors? If the columns of \\(A\\) are linearly independent, then we can always say \\(\mathcal{N}(A) = {0} \\).
+
+## Column Space (Range) of a Matrix
+
+Given an \\(m \times n\\) matrix \\(A\\), we would like to know for which vectors \\(b \in \mathbb{R}^m\\) the system \\(Ax = b\\) has a solution. Let's define the columns of \\(A\\) as:
+
+$$
+A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{bmatrix}
+$$
+
+The column space of \\(A\\) is
+
+$$
+C(A) = \mbox{span}(v_1, v_2, \dots, v_n)
+$$
+
+$$
+C(A) = \{ Ax \mid x \in \mathbb{R}^n \}
+$$
+
+The system \\(Ax = b\\) has a solution **if and only if** \\(b \in C(A)\\), equivalent to stating \\(b\\) is in the range of \\(A\\): \\(b \in R(A)\\). 
+
+## Rank-Nullity Theorem
+Let \\(A\\) be any matrix such that \\(A \in \mathbb{R}^{m \times n}\\).
+
+$$
+\mbox{rank}(A) + \mbox{nullity}(A) = n
+$$
+
+$$
+\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n
+$$
+
+## Orthogonal Complement
+
+### Matrix Calculus
+
+### Gram Schmidt
+
+### Solving Systems of Equations
+
+## Overdetermined Systems
+Here, matrix \\(A\\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \\(r\\), i.e. we minimize \\(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\\).  We find an approximate solution to \\(Y=Ax\\). Formally, we minimize some objective function \\(J\\):
+$$
+\begin{align}
+\begin{array}{ll}
+\mbox{minimize} & J \\
+& \lVert r \rVert^2 \\
+ &  \lVert Ax-y \rVert^2 \\
+& (Ax-y)^T (Ax-y) \\
+& (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
+& x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
+\end{array}
+\end{align}
+$$
+
+We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:
+
+$$
+\nabla_x J = 2(A^TA)x - 2A^Ty = 0
+$$
+
+$$
+2(A^TA)x = 2A^Ty
+$$
+
+$$
+(A^TA)x = A^Ty
+$$
+
+Multiply on the left by \\((A^TA)^{-1}\\), and we recover the least squares solution:
+
+$$
+x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y
+$$
+
+We call \\(A^{\dagger}\\) a **left-inverse** of \\(A\\) because \\(A^{\dagger}A=I\\).
+
+## Underdetermined Systems
+Here \\(A\\) is a fat, full-rank matrix. We can **always** solve such a system, and there will be an infinite # of solutions.
+
+We often choose to find the smallest solution, i.e. the one closest to the origin. We call this a least-norm (\\(x_{ln}\\) ) solution, because we minimize \\(\lVert x \rVert\\):
+
+$$
+x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y
+$$
+
+We call \\(A^{\dagger}\\) a right-inverse of \\(A\\) because \\(AA^{\dagger}=I\\).
+
+## Singular Value Decomposition (SVD)
+
+### SVD Definition
+
+$$
+A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} \sigma_1 & & \\ & \ddots & \\ & & \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix}
+$$
+
+where \\(U\\), \\(V\\) are orthogonal matrices, meaning \\(U^TU = I\\), \\(UU^T=I\\). 
+
+We call \\(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\\) the right/input singular vectors, because this is the first matrix to interact with an input vector \\(x\\) when we compute \\(y=Ax\\).
+
+We call \\(U=\begin{bmatrix} u_1, \dots, u_r \end{bmatrix}\\) the left/output singular vectors, because this is the last matrix that the intermediate results are multiplied before we obtain our result ( \\(y=Ax\\) ).
+
+### Computation of the SVD
+
+To find this decomposition for a matrix \\(A\\), we'll need to compute the \\(V\\)'s.
+
+$$
+A^TA = (V\Sigma U^T) (U \Sigma V^T)
+$$
+
+This reduces to \\(V \Sigma^2 V^T\\). We need to find orthonormal eigenvectors, and the \\(V_i\\)'s are simply the eigenvectors of \\(A^TA\\).
+
+Now, we'll need to compute the \\(U\\)'s.
+
+$$
+AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T
+$$
+
+The \\(U_i\\)'s are the eigenvectors of \\(AA^T\\).
+### SVD Applications
+
+We can use the SVD to compute the general pseudo-inverse of a matrix for \\(y=Ax\\):
+
+For skinny/full-rank matrices:
+
+
+
+## Extremal Trace Problems
+
+## Eigenvectors
+
+## Unconstrained Optimization
+
+### The Gauss-Newton Method
+
+Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \\(\lVert r(x) \rVert^2\\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.
+
+- Start from initial guess for your solution
+
+- Repeat:
+
+- (1) Linearize \\(r(x)\\) around current guess \\(x^{(k)}\\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.
+- (2) Solve least squares for linearized objective, get \\(x^{(k+1)}\\).
+
+The linearized residual \\(r(x)\\) will resemble:
+
+$$
+r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})
+$$
+
+where \\(Dr\\) is the Jacobian, meaning \\( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\\)
+
+Distributing the rightmost product, we obtain
+
+$$
+r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)
+$$
+
+With a single variable \\(x\\), we can re-write the above equation as
+
+$$
+r(x) \approx A^{(k)}x - b^{(k)}
+$$
+
+### Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)
+
