@@ -1,0 +1,18 @@
+# Site settings
+title: John Lambert blog
+email: 
+description: "Notes on Machine Learning and Optimization."
+baseurl: ""
+url: "http://johnwlambert.github.io"
+twitter_username: none
+github_username:  johnwlambert
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+
+highlighter: rouge
+kramdown:
+  input: GFM
+  auto_ids: true
+  syntax_highlighter: rouge
