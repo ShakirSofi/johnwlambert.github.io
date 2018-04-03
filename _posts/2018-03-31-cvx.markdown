@@ -137,7 +137,7 @@ We refer to this problem as the **Lagrange dual problem** associated with the st
 
 ### Weak Duality
 
-Let us define \\(d^*\\) as the optimal value of the Lagrange dual problem. This is **the best lower bound** on \\(p^*\\) that can be obtained from the Lagrange dual function.
+Let us define \\(d^{*}\\) as the optimal value of the Lagrange dual problem. This is **the best lower bound** on \\(p^{*}\\) that can be obtained from the Lagrange dual function.
 
 Even if the original problem is not convex, we can always say \\(d^* \leq p^*\\). We call this property weak duality.
 
@@ -165,7 +165,9 @@ $$
 
 If the function \\(f\\) is quadratic, then minimizing \\(\hat{f}(x+v)\\) will give us an exact minimizer of \\(f\\). If the function \\(f\\) is nearly quadratic, intuition suggests that minimizing \\(\hat{f}(x+v)\\) should be a very good estimate of the minimizer of \\(f\\), i.e., \\(x^*\\).
 
-Setting \\(\nabla_v \hat{f}(x+v)=0\\), we see: 
+Setting \\(\nabla_v \hat{f}(x+v)=0\\), we see:
+
+
 
 ## Interior Point Methods
 

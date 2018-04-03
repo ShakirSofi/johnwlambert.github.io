@@ -5,8 +5,8 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 01 Apr 2018 05:14:12 -0700</pubDate>
-    <lastBuildDate>Sun, 01 Apr 2018 05:14:12 -0700</lastBuildDate>
+    <pubDate>Mon, 02 Apr 2018 22:45:27 -0700</pubDate>
+    <lastBuildDate>Mon, 02 Apr 2018 22:45:27 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -378,7 +378,7 @@ This condition can be interpreted geometrically as the requirement that the grap
 
 &lt;h3 id=&quot;weak-duality&quot;&gt;Weak Duality&lt;/h3&gt;
 
-&lt;p&gt;Let us define \(d^&lt;em&gt;\) as the optimal value of the Lagrange dual problem. This is &lt;strong&gt;the best lower bound&lt;/strong&gt; on \(p^&lt;/em&gt;\) that can be obtained from the Lagrange dual function.&lt;/p&gt;
+&lt;p&gt;Let us define \(d^{&lt;em&gt;}\) as the optimal value of the Lagrange dual problem. This is &lt;strong&gt;the best lower bound&lt;/strong&gt; on \(p^{&lt;/em&gt;}\) that can be obtained from the Lagrange dual function.&lt;/p&gt;
 
 &lt;p&gt;Even if the original problem is not convex, we can always say \(d^* \leq p^*\). We call this property weak duality.&lt;/p&gt;
 
