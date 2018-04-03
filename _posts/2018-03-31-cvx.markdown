@@ -137,7 +137,7 @@ We refer to this problem as the **Lagrange dual problem** associated with the st
 
 ### Weak Duality
 
-Let us define \\(d^{*}\\) as the optimal value of the Lagrange dual problem. This is **the best lower bound** on \\(p^{*}\\) that can be obtained from the Lagrange dual function.
+Let us define \\( d^* \\) as the optimal value of the Lagrange dual problem. This is **the best lower bound** on \\( p^* \\) that can be obtained from the Lagrange dual function.
 
 Even if the original problem is not convex, we can always say \\(d^* \leq p^*\\). We call this property weak duality.
 
