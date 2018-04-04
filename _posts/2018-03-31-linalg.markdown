@@ -68,6 +68,8 @@ $$
 
 ### Matrix Calculus
 
+
+
 ### Gram Schmidt
 
 ### Solving Systems of Equations

@@ -5,8 +5,8 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 02 Apr 2018 22:51:57 -0700</pubDate>
-    <lastBuildDate>Mon, 02 Apr 2018 22:51:57 -0700</lastBuildDate>
+    <pubDate>Wed, 04 Apr 2018 01:56:07 -0700</pubDate>
+    <lastBuildDate>Wed, 04 Apr 2018 01:56:07 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -20,13 +20,75 @@
 &lt;/svg&gt;
  --&gt;
 
-&lt;p&gt;Now that we’ve cover topics from convex optimization in a very shallow manner, it’s time to go deeper.&lt;/p&gt;
+&lt;p&gt;Now that we’ve covered topics from convex optimization in a very shallow manner, it’s time to go deeper.&lt;/p&gt;
 
 &lt;h2 id=&quot;subgradient-methods&quot;&gt;Subgradient methods&lt;/h2&gt;
 
-&lt;h3 id=&quot;subgradients&quot;&gt;Subgradients&lt;/h3&gt;
+&lt;h3 id=&quot;convexity-review&quot;&gt;Convexity Review&lt;/h3&gt;
+
+&lt;p&gt;To understand subgradients, first we need to review convexity. The Taylor series of a real valued function that is infinitely differentiable at a real number \(x\) is given by&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(y) \approx \sum\limits_{k=0}^{\infty} \frac{f^{(k)}(x)}{k!}(y-x)^k&lt;/script&gt;
+
+&lt;p&gt;Expanding terms, the series resembles&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(y) \approx  f(x) + \frac{f^{\prime}(x)}{1!}(y-x) + \frac{f^{\prime\prime}(x)}{2!}(y-x)^2 + \frac{f^{\prime\prime\prime}(x)}{3!}(y-x)^3 + \cdots.&lt;/script&gt;
+
+&lt;p&gt;If a function is convex, its first order Taylor expansion (a tangent line) will always be a global underestimator:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(y) \geq f(x) + \frac{f^{\prime}(x)}{1!}(y-x)&lt;/script&gt;
+
+&lt;p&gt;If \(y=x + \delta\), then:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+f(x+ \delta) \geq f(x) + \nabla f(x)^T (x+\delta-x) \\
+f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
+\end{aligned}&lt;/script&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/tangent_underestimates_quadratic.jpg&quot; width=&quot;25%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).&lt;/p&gt;
+
+&lt;p&gt;If \(y&amp;gt;x\), our \(\delta\) is positive, and since the derivative is increasing (which an affine function cannot account for), we always underestimate.&lt;/p&gt;
+
+&lt;p&gt;If \(x&amp;gt;y\), our \(\delta\) is negative, and since the …&lt;/p&gt;
+
+&lt;h2 id=&quot;subgradients&quot;&gt;Subgradients&lt;/h2&gt;
+
+&lt;p&gt;Consider a function \(f\) with a kink inside of it, rendering the function non-differentiable at a point \(x_2\).&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/subgradients.png&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient.&lt;/p&gt;
 
 &lt;h3 id=&quot;subgradient-methods-1&quot;&gt;Subgradient methods&lt;/h3&gt;
+
+&lt;p&gt;From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. Subgradient method is just like gradient descent, but replacing gradients with subgradients. I.e., initialize \(x^{(0)}\), then repeat&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, &amp; k = 1, 2, 3, \cdots
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where \(g^{(k−1)}\) is &lt;strong&gt;any&lt;/strong&gt; subgradient of \(f\) at \(x^{(k−1)}\). We keep track of best iterate \(x_{best}^k\)
+ among \(x^{(1)}, \cdots , x^{(k)}\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(x_{best}^{(k)}) = \underset{i=1,\cdots ,k}{\mbox{ min  }}  f(x^{(i)})&lt;/script&gt;
+
+&lt;p&gt;To update each \(x^{(i)}\), there are basically two ways to select the step size:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Fixed step size: \(t_k = t\) for all \(k = 1, 2, 3, \cdots \)&lt;/li&gt;
+  &lt;li&gt;Diminishing step size: choose \(t_k\) to satisfy&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+\sum\limits_{k=1}^{\infty} t_k^2 &lt; \infty , &amp; \sum\limits_{k=1}^{\infty} t_k &lt; \infty 
+\end{array} %]]&gt;&lt;/script&gt;
 
 &lt;h3 id=&quot;subgradient-methods-for-constrained-problems&quot;&gt;Subgradient methods for constrained problems&lt;/h3&gt;
 
@@ -70,13 +132,18 @@
 
 &lt;h2 id=&quot;nonconvex-problems&quot;&gt;Nonconvex problems&lt;/h2&gt;
 
-&lt;h3 id=&quot;l_1-methods-for-convex-cardinality-problems-matlab-files&quot;&gt;l_1 methods for convex-cardinality problems (matlab files)&lt;/h3&gt;
+&lt;h3 id=&quot;l_1-methods-for-convex-cardinality-problems&quot;&gt;\(l_1\) methods for convex-cardinality problems&lt;/h3&gt;
 
-&lt;h3 id=&quot;l_1-methods-for-convex-cardinality-problems-part-ii-matlab-files&quot;&gt;l_1 methods for convex-cardinality problems, part II (matlab files)&lt;/h3&gt;
+&lt;h3 id=&quot;l_1-methods-for-convex-cardinality-problems-part-ii&quot;&gt;\(l_1\) methods for convex-cardinality problems, part II&lt;/h3&gt;
 
-&lt;h3 id=&quot;sequential-convex-programming-matlab-files&quot;&gt;Sequential convex programming (matlab files)&lt;/h3&gt;
+&lt;h3 id=&quot;sequential-convex-programming&quot;&gt;Sequential convex programming&lt;/h3&gt;
 
-&lt;h2 id=&quot;branch-and-bound-methods-notes--python-files&quot;&gt;Branch-and-bound methods (notes | python files)&lt;/h2&gt;
+&lt;h2 id=&quot;branch-and-bound-methods&quot;&gt;Branch-and-bound methods&lt;/h2&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf&quot;&gt;Lecture 6&lt;/a&gt;.&lt;/p&gt;
+
 </description>
         <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
         <link>http://localhost:4000/2018/03/31/subgradient/</link>
@@ -136,6 +203,41 @@ A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; 
 &lt;h2 id=&quot;orthogonal-complement&quot;&gt;Orthogonal Complement&lt;/h2&gt;
 
 &lt;h3 id=&quot;matrix-calculus&quot;&gt;Matrix Calculus&lt;/h3&gt;
+
+&lt;p&gt;Although I don’t know what an “upstream cost function” is or what “back propogation” means, it doesn’t matter:  what you are asking about is definitely a (very) special case of the Chain Rule from Math 51. It is being presented to you in some domain-specific notation that is making it look mysterious, but it is really something you know from Math 51, as I’ll explain below.&lt;/p&gt;
+
+&lt;p&gt;For example, in the case of n x n matrices with n = 1  we’ve got a function j(x) of a real variable x and define y = cx for some nonzero number c. Then \(dj/dx = (dj/dy)(dy/dx) = (dj/dy)c\) by a very baby case of the 1-variable Chain Rule — that’s all there is to it when n=1, and the case n &amp;gt; 1 is going to be similar except we have to be careful with the matrix products.  It is going to be an equally special case of the Math 51 Chain Rule (for a linear change of coordinates in n^2 variables, which is so special that it just barely merits being considered by using a general Theorem rather than being proved directly by bare hands).&lt;/p&gt;
+
+&lt;p&gt;I assume J is a numerical-valued function of some n x n matrix input.  We regard J as a function of n^2 variables \(x_{11}, x_{12}, \dots , x_{nn}\), so we write it as J(X) where X is a matrix \((x_{ij})\).   For an invertible n x n numerical matrix C, one can consider the linear change of n^2 variables as matrix entries:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;X&lt;/td&gt;
+      &lt;td&gt;—&amp;gt; XC =: Y&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;The 2nd formula in your screenshot is just a garbled way of trying to express how the partials of J with respect to the \(x_{ij}\)’s are related to those of J with respect to the y_{ij}’s (generalizing what we saw above in the easy case n = 1).  That is, we want to prove the matrix-product formula&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(*) DJ/DX = (DJ/DY) C^T&lt;/script&gt;
+
+&lt;p&gt;where DJ/DX := matrix of \(x_{ij}\)-partials of J and likewise for DJ/DY.  The formula (*) really is the meaning of the 2nd formula in your screenshot if you think about it (renaming A as Y, and B as X).&lt;/p&gt;
+
+&lt;p&gt;For instance, varying across all y_{ij}’s we have by the Chain Rule&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dJ/dx_{11} = \sum_{ij} (dJ/dy_{ij}) (dy_{ij}/dx_{11})&lt;/script&gt;
+
+&lt;p&gt;and since \(y_{ij} = \sum_k x_{ik} c_{kj}\) by the definition Y := XC we see that dy_{ij}/dx_{11} vanishes if i \ne 1 whereas if i = 1 then it is equal to \(c_{1j}\).  Thus,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dJ/dx_{11} = \sum_j (dJ/dy_{1j}) c_{1j} = \mbox{ 11-entry of }(DJ/DY) C^T&lt;/script&gt;
+
+&lt;p&gt;since the j1-entry of the transpose C^T is \(c_{1j}\).  The same calculation works in the same way with “11” replaced by any “hk (I just did the 11-case to keep the profusion of subscript letters under control), so it gives the entry-by-entry version of (*).&lt;/p&gt;
+
+&lt;p&gt;You can derive the 3rd line of the screenshot in a similar manner, or to save time just deduce it directly from the 2nd line by applying transpose to everything in sight (including the initial identity A = BC) using that transpose swaps the order of matrix multiplication.&lt;/p&gt;
+
+&lt;p&gt;QED&lt;/p&gt;
 
 &lt;h3 id=&quot;gram-schmidt&quot;&gt;Gram Schmidt&lt;/h3&gt;
 

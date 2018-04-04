@@ -16,14 +16,85 @@ mathjax: true
 </svg>
  -->
 
-Now that we've cover topics from convex optimization in a very shallow manner, it's time to go deeper.
+Now that we've covered topics from convex optimization in a very shallow manner, it's time to go deeper.
 
 ## Subgradient methods
 
+### Convexity Review
 
-### Subgradients
+To understand subgradients, first we need to review convexity. The Taylor series of a real valued function that is infinitely differentiable at a real number \\(x\\) is given by 
+
+$$
+f(y) \approx \sum\limits_{k=0}^{\infty} \frac{f^{(k)}(x)}{k!}(y-x)^k
+$$
+
+Expanding terms, the series resembles
+
+$$
+f(y) \approx  f(x) + \frac{f^{\prime}(x)}{1!}(y-x) + \frac{f^{\prime\prime}(x)}{2!}(y-x)^2 + \frac{f^{\prime\prime\prime}(x)}{3!}(y-x)^3 + \cdots.
+$$
+
+If a function is convex, its first order Taylor expansion (a tangent line) will always be a global underestimator:
+
+$$
+f(y) \geq f(x) + \frac{f^{\prime}(x)}{1!}(y-x)
+$$
+
+If \\(y=x + \delta\\), then:
+
+$$
+\begin{aligned}
+f(x+ \delta) \geq f(x) + \nabla f(x)^T (x+\delta-x) \\
+f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
+\end{aligned}
+$$
+
+<div align="center">
+<img  src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
+</div>
+
+From the picture, it's obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase over some interval \\(\delta\\), where usually \\(\delta=1\\), if we multiply slope by \\(\delta = y-x = \\) "run", then we will be left with only the change in function value over the interval (\\(slope=\frac{rise}{run}\\) and \\(\frac{rise}{run}\cdot(run)=rise\\) ).
+
+If \\(y>x\\), our \\(\delta\\) is positive, and since the derivative is increasing (which an affine function cannot account for), we always underestimate.
+
+If \\(x>y\\), our \\(\delta\\) is negative, and since the ...
+
+## Subgradients
+
+Consider a function \\(f\\) with a kink inside of it, rendering the function non-differentiable at a point \\(x_2\\).
+
+<div align="center">
+<img  src="/assets/subgradients.png" width="50%" />
+</div>
+
+The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient.
 
 ### Subgradient methods 
+
+From [1]: Given a convex function \\(f:\mathbb{R}^n \rightarrow \mathbb{R}\\), not necessarily differentiable. Subgradient method is just like gradient descent, but replacing gradients with subgradients. I.e., initialize \\(x^{(0)}\\), then repeat
+
+$$
+\begin{array}{ll}
+x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, & k = 1, 2, 3, \cdots
+\end{array}
+$$
+
+where \\(g^{(k−1)}\\) is **any** subgradient of \\(f\\) at \\(x^{(k−1)}\\). We keep track of best iterate \\(x_{best}^k\\)
+ among \\(x^{(1)}, \cdots , x^{(k)}\\):
+
+$$
+f(x_{best}^{(k)}) = \underset{i=1,\cdots ,k}{\mbox{ min  }}  f(x^{(i)})
+$$
+
+To update each \\(x^{(i)}\\), there are basically two ways to select the step size:
+- Fixed step size: \\(t_k = t\\) for all \\(k = 1, 2, 3, \cdots \\)
+- Diminishing step size: choose \\(t_k\\) to satisfy
+
+$$
+\begin{array}{ll}
+\sum\limits_{k=1}^{\infty} t_k^2 < \infty , & \sum\limits_{k=1}^{\infty} t_k < \infty 
+\end{array}
+$$
 
 ### Subgradient methods for constrained problems
 
@@ -67,10 +138,17 @@ Now that we've cover topics from convex optimization in a very shallow manner, i
 
 ## Nonconvex problems
 
-### l_1 methods for convex-cardinality problems (matlab files)
+### \\(l_1\\) methods for convex-cardinality problems 
 
-### l_1 methods for convex-cardinality problems, part II (matlab files)
+### \\(l_1\\) methods for convex-cardinality problems, part II 
 
-### Sequential convex programming (matlab files)
+### Sequential convex programming
 
-## Branch-and-bound methods (notes | python files)
+## Branch-and-bound methods 
+
+## References
+
+[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, [Lecture 6](https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf). 
+
+
+

@@ -129,6 +129,41 @@ A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{
 
 <h3 id="matrix-calculus">Matrix Calculus</h3>
 
+<p>Although I don’t know what an “upstream cost function” is or what “back propogation” means, it doesn’t matter:  what you are asking about is definitely a (very) special case of the Chain Rule from Math 51. It is being presented to you in some domain-specific notation that is making it look mysterious, but it is really something you know from Math 51, as I’ll explain below.</p>
+
+<p>For example, in the case of n x n matrices with n = 1  we’ve got a function j(x) of a real variable x and define y = cx for some nonzero number c. Then \(dj/dx = (dj/dy)(dy/dx) = (dj/dy)c\) by a very baby case of the 1-variable Chain Rule — that’s all there is to it when n=1, and the case n &gt; 1 is going to be similar except we have to be careful with the matrix products.  It is going to be an equally special case of the Math 51 Chain Rule (for a linear change of coordinates in n^2 variables, which is so special that it just barely merits being considered by using a general Theorem rather than being proved directly by bare hands).</p>
+
+<p>I assume J is a numerical-valued function of some n x n matrix input.  We regard J as a function of n^2 variables \(x_{11}, x_{12}, \dots , x_{nn}\), so we write it as J(X) where X is a matrix \((x_{ij})\).   For an invertible n x n numerical matrix C, one can consider the linear change of n^2 variables as matrix entries:</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>X</td>
+      <td>—&gt; XC =: Y</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The 2nd formula in your screenshot is just a garbled way of trying to express how the partials of J with respect to the \(x_{ij}\)’s are related to those of J with respect to the y_{ij}’s (generalizing what we saw above in the easy case n = 1).  That is, we want to prove the matrix-product formula</p>
+
+<script type="math/tex; mode=display">(*) DJ/DX = (DJ/DY) C^T</script>
+
+<p>where DJ/DX := matrix of \(x_{ij}\)-partials of J and likewise for DJ/DY.  The formula (*) really is the meaning of the 2nd formula in your screenshot if you think about it (renaming A as Y, and B as X).</p>
+
+<p>For instance, varying across all y_{ij}’s we have by the Chain Rule</p>
+
+<script type="math/tex; mode=display">dJ/dx_{11} = \sum_{ij} (dJ/dy_{ij}) (dy_{ij}/dx_{11})</script>
+
+<p>and since \(y_{ij} = \sum_k x_{ik} c_{kj}\) by the definition Y := XC we see that dy_{ij}/dx_{11} vanishes if i \ne 1 whereas if i = 1 then it is equal to \(c_{1j}\).  Thus,</p>
+
+<script type="math/tex; mode=display">dJ/dx_{11} = \sum_j (dJ/dy_{1j}) c_{1j} = \mbox{ 11-entry of }(DJ/DY) C^T</script>
+
+<p>since the j1-entry of the transpose C^T is \(c_{1j}\).  The same calculation works in the same way with “11” replaced by any “hk (I just did the 11-case to keep the profusion of subscript letters under control), so it gives the entry-by-entry version of (*).</p>
+
+<p>You can derive the 3rd line of the screenshot in a similar manner, or to save time just deduce it directly from the 2nd line by applying transpose to everything in sight (including the initial identity A = BC) using that transpose swaps the order of matrix multiplication.</p>
+
+<p>QED</p>
+
 <h3 id="gram-schmidt">Gram Schmidt</h3>
 
 <h3 id="solving-systems-of-equations">Solving Systems of Equations</h3>

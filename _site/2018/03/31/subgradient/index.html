@@ -88,13 +88,75 @@
 </svg>
  -->
 
-<p>Now that we’ve cover topics from convex optimization in a very shallow manner, it’s time to go deeper.</p>
+<p>Now that we’ve covered topics from convex optimization in a very shallow manner, it’s time to go deeper.</p>
 
 <h2 id="subgradient-methods">Subgradient methods</h2>
 
-<h3 id="subgradients">Subgradients</h3>
+<h3 id="convexity-review">Convexity Review</h3>
+
+<p>To understand subgradients, first we need to review convexity. The Taylor series of a real valued function that is infinitely differentiable at a real number \(x\) is given by</p>
+
+<script type="math/tex; mode=display">f(y) \approx \sum\limits_{k=0}^{\infty} \frac{f^{(k)}(x)}{k!}(y-x)^k</script>
+
+<p>Expanding terms, the series resembles</p>
+
+<script type="math/tex; mode=display">f(y) \approx  f(x) + \frac{f^{\prime}(x)}{1!}(y-x) + \frac{f^{\prime\prime}(x)}{2!}(y-x)^2 + \frac{f^{\prime\prime\prime}(x)}{3!}(y-x)^3 + \cdots.</script>
+
+<p>If a function is convex, its first order Taylor expansion (a tangent line) will always be a global underestimator:</p>
+
+<script type="math/tex; mode=display">f(y) \geq f(x) + \frac{f^{\prime}(x)}{1!}(y-x)</script>
+
+<p>If \(y=x + \delta\), then:</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+f(x+ \delta) \geq f(x) + \nabla f(x)^T (x+\delta-x) \\
+f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
+\end{aligned}</script>
+
+<div align="center">
+<img src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
+</div>
+
+<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).</p>
+
+<p>If \(y&gt;x\), our \(\delta\) is positive, and since the derivative is increasing (which an affine function cannot account for), we always underestimate.</p>
+
+<p>If \(x&gt;y\), our \(\delta\) is negative, and since the …</p>
+
+<h2 id="subgradients">Subgradients</h2>
+
+<p>Consider a function \(f\) with a kink inside of it, rendering the function non-differentiable at a point \(x_2\).</p>
+
+<div align="center">
+<img src="/assets/subgradients.png" width="50%" />
+</div>
+
+<p>The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient.</p>
 
 <h3 id="subgradient-methods-1">Subgradient methods</h3>
+
+<p>From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. Subgradient method is just like gradient descent, but replacing gradients with subgradients. I.e., initialize \(x^{(0)}\), then repeat</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, & k = 1, 2, 3, \cdots
+\end{array} %]]></script>
+
+<p>where \(g^{(k−1)}\) is <strong>any</strong> subgradient of \(f\) at \(x^{(k−1)}\). We keep track of best iterate \(x_{best}^k\)
+ among \(x^{(1)}, \cdots , x^{(k)}\):</p>
+
+<script type="math/tex; mode=display">f(x_{best}^{(k)}) = \underset{i=1,\cdots ,k}{\mbox{ min  }}  f(x^{(i)})</script>
+
+<p>To update each \(x^{(i)}\), there are basically two ways to select the step size:</p>
+<ul>
+  <li>Fixed step size: \(t_k = t\) for all \(k = 1, 2, 3, \cdots \)</li>
+  <li>Diminishing step size: choose \(t_k\) to satisfy</li>
+</ul>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+\sum\limits_{k=1}^{\infty} t_k^2 < \infty , & \sum\limits_{k=1}^{\infty} t_k < \infty 
+\end{array} %]]></script>
 
 <h3 id="subgradient-methods-for-constrained-problems">Subgradient methods for constrained problems</h3>
 
@@ -138,13 +200,18 @@
 
 <h2 id="nonconvex-problems">Nonconvex problems</h2>
 
-<h3 id="l_1-methods-for-convex-cardinality-problems-matlab-files">l_1 methods for convex-cardinality problems (matlab files)</h3>
+<h3 id="l_1-methods-for-convex-cardinality-problems">\(l_1\) methods for convex-cardinality problems</h3>
 
-<h3 id="l_1-methods-for-convex-cardinality-problems-part-ii-matlab-files">l_1 methods for convex-cardinality problems, part II (matlab files)</h3>
+<h3 id="l_1-methods-for-convex-cardinality-problems-part-ii">\(l_1\) methods for convex-cardinality problems, part II</h3>
 
-<h3 id="sequential-convex-programming-matlab-files">Sequential convex programming (matlab files)</h3>
+<h3 id="sequential-convex-programming">Sequential convex programming</h3>
 
-<h2 id="branch-and-bound-methods-notes--python-files">Branch-and-bound methods (notes | python files)</h2>
+<h2 id="branch-and-bound-methods">Branch-and-bound methods</h2>
+
+<h2 id="references">References</h2>
+
+<p>[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, <a href="https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf">Lecture 6</a>.</p>
+
 
   </article>
 
