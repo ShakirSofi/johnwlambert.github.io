@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Subgradient Calculus</title>
+    <title>Subgradient Methods in 20 Minutes</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Notes on Machine Learning and Optimization.">
-    <link rel="canonical" href="http://localhost:4000/2018/03/31/subgradient/">
+    <link rel="canonical" href="http://localhost:4000/2018/04/02/subgradient/">
     <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="John Lambert blog posts" />
 
     <!-- Custom CSS -->
@@ -74,8 +74,8 @@
       <div class="post">
 
   <header class="post-header">
-    <h1>Subgradient Calculus</h1>
-    <p class="meta">Mar 31, 2018</p>
+    <h1>Subgradient Methods in 20 Minutes</h1>
+    <p class="meta">Apr 2, 2018</p>
   </header>
 
   <article class="post-content">
@@ -117,11 +117,23 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 <img src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
 </div>
 
-<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).</p>
+<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).</p>
 
-<p>If \(y&gt;x\), our \(\delta\) is positive, and since the derivative is increasing (which an affine function cannot account for), we always underestimate.</p>
+<div align="center">
+<img src="/assets/tangent_underestimates_4cases.jpg" width="50%" />
+</div>
 
-<p>If \(x&gt;y\), our \(\delta\) is negative, and since the …</p>
+<p>If \(y&gt;x\), then \(\delta &gt; 0\):</p>
+<ul>
+  <li>(Case 1 above) If we are to the right of the stationary point (here global minimum) \(0,0)\) then \(\nabla f&gt;0\), and since the derivative is increasing (which an affine function cannot account for), we never predict a large enough function increase (underestimating).</li>
+  <li>(Case 2 above) If we are to the left of \(0,0)\) then \(\nabla f&lt;0\), we estimate too large of a function decrease (the derivative is increasing). So we underestimate.</li>
+</ul>
+
+<p>-If \(x&gt;y\), our \(\delta &lt; 0\):</p>
+<ul>
+  <li>(Case 3 above) If we are to the right of \(0,0)\), then \(\nabla f&gt;0\). We predict too large of a function decrease and underestimate.</li>
+  <li>(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&lt;0\). We overestimate the function decrease, so we underestimate.</li>
+</ul>
 
 <h2 id="subgradients">Subgradients</h2>
 
@@ -131,7 +143,7 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 <img src="/assets/subgradients.png" width="50%" />
 </div>
 
-<p>The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \(f\) at \(x\) is called the subdifferential \(\partial f(x)\). To determine if a function issubdifferentiable at \(x_0\), we must ask, “is there a global affine lower bound on this function that is tight at this point?”.</p>
+<p>The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \(f\) at \(x\) is called the subdifferential \(\partial f(x)\) (a point-to-set mapping). To determine if a function is subdifferentiable at \(x_0\), we must ask, “is there a global affine lower bound on this function that is tight at this point?”.</p>
 <ul>
   <li>If a function is convex, it has at least one point in the relative interior of the domain.</li>
   <li>If a function is differentiable at \(x\), then \(\partial f(x) = {\nabla f(x)} \) (a singleton set).</li>
@@ -143,32 +155,31 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 <img src="/assets/subdifferential.png" width="50%" />
 </div>
 
-<p>A subdifferential is a point-to-set mapping.</p>
+<h3 id="basic-subgradient-method-negative-subgradient-update">Basic Subgradient Method: Negative Subgradient Update</h3>
 
-<h3 id="subgradient-methods-1">Subgradient methods</h3>
-
-<p>From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. Subgradient method is just like gradient descent, but replacing gradients with subgradients. I.e., initialize \(x^{(0)}\), then repeat</p>
+<p>From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. The subgradient method is just like gradient descent, but replacing gradients with subgradients. i.e., initialize \(x^{(0)}\), then repeat</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{array}{ll}
-x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, & k = 1, 2, 3, \cdots
+x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, & k = 0, 1, 2, 3, \cdots
 \end{array} %]]></script>
 
-<p>where \(g^{(k−1)}\) is <strong>any</strong> subgradient of \(f\) at \(x^{(k−1)}\). We keep track of best iterate \(x_{best}^k\)
- among \(x^{(1)}, \cdots , x^{(k)}\):</p>
+<p>where \(g^{(k)}\) is <strong>any</strong> subgradient of \(f\) at \(x^{(k)}\), and \(\alpha_k &gt;0 \) is the \(k\)’th step size.</p>
+
+<p>Unlike gradient descent, in the negative subgradient update it’s entirely possible that \(-g^{(k)}\) is not a descent direction for \(f\) at \(x^{(k)}\). In such cases, we always have \(f(x^{(k+1)}) &gt; f(x^{(k)})\), meaning an iteration of the subgradient method can increase the objective function. To resolve this issue, we keep track of best iterate \(x_{best}^k\) among \(x^{(1)}, \cdots , x^{(k)}\):</p>
 
 <script type="math/tex; mode=display">f(x_{best}^{(k)}) = \underset{i=1,\cdots ,k}{\mbox{ min  }}  f(x^{(i)})</script>
 
-<p>To update each \(x^{(i)}\), there are basically two ways to select the step size:</p>
+<p>To update each \(x^{(i)}\), there are at least 5 common ways to select the step size, all with different convergence properties:</p>
 <ul>
-  <li>Fixed step size: \(t_k = t\) for all \(k = 1, 2, 3, \cdots \)</li>
-  <li>Diminishing step size: choose \(t_k\) to satisfy</li>
+  <li>Constant step size</li>
+  <li>Constant step length</li>
+  <li>Square summable but not summable.</li>
+  <li>Nonsummable diminishing</li>
+  <li>Nonsummable diminishing step lengths.</li>
 </ul>
 
-<script type="math/tex; mode=display">% <![CDATA[
-\begin{array}{ll}
-\sum\limits_{k=1}^{\infty} t_k^2 < \infty , & \sum\limits_{k=1}^{\infty} t_k < \infty 
-\end{array} %]]></script>
+<p>See <a href="https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf">[2]</a> for details regarding each of these possible step size choices and the <strong>associated guarantees on convergence</strong>.</p>
 
 <h3 id="subgradient-methods-for-constrained-problems">Subgradient methods for constrained problems</h3>
 
@@ -223,6 +234,8 @@ x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, & k = 1, 2, 3, \cdots
 <h2 id="references">References</h2>
 
 <p>[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, <a href="https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf">Lecture 6</a>.</p>
+
+<p>[2] Boyd, Stephen. <a href="https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf">Subgradient Methods: Notes for EE 364B</a>, January 2007.</p>
 
 
   </article>

@@ -5,12 +5,12 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 04 Apr 2018 21:17:37 -0700</pubDate>
-    <lastBuildDate>Wed, 04 Apr 2018 21:17:37 -0700</lastBuildDate>
+    <pubDate>Thu, 05 Apr 2018 03:22:55 -0700</pubDate>
+    <lastBuildDate>Thu, 05 Apr 2018 03:22:55 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
-        <title>Subgradient Calculus</title>
+        <title>Subgradient Methods in 20 Minutes</title>
         <description>&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
@@ -49,11 +49,23 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 &lt;img src=&quot;/assets/tangent_underestimates_quadratic.jpg&quot; width=&quot;25%&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).&lt;/p&gt;
+&lt;p&gt;From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).&lt;/p&gt;
 
-&lt;p&gt;If \(y&amp;gt;x\), our \(\delta\) is positive, and since the derivative is increasing (which an affine function cannot account for), we always underestimate.&lt;/p&gt;
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/tangent_underestimates_4cases.jpg&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
 
-&lt;p&gt;If \(x&amp;gt;y\), our \(\delta\) is negative, and since the …&lt;/p&gt;
+&lt;p&gt;If \(y&amp;gt;x\), then \(\delta &amp;gt; 0\):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;(Case 1 above) If we are to the right of the stationary point (here global minimum) \(0,0)\) then \(\nabla f&amp;gt;0\), and since the derivative is increasing (which an affine function cannot account for), we never predict a large enough function increase (underestimating).&lt;/li&gt;
+  &lt;li&gt;(Case 2 above) If we are to the left of \(0,0)\) then \(\nabla f&amp;lt;0\), we estimate too large of a function decrease (the derivative is increasing). So we underestimate.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;-If \(x&amp;gt;y\), our \(\delta &amp;lt; 0\):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;(Case 3 above) If we are to the right of \(0,0)\), then \(\nabla f&amp;gt;0\). We predict too large of a function decrease and underestimate.&lt;/li&gt;
+  &lt;li&gt;(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&amp;lt;0\). We overestimate the function decrease, so we underestimate.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;subgradients&quot;&gt;Subgradients&lt;/h2&gt;
 
@@ -63,7 +75,7 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 &lt;img src=&quot;/assets/subgradients.png&quot; width=&quot;50%&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \(f\) at \(x\) is called the subdifferential \(\partial f(x)\). To determine if a function issubdifferentiable at \(x_0\), we must ask, “is there a global affine lower bound on this function that is tight at this point?”.&lt;/p&gt;
+&lt;p&gt;The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \(f\) at \(x\) is called the subdifferential \(\partial f(x)\) (a point-to-set mapping). To determine if a function is subdifferentiable at \(x_0\), we must ask, “is there a global affine lower bound on this function that is tight at this point?”.&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;If a function is convex, it has at least one point in the relative interior of the domain.&lt;/li&gt;
   &lt;li&gt;If a function is differentiable at \(x\), then \(\partial f(x) = {\nabla f(x)} \) (a singleton set).&lt;/li&gt;
@@ -75,32 +87,31 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 &lt;img src=&quot;/assets/subdifferential.png&quot; width=&quot;50%&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;A subdifferential is a point-to-set mapping.&lt;/p&gt;
+&lt;h3 id=&quot;basic-subgradient-method-negative-subgradient-update&quot;&gt;Basic Subgradient Method: Negative Subgradient Update&lt;/h3&gt;
 
-&lt;h3 id=&quot;subgradient-methods-1&quot;&gt;Subgradient methods&lt;/h3&gt;
-
-&lt;p&gt;From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. Subgradient method is just like gradient descent, but replacing gradients with subgradients. I.e., initialize \(x^{(0)}\), then repeat&lt;/p&gt;
+&lt;p&gt;From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. The subgradient method is just like gradient descent, but replacing gradients with subgradients. i.e., initialize \(x^{(0)}\), then repeat&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{array}{ll}
-x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, &amp; k = 1, 2, 3, \cdots
+x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 \end{array} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;where \(g^{(k−1)}\) is &lt;strong&gt;any&lt;/strong&gt; subgradient of \(f\) at \(x^{(k−1)}\). We keep track of best iterate \(x_{best}^k\)
- among \(x^{(1)}, \cdots , x^{(k)}\):&lt;/p&gt;
+&lt;p&gt;where \(g^{(k)}\) is &lt;strong&gt;any&lt;/strong&gt; subgradient of \(f\) at \(x^{(k)}\), and \(\alpha_k &amp;gt;0 \) is the \(k\)’th step size.&lt;/p&gt;
+
+&lt;p&gt;Unlike gradient descent, in the negative subgradient update it’s entirely possible that \(-g^{(k)}\) is not a descent direction for \(f\) at \(x^{(k)}\). In such cases, we always have \(f(x^{(k+1)}) &amp;gt; f(x^{(k)})\), meaning an iteration of the subgradient method can increase the objective function. To resolve this issue, we keep track of best iterate \(x_{best}^k\) among \(x^{(1)}, \cdots , x^{(k)}\):&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;f(x_{best}^{(k)}) = \underset{i=1,\cdots ,k}{\mbox{ min  }}  f(x^{(i)})&lt;/script&gt;
 
-&lt;p&gt;To update each \(x^{(i)}\), there are basically two ways to select the step size:&lt;/p&gt;
+&lt;p&gt;To update each \(x^{(i)}\), there are at least 5 common ways to select the step size, all with different convergence properties:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;Fixed step size: \(t_k = t\) for all \(k = 1, 2, 3, \cdots \)&lt;/li&gt;
-  &lt;li&gt;Diminishing step size: choose \(t_k\) to satisfy&lt;/li&gt;
+  &lt;li&gt;Constant step size&lt;/li&gt;
+  &lt;li&gt;Constant step length&lt;/li&gt;
+  &lt;li&gt;Square summable but not summable.&lt;/li&gt;
+  &lt;li&gt;Nonsummable diminishing&lt;/li&gt;
+  &lt;li&gt;Nonsummable diminishing step lengths.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-\sum\limits_{k=1}^{\infty} t_k^2 &lt; \infty , &amp; \sum\limits_{k=1}^{\infty} t_k &lt; \infty 
-\end{array} %]]&gt;&lt;/script&gt;
+&lt;p&gt;See &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;[2]&lt;/a&gt; for details regarding each of these possible step size choices and the &lt;strong&gt;associated guarantees on convergence&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;subgradient-methods-for-constrained-problems&quot;&gt;Subgradient methods for constrained problems&lt;/h3&gt;
 
@@ -156,221 +167,18 @@ x^{(k)} = x^{(k−1)} − t_k \cdot g^{(k−1)}, &amp; k = 1, 2, 3, \cdots
 
 &lt;p&gt;[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf&quot;&gt;Lecture 6&lt;/a&gt;.&lt;/p&gt;
 
+&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;
+
 </description>
-        <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/03/31/subgradient/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/31/subgradient/</guid>
+        <pubDate>Mon, 02 Apr 2018 04:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2018/04/02/subgradient/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/02/subgradient/</guid>
         
         
       </item>
     
       <item>
-        <title>Essential Linear Algebra Overview</title>
-        <description>&lt;!-- 
-&lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
-	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
-	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
-	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;760&quot; y=&quot;30&quot; style=&quot;fill:rgb(77,175,75)&quot; /&gt;
-	&lt;rect width=&quot;10&quot; height=&quot;10&quot; x=&quot;400&quot; y=&quot;60&quot; style=&quot;fill:rgb(225,229,224)&quot; /&gt;
-&lt;/svg&gt;
- --&gt;
-&lt;h3 id=&quot;linear-algebra-definitions&quot;&gt;Linear Algebra Definitions&lt;/h3&gt;
-&lt;p&gt;Before we do anything interesting with machine learning or optimization, we’ll need to review some absolutely &lt;strong&gt;essential&lt;/strong&gt; linear algebra concepts.&lt;/p&gt;
-&lt;h2 id=&quot;matrix-rank&quot;&gt;Matrix Rank&lt;/h2&gt;
-
-&lt;h2 id=&quot;vector-space&quot;&gt;Vector Space&lt;/h2&gt;
-
-&lt;h2 id=&quot;null-space-of-a-matrix&quot;&gt;Null Space of a Matrix&lt;/h2&gt;
-
-&lt;p&gt;Given \(A \in \mathbb{R}^{m \times n}\), the &lt;strong&gt;null space&lt;/strong&gt; of \(A\) is the set of vectors which are sent to the zero vector:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(A) = \{ x \in \mathbb{R}^n \mid Ax = 0 \}&lt;/script&gt;
-
-&lt;p&gt;Multiplication by \(A\) can be seen as a function which sends a vector \(x \in \mathbb{R}^n\) to a vector \(Ax \in \mathbb{R}^m\).&lt;/p&gt;
-
-&lt;p&gt;Of course, \(\mathcal{N}(A)\) always contains the zero vector, i.e. \({0} \in \mathcal{N}(A)\). But the question is, does it contain any other vectors? If the columns of \(A\) are linearly independent, then we can always say \(\mathcal{N}(A) = {0} \).&lt;/p&gt;
-
-&lt;h2 id=&quot;column-space-range-of-a-matrix&quot;&gt;Column Space (Range) of a Matrix&lt;/h2&gt;
-
-&lt;p&gt;Given an \(m \times n\) matrix \(A\), we would like to know for which vectors \(b \in \mathbb{R}^m\) the system \(Ax = b\) has a solution. Let’s define the columns of \(A\) as:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; v_n \\ | &amp; | &amp; &amp; | \end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;The column space of \(A\) is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;C(A) = \mbox{span}(v_1, v_2, \dots, v_n)&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;C(A) = \{ Ax \mid x \in \mathbb{R}^n \}&lt;/script&gt;
-
-&lt;p&gt;The system \(Ax = b\) has a solution &lt;strong&gt;if and only if&lt;/strong&gt; \(b \in C(A)\), equivalent to stating \(b\) is in the range of \(A\): \(b \in R(A)\).&lt;/p&gt;
-
-&lt;h2 id=&quot;rank-nullity-theorem&quot;&gt;Rank-Nullity Theorem&lt;/h2&gt;
-&lt;p&gt;Let \(A\) be any matrix such that \(A \in \mathbb{R}^{m \times n}\).&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{rank}(A) + \mbox{nullity}(A) = n&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n&lt;/script&gt;
-
-&lt;h2 id=&quot;orthogonal-complement&quot;&gt;Orthogonal Complement&lt;/h2&gt;
-
-&lt;h3 id=&quot;matrix-calculus&quot;&gt;Matrix Calculus&lt;/h3&gt;
-
-&lt;p&gt;Although I don’t know what an “upstream cost function” is or what “back propogation” means, it doesn’t matter:  what you are asking about is definitely a (very) special case of the Chain Rule from Math 51. It is being presented to you in some domain-specific notation that is making it look mysterious, but it is really something you know from Math 51, as I’ll explain below.&lt;/p&gt;
-
-&lt;p&gt;For example, in the case of n x n matrices with n = 1  we’ve got a function j(x) of a real variable x and define y = cx for some nonzero number c. Then \(dj/dx = (dj/dy)(dy/dx) = (dj/dy)c\) by a very baby case of the 1-variable Chain Rule — that’s all there is to it when n=1, and the case n &amp;gt; 1 is going to be similar except we have to be careful with the matrix products.  It is going to be an equally special case of the Math 51 Chain Rule (for a linear change of coordinates in n^2 variables, which is so special that it just barely merits being considered by using a general Theorem rather than being proved directly by bare hands).&lt;/p&gt;
-
-&lt;p&gt;I assume J is a numerical-valued function of some n x n matrix input.  We regard J as a function of n^2 variables \(x_{11}, x_{12}, \dots , x_{nn}\), so we write it as J(X) where X is a matrix \((x_{ij})\).   For an invertible n x n numerical matrix C, one can consider the linear change of n^2 variables as matrix entries:&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;X&lt;/td&gt;
-      &lt;td&gt;—&amp;gt; XC =: Y&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;The 2nd formula in your screenshot is just a garbled way of trying to express how the partials of J with respect to the \(x_{ij}\)’s are related to those of J with respect to the y_{ij}’s (generalizing what we saw above in the easy case n = 1).  That is, we want to prove the matrix-product formula&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(*) DJ/DX = (DJ/DY) C^T&lt;/script&gt;
-
-&lt;p&gt;where DJ/DX := matrix of \(x_{ij}\)-partials of J and likewise for DJ/DY.  The formula (*) really is the meaning of the 2nd formula in your screenshot if you think about it (renaming A as Y, and B as X).&lt;/p&gt;
-
-&lt;p&gt;For instance, varying across all y_{ij}’s we have by the Chain Rule&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;dJ/dx_{11} = \sum_{ij} (dJ/dy_{ij}) (dy_{ij}/dx_{11})&lt;/script&gt;
-
-&lt;p&gt;and since \(y_{ij} = \sum_k x_{ik} c_{kj}\) by the definition Y := XC we see that dy_{ij}/dx_{11} vanishes if i \ne 1 whereas if i = 1 then it is equal to \(c_{1j}\).  Thus,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;dJ/dx_{11} = \sum_j (dJ/dy_{1j}) c_{1j} = \mbox{ 11-entry of }(DJ/DY) C^T&lt;/script&gt;
-
-&lt;p&gt;since the j1-entry of the transpose C^T is \(c_{1j}\).  The same calculation works in the same way with “11” replaced by any “hk (I just did the 11-case to keep the profusion of subscript letters under control), so it gives the entry-by-entry version of (*).&lt;/p&gt;
-
-&lt;p&gt;You can derive the 3rd line of the screenshot in a similar manner, or to save time just deduce it directly from the 2nd line by applying transpose to everything in sight (including the initial identity A = BC) using that transpose swaps the order of matrix multiplication.&lt;/p&gt;
-
-&lt;p&gt;QED&lt;/p&gt;
-
-&lt;h3 id=&quot;gram-schmidt&quot;&gt;Gram Schmidt&lt;/h3&gt;
-
-&lt;h3 id=&quot;solving-systems-of-equations&quot;&gt;Solving Systems of Equations&lt;/h3&gt;
-
-&lt;h2 id=&quot;overdetermined-systems&quot;&gt;Overdetermined Systems&lt;/h2&gt;
-&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\begin{array}{ll}
-\mbox{minimize} &amp; J \\
-&amp; \lVert r \rVert^2 \\
- &amp;  \lVert Ax-y \rVert^2 \\
-&amp; (Ax-y)^T (Ax-y) \\
-&amp; (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
-&amp; x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
-\end{array}
-\end{align} %]]&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_x J = 2(A^TA)x - 2A^Ty = 0&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;2(A^TA)x = 2A^Ty&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(A^TA)x = A^Ty&lt;/script&gt;
-
-&lt;p&gt;Multiply on the left by \((A^TA)^{-1}\), and we recover the least squares solution:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y&lt;/script&gt;
-
-&lt;p&gt;We call \(A^{\dagger}\) a &lt;strong&gt;left-inverse&lt;/strong&gt; of \(A\) because \(A^{\dagger}A=I\).&lt;/p&gt;
-
-&lt;h2 id=&quot;underdetermined-systems&quot;&gt;Underdetermined Systems&lt;/h2&gt;
-&lt;p&gt;Here \(A\) is a fat, full-rank matrix. We can &lt;strong&gt;always&lt;/strong&gt; solve such a system, and there will be an infinite # of solutions.&lt;/p&gt;
-
-&lt;p&gt;We often choose to find the smallest solution, i.e. the one closest to the origin. We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y&lt;/script&gt;
-
-&lt;p&gt;We call \(A^{\dagger}\) a right-inverse of \(A\) because \(AA^{\dagger}=I\).&lt;/p&gt;
-
-&lt;h2 id=&quot;singular-value-decomposition-svd&quot;&gt;Singular Value Decomposition (SVD)&lt;/h2&gt;
-
-&lt;h3 id=&quot;svd-definition&quot;&gt;SVD Definition&lt;/h3&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{bmatrix} \sigma_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where \(U\), \(V\) are orthogonal matrices, meaning \(U^TU = I\), \(UU^T=I\).&lt;/p&gt;
-
-&lt;p&gt;We call \(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\) the right/input singular vectors, because this is the first matrix to interact with an input vector \(x\) when we compute \(y=Ax\).&lt;/p&gt;
-
-&lt;p&gt;We call \(U=\begin{bmatrix} u_1, \dots, u_r \end{bmatrix}\) the left/output singular vectors, because this is the last matrix that the intermediate results are multiplied before we obtain our result ( \(y=Ax\) ).&lt;/p&gt;
-
-&lt;h3 id=&quot;computation-of-the-svd&quot;&gt;Computation of the SVD&lt;/h3&gt;
-
-&lt;p&gt;To find this decomposition for a matrix \(A\), we’ll need to compute the \(V\)’s.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^TA = (V\Sigma U^T) (U \Sigma V^T)&lt;/script&gt;
-
-&lt;p&gt;This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(V_i\)’s are simply the eigenvectors of \(A^TA\).&lt;/p&gt;
-
-&lt;p&gt;Now, we’ll need to compute the \(U\)’s.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T&lt;/script&gt;
-
-&lt;p&gt;The \(U_i\)’s are the eigenvectors of \(AA^T\).&lt;/p&gt;
-&lt;h3 id=&quot;svd-applications&quot;&gt;SVD Applications&lt;/h3&gt;
-
-&lt;p&gt;We can use the SVD to compute the general pseudo-inverse of a matrix for \(y=Ax\):&lt;/p&gt;
-
-&lt;p&gt;For skinny/full-rank matrices:&lt;/p&gt;
-
-&lt;h2 id=&quot;extremal-trace-problems&quot;&gt;Extremal Trace Problems&lt;/h2&gt;
-
-&lt;h2 id=&quot;eigenvectors&quot;&gt;Eigenvectors&lt;/h2&gt;
-
-&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
-
-&lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
-
-&lt;p&gt;Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \(\lVert r(x) \rVert^2\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Start from initial guess for your solution&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Repeat:&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;(1) Linearize \(r(x)\) around current guess \(x^{(k)}\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.&lt;/li&gt;
-  &lt;li&gt;(2) Solve least squares for linearized objective, get \(x^{(k+1)}\).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The linearized residual \(r(x)\) will resemble:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})&lt;/script&gt;
-
-&lt;p&gt;where \(Dr\) is the Jacobian, meaning \( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\)&lt;/p&gt;
-
-&lt;p&gt;Distributing the rightmost product, we obtain&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)&lt;/script&gt;
-
-&lt;p&gt;With a single variable \(x\), we can re-write the above equation as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx A^{(k)}x - b^{(k)}&lt;/script&gt;
-
-&lt;h3 id=&quot;levenberg-marquardt-algorithm-trust-region-gauss-newton-method&quot;&gt;Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)&lt;/h3&gt;
-
-</description>
-        <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/03/31/linalg/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/31/linalg/</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Convex Optimization</title>
+        <title>Convex Optimization Without the Agonizing Pain</title>
         <description>&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
@@ -667,9 +475,293 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 &lt;/ol&gt;
 
 </description>
+        <pubDate>Sun, 01 Apr 2018 04:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2018/04/01/cvx/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/01/cvx/</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Linear Algebra Without the Agonizing Pain</title>
+        <description>&lt;!-- 
+&lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
+	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
+	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
+	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;760&quot; y=&quot;30&quot; style=&quot;fill:rgb(77,175,75)&quot; /&gt;
+	&lt;rect width=&quot;10&quot; height=&quot;10&quot; x=&quot;400&quot; y=&quot;60&quot; style=&quot;fill:rgb(225,229,224)&quot; /&gt;
+&lt;/svg&gt;
+ --&gt;
+&lt;h2 id=&quot;linear-algebra-definitions&quot;&gt;Linear Algebra Definitions&lt;/h2&gt;
+&lt;p&gt;Before we do anything interesting with machine learning or optimization, we’ll need to review some absolutely &lt;strong&gt;essential&lt;/strong&gt; linear algebra concepts.&lt;/p&gt;
+&lt;h3 id=&quot;matrix-rank&quot;&gt;Matrix Rank&lt;/h3&gt;
+
+&lt;h3 id=&quot;vector-space&quot;&gt;Vector Space&lt;/h3&gt;
+
+&lt;h3 id=&quot;null-space-of-a-matrix&quot;&gt;Null Space of a Matrix&lt;/h3&gt;
+
+&lt;p&gt;Given \(A \in \mathbb{R}^{m \times n}\), the &lt;strong&gt;null space&lt;/strong&gt; of \(A\) is the set of vectors which are sent to the zero vector:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(A) = \{ x \in \mathbb{R}^n \mid Ax = 0 \}&lt;/script&gt;
+
+&lt;p&gt;Multiplication by \(A\) can be seen as a function which sends a vector \(x \in \mathbb{R}^n\) to a vector \(Ax \in \mathbb{R}^m\).&lt;/p&gt;
+
+&lt;p&gt;Of course, \(\mathcal{N}(A)\) always contains the zero vector, i.e. \({0} \in \mathcal{N}(A)\). But the question is, does it contain any other vectors? If the columns of \(A\) are linearly independent, then we can always say \(\mathcal{N}(A) = {0} \).&lt;/p&gt;
+
+&lt;h3 id=&quot;column-space-range-of-a-matrix&quot;&gt;Column Space (Range) of a Matrix&lt;/h3&gt;
+
+&lt;p&gt;Given an \(m \times n\) matrix \(A\), we would like to know for which vectors \(b \in \mathbb{R}^m\) the system \(Ax = b\) has a solution. Let’s define the columns of \(A\) as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; v_n \\ | &amp; | &amp; &amp; | \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;The column space of \(A\) is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;C(A) = \mbox{span}(v_1, v_2, \dots, v_n)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;C(A) = \{ Ax \mid x \in \mathbb{R}^n \}&lt;/script&gt;
+
+&lt;p&gt;The system \(Ax = b\) has a solution &lt;strong&gt;if and only if&lt;/strong&gt; \(b \in C(A)\), equivalent to stating \(b\) is in the range of \(A\): \(b \in R(A)\).&lt;/p&gt;
+
+&lt;h3 id=&quot;rank-nullity-theorem&quot;&gt;Rank-Nullity Theorem&lt;/h3&gt;
+&lt;p&gt;Let \(A\) be any matrix such that \(A \in \mathbb{R}^{m \times n}\).&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{rank}(A) + \mbox{nullity}(A) = n&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n&lt;/script&gt;
+
+&lt;h3 id=&quot;orthogonal-complement&quot;&gt;Orthogonal Complement&lt;/h3&gt;
+
+&lt;h3 id=&quot;matrix-calculus&quot;&gt;Matrix Calculus&lt;/h3&gt;
+
+&lt;p&gt;Two identities are essential: gradients of matrix-vector products and of quadratic forms.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;\( \nabla_x (Ax) = A^T\)&lt;/li&gt;
+  &lt;li&gt;\(\nabla_x (x^TAx) = Ax + A^Tx\)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When \(A\) is symmetric, which is often the case, \(A = A^T\) and thus \(\nabla_x (x^TAx) = 2Ax \)&lt;/p&gt;
+
+&lt;p&gt;John Duchi explains exactly why identies are true in &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;[1]&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;gram-schmidt&quot;&gt;Gram Schmidt&lt;/h3&gt;
+
+&lt;h2 id=&quot;solving-systems-of-equations&quot;&gt;Solving Systems of Equations&lt;/h2&gt;
+
+&lt;h3 id=&quot;overdetermined-systems&quot;&gt;Overdetermined Systems&lt;/h3&gt;
+&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\begin{array}{ll}
+\mbox{minimize} &amp; J \\
+&amp; \lVert r \rVert^2 \\
+ &amp;  \lVert Ax-y \rVert^2 \\
+&amp; (Ax-y)^T (Ax-y) \\
+&amp; (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
+&amp; x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
+\end{array}
+\end{align} %]]&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_x J = 2(A^TA)x - 2A^Ty = 0&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;2(A^TA)x = 2A^Ty&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(A^TA)x = A^Ty&lt;/script&gt;
+
+&lt;p&gt;Multiply on the left by \((A^TA)^{-1}\), and we recover the least squares solution:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y&lt;/script&gt;
+
+&lt;p&gt;We call \(A^{\dagger}\) a &lt;strong&gt;left-inverse&lt;/strong&gt; of \(A\) because \(A^{\dagger}A=I\).&lt;/p&gt;
+
+&lt;h3 id=&quot;underdetermined-systems&quot;&gt;Underdetermined Systems&lt;/h3&gt;
+&lt;p&gt;Here \(A\) is a fat, full-rank matrix. We can &lt;strong&gt;always&lt;/strong&gt; solve such a system, and there will be an infinite # of solutions.&lt;/p&gt;
+
+&lt;p&gt;We often choose to find the smallest solution, i.e. the one closest to the origin. We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y&lt;/script&gt;
+
+&lt;p&gt;We call \(A^{\dagger}\) a right-inverse of \(A\) because \(AA^{\dagger}=I\).&lt;/p&gt;
+
+&lt;h2 id=&quot;singular-value-decomposition-svd&quot;&gt;Singular Value Decomposition (SVD)&lt;/h2&gt;
+
+&lt;h3 id=&quot;svd-definition&quot;&gt;SVD Definition&lt;/h3&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{bmatrix} \sigma_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where \(U\), \(V\) are orthogonal matrices, meaning \(U^TU = I\), \(UU^T=I\).&lt;/p&gt;
+
+&lt;p&gt;We call \(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\) the right/input singular vectors, because this is the first matrix to interact with an input vector \(x\) when we compute \(y=Ax\).&lt;/p&gt;
+
+&lt;p&gt;We call \(U=\begin{bmatrix} u_1, \dots, u_r \end{bmatrix}\) the left/output singular vectors, because this is the last matrix that the intermediate results are multiplied before we obtain our result ( \(y=Ax\) ).&lt;/p&gt;
+
+&lt;h3 id=&quot;computation-of-the-svd&quot;&gt;Computation of the SVD&lt;/h3&gt;
+
+&lt;p&gt;To find this decomposition for a matrix \(A\), we’ll need to compute the \(V\)’s.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^TA = (V\Sigma U^T) (U \Sigma V^T)&lt;/script&gt;
+
+&lt;p&gt;This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(V_i\)’s are simply the eigenvectors of \(A^TA\).&lt;/p&gt;
+
+&lt;p&gt;Now, we’ll need to compute the \(U\)’s.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T&lt;/script&gt;
+
+&lt;p&gt;The \(U_i\)’s are the eigenvectors of \(AA^T\).&lt;/p&gt;
+&lt;h3 id=&quot;svd-applications&quot;&gt;SVD Applications&lt;/h3&gt;
+
+&lt;p&gt;We can use the SVD to compute the general pseudo-inverse of a matrix for \(y=Ax\):&lt;/p&gt;
+
+&lt;p&gt;For skinny/full-rank matrices:&lt;/p&gt;
+
+&lt;h2 id=&quot;extremal-trace-problems&quot;&gt;Extremal Trace Problems&lt;/h2&gt;
+
+&lt;h2 id=&quot;eigenvectors&quot;&gt;Eigenvectors&lt;/h2&gt;
+
+&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
+
+&lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
+
+&lt;p&gt;Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \(\lVert r(x) \rVert^2\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Start from initial guess for your solution&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Repeat:&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;(1) Linearize \(r(x)\) around current guess \(x^{(k)}\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.&lt;/li&gt;
+  &lt;li&gt;(2) Solve least squares for linearized objective, get \(x^{(k+1)}\).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The linearized residual \(r(x)\) will resemble:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})&lt;/script&gt;
+
+&lt;p&gt;where \(Dr\) is the Jacobian, meaning \( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\)&lt;/p&gt;
+
+&lt;p&gt;Distributing the rightmost product, we obtain&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)&lt;/script&gt;
+
+&lt;p&gt;With a single variable \(x\), we can re-write the above equation as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx A^{(k)}x - b^{(k)}&lt;/script&gt;
+
+&lt;h3 id=&quot;levenberg-marquardt-algorithm-trust-region-gauss-newton-method&quot;&gt;Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)&lt;/h3&gt;
+
+&lt;p&gt;In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (&lt;a href=&quot;https://arxiv.org/abs/1502.05477&quot;&gt;TRPO&lt;/a&gt; is named after the same concept). Thus, we wish 
+&lt;script type=&quot;math/tex&quot;&gt;|| \theta - \theta^{(k)} ||^2&lt;/script&gt;
+ to be small. Our new objective is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;||A^{(k)} \theta - b^{(k)}||^2 + \lambda^{(k)} || \theta − \theta^{(k)}||^2&lt;/script&gt;
+
+&lt;p&gt;This objective can be written inside a single \(\ell_2\)-norm, instead using two separate \(\ell_2\)-norms:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2&lt;/script&gt;
+
+&lt;p&gt;Suppose we have some input data \(x\) and labels \(y\). Our prediction function could be&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{f} = x^T\theta_1 + \theta_2&lt;/script&gt;
+
+&lt;p&gt;Suppose at inference time we use \(f(x) = \mbox{sign }\bigg(\hat{f}(x)\bigg)\), where \(\mbox{sign }(a) = +1\) for \(a \geq 0\) and −1 for \(a &amp;lt; 0\). At training time, we use its smooth approximation, the hyperbolic tangent, tanh:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\phi(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}&lt;/script&gt;
+
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The gradient of \(\mbox{tanh}\): \(\nabla_x \mbox{tanh } = 1-\mbox{tanh }(x)^2\). We call this \(\phi^{\prime}\) in code:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.^&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Suppose our objective function is the MSE loss, with a regularization term:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;J = \sum\limits_{i=1}^{N} \Bigg(y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)\Bigg)^2 + \mu ||\theta_1||^2&lt;/script&gt;
+
+&lt;p&gt;The residual for a single training example \(i\) is \(r_i\) is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)&lt;/script&gt;
+
+&lt;p&gt;For a vector of training examples \(\mathbf{X}\) and labels \(\mathbf{Y}\), our nonlinear residual function is:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To linearize the residual, we compute its Jacobian \(Dr(\theta_1,\theta_2)\) via matrix calculus:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial r_i}{\partial \theta_1} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)x_i^T&lt;/script&gt;
+
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'*theta(1:400)+theta(end))* X(:,i)'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\frac{\partial r_i}{\partial \theta_2} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)&lt;/script&gt;&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The the full Jacobian evaluated at a certain point \(X_i\) is just these stacked individual entries:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Let \(\theta= \begin{bmatrix} \theta_1^T &amp;amp; \theta_2 \end{bmatrix}^T \in \mathbb{R}^{401}\). The linearized residual follows the exact form outlined in the Gauss-Newton section above:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(\theta) \approx A^{(k)}\theta - b^{(k)}&lt;/script&gt;
+
+&lt;p&gt;where&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;b^{(k)} = A^{(k)} \theta^{(k)} - r\bigg(\theta^{(k)}\bigg)&lt;/script&gt;
+
+&lt;p&gt;In code, this term is computed as:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;% computed above&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;b_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We solve a least-squares problem in every iteration, with a 3-part objective function (penalizing the residual, large step sizes, and also large \(\theta_1\)-norm weights):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I_{401} \\ \begin{bmatrix} \sqrt{\mu} I_{400 } &amp; 0\end{bmatrix} \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \\ 0 \end{bmatrix} ||^2. %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;We represent the left term by&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]];&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;and the right term by&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;b_k = [b_k_temp; sqrt(lambda(itr))*theta; zeros(length(theta)-1,1)];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We solve for the next iterate of \(\theta\) with the pseudo-inverse:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;theta_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The full algorithm might resemble:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%regularization coefficient&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial lambda for Levenberg-Marquardt&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;401&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial value for theta (last entry is theta_2)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
+	&lt;span class=&quot;c1&quot;&gt;%calculate Jacobian at the current iteration (see code above)&lt;/span&gt;
+
+	&lt;span class=&quot;c1&quot;&gt;%linearize the objective function (see code above)&lt;/span&gt;
+
+	&lt;span class=&quot;c1&quot;&gt;% stopping condition ...&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;References:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Duchi, John. &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;Properties of the Trace and Matrix Derivatives&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+</description>
         <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/03/31/cvx/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/31/cvx/</guid>
+        <link>http://localhost:4000/2018/03/31/linalg/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/31/linalg/</guid>
         
         
       </item>

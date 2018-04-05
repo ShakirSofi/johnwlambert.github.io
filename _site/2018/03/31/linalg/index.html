@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Essential Linear Algebra Overview</title>
+    <title>Linear Algebra Without the Agonizing Pain</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Notes on Machine Learning and Optimization.">
     <link rel="canonical" href="http://localhost:4000/2018/03/31/linalg/">
@@ -74,7 +74,7 @@
       <div class="post">
 
   <header class="post-header">
-    <h1>Essential Linear Algebra Overview</h1>
+    <h1>Linear Algebra Without the Agonizing Pain</h1>
     <p class="meta">Mar 31, 2018</p>
   </header>
 
@@ -87,13 +87,13 @@
 	<rect width="10" height="10" x="400" y="60" style="fill:rgb(225,229,224)" />
 </svg>
  -->
-<h3 id="linear-algebra-definitions">Linear Algebra Definitions</h3>
+<h2 id="linear-algebra-definitions">Linear Algebra Definitions</h2>
 <p>Before we do anything interesting with machine learning or optimization, we’ll need to review some absolutely <strong>essential</strong> linear algebra concepts.</p>
-<h2 id="matrix-rank">Matrix Rank</h2>
+<h3 id="matrix-rank">Matrix Rank</h3>
 
-<h2 id="vector-space">Vector Space</h2>
+<h3 id="vector-space">Vector Space</h3>
 
-<h2 id="null-space-of-a-matrix">Null Space of a Matrix</h2>
+<h3 id="null-space-of-a-matrix">Null Space of a Matrix</h3>
 
 <p>Given \(A \in \mathbb{R}^{m \times n}\), the <strong>null space</strong> of \(A\) is the set of vectors which are sent to the zero vector:</p>
 
@@ -103,7 +103,7 @@
 
 <p>Of course, \(\mathcal{N}(A)\) always contains the zero vector, i.e. \({0} \in \mathcal{N}(A)\). But the question is, does it contain any other vectors? If the columns of \(A\) are linearly independent, then we can always say \(\mathcal{N}(A) = {0} \).</p>
 
-<h2 id="column-space-range-of-a-matrix">Column Space (Range) of a Matrix</h2>
+<h3 id="column-space-range-of-a-matrix">Column Space (Range) of a Matrix</h3>
 
 <p>Given an \(m \times n\) matrix \(A\), we would like to know for which vectors \(b \in \mathbb{R}^m\) the system \(Ax = b\) has a solution. Let’s define the columns of \(A\) as:</p>
 
@@ -118,57 +118,32 @@ A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{
 
 <p>The system \(Ax = b\) has a solution <strong>if and only if</strong> \(b \in C(A)\), equivalent to stating \(b\) is in the range of \(A\): \(b \in R(A)\).</p>
 
-<h2 id="rank-nullity-theorem">Rank-Nullity Theorem</h2>
+<h3 id="rank-nullity-theorem">Rank-Nullity Theorem</h3>
 <p>Let \(A\) be any matrix such that \(A \in \mathbb{R}^{m \times n}\).</p>
 
 <script type="math/tex; mode=display">\mbox{rank}(A) + \mbox{nullity}(A) = n</script>
 
 <script type="math/tex; mode=display">\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n</script>
 
-<h2 id="orthogonal-complement">Orthogonal Complement</h2>
+<h3 id="orthogonal-complement">Orthogonal Complement</h3>
 
 <h3 id="matrix-calculus">Matrix Calculus</h3>
 
-<p>Although I don’t know what an “upstream cost function” is or what “back propogation” means, it doesn’t matter:  what you are asking about is definitely a (very) special case of the Chain Rule from Math 51. It is being presented to you in some domain-specific notation that is making it look mysterious, but it is really something you know from Math 51, as I’ll explain below.</p>
+<p>Two identities are essential: gradients of matrix-vector products and of quadratic forms.</p>
+<ul>
+  <li>\( \nabla_x (Ax) = A^T\)</li>
+  <li>\(\nabla_x (x^TAx) = Ax + A^Tx\)</li>
+</ul>
 
-<p>For example, in the case of n x n matrices with n = 1  we’ve got a function j(x) of a real variable x and define y = cx for some nonzero number c. Then \(dj/dx = (dj/dy)(dy/dx) = (dj/dy)c\) by a very baby case of the 1-variable Chain Rule — that’s all there is to it when n=1, and the case n &gt; 1 is going to be similar except we have to be careful with the matrix products.  It is going to be an equally special case of the Math 51 Chain Rule (for a linear change of coordinates in n^2 variables, which is so special that it just barely merits being considered by using a general Theorem rather than being proved directly by bare hands).</p>
+<p>When \(A\) is symmetric, which is often the case, \(A = A^T\) and thus \(\nabla_x (x^TAx) = 2Ax \)</p>
 
-<p>I assume J is a numerical-valued function of some n x n matrix input.  We regard J as a function of n^2 variables \(x_{11}, x_{12}, \dots , x_{nn}\), so we write it as J(X) where X is a matrix \((x_{ij})\).   For an invertible n x n numerical matrix C, one can consider the linear change of n^2 variables as matrix entries:</p>
-
-<table>
-  <tbody>
-    <tr>
-      <td>X</td>
-      <td>—&gt; XC =: Y</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>The 2nd formula in your screenshot is just a garbled way of trying to express how the partials of J with respect to the \(x_{ij}\)’s are related to those of J with respect to the y_{ij}’s (generalizing what we saw above in the easy case n = 1).  That is, we want to prove the matrix-product formula</p>
-
-<script type="math/tex; mode=display">(*) DJ/DX = (DJ/DY) C^T</script>
-
-<p>where DJ/DX := matrix of \(x_{ij}\)-partials of J and likewise for DJ/DY.  The formula (*) really is the meaning of the 2nd formula in your screenshot if you think about it (renaming A as Y, and B as X).</p>
-
-<p>For instance, varying across all y_{ij}’s we have by the Chain Rule</p>
-
-<script type="math/tex; mode=display">dJ/dx_{11} = \sum_{ij} (dJ/dy_{ij}) (dy_{ij}/dx_{11})</script>
-
-<p>and since \(y_{ij} = \sum_k x_{ik} c_{kj}\) by the definition Y := XC we see that dy_{ij}/dx_{11} vanishes if i \ne 1 whereas if i = 1 then it is equal to \(c_{1j}\).  Thus,</p>
-
-<script type="math/tex; mode=display">dJ/dx_{11} = \sum_j (dJ/dy_{1j}) c_{1j} = \mbox{ 11-entry of }(DJ/DY) C^T</script>
-
-<p>since the j1-entry of the transpose C^T is \(c_{1j}\).  The same calculation works in the same way with “11” replaced by any “hk (I just did the 11-case to keep the profusion of subscript letters under control), so it gives the entry-by-entry version of (*).</p>
-
-<p>You can derive the 3rd line of the screenshot in a similar manner, or to save time just deduce it directly from the 2nd line by applying transpose to everything in sight (including the initial identity A = BC) using that transpose swaps the order of matrix multiplication.</p>
-
-<p>QED</p>
+<p>John Duchi explains exactly why identies are true in <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">[1]</a>.</p>
 
 <h3 id="gram-schmidt">Gram Schmidt</h3>
 
-<h3 id="solving-systems-of-equations">Solving Systems of Equations</h3>
+<h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
 
-<h2 id="overdetermined-systems">Overdetermined Systems</h2>
+<h3 id="overdetermined-systems">Overdetermined Systems</h3>
 <p>Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):
 <script type="math/tex">% <![CDATA[
 \begin{align}
@@ -196,7 +171,7 @@ A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{
 
 <p>We call \(A^{\dagger}\) a <strong>left-inverse</strong> of \(A\) because \(A^{\dagger}A=I\).</p>
 
-<h2 id="underdetermined-systems">Underdetermined Systems</h2>
+<h3 id="underdetermined-systems">Underdetermined Systems</h3>
 <p>Here \(A\) is a fat, full-rank matrix. We can <strong>always</strong> solve such a system, and there will be an infinite # of solutions.</p>
 
 <p>We often choose to find the smallest solution, i.e. the one closest to the origin. We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):</p>
@@ -273,6 +248,110 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} 
 <script type="math/tex; mode=display">r(x) \approx A^{(k)}x - b^{(k)}</script>
 
 <h3 id="levenberg-marquardt-algorithm-trust-region-gauss-newton-method">Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)</h3>
+
+<p>In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (<a href="https://arxiv.org/abs/1502.05477">TRPO</a> is named after the same concept). Thus, we wish 
+<script type="math/tex">|| \theta - \theta^{(k)} ||^2</script>
+ to be small. Our new objective is:</p>
+
+<script type="math/tex; mode=display">||A^{(k)} \theta - b^{(k)}||^2 + \lambda^{(k)} || \theta − \theta^{(k)}||^2</script>
+
+<p>This objective can be written inside a single \(\ell_2\)-norm, instead using two separate \(\ell_2\)-norms:</p>
+
+<script type="math/tex; mode=display">|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2</script>
+
+<p>Suppose we have some input data \(x\) and labels \(y\). Our prediction function could be</p>
+
+<script type="math/tex; mode=display">\hat{f} = x^T\theta_1 + \theta_2</script>
+
+<p>Suppose at inference time we use \(f(x) = \mbox{sign }\bigg(\hat{f}(x)\bigg)\), where \(\mbox{sign }(a) = +1\) for \(a \geq 0\) and −1 for \(a &lt; 0\). At training time, we use its smooth approximation, the hyperbolic tangent, tanh:</p>
+
+<script type="math/tex; mode=display">\phi(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}</script>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">phi</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="p">/(</span><span class="nb">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>The gradient of \(\mbox{tanh}\): \(\nabla_x \mbox{tanh } = 1-\mbox{tanh }(x)^2\). We call this \(\phi^{\prime}\) in code:</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">phiprime</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">phi</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Suppose our objective function is the MSE loss, with a regularization term:</p>
+
+<script type="math/tex; mode=display">J = \sum\limits_{i=1}^{N} \Bigg(y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)\Bigg)^2 + \mu ||\theta_1||^2</script>
+
+<p>The residual for a single training example \(i\) is \(r_i\) is</p>
+
+<script type="math/tex; mode=display">y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)</script>
+
+<p>For a vector of training examples \(\mathbf{X}\) and labels \(\mathbf{Y}\), our nonlinear residual function is:</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">r</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)</span> <span class="n">y</span><span class="o">-</span><span class="n">phi</span><span class="p">(</span><span class="n">x</span><span class="o">'*</span><span class="n">t1</span><span class="o">+</span><span class="n">t2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>To linearize the residual, we compute its Jacobian \(Dr(\theta_1,\theta_2)\) via matrix calculus:</p>
+
+<script type="math/tex; mode=display">\frac{\partial r_i}{\partial \theta_1} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)x_i^T</script>
+
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">jacobian_0_entr</span> <span class="o">=</span> <span class="o">-</span><span class="n">phiprime</span><span class="p">(</span><span class="n">X</span><span class="p">(:,</span><span class="nb">i</span><span class="p">)</span><span class="s1">'*theta(1:400)+theta(end))* X(:,i)'</span>
+</code></pre></div></div>
+
+<p><script type="math/tex">\frac{\partial r_i}{\partial \theta_2} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)</script></p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">jacobian_1_entr</span> <span class="o">=</span> <span class="o">-</span><span class="n">phiprime</span><span class="p">(</span><span class="n">X</span><span class="p">(:,</span><span class="nb">i</span><span class="p">)</span><span class="o">'*</span><span class="n">theta</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">400</span><span class="p">)</span><span class="o">+</span><span class="n">theta</span><span class="p">(</span><span class="k">end</span><span class="p">))</span>
+</code></pre></div></div>
+<p>The the full Jacobian evaluated at a certain point \(X_i\) is just these stacked individual entries:</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Dr</span> <span class="o">=</span> <span class="nb">zeros</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">labels_train</span><span class="p">),</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">));</span>
+<span class="k">for</span> <span class="nb">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">labels_train</span><span class="p">)</span>
+	<span class="n">Dr</span><span class="p">(</span><span class="nb">i</span><span class="p">,:)</span> <span class="o">=</span> <span class="p">[</span><span class="n">jacobian_0_entr</span><span class="p">,</span> <span class="n">jacobian_1_entr</span><span class="p">];</span>
+<span class="k">end</span>
+</code></pre></div></div>
+<p>Let \(\theta= \begin{bmatrix} \theta_1^T &amp; \theta_2 \end{bmatrix}^T \in \mathbb{R}^{401}\). The linearized residual follows the exact form outlined in the Gauss-Newton section above:</p>
+
+<script type="math/tex; mode=display">r(\theta) \approx A^{(k)}\theta - b^{(k)}</script>
+
+<p>where</p>
+
+<script type="math/tex; mode=display">b^{(k)} = A^{(k)} \theta^{(k)} - r\bigg(\theta^{(k)}\bigg)</script>
+
+<p>In code, this term is computed as:</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">A_k_temp</span> <span class="o">=</span> <span class="n">Dr</span><span class="p">;</span> <span class="c1">% computed above</span>
+<span class="n">b_k_temp</span> <span class="o">=</span> <span class="n">Dr</span><span class="o">*</span><span class="n">theta</span> <span class="o">-</span> <span class="n">r</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span><span class="n">theta</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">400</span><span class="p">),</span><span class="n">theta</span><span class="p">(</span><span class="k">end</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>We solve a least-squares problem in every iteration, with a 3-part objective function (penalizing the residual, large step sizes, and also large \(\theta_1\)-norm weights):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I_{401} \\ \begin{bmatrix} \sqrt{\mu} I_{400 } & 0\end{bmatrix} \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \\ 0 \end{bmatrix} ||^2. %]]></script>
+
+<p>We represent the left term by</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">A_k</span> <span class="o">=</span> <span class="p">[</span><span class="n">A_k_temp</span><span class="p">;</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">lambda</span><span class="p">(</span><span class="n">itr</span><span class="p">))</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">));</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="o">*</span><span class="p">[</span><span class="nb">eye</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="nb">zeros</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)]];</span>
+</code></pre></div></div>
+<p>and the right term by</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b_k = [b_k_temp; sqrt(lambda(itr))*theta; zeros(length(theta)-1,1)];
+</code></pre></div></div>
+
+<p>We solve for the next iterate of \(\theta\) with the pseudo-inverse:</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theta_temp</span> <span class="o">=</span> <span class="n">A_k</span><span class="p">\</span><span class="n">b_k</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The full algorithm might resemble:</p>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mu</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c1">%regularization coefficient</span>
+<span class="n">lambda</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">%initial lambda for Levenberg-Marquardt</span>
+
+<span class="n">theta</span> <span class="o">=</span> <span class="nb">ones</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="c1">%initial value for theta (last entry is theta_2)</span>
+
+<span class="k">for</span> <span class="n">itr</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="mi">15</span>
+	<span class="c1">%calculate Jacobian at the current iteration (see code above)</span>
+
+	<span class="c1">%linearize the objective function (see code above)</span>
+
+	<span class="c1">% stopping condition ...</span>
+<span class="k">end</span>
+
+</code></pre></div></div>
+
+<p>References:</p>
+
+<ol>
+  <li>Duchi, John. <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">Properties of the Trace and Matrix Derivatives</a>.</li>
+</ol>
 
 
   </article>
