@@ -7,7 +7,7 @@
     <title>Linear Algebra Without the Agonizing Pain</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Notes on Machine Learning and Optimization.">
-    <link rel="canonical" href="http://localhost:4000/2018/03/31/linalg/">
+    <link rel="canonical" href="http://localhost:4000/2018/03/30/linalg/">
     <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="John Lambert blog posts" />
 
     <!-- Custom CSS -->
@@ -60,8 +60,6 @@
         
           
         
-          <a class="page-link" href="/neuralnets/">Hacker's guide to Neural Networks</a>
-        
       </div>
     </nav>
   </div>
@@ -75,7 +73,7 @@
 
   <header class="post-header">
     <h1>Linear Algebra Without the Agonizing Pain</h1>
-    <p class="meta">Mar 31, 2018</p>
+    <p class="meta">Mar 30, 2018</p>
   </header>
 
   <article class="post-content">
@@ -215,137 +213,6 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} 
 <h2 id="extremal-trace-problems">Extremal Trace Problems</h2>
 
 <h2 id="eigenvectors">Eigenvectors</h2>
-
-<h2 id="unconstrained-optimization">Unconstrained Optimization</h2>
-
-<h3 id="the-gauss-newton-method">The Gauss-Newton Method</h3>
-
-<p>Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \(\lVert r(x) \rVert^2\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.</p>
-
-<ul>
-  <li>
-    <p>Start from initial guess for your solution</p>
-  </li>
-  <li>
-    <p>Repeat:</p>
-  </li>
-  <li>(1) Linearize \(r(x)\) around current guess \(x^{(k)}\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.</li>
-  <li>(2) Solve least squares for linearized objective, get \(x^{(k+1)}\).</li>
-</ul>
-
-<p>The linearized residual \(r(x)\) will resemble:</p>
-
-<script type="math/tex; mode=display">r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})</script>
-
-<p>where \(Dr\) is the Jacobian, meaning \( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\)</p>
-
-<p>Distributing the rightmost product, we obtain</p>
-
-<script type="math/tex; mode=display">r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)</script>
-
-<p>With a single variable \(x\), we can re-write the above equation as</p>
-
-<script type="math/tex; mode=display">r(x) \approx A^{(k)}x - b^{(k)}</script>
-
-<h3 id="levenberg-marquardt-algorithm-trust-region-gauss-newton-method">Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)</h3>
-
-<p>In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (<a href="https://arxiv.org/abs/1502.05477">TRPO</a> is named after the same concept). Thus, we wish 
-<script type="math/tex">|| \theta - \theta^{(k)} ||^2</script>
- to be small. Our new objective is:</p>
-
-<script type="math/tex; mode=display">||A^{(k)} \theta - b^{(k)}||^2 + \lambda^{(k)} || \theta − \theta^{(k)}||^2</script>
-
-<p>This objective can be written inside a single \(\ell_2\)-norm, instead using two separate \(\ell_2\)-norms:</p>
-
-<script type="math/tex; mode=display">|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2</script>
-
-<p>Suppose we have some input data \(x\) and labels \(y\). Our prediction function could be</p>
-
-<script type="math/tex; mode=display">\hat{f} = x^T\theta_1 + \theta_2</script>
-
-<p>Suppose at inference time we use \(f(x) = \mbox{sign }\bigg(\hat{f}(x)\bigg)\), where \(\mbox{sign }(a) = +1\) for \(a \geq 0\) and −1 for \(a &lt; 0\). At training time, we use its smooth approximation, the hyperbolic tangent, tanh:</p>
-
-<script type="math/tex; mode=display">\phi(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}</script>
-
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">phi</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="p">/(</span><span class="nb">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">));</span>
-</code></pre></div></div>
-
-<p>The gradient of \(\mbox{tanh}\): \(\nabla_x \mbox{tanh } = 1-\mbox{tanh }(x)^2\). We call this \(\phi^{\prime}\) in code:</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">phiprime</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">phi</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>Suppose our objective function is the MSE loss, with a regularization term:</p>
-
-<script type="math/tex; mode=display">J = \sum\limits_{i=1}^{N} \Bigg(y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)\Bigg)^2 + \mu ||\theta_1||^2</script>
-
-<p>The residual for a single training example \(i\) is \(r_i\) is</p>
-
-<script type="math/tex; mode=display">y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)</script>
-
-<p>For a vector of training examples \(\mathbf{X}\) and labels \(\mathbf{Y}\), our nonlinear residual function is:</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">r</span> <span class="o">=</span> <span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">t1</span><span class="p">,</span><span class="n">t2</span><span class="p">)</span> <span class="n">y</span><span class="o">-</span><span class="n">phi</span><span class="p">(</span><span class="n">x</span><span class="o">'*</span><span class="n">t1</span><span class="o">+</span><span class="n">t2</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>To linearize the residual, we compute its Jacobian \(Dr(\theta_1,\theta_2)\) via matrix calculus:</p>
-
-<script type="math/tex; mode=display">\frac{\partial r_i}{\partial \theta_1} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)x_i^T</script>
-
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">jacobian_0_entr</span> <span class="o">=</span> <span class="o">-</span><span class="n">phiprime</span><span class="p">(</span><span class="n">X</span><span class="p">(:,</span><span class="nb">i</span><span class="p">)</span><span class="s1">'*theta(1:400)+theta(end))* X(:,i)'</span>
-</code></pre></div></div>
-
-<p><script type="math/tex">\frac{\partial r_i}{\partial \theta_2} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)</script></p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">jacobian_1_entr</span> <span class="o">=</span> <span class="o">-</span><span class="n">phiprime</span><span class="p">(</span><span class="n">X</span><span class="p">(:,</span><span class="nb">i</span><span class="p">)</span><span class="o">'*</span><span class="n">theta</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">400</span><span class="p">)</span><span class="o">+</span><span class="n">theta</span><span class="p">(</span><span class="k">end</span><span class="p">))</span>
-</code></pre></div></div>
-<p>The the full Jacobian evaluated at a certain point \(X_i\) is just these stacked individual entries:</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Dr</span> <span class="o">=</span> <span class="nb">zeros</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">labels_train</span><span class="p">),</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">));</span>
-<span class="k">for</span> <span class="nb">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">labels_train</span><span class="p">)</span>
-	<span class="n">Dr</span><span class="p">(</span><span class="nb">i</span><span class="p">,:)</span> <span class="o">=</span> <span class="p">[</span><span class="n">jacobian_0_entr</span><span class="p">,</span> <span class="n">jacobian_1_entr</span><span class="p">];</span>
-<span class="k">end</span>
-</code></pre></div></div>
-<p>Let \(\theta= \begin{bmatrix} \theta_1^T &amp; \theta_2 \end{bmatrix}^T \in \mathbb{R}^{401}\). The linearized residual follows the exact form outlined in the Gauss-Newton section above:</p>
-
-<script type="math/tex; mode=display">r(\theta) \approx A^{(k)}\theta - b^{(k)}</script>
-
-<p>where</p>
-
-<script type="math/tex; mode=display">b^{(k)} = A^{(k)} \theta^{(k)} - r\bigg(\theta^{(k)}\bigg)</script>
-
-<p>In code, this term is computed as:</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">A_k_temp</span> <span class="o">=</span> <span class="n">Dr</span><span class="p">;</span> <span class="c1">% computed above</span>
-<span class="n">b_k_temp</span> <span class="o">=</span> <span class="n">Dr</span><span class="o">*</span><span class="n">theta</span> <span class="o">-</span> <span class="n">r</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span><span class="n">theta</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">400</span><span class="p">),</span><span class="n">theta</span><span class="p">(</span><span class="k">end</span><span class="p">));</span>
-</code></pre></div></div>
-
-<p>We solve a least-squares problem in every iteration, with a 3-part objective function (penalizing the residual, large step sizes, and also large \(\theta_1\)-norm weights):</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I_{401} \\ \begin{bmatrix} \sqrt{\mu} I_{400 } & 0\end{bmatrix} \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \\ 0 \end{bmatrix} ||^2. %]]></script>
-
-<p>We represent the left term by</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">A_k</span> <span class="o">=</span> <span class="p">[</span><span class="n">A_k_temp</span><span class="p">;</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">lambda</span><span class="p">(</span><span class="n">itr</span><span class="p">))</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">));</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="o">*</span><span class="p">[</span><span class="nb">eye</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="nb">zeros</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)]];</span>
-</code></pre></div></div>
-<p>and the right term by</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b_k = [b_k_temp; sqrt(lambda(itr))*theta; zeros(length(theta)-1,1)];
-</code></pre></div></div>
-
-<p>We solve for the next iterate of \(\theta\) with the pseudo-inverse:</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theta_temp</span> <span class="o">=</span> <span class="n">A_k</span><span class="p">\</span><span class="n">b_k</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>The full algorithm might resemble:</p>
-<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mu</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="c1">%regularization coefficient</span>
-<span class="n">lambda</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">%initial lambda for Levenberg-Marquardt</span>
-
-<span class="n">theta</span> <span class="o">=</span> <span class="nb">ones</span><span class="p">(</span><span class="mi">401</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span> <span class="c1">%initial value for theta (last entry is theta_2)</span>
-
-<span class="k">for</span> <span class="n">itr</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="mi">15</span>
-	<span class="c1">%calculate Jacobian at the current iteration (see code above)</span>
-
-	<span class="c1">%linearize the objective function (see code above)</span>
-
-	<span class="c1">% stopping condition ...</span>
-<span class="k">end</span>
-
-</code></pre></div></div>
 
 <p>References:</p>
 

@@ -5,12 +5,12 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 05 Apr 2018 03:22:55 -0700</pubDate>
-    <lastBuildDate>Thu, 05 Apr 2018 03:22:55 -0700</lastBuildDate>
+    <pubDate>Thu, 05 Apr 2018 03:33:32 -0700</pubDate>
+    <lastBuildDate>Thu, 05 Apr 2018 03:33:32 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
-        <title>Subgradient Methods in 20 Minutes</title>
+        <title>Subgradient Methods in 10 Minutes</title>
         <description>&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
@@ -483,6 +483,146 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
       </item>
     
       <item>
+        <title>Gauss-Newton Optimization in 10 Minutes</title>
+        <description>&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
+
+&lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
+
+&lt;p&gt;Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \(\lVert r(x) \rVert^2\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Start from initial guess for your solution&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Repeat:&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;(1) Linearize \(r(x)\) around current guess \(x^{(k)}\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.&lt;/li&gt;
+  &lt;li&gt;(2) Solve least squares for linearized objective, get \(x^{(k+1)}\).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The linearized residual \(r(x)\) will resemble:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})&lt;/script&gt;
+
+&lt;p&gt;where \(Dr\) is the Jacobian, meaning \( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\)&lt;/p&gt;
+
+&lt;p&gt;Distributing the rightmost product, we obtain&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)&lt;/script&gt;
+
+&lt;p&gt;With a single variable \(x\), we can re-write the above equation as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx A^{(k)}x - b^{(k)}&lt;/script&gt;
+
+&lt;h3 id=&quot;levenberg-marquardt-algorithm-trust-region-gauss-newton-method&quot;&gt;Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)&lt;/h3&gt;
+
+&lt;p&gt;In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (&lt;a href=&quot;https://arxiv.org/abs/1502.05477&quot;&gt;TRPO&lt;/a&gt; is named after the same concept). Thus, we wish 
+&lt;script type=&quot;math/tex&quot;&gt;|| \theta - \theta^{(k)} ||^2&lt;/script&gt;
+ to be small. Our new objective is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;||A^{(k)} \theta - b^{(k)}||^2 + \lambda^{(k)} || \theta − \theta^{(k)}||^2&lt;/script&gt;
+
+&lt;p&gt;This objective can be written inside a single \(\ell_2\)-norm, instead using two separate \(\ell_2\)-norms:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2&lt;/script&gt;
+
+&lt;p&gt;Suppose we have some input data \(x\) and labels \(y\). Our prediction function could be&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{f} = x^T\theta_1 + \theta_2&lt;/script&gt;
+
+&lt;p&gt;Suppose at inference time we use \(f(x) = \mbox{sign }\bigg(\hat{f}(x)\bigg)\), where \(\mbox{sign }(a) = +1\) for \(a \geq 0\) and −1 for \(a &amp;lt; 0\). At training time, we use its smooth (and differentiable) approximation, the hyperbolic tangent, tanh:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\phi(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}&lt;/script&gt;
+
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The gradient of \(\mbox{tanh}\): \(\nabla_x \mbox{tanh } = 1-\mbox{tanh }(x)^2\). We call this \(\phi^{\prime}\) in code:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.^&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Suppose our objective function is the MSE loss, with a regularization term:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;J = \sum\limits_{i=1}^{N} \Bigg(y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)\Bigg)^2 + \mu ||\theta_1||^2&lt;/script&gt;
+
+&lt;p&gt;The residual for a single training example \(i\) is \(r_i\) is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)&lt;/script&gt;
+
+&lt;p&gt;For a vector of training examples \(\mathbf{X}\) and labels \(\mathbf{Y}\), our nonlinear residual function is:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To linearize the residual, we compute its Jacobian \(Dr(\theta_1,\theta_2)\) via matrix calculus:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial r_i}{\partial \theta_1} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)x_i^T&lt;/script&gt;
+
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'*theta(1:400)+theta(end))* X(:,i)'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\frac{\partial r_i}{\partial \theta_2} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)&lt;/script&gt;&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The the full Jacobian evaluated at a certain point \(X_i\) is just these stacked individual entries:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Let \(\theta= \begin{bmatrix} \theta_1^T &amp;amp; \theta_2 \end{bmatrix}^T \in \mathbb{R}^{401}\). The linearized residual follows the exact form outlined in the Gauss-Newton section above:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(\theta) \approx A^{(k)}\theta - b^{(k)}&lt;/script&gt;
+
+&lt;p&gt;where&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;b^{(k)} = A^{(k)} \theta^{(k)} - r\bigg(\theta^{(k)}\bigg)&lt;/script&gt;
+
+&lt;p&gt;In code, this term is computed as:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;% computed above&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;b_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We solve a least-squares problem in every iteration, with a 3-part objective function (penalizing the residual, large step sizes, and also large \(\theta_1\)-norm weights):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I_{401} \\ \begin{bmatrix} \sqrt{\mu} I_{400 } &amp; 0\end{bmatrix} \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \\ 0 \end{bmatrix} ||^2. %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;We represent the left term by&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]];&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;and the right term by&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;b_k = [b_k_temp; sqrt(lambda(itr))*theta; zeros(length(theta)-1,1)];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We solve for the next iterate of \(\theta\) with the pseudo-inverse:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;theta_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The full algorithm might resemble:&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%regularization coefficient&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial lambda for Levenberg-Marquardt&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;401&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial value for theta (last entry is theta_2)&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
+	&lt;span class=&quot;c1&quot;&gt;%calculate Jacobian at the current iteration (see code above)&lt;/span&gt;
+
+	&lt;span class=&quot;c1&quot;&gt;%linearize the objective function (see code above)&lt;/span&gt;
+
+	&lt;span class=&quot;c1&quot;&gt;% stopping condition ...&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2018/03/31/gaussnewton/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/31/gaussnewton/</guid>
+        
+        
+      </item>
+    
+      <item>
         <title>Linear Algebra Without the Agonizing Pain</title>
         <description>&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
@@ -621,137 +761,6 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{b
 
 &lt;h2 id=&quot;eigenvectors&quot;&gt;Eigenvectors&lt;/h2&gt;
 
-&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
-
-&lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
-
-&lt;p&gt;Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \(\lVert r(x) \rVert^2\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Start from initial guess for your solution&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Repeat:&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;(1) Linearize \(r(x)\) around current guess \(x^{(k)}\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.&lt;/li&gt;
-  &lt;li&gt;(2) Solve least squares for linearized objective, get \(x^{(k+1)}\).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The linearized residual \(r(x)\) will resemble:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})&lt;/script&gt;
-
-&lt;p&gt;where \(Dr\) is the Jacobian, meaning \( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\)&lt;/p&gt;
-
-&lt;p&gt;Distributing the rightmost product, we obtain&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)&lt;/script&gt;
-
-&lt;p&gt;With a single variable \(x\), we can re-write the above equation as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx A^{(k)}x - b^{(k)}&lt;/script&gt;
-
-&lt;h3 id=&quot;levenberg-marquardt-algorithm-trust-region-gauss-newton-method&quot;&gt;Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)&lt;/h3&gt;
-
-&lt;p&gt;In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (&lt;a href=&quot;https://arxiv.org/abs/1502.05477&quot;&gt;TRPO&lt;/a&gt; is named after the same concept). Thus, we wish 
-&lt;script type=&quot;math/tex&quot;&gt;|| \theta - \theta^{(k)} ||^2&lt;/script&gt;
- to be small. Our new objective is:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;||A^{(k)} \theta - b^{(k)}||^2 + \lambda^{(k)} || \theta − \theta^{(k)}||^2&lt;/script&gt;
-
-&lt;p&gt;This objective can be written inside a single \(\ell_2\)-norm, instead using two separate \(\ell_2\)-norms:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2&lt;/script&gt;
-
-&lt;p&gt;Suppose we have some input data \(x\) and labels \(y\). Our prediction function could be&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{f} = x^T\theta_1 + \theta_2&lt;/script&gt;
-
-&lt;p&gt;Suppose at inference time we use \(f(x) = \mbox{sign }\bigg(\hat{f}(x)\bigg)\), where \(\mbox{sign }(a) = +1\) for \(a \geq 0\) and −1 for \(a &amp;lt; 0\). At training time, we use its smooth approximation, the hyperbolic tangent, tanh:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\phi(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}&lt;/script&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The gradient of \(\mbox{tanh}\): \(\nabla_x \mbox{tanh } = 1-\mbox{tanh }(x)^2\). We call this \(\phi^{\prime}\) in code:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.^&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Suppose our objective function is the MSE loss, with a regularization term:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;J = \sum\limits_{i=1}^{N} \Bigg(y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)\Bigg)^2 + \mu ||\theta_1||^2&lt;/script&gt;
-
-&lt;p&gt;The residual for a single training example \(i\) is \(r_i\) is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)&lt;/script&gt;
-
-&lt;p&gt;For a vector of training examples \(\mathbf{X}\) and labels \(\mathbf{Y}\), our nonlinear residual function is:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To linearize the residual, we compute its Jacobian \(Dr(\theta_1,\theta_2)\) via matrix calculus:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial r_i}{\partial \theta_1} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)x_i^T&lt;/script&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'*theta(1:400)+theta(end))* X(:,i)'&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\frac{\partial r_i}{\partial \theta_2} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)&lt;/script&gt;&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;The the full Jacobian evaluated at a certain point \(X_i\) is just these stacked individual entries:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Let \(\theta= \begin{bmatrix} \theta_1^T &amp;amp; \theta_2 \end{bmatrix}^T \in \mathbb{R}^{401}\). The linearized residual follows the exact form outlined in the Gauss-Newton section above:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(\theta) \approx A^{(k)}\theta - b^{(k)}&lt;/script&gt;
-
-&lt;p&gt;where&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;b^{(k)} = A^{(k)} \theta^{(k)} - r\bigg(\theta^{(k)}\bigg)&lt;/script&gt;
-
-&lt;p&gt;In code, this term is computed as:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;% computed above&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;b_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;We solve a least-squares problem in every iteration, with a 3-part objective function (penalizing the residual, large step sizes, and also large \(\theta_1\)-norm weights):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I_{401} \\ \begin{bmatrix} \sqrt{\mu} I_{400 } &amp; 0\end{bmatrix} \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \\ 0 \end{bmatrix} ||^2. %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;We represent the left term by&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]];&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;and the right term by&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;b_k = [b_k_temp; sqrt(lambda(itr))*theta; zeros(length(theta)-1,1)];
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;We solve for the next iterate of \(\theta\) with the pseudo-inverse:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;theta_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The full algorithm might resemble:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%regularization coefficient&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial lambda for Levenberg-Marquardt&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;401&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial value for theta (last entry is theta_2)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
-	&lt;span class=&quot;c1&quot;&gt;%calculate Jacobian at the current iteration (see code above)&lt;/span&gt;
-
-	&lt;span class=&quot;c1&quot;&gt;%linearize the objective function (see code above)&lt;/span&gt;
-
-	&lt;span class=&quot;c1&quot;&gt;% stopping condition ...&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
 &lt;p&gt;References:&lt;/p&gt;
 
 &lt;ol&gt;
@@ -759,9 +768,9 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{b
 &lt;/ol&gt;
 
 </description>
-        <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/03/31/linalg/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/31/linalg/</guid>
+        <pubDate>Fri, 30 Mar 2018 04:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2018/03/30/linalg/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/30/linalg/</guid>
         
         
       </item>

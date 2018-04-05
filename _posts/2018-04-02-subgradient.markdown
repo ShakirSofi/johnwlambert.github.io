@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "Subgradient Methods in 20 Minutes"
+title:  "Subgradient Methods in 10 Minutes"
 excerpt: "Convex Optimization Part II"
 date:   2018-04-02 11:00:00
 mathjax: true
