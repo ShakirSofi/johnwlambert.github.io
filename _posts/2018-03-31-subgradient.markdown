@@ -67,7 +67,22 @@ Consider a function \\(f\\) with a kink inside of it, rendering the function non
 <img  src="/assets/subgradients.png" width="50%" />
 </div>
 
-The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient.
+The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \\(f\\) at \\(x\\) is called the subdifferential \\(\partial f(x)\\). To determine if a function issubdifferentiable at \\(x_0\\), we must ask, "is there a global affine lower bound on this function that is tight at this point?".
+- If a function is convex, it has at least one point in the relative interior of the domain. 
+- If a function is differentiable at \\(x\\), then \\(\partial f(x) = \{\nabla f(x)\} \\) (a singleton set).
+
+For example, for absolute value, we could say the interval \\( [\nabla f_{\text{left}}(x_0), \nabla f_{\text{right}}(x_0)] \\) is the range of possible slopes (subgradients):
+
+<div align="center">
+<img  src="/assets/subdifferential.png" width="50%" />
+</div>
+
+
+
+
+A subdifferential is a point-to-set mapping.
+
+
 
 ### Subgradient methods 
 
