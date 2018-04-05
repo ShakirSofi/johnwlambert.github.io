@@ -41,7 +41,7 @@ This condition can be interpreted geometrically as the requirement that the grap
 
 ### Known Convex and Concave Functions
 
-Convex
+Convex:
 - Linear.
 - Affine. \\(f(x) = Ax+b\\), where \\(A \in \mathbb{R}^{m \times n}\\) and \\(b \in \mathbb{R}^m\\). This is the sum of a linear function and a constant.
 - Exponential. \\(e^{ax}\\) is convex on \\(\mathbb{R}\\), for any \\(a \in \mathbb{R}\\).
@@ -53,7 +53,7 @@ Convex
 - Quadratic-over-linear function.
 - Log-sum-exp. \\(f(x) = \mbox{log }(e^{x_1}+\cdots+e^{x_n})\\) is convex on \\(\mathbb{R}^n\\).
 
-Concave
+Concave:
 - Logarithm. \\(\mbox{log}(x)\\) concave on \\(\mathbb{R}_{++}\\).
 - Powers. \\(x^a\\) is concave for \\(0 \leq a \leq 1\\).
 - Geometric mean. \\(f(x) = (\prod\limits_{i=1}^n x_i)^{1/n}\\) is concave on \\(\mathbb{R}_{++}^n\\).
@@ -153,20 +153,138 @@ $$
 
 Why is that important? Well, because if the problem is convex, and **if Slater's condition** holds, then **strong duality** holds.
 
-## KKT Conditions
+## KKT Conditions (See[1] p. 243)
+
+Let \\(x^{\star}\\) and \\(\lambda^{\star}, \nu^{\star})\\) be any primal and dual optimal points with "zero duality gap" (we will explain what this means shortly).
+
+Since this is a feasible (and optimal) point, each of the \\(p\\) equality constraints must be fulfilled, meaning:
+
+$$
+\begin{array}{ll}
+h_i(x^{\star}) = 0, i = 1, \dots, p
+\end{array}
+$$
+
+Also, we can certainly say that each of the inequality constraints \\(f_i\\) must also be fulfilled:
+
+$$
+f_i(x^{\star}) \leq 0, i = 1, \dots , m
+$$
+
+The point \\(x^{\star}\\) minimizes \\(L(x, \lambda^{\star}, \nu^{\star}\\) over \\(x\in \mathbb{R}^n\\), so its gradient must vanish at \\(x^{\star}\\):
+
+$$
+\nabla f_0(x^{\star}) + \sum\limits_{i=1}^m \lambda_i^{\star} \nabla f_i(x^{\star} ) + \sum\limits_{i=1}^p \nu_i^{\star} \nabla h_i(x^{\star}) = 0.
+$$
+
+### Complementary Slackness
+The next condition is called "complementary slackness", which at first makes absolutely zero sense. However, I will explain it, from [1] and [2]
+
+
+Suppose that primal and dual optimal values are attained and equal (so, in
+particular, strong duality holds). Let \\(x^{\star}\\) be a primal optimal and \\( (\lambda^{\star}, \nu^{\star})\\)  be a dual optimal point. This means that
+
+$$
+\begin{aligned}
+\begin{array}{ll}
+\mbox{primal value} = \mbox{dual value}, & (\mbox{ bc optimal duality gap is zero})\\
+f_0(x^{\star}) = g(\lambda^{\star}, \nu^{\star}) & (\mbox{ by definitions of primal and dual function values})\\
+= \underset{x}{\mbox{inf }} \Bigg(f_0(x) + \sum\limits_{i=1}^m \lambda_i^{\star} f_i(x) + \sum\limits_{i=1}^p \nu_i^{\star} h_i(x) \Bigg) & (\mbox{ by definition of the dual function})\\
+\leq f_0(x^{\star}) + \sum\limits_{i=1}^m \lambda_i^{\star} f_i(x^{\star}) + \sum\limits_{i=1}^p \nu_i^{\star} h_i(x^{\star}) &  \mbox{ (bc the infimum of the Lagrangian over } x \mbox{ is less than or equal to its value at } x = x^{\star} )\\
+\leq f_0(x^{\star}) & (\mbox{ bc } \lambda_i^{\star} \geq 0, f_i(x^{\star}) \leq 0, i= 1,\dots,m \mbox{ and } h_i(x^{\star}) = 0, i = 1, \dots, p)
+\end{array}
+\end{aligned}
+$$ 
+
+This is a somewhat suprising result: all these inequalities are actually equalities.
+
+We can safely conclude from this proof that the following term is zero:
+
+$$
+\sum\limits_{i=1}^m \lambda_i^{\star} + f_i(x^{\star}) = 0.
+$$
+
+At the same time, we know that at \\(x^{\star}\\) our inequality constraints \\(f_i(x^{\star}) \leq 0\\) are all fulfilled (\\(\forall i)\\). Thus, combining this fact with the above result, we know that every single term in the sum must also equal zero:
+
+$$
+\lambda_i^{\star} f_i(x^{\star}) = 0, i = 1, \dots , m
+$$
+
+This is **complementary slackness**.
+
+Finally, the Lagrange dual required that each element of \\(\mathbf{\lambda}\\) be positive:
+
+$$
+λ_i^{\star} \geq 0, i = 1, \dots , m
+$$
+
+We call these 5 conditions the **Karush-Kuhn-Tucker (KKT) conditions**. In short, If \\(x^{\star}\\) and \\(u^{\star}, v^{\star}\\)
+are primal and dual solutions, with zero duality gap, then \\(x^{\star}, \lambda^{\star}, \nu^{\star}\\) satisfy the KKT conditions. 
+
+In stating this, we have assumed nothing a priori about convexity of our problem, i.e. of \\(f_0, f_i, h_i\\).
+
+## Simple Example with Matrix-vector product (See [2])
+
+Consider for \\(Q \succeq 0\\) (i.e. positive semidefinite),
+
+$$
+\begin{array}{ll}
+\underset{x \in \mathbb{R}^n}{\mbox{min}} & \frac{1}{2}x^TQx + c^Tx \\
+\mbox{subject to} & Ax = 0
+\end{array}
+$$
+
+This is a convex problem, so by the KKT conditions, \\(x\\) is a solution iff
+
+$$
+\nabla L(x,\lambda) = \nabla \Bigg(\frac{1}{2}x^TQx + c^Tx + \lambda^T (Ax) \Bigg) = 0 \\
+$$
+
+For \\(\nabla_x\\), \\( Qx + c + A^T \lambda = 0  \\).
+
+For \\(\nabla_{\lambda}\\), \\(Ax=0\\).
+
+This system of equations can be written in matrix form as:
+
+$$
+\begin{bmatrix} Q & A^T \\ A & 0 \end{bmatrix} \begin{bmatrix} x \\ \lambda \end{bmatrix} = \begin{bmatrix} -c \\ 0 \end{bmatrix}
+$$
+
+for some \\(\lambda\\).
 
 ## Newton's Method
 
-Instead of minimizing the first-order Taylor approximation of a function \\(f\\), we may want to minimize the second-order Taylor approximation, \\(\hat{f}\\). That approximation at a point \\(x\\) is given by:
+Instead of minimizing the first-order Taylor approximation of a function \\(f\\), we may want to minimize the second-order Taylor approximation, \\(f^k(\mathbf{x})\\). That approximation around a point \\(\mathbf{x}^k\\) is given by:
 
 $$
-\hat{f}(x+v) = f(x) + \nabla f(x)^T v + \frac{1}{2}v^T \nabla^2 f(x) v
+f^k(\mathbf{x}) = f(\mathbf{x}^k) + \nabla f(\mathbf{x}^k)^T (\mathbf{x}-\mathbf{x}^k) + \frac{1}{2}(\mathbf{x}-\mathbf{x}^k)^T \nabla^2 f(\mathbf{x}^k) (\mathbf{x}-\mathbf{x}^k)
 $$
 
-If the function \\(f\\) is quadratic, then minimizing \\(\hat{f}(x+v)\\) will give us an exact minimizer of \\(f\\). If the function \\(f\\) is nearly quadratic, intuition suggests that minimizing \\(\hat{f}(x+v)\\) should be a very good estimate of the minimizer of \\(f\\), i.e., \\(x^*\\).
+By setting derivative w.r.t \\(\mathbf{x}\\) to 0, we find:
 
-Setting \\(\nabla_v \hat{f}(x+v)=0\\), we see:
+$$
+\nabla f(\mathbf{x}^k) + \nabla^2 f(\mathbf{x}^k) (\mathbf{x} - \mathbf{x}^k) = 0
+$$
 
+Multiply all terms on the left by the inverse of the Hessian, \\(H^{-1}= (\nabla^2 f)^{-1} \\),
+
+$$
+(\nabla^2 f)^{-1} \nabla f(\mathbf{x}^k) + (\mathbf{x}-\mathbf{x}^k) = 0
+$$
+
+$$
+\mathbf{x} = \mathbf{x}^{k} - (\nabla^2 f)^{-1} \nabla f(\mathbf{x}^k)
+$$
+The expression you may be familiar with for a Newton step is:
+
+$$
+\mathbf{x}^{k+1} = \mathbf{x}^{k} - \frac{ \nabla f(\mathbf{x}^k) }{(\nabla^2 f)}
+$$
+
+However, a Newtons step requires not only the computation of the Hessian, but also being able to invert it. Thus, one may need to regularize \\(H=\nabla^2 f\\) so that your Hessian \\(H\\) is invertible (if the Hessian is not positive definite).
+
+
+If the function \\(f\\) is quadratic, then minimizing the 2nd order Taylor approximation given above, \\(f^k\\), will give us an exact minimizer of \\(f\\). If the function \\(f\\) is nearly quadratic, intuition suggests that minimizing this 2nd order expansion should be a very good estimate of the minimizer of \\(f\\), i.e., \\(x^*\\).
 
 
 ## Interior Point Methods
@@ -221,5 +339,8 @@ $$
 This objective function is convex, and as long as an **appropriate closedness condition** holds, Newton's method can be used to solve it.
 
 ### References: 
-1. Stephen Boyd and Lieven Vandenberghe. 2004. Convex Optimization. Cambridge University Press, New York, NY, USA.
+1. Stephen Boyd and Lieven Vandenberghe. 2004. [Convex Optimization](http://stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf). Cambridge University Press, New York, NY, USA.
+
+2. Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, [Lecture 16](https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf). 
+
 

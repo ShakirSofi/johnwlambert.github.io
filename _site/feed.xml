@@ -5,8 +5,8 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 04 Apr 2018 01:56:07 -0700</pubDate>
-    <lastBuildDate>Wed, 04 Apr 2018 01:56:07 -0700</lastBuildDate>
+    <pubDate>Wed, 04 Apr 2018 21:17:37 -0700</pubDate>
+    <lastBuildDate>Wed, 04 Apr 2018 21:17:37 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -63,7 +63,19 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 &lt;img src=&quot;/assets/subgradients.png&quot; width=&quot;50%&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient.&lt;/p&gt;
+&lt;p&gt;The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \(f\) at \(x\) is called the subdifferential \(\partial f(x)\). To determine if a function issubdifferentiable at \(x_0\), we must ask, “is there a global affine lower bound on this function that is tight at this point?”.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;If a function is convex, it has at least one point in the relative interior of the domain.&lt;/li&gt;
+  &lt;li&gt;If a function is differentiable at \(x\), then \(\partial f(x) = {\nabla f(x)} \) (a singleton set).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For example, for absolute value, we could say the interval \( [\nabla f_{\text{left}}(x_0), \nabla f_{\text{right}}(x_0)] \) is the range of possible slopes (subgradients):&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/subdifferential.png&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;A subdifferential is a point-to-set mapping.&lt;/p&gt;
 
 &lt;h3 id=&quot;subgradient-methods-1&quot;&gt;Subgradient methods&lt;/h3&gt;
 
@@ -389,7 +401,7 @@ This condition can be interpreted geometrically as the requirement that the grap
 
 &lt;h3 id=&quot;known-convex-and-concave-functions&quot;&gt;Known Convex and Concave Functions&lt;/h3&gt;
 
-&lt;p&gt;Convex&lt;/p&gt;
+&lt;p&gt;Convex:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;Linear.&lt;/li&gt;
   &lt;li&gt;Affine. \(f(x) = Ax+b\), where \(A \in \mathbb{R}^{m \times n}\) and \(b \in \mathbb{R}^m\). This is the sum of a linear function and a constant.&lt;/li&gt;
@@ -403,7 +415,7 @@ This condition can be interpreted geometrically as the requirement that the grap
   &lt;li&gt;Log-sum-exp. \(f(x) = \mbox{log }(e^{x_1}+\cdots+e^{x_n})\) is convex on \(\mathbb{R}^n\).&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Concave&lt;/p&gt;
+&lt;p&gt;Concave:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;Logarithm. \(\mbox{log}(x)\) concave on \(\mathbb{R}_{++}\).&lt;/li&gt;
   &lt;li&gt;Powers. \(x^a\) is concave for \(0 \leq a \leq 1\).&lt;/li&gt;
@@ -495,17 +507,109 @@ f_i(x) &lt; 0, &amp; i=1,\dots,m, &amp; Ax=b.
 
 &lt;p&gt;Why is that important? Well, because if the problem is convex, and &lt;strong&gt;if Slater’s condition&lt;/strong&gt; holds, then &lt;strong&gt;strong duality&lt;/strong&gt; holds.&lt;/p&gt;
 
-&lt;h2 id=&quot;kkt-conditions&quot;&gt;KKT Conditions&lt;/h2&gt;
+&lt;h2 id=&quot;kkt-conditions-see1-p-243&quot;&gt;KKT Conditions (See[1] p. 243)&lt;/h2&gt;
+
+&lt;p&gt;Let \(x^{\star}\) and \(\lambda^{\star}, \nu^{\star})\) be any primal and dual optimal points with “zero duality gap” (we will explain what this means shortly).&lt;/p&gt;
+
+&lt;p&gt;Since this is a feasible (and optimal) point, each of the \(p\) equality constraints must be fulfilled, meaning:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{array}{ll}
+h_i(x^{\star}) = 0, i = 1, \dots, p
+\end{array}&lt;/script&gt;
+
+&lt;p&gt;Also, we can certainly say that each of the inequality constraints \(f_i\) must also be fulfilled:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f_i(x^{\star}) \leq 0, i = 1, \dots , m&lt;/script&gt;
+
+&lt;p&gt;The point \(x^{\star}\) minimizes \(L(x, \lambda^{\star}, \nu^{\star}\) over \(x\in \mathbb{R}^n\), so its gradient must vanish at \(x^{\star}\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla f_0(x^{\star}) + \sum\limits_{i=1}^m \lambda_i^{\star} \nabla f_i(x^{\star} ) + \sum\limits_{i=1}^p \nu_i^{\star} \nabla h_i(x^{\star}) = 0.&lt;/script&gt;
+
+&lt;h3 id=&quot;complementary-slackness&quot;&gt;Complementary Slackness&lt;/h3&gt;
+&lt;p&gt;The next condition is called “complementary slackness”, which at first makes absolutely zero sense. However, I will explain it, from [1] and [2]&lt;/p&gt;
+
+&lt;p&gt;Suppose that primal and dual optimal values are attained and equal (so, in
+particular, strong duality holds). Let \(x^{\star}\) be a primal optimal and \( (\lambda^{\star}, \nu^{\star})\)  be a dual optimal point. This means that&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{aligned}
+\begin{array}{ll}
+\mbox{primal value} = \mbox{dual value}, &amp; (\mbox{ bc optimal duality gap is zero})\\
+f_0(x^{\star}) = g(\lambda^{\star}, \nu^{\star}) &amp; (\mbox{ by definitions of primal and dual function values})\\
+= \underset{x}{\mbox{inf }} \Bigg(f_0(x) + \sum\limits_{i=1}^m \lambda_i^{\star} f_i(x) + \sum\limits_{i=1}^p \nu_i^{\star} h_i(x) \Bigg) &amp; (\mbox{ by definition of the dual function})\\
+\leq f_0(x^{\star}) + \sum\limits_{i=1}^m \lambda_i^{\star} f_i(x^{\star}) + \sum\limits_{i=1}^p \nu_i^{\star} h_i(x^{\star}) &amp;  \mbox{ (bc the infimum of the Lagrangian over } x \mbox{ is less than or equal to its value at } x = x^{\star} )\\
+\leq f_0(x^{\star}) &amp; (\mbox{ bc } \lambda_i^{\star} \geq 0, f_i(x^{\star}) \leq 0, i= 1,\dots,m \mbox{ and } h_i(x^{\star}) = 0, i = 1, \dots, p)
+\end{array}
+\end{aligned} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;This is a somewhat suprising result: all these inequalities are actually equalities.&lt;/p&gt;
+
+&lt;p&gt;We can safely conclude from this proof that the following term is zero:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^m \lambda_i^{\star} + f_i(x^{\star}) = 0.&lt;/script&gt;
+
+&lt;p&gt;At the same time, we know that at \(x^{\star}\) our inequality constraints \(f_i(x^{\star}) \leq 0\) are all fulfilled (\(\forall i)\). Thus, combining this fact with the above result, we know that every single term in the sum must also equal zero:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\lambda_i^{\star} f_i(x^{\star}) = 0, i = 1, \dots , m&lt;/script&gt;
+
+&lt;p&gt;This is &lt;strong&gt;complementary slackness&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Finally, the Lagrange dual required that each element of \(\mathbf{\lambda}\) be positive:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;λ_i^{\star} \geq 0, i = 1, \dots , m&lt;/script&gt;
+
+&lt;p&gt;We call these 5 conditions the &lt;strong&gt;Karush-Kuhn-Tucker (KKT) conditions&lt;/strong&gt;. In short, If \(x^{\star}\) and \(u^{\star}, v^{\star}\)
+are primal and dual solutions, with zero duality gap, then \(x^{\star}, \lambda^{\star}, \nu^{\star}\) satisfy the KKT conditions.&lt;/p&gt;
+
+&lt;p&gt;In stating this, we have assumed nothing a priori about convexity of our problem, i.e. of \(f_0, f_i, h_i\).&lt;/p&gt;
+
+&lt;h2 id=&quot;simple-example-with-matrix-vector-product-see-2&quot;&gt;Simple Example with Matrix-vector product (See [2])&lt;/h2&gt;
+
+&lt;p&gt;Consider for \(Q \succeq 0\) (i.e. positive semidefinite),&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+\underset{x \in \mathbb{R}^n}{\mbox{min}} &amp; \frac{1}{2}x^TQx + c^Tx \\
+\mbox{subject to} &amp; Ax = 0
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;This is a convex problem, so by the KKT conditions, \(x\) is a solution iff&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla L(x,\lambda) = \nabla \Bigg(\frac{1}{2}x^TQx + c^Tx + \lambda^T (Ax) \Bigg) = 0 \\&lt;/script&gt;
+
+&lt;p&gt;For \(\nabla_x\), \( Qx + c + A^T \lambda = 0  \).&lt;/p&gt;
+
+&lt;p&gt;For \(\nabla_{\lambda}\), \(Ax=0\).&lt;/p&gt;
+
+&lt;p&gt;This system of equations can be written in matrix form as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{bmatrix} Q &amp; A^T \\ A &amp; 0 \end{bmatrix} \begin{bmatrix} x \\ \lambda \end{bmatrix} = \begin{bmatrix} -c \\ 0 \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;for some \(\lambda\).&lt;/p&gt;
 
 &lt;h2 id=&quot;newtons-method&quot;&gt;Newton’s Method&lt;/h2&gt;
 
-&lt;p&gt;Instead of minimizing the first-order Taylor approximation of a function \(f\), we may want to minimize the second-order Taylor approximation, \(\hat{f}\). That approximation at a point \(x\) is given by:&lt;/p&gt;
+&lt;p&gt;Instead of minimizing the first-order Taylor approximation of a function \(f\), we may want to minimize the second-order Taylor approximation, \(f^k(\mathbf{x})\). That approximation around a point \(\mathbf{x}^k\) is given by:&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{f}(x+v) = f(x) + \nabla f(x)^T v + \frac{1}{2}v^T \nabla^2 f(x) v&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f^k(\mathbf{x}) = f(\mathbf{x}^k) + \nabla f(\mathbf{x}^k)^T (\mathbf{x}-\mathbf{x}^k) + \frac{1}{2}(\mathbf{x}-\mathbf{x}^k)^T \nabla^2 f(\mathbf{x}^k) (\mathbf{x}-\mathbf{x}^k)&lt;/script&gt;
 
-&lt;p&gt;If the function \(f\) is quadratic, then minimizing \(\hat{f}(x+v)\) will give us an exact minimizer of \(f\). If the function \(f\) is nearly quadratic, intuition suggests that minimizing \(\hat{f}(x+v)\) should be a very good estimate of the minimizer of \(f\), i.e., \(x^*\).&lt;/p&gt;
+&lt;p&gt;By setting derivative w.r.t \(\mathbf{x}\) to 0, we find:&lt;/p&gt;
 
-&lt;p&gt;Setting \(\nabla_v \hat{f}(x+v)=0\), we see:&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla f(\mathbf{x}^k) + \nabla^2 f(\mathbf{x}^k) (\mathbf{x} - \mathbf{x}^k) = 0&lt;/script&gt;
+
+&lt;p&gt;Multiply all terms on the left by the inverse of the Hessian, \(H^{-1}= (\nabla^2 f)^{-1} \),&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(\nabla^2 f)^{-1} \nabla f(\mathbf{x}^k) + (\mathbf{x}-\mathbf{x}^k) = 0&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\mathbf{x} = \mathbf{x}^{k} - (\nabla^2 f)^{-1} \nabla f(\mathbf{x}^k)&lt;/script&gt;
+The expression you may be familiar with for a Newton step is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbf{x}^{k+1} = \mathbf{x}^{k} - \frac{ \nabla f(\mathbf{x}^k) }{(\nabla^2 f)}&lt;/script&gt;
+
+&lt;p&gt;However, a Newtons step requires not only the computation of the Hessian, but also being able to invert it. Thus, one may need to regularize \(H=\nabla^2 f\) so that your Hessian \(H\) is invertible (if the Hessian is not positive definite).&lt;/p&gt;
+
+&lt;p&gt;If the function \(f\) is quadratic, then minimizing the 2nd order Taylor approximation given above, \(f^k\), will give us an exact minimizer of \(f\). If the function \(f\) is nearly quadratic, intuition suggests that minimizing this 2nd order expansion should be a very good estimate of the minimizer of \(f\), i.e., \(x^*\).&lt;/p&gt;
 
 &lt;h2 id=&quot;interior-point-methods&quot;&gt;Interior Point Methods&lt;/h2&gt;
 
@@ -554,7 +658,12 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 
 &lt;h3 id=&quot;references&quot;&gt;References:&lt;/h3&gt;
 &lt;ol&gt;
-  &lt;li&gt;Stephen Boyd and Lieven Vandenberghe. 2004. Convex Optimization. Cambridge University Press, New York, NY, USA.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Stephen Boyd and Lieven Vandenberghe. 2004. &lt;a href=&quot;http://stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf&quot;&gt;Convex Optimization&lt;/a&gt;. Cambridge University Press, New York, NY, USA.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf&quot;&gt;Lecture 16&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ol&gt;
 
 </description>
