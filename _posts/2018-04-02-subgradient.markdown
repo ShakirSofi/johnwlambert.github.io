@@ -53,7 +53,8 @@ $$
 <img  src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
 </div>
 
-From the picture, it's obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \\(\delta\\), where usually \\(\delta=1\\), if we multiply slope by \\(\delta = y-x = \\) "run", then we will be left with only the change in function value over the interval (\\(slope=\frac{rise}{run}\\) and \\(\frac{rise}{run}\cdot(run)=rise\\) ).
+From the picture, it's obvious that an affine function is always an underestimator for this quadratic (thus convex) function. 
+<!-- But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \\(\delta\\), where usually \\(\delta=1\\), if we multiply slope by \\(\delta = y-x = \\) "run", then we will be left with only the change in function value over the interval (\\(slope=\frac{rise}{run}\\) and \\(\frac{rise}{run}\cdot(run)=rise\\) ).
 
 <div align="center">
 <img  src="/assets/tangent_underestimates_4cases.jpg" width="50%" />
@@ -65,7 +66,7 @@ If \\(y>x\\), then \\(\delta > 0\\):
 
 -If \\(x>y\\), our \\(\delta < 0\\):
 - (Case 3 above) If we are to the right of \\(0,0)\\), then \\(\nabla f>0\\). We predict too large of a function decrease and underestimate.
-- (Case 4 above) If we are to the left of \\(0,0)\\), then \\(\nabla f<0\\). We overestimate the function decrease, so we underestimate.
+- (Case 4 above) If we are to the left of \\(0,0)\\), then \\(\nabla f<0\\). We overestimate the function decrease, so we underestimate. -->
 
 ## Subgradients
 
