@@ -3,10 +3,10 @@
   <channel>
     <title>John Lambert blog</title>
     <description>Notes on Machine Learning and Optimization.</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 05 Apr 2018 03:33:32 -0700</pubDate>
-    <lastBuildDate>Thu, 05 Apr 2018 03:33:32 -0700</lastBuildDate>
+    <link>http://johnwlambert.github.io/</link>
+    <atom:link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Tue, 17 Apr 2018 03:41:22 -0700</pubDate>
+    <lastBuildDate>Tue, 17 Apr 2018 03:41:22 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -49,7 +49,8 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 &lt;img src=&quot;/assets/tangent_underestimates_quadratic.jpg&quot; width=&quot;25%&quot; /&gt;
 &lt;/div&gt;
 
-&lt;p&gt;From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).&lt;/p&gt;
+&lt;p&gt;From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. 
+&amp;lt;!– But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).&lt;/p&gt;
 
 &lt;div align=&quot;center&quot;&gt;
 &lt;img src=&quot;/assets/tangent_underestimates_4cases.jpg&quot; width=&quot;50%&quot; /&gt;
@@ -64,7 +65,7 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 &lt;p&gt;-If \(x&amp;gt;y\), our \(\delta &amp;lt; 0\):&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;(Case 3 above) If we are to the right of \(0,0)\), then \(\nabla f&amp;gt;0\). We predict too large of a function decrease and underestimate.&lt;/li&gt;
-  &lt;li&gt;(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&amp;lt;0\). We overestimate the function decrease, so we underestimate.&lt;/li&gt;
+  &lt;li&gt;(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&amp;lt;0\). We overestimate the function decrease, so we underestimate. –&amp;gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;subgradients&quot;&gt;Subgradients&lt;/h2&gt;
@@ -171,8 +172,8 @@ x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 
 </description>
         <pubDate>Mon, 02 Apr 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/04/02/subgradient/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/04/02/subgradient/</guid>
+        <link>http://johnwlambert.github.io/2018/04/02/subgradient/</link>
+        <guid isPermaLink="true">http://johnwlambert.github.io/2018/04/02/subgradient/</guid>
         
         
       </item>
@@ -476,8 +477,8 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 
 </description>
         <pubDate>Sun, 01 Apr 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/04/01/cvx/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/04/01/cvx/</guid>
+        <link>http://johnwlambert.github.io/2018/04/01/cvx/</link>
+        <guid isPermaLink="true">http://johnwlambert.github.io/2018/04/01/cvx/</guid>
         
         
       </item>
@@ -616,8 +617,8 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </description>
         <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/03/31/gaussnewton/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/31/gaussnewton/</guid>
+        <link>http://johnwlambert.github.io/2018/03/31/gaussnewton/</link>
+        <guid isPermaLink="true">http://johnwlambert.github.io/2018/03/31/gaussnewton/</guid>
         
         
       </item>
@@ -684,13 +685,106 @@ A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; 
 
 &lt;p&gt;John Duchi explains exactly why identies are true in &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;[1]&lt;/a&gt;.&lt;/p&gt;
 
-&lt;h3 id=&quot;gram-schmidt&quot;&gt;Gram Schmidt&lt;/h3&gt;
+&lt;h2 id=&quot;projection&quot;&gt;Projection&lt;/h2&gt;
 
+&lt;h3 id=&quot;cosine-rule&quot;&gt;Cosine Rule&lt;/h3&gt;
+
+&lt;p&gt;Consider the following triangle, which can be divided into two right triangles by drawing a line that passes through point \(B\) and is perpendicular to side \(b\).&lt;/p&gt;
+
+&lt;p&gt;Consider the right subtriangle, which is a “right triangle” with edge length \(c\) as its hypotenuse. By the Pythagorean Theorem,&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/cosine_law_dot_product.png&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+c^2 = (a \mbox{ sin } C)^2 + (b-a \mbox{ cos } C)^2 \\
+ = a^2 \mbox{ sin }^2 C + b^2 - 2ab \mbox{ cos } C + a^2 \mbox{ cos }^2 C \\
+  = a^2 \Big( \mbox{ sin }^2 C + \mbox{ cos }^2 C\Big) + b^2 - 2ab \mbox{ cos } C \\
+   = a^2 \Big( 1 \Big) + b^2 - 2ab \mbox{ cos } C
+\end{aligned}&lt;/script&gt;
+
+&lt;h3 id=&quot;dot-product-as-a-cosine&quot;&gt;Dot Product as a Cosine&lt;/h3&gt;
+
+&lt;p&gt;Consider two arbitrary vectors \(A\) and \(B\). We can form a triangle with these two sides and a third side connecting the ends of \(A\) and \(B\). We let \(\theta\) be the angle between \(A\) and \(B\).&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/cosine_law_dot_product_im2.png&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+B + C = A \\
+C = A - B \\
+C \cdot C = (A-B) \cdot (A-B) \\
+C \cdot C = (A-B)^T (A-B) \\
+ = A^A - B^TA - A^TB + B^B \\
+ = \|A\| - 2B^TA + \|B\| \\
+  = \|A\| + \|B\| - 2B^TA \\
+  = \|A\| + \|B\| - 2 A \cdot B
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;We showed above that
+&lt;script type=&quot;math/tex&quot;&gt;C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta)&lt;/script&gt;
+, thus&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A \cdot B = \|A\| \|B\| \mbox{ cos }(\theta)&lt;/script&gt;
+
+&lt;h3 id=&quot;inner-products&quot;&gt;Inner Products&lt;/h3&gt;
+
+&lt;p&gt;Consider two vectors \(x,y \in \mathbb{R}^n\). We write their “inner product” as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\langle x, y \rangle  = x^Ty = x_1y_1 + \dots + x_iy_i + \dots + x_ny_n&lt;/script&gt;
+
+&lt;p&gt;The “norm” of a vector \(x\), a measure of its length, is computed as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}&lt;/script&gt;
+
+&lt;p&gt;By trigonometry, we see&lt;/p&gt;
+
+&lt;p&gt;We know that the vector 
+&lt;script type=&quot;math/tex&quot;&gt;\vec{e}_y = \frac{y}{||y||}&lt;/script&gt;. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/dot_product_im3.JPG&quot; width=&quot;25%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y&lt;/script&gt;
+
+&lt;p&gt;where 
+&lt;script type=&quot;math/tex&quot;&gt;\frac{x^Ty}{||y||^2}&lt;/script&gt;
+is just a scalar coefficient.&lt;/p&gt;
+&lt;h3 id=&quot;the-gram-schmidt-procedure&quot;&gt;The Gram Schmidt Procedure&lt;/h3&gt;
+
+&lt;p&gt;Suppose we have a set of \(k\) vectors
+&lt;script type=&quot;math/tex&quot;&gt;\{a_1, \dots, a_k\}&lt;/script&gt;
+such that \(a_i \in \mathbb{R}^n\) are all independent. The objective of the Gram Schmidt procedure is to produce an orthonormal set of vectors
+&lt;script type=&quot;math/tex&quot;&gt;\{ q_1, \dots, q_k \}&lt;/script&gt;
+such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the portion of the next vector \(a_{i+1}\) that projects onto \(a_i\). For example, to find a vector which is orthogonal to the first, we could compute&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/gram_schmidt_projection.JPG&quot; width=&quot;40%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;To find many vectors, we can follow an iterative procedure:&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+\begin{aligned}
+\begin{array}{ll}
+\mbox{Step 1a:} &amp; \tilde{q_1} = a_1 \\
+\mbox{Step 1b:} &amp; q_1 = \frac{\tilde{q_1} }{\|\tilde{q_1}\|} \\
+\mbox{Step 2a:} &amp; \tilde{q_2} = a_2 - P_{q_1}(a_2) = a_2 - (a_2^Tq_1)q_1\\
+\mbox{Step 2b:} &amp; q_2 = \frac{\tilde{q_2} }{\|\tilde{q_2}\|}\\
+\mbox{Step 3a:} &amp; \tilde{q_3} = a_3 - P_{q_2}(a_3) - P_{q_1}(a_3)\\ 
+ &amp;  = a_3 - (a_3^Tq_2)q_2 - (a_3^Tq_1)q_1 \\
+\mbox{Step 3b:} &amp; q_3 = \frac{\tilde{q_3} }{\|\tilde{q_3}\|} \\
+\end{array}
+\end{aligned} %]]&gt;&lt;/script&gt;&lt;/p&gt;
 &lt;h2 id=&quot;solving-systems-of-equations&quot;&gt;Solving Systems of Equations&lt;/h2&gt;
 
 &lt;h3 id=&quot;overdetermined-systems&quot;&gt;Overdetermined Systems&lt;/h3&gt;
-&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{align}
 \begin{array}{ll}
 \mbox{minimize} &amp; J \\
@@ -700,7 +794,7 @@ A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; 
 &amp; (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
 &amp; x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
 \end{array}
-\end{align} %]]&gt;&lt;/script&gt;&lt;/p&gt;
+\end{align} %]]&gt;&lt;/script&gt;
 
 &lt;p&gt;We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:&lt;/p&gt;
 
@@ -714,12 +808,48 @@ A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; 
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y&lt;/script&gt;
 
+&lt;p&gt;We are projecting \(y\) onto the the range of \(A\):&lt;/p&gt;
+
 &lt;p&gt;We call \(A^{\dagger}\) a &lt;strong&gt;left-inverse&lt;/strong&gt; of \(A\) because \(A^{\dagger}A=I\).&lt;/p&gt;
 
 &lt;h3 id=&quot;underdetermined-systems&quot;&gt;Underdetermined Systems&lt;/h3&gt;
 &lt;p&gt;Here \(A\) is a fat, full-rank matrix. We can &lt;strong&gt;always&lt;/strong&gt; solve such a system, and there will be an infinite # of solutions.&lt;/p&gt;
 
-&lt;p&gt;We often choose to find the smallest solution, i.e. the one closest to the origin. We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):&lt;/p&gt;
+&lt;p&gt;We often choose to find the smallest solution, i.e. the one closest to the origin&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/least_norm_solution.png&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+&lt;p&gt;Source: [&lt;a href=&quot;https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf&quot;&gt;3&lt;/a&gt;]&lt;/p&gt;
+
+&lt;p&gt;We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+\mbox{minimize} &amp; x^Tx \\
+\mbox{subject to} &amp; Ax = y
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;By introducing Lagrange multipliers, we find&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L(x, \lambda) = x^Tx + \lambda^T(Ax-y)&lt;/script&gt;
+
+&lt;p&gt;We have two optimality conditions:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+\nabla_x L = 2x + A^T \lambda = 0 \\
+\nabla_{\lambda} L = Ax - y = 0
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;From condition (1), we see that&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x = -\frac{A^T \lambda}{2}&lt;/script&gt;
+
+&lt;p&gt;Substituting this into condition (2), we observe:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;Ax - y = 0 \\
+A(-\frac{A^T \lambda}{2}) = y \\
+\lambda = -2(AA^T)^{-1}y&lt;/script&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y&lt;/script&gt;
 
@@ -744,18 +874,62 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{b
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;A^TA = (V\Sigma U^T) (U \Sigma V^T)&lt;/script&gt;
 
-&lt;p&gt;This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(V_i\)’s are simply the eigenvectors of \(A^TA\).&lt;/p&gt;
+&lt;p&gt;This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(v_i\)’s are simply the eigenvectors of \(A^TA\).&lt;/p&gt;
 
 &lt;p&gt;Now, we’ll need to compute the \(U\)’s.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T&lt;/script&gt;
 
-&lt;p&gt;The \(U_i\)’s are the eigenvectors of \(AA^T\).&lt;/p&gt;
+&lt;p&gt;The \(u_i\)’s are the eigenvectors of \(AA^T\). Furthermore,  \(u_1, \dots u_r\) are an orthonormal basis for \(\mbox{range}(A)\).&lt;/p&gt;
+
+&lt;h3 id=&quot;how-can-we-interpret-the-svd-from-2&quot;&gt;How Can We Interpret the SVD? (From [&lt;a href=&quot;http://ee263.stanford.edu/lectures/svd-v2.pdf&quot;&gt;2&lt;/a&gt;])&lt;/h3&gt;
+
+&lt;p&gt;If \(A = U \Sigma V^T\), then we can decompose the the linear mapping \(y = Ax\) to a series of steps, e.g.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;I compute coefficients of \(x\) along input directions \(v_1, \dots , v_r\)&lt;/li&gt;
+  &lt;li&gt;I scale coefficients by \(\sigma_i\)&lt;/li&gt;
+  &lt;li&gt;I reconstitute along output directions \(u_1, \dots , u_r\)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/svd_interpretation_decomposition.png&quot; width=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;How can we visualize this transformation? Consider the image of a unit ball under \(A\):&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/svd_interpretation_unit_ball_to_ellipsoid.png&quot; width=&quot;75%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The unit ball is transformed into an ellipsoid. Specifically, 
+&lt;script type=&quot;math/tex&quot;&gt;\{ Ax \mid \|x\| \leq 1 \}&lt;/script&gt;
+is an ellipsoid with principal axes \(\sigma_iu_i.\)&lt;/p&gt;
+
 &lt;h3 id=&quot;svd-applications&quot;&gt;SVD Applications&lt;/h3&gt;
 
-&lt;p&gt;We can use the SVD to compute the general pseudo-inverse of a matrix for \(y=Ax\):&lt;/p&gt;
+&lt;p&gt;If \(A\) has SVD \(A = U \Sigma V^T\), we can use the SVD to compute the general pseudo-inverse of a matrix:&lt;/p&gt;
 
-&lt;p&gt;For skinny/full-rank matrices:&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;y=Ax&lt;/script&gt;
+
+&lt;p&gt;We substitute in the SVD decomposition of \(A\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;y= (U \Sigma V^T)x&lt;/script&gt;
+
+&lt;p&gt;We now wish to find&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(U \Sigma V^T)^{-1} y= x&lt;/script&gt;
+
+&lt;p&gt;Since \((AB)^{−1} = B^{−1}A^{−1}\), we can say&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(U \Sigma V^T)^{-1} =  (V^T)^{-1} \Sigma^{-1} U^{-1}&lt;/script&gt;
+
+&lt;p&gt;Since \(U,V\) are orthogonal matrices, we know \(U^{-1}=U^T\) and \(V^{-1}=V^T\), so&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(V^T)^{-1} \Sigma^{-1} U^{-1} = (V^T)^{T} \Sigma^{-1} U^{T} = V \Sigma^{-1} U^{T}&lt;/script&gt;
+
+&lt;p&gt;Thus, we have:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^{\dagger} = V \Sigma^{-1}U^T&lt;/script&gt;
 
 &lt;h2 id=&quot;extremal-trace-problems&quot;&gt;Extremal Trace Problems&lt;/h2&gt;
 
@@ -764,13 +938,21 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{b
 &lt;p&gt;References:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Duchi, John. &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;Properties of the Trace and Matrix Derivatives&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Duchi, John. &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;Properties of the Trace and Matrix Derivatives&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Boyd, Stephen. &lt;a href=&quot;http://ee263.stanford.edu/lectures/svd-v2.pdf&quot;&gt;Linear Dynamical Systems, (EE263) Lecture Slides&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Boyd, Stephen. &lt;a href=&quot;https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf&quot;&gt;Linear Dynamical Systems, (EE263) Lecture 8: Least-norm solutions of undetermined equations&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ol&gt;
 
 </description>
         <pubDate>Fri, 30 Mar 2018 04:00:00 -0700</pubDate>
-        <link>http://localhost:4000/2018/03/30/linalg/</link>
-        <guid isPermaLink="true">http://localhost:4000/2018/03/30/linalg/</guid>
+        <link>http://johnwlambert.github.io/2018/03/30/linalg/</link>
+        <guid isPermaLink="true">http://johnwlambert.github.io/2018/03/30/linalg/</guid>
         
         
       </item>
