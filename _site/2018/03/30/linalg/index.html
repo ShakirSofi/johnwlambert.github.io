@@ -175,7 +175,7 @@ C \cdot C = (A-B)^T (A-B) \\
   = \|A\| + \|B\| - 2 A \cdot B
 \end{aligned}</script>
 
-<p>We showed above that
+<p>We showed above via the Law of Cosines that
 <script type="math/tex">C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta)</script>
 , thus</p>
 
@@ -191,14 +191,14 @@ C \cdot C = (A-B)^T (A-B) \\
 
 <script type="math/tex; mode=display">||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}</script>
 
-<p>By trigonometry, we see</p>
-
-<p>We know that the vector 
-<script type="math/tex">\vec{e}_y = \frac{y}{||y||}</script>. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is</p>
+<p>By trigonometry, we see a triangle:</p>
 
 <div align="center">
 <img src="/assets/dot_product_im3.JPG" width="25%" />
 </div>
+
+<p>We know that the vector 
+<script type="math/tex">\vec{e}_y = \frac{y}{||y||}</script>. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is</p>
 
 <script type="math/tex; mode=display">P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y</script>
 
@@ -234,7 +234,13 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
 <h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
 
 <h3 id="overdetermined-systems">Overdetermined Systems</h3>
-<p>Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):</p>
+<p>Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\).</p>
+
+<div align="center">
+<img src="/assets/least_squares_solution.JPG" width="50%" />
+</div>
+
+<p>Formally, we minimize some objective function \(J\):</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{align}
