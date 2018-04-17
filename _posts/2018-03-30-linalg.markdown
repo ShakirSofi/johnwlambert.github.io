@@ -119,7 +119,7 @@ C \cdot C = (A-B)^T (A-B) \\
 \end{aligned}
 $$
 
-We showed above that
+We showed above via the Law of Cosines that
 $$
   C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta) 
 $$
@@ -143,15 +143,15 @@ $$
 ||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}
 $$
 
-By trigonometry, we see
-
-We know that the vector 
-$$\vec{e}_y = \frac{y}{||y||}
-$$. The projection of \\(x\\) onto the vector \\(y\\), denoted as \\(P_y(x)\\), is
+By trigonometry, we see a triangle:
 
 <div align="center">
 <img  src="/assets/dot_product_im3.JPG" width="25%" />
 </div>
+
+We know that the vector 
+$$\vec{e}_y = \frac{y}{||y||}
+$$. The projection of \\(x\\) onto the vector \\(y\\), denoted as \\(P_y(x)\\), is
 
 $$
 P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y
@@ -196,7 +196,14 @@ $$
 ## Solving Systems of Equations
 
 ### Overdetermined Systems
-Here, matrix \\(A\\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \\(r\\), i.e. we minimize \\(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\\).  We find an approximate solution to \\(Y=Ax\\). Formally, we minimize some objective function \\(J\\):
+Here, matrix \\(A\\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \\(r\\), i.e. we minimize \\(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\\).  We find an approximate solution to \\(Y=Ax\\). 
+
+<div align="center">
+<img  src="/assets/least_squares_solution.JPG" width="50%" />
+</div>
+
+
+Formally, we minimize some objective function \\(J\\):
 
 $$
 \begin{align}

@@ -5,8 +5,8 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://johnwlambert.github.io/</link>
     <atom:link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 17 Apr 2018 03:41:22 -0700</pubDate>
-    <lastBuildDate>Tue, 17 Apr 2018 03:41:22 -0700</lastBuildDate>
+    <pubDate>Tue, 17 Apr 2018 03:46:34 -0700</pubDate>
+    <lastBuildDate>Tue, 17 Apr 2018 03:46:34 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -723,7 +723,7 @@ C \cdot C = (A-B)^T (A-B) \\
   = \|A\| + \|B\| - 2 A \cdot B
 \end{aligned}&lt;/script&gt;
 
-&lt;p&gt;We showed above that
+&lt;p&gt;We showed above via the Law of Cosines that
 &lt;script type=&quot;math/tex&quot;&gt;C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta)&lt;/script&gt;
 , thus&lt;/p&gt;
 
@@ -739,14 +739,14 @@ C \cdot C = (A-B)^T (A-B) \\
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}&lt;/script&gt;
 
-&lt;p&gt;By trigonometry, we see&lt;/p&gt;
-
-&lt;p&gt;We know that the vector 
-&lt;script type=&quot;math/tex&quot;&gt;\vec{e}_y = \frac{y}{||y||}&lt;/script&gt;. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is&lt;/p&gt;
+&lt;p&gt;By trigonometry, we see a triangle:&lt;/p&gt;
 
 &lt;div align=&quot;center&quot;&gt;
 &lt;img src=&quot;/assets/dot_product_im3.JPG&quot; width=&quot;25%&quot; /&gt;
 &lt;/div&gt;
+
+&lt;p&gt;We know that the vector 
+&lt;script type=&quot;math/tex&quot;&gt;\vec{e}_y = \frac{y}{||y||}&lt;/script&gt;. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y&lt;/script&gt;
 
@@ -782,7 +782,13 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
 &lt;h2 id=&quot;solving-systems-of-equations&quot;&gt;Solving Systems of Equations&lt;/h2&gt;
 
 &lt;h3 id=&quot;overdetermined-systems&quot;&gt;Overdetermined Systems&lt;/h3&gt;
-&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):&lt;/p&gt;
+&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\).&lt;/p&gt;
+
+&lt;div align=&quot;center&quot;&gt;
+&lt;img src=&quot;/assets/least_squares_solution.JPG&quot; width=&quot;50%&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Formally, we minimize some objective function \(J\):&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{align}
