@@ -5,8 +5,8 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://johnwlambert.github.io/</link>
     <atom:link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 17 Apr 2018 03:46:34 -0700</pubDate>
-    <lastBuildDate>Tue, 17 Apr 2018 03:46:34 -0700</lastBuildDate>
+    <pubDate>Tue, 17 Apr 2018 03:48:38 -0700</pubDate>
+    <lastBuildDate>Tue, 17 Apr 2018 03:48:38 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -785,7 +785,7 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
 &lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\).&lt;/p&gt;
 
 &lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/least_squares_solution.JPG&quot; width=&quot;50%&quot; /&gt;
+&lt;img src=&quot;/assets/least_squares_solution.png&quot; width=&quot;50%&quot; /&gt;
 &lt;/div&gt;
 
 &lt;p&gt;Formally, we minimize some objective function \(J\):&lt;/p&gt;
