@@ -7,7 +7,7 @@
     <title>Linear Algebra Without the Agonizing Pain</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Notes on Machine Learning and Optimization.">
-    <link rel="canonical" href="http://localhost:4000/2018/03/30/linalg/">
+    <link rel="canonical" href="http://johnwlambert.github.io/2018/03/30/linalg/">
     <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="John Lambert blog posts" />
 
     <!-- Custom CSS -->
@@ -137,13 +137,106 @@ A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{
 
 <p>John Duchi explains exactly why identies are true in <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">[1]</a>.</p>
 
-<h3 id="gram-schmidt">Gram Schmidt</h3>
+<h2 id="projection">Projection</h2>
 
+<h3 id="cosine-rule">Cosine Rule</h3>
+
+<p>Consider the following triangle, which can be divided into two right triangles by drawing a line that passes through point \(B\) and is perpendicular to side \(b\).</p>
+
+<p>Consider the right subtriangle, which is a “right triangle” with edge length \(c\) as its hypotenuse. By the Pythagorean Theorem,</p>
+
+<div align="center">
+<img src="/assets/cosine_law_dot_product.png" width="50%" />
+</div>
+
+<script type="math/tex; mode=display">\begin{aligned}
+c^2 = (a \mbox{ sin } C)^2 + (b-a \mbox{ cos } C)^2 \\
+ = a^2 \mbox{ sin }^2 C + b^2 - 2ab \mbox{ cos } C + a^2 \mbox{ cos }^2 C \\
+  = a^2 \Big( \mbox{ sin }^2 C + \mbox{ cos }^2 C\Big) + b^2 - 2ab \mbox{ cos } C \\
+   = a^2 \Big( 1 \Big) + b^2 - 2ab \mbox{ cos } C
+\end{aligned}</script>
+
+<h3 id="dot-product-as-a-cosine">Dot Product as a Cosine</h3>
+
+<p>Consider two arbitrary vectors \(A\) and \(B\). We can form a triangle with these two sides and a third side connecting the ends of \(A\) and \(B\). We let \(\theta\) be the angle between \(A\) and \(B\).</p>
+
+<div align="center">
+<img src="/assets/cosine_law_dot_product_im2.png" width="50%" />
+</div>
+
+<script type="math/tex; mode=display">\begin{aligned}
+B + C = A \\
+C = A - B \\
+C \cdot C = (A-B) \cdot (A-B) \\
+C \cdot C = (A-B)^T (A-B) \\
+ = A^A - B^TA - A^TB + B^B \\
+ = \|A\| - 2B^TA + \|B\| \\
+  = \|A\| + \|B\| - 2B^TA \\
+  = \|A\| + \|B\| - 2 A \cdot B
+\end{aligned}</script>
+
+<p>We showed above that
+<script type="math/tex">C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta)</script>
+, thus</p>
+
+<script type="math/tex; mode=display">A \cdot B = \|A\| \|B\| \mbox{ cos }(\theta)</script>
+
+<h3 id="inner-products">Inner Products</h3>
+
+<p>Consider two vectors \(x,y \in \mathbb{R}^n\). We write their “inner product” as</p>
+
+<script type="math/tex; mode=display">\langle x, y \rangle  = x^Ty = x_1y_1 + \dots + x_iy_i + \dots + x_ny_n</script>
+
+<p>The “norm” of a vector \(x\), a measure of its length, is computed as</p>
+
+<script type="math/tex; mode=display">||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}</script>
+
+<p>By trigonometry, we see</p>
+
+<p>We know that the vector 
+<script type="math/tex">\vec{e}_y = \frac{y}{||y||}</script>. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is</p>
+
+<div align="center">
+<img src="/assets/dot_product_im3.JPG" width="25%" />
+</div>
+
+<script type="math/tex; mode=display">P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y</script>
+
+<p>where 
+<script type="math/tex">\frac{x^Ty}{||y||^2}</script>
+is just a scalar coefficient.</p>
+<h3 id="the-gram-schmidt-procedure">The Gram Schmidt Procedure</h3>
+
+<p>Suppose we have a set of \(k\) vectors
+<script type="math/tex">\{a_1, \dots, a_k\}</script>
+such that \(a_i \in \mathbb{R}^n\) are all independent. The objective of the Gram Schmidt procedure is to produce an orthonormal set of vectors
+<script type="math/tex">\{ q_1, \dots, q_k \}</script>
+such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the portion of the next vector \(a_{i+1}\) that projects onto \(a_i\). For example, to find a vector which is orthogonal to the first, we could compute</p>
+
+<div align="center">
+<img src="/assets/gram_schmidt_projection.JPG" width="40%" />
+</div>
+
+<p>To find many vectors, we can follow an iterative procedure:</p>
+
+<p><script type="math/tex">% <![CDATA[
+\begin{aligned}
+\begin{array}{ll}
+\mbox{Step 1a:} & \tilde{q_1} = a_1 \\
+\mbox{Step 1b:} & q_1 = \frac{\tilde{q_1} }{\|\tilde{q_1}\|} \\
+\mbox{Step 2a:} & \tilde{q_2} = a_2 - P_{q_1}(a_2) = a_2 - (a_2^Tq_1)q_1\\
+\mbox{Step 2b:} & q_2 = \frac{\tilde{q_2} }{\|\tilde{q_2}\|}\\
+\mbox{Step 3a:} & \tilde{q_3} = a_3 - P_{q_2}(a_3) - P_{q_1}(a_3)\\ 
+ &  = a_3 - (a_3^Tq_2)q_2 - (a_3^Tq_1)q_1 \\
+\mbox{Step 3b:} & q_3 = \frac{\tilde{q_3} }{\|\tilde{q_3}\|} \\
+\end{array}
+\end{aligned} %]]></script></p>
 <h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
 
 <h3 id="overdetermined-systems">Overdetermined Systems</h3>
-<p>Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):
-<script type="math/tex">% <![CDATA[
+<p>Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\). Formally, we minimize some objective function \(J\):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
 \begin{align}
 \begin{array}{ll}
 \mbox{minimize} & J \\
@@ -153,7 +246,7 @@ A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{
 & (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
 & x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
 \end{array}
-\end{align} %]]></script></p>
+\end{align} %]]></script>
 
 <p>We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:</p>
 
@@ -167,12 +260,48 @@ A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{
 
 <script type="math/tex; mode=display">x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y</script>
 
+<p>We are projecting \(y\) onto the the range of \(A\):</p>
+
 <p>We call \(A^{\dagger}\) a <strong>left-inverse</strong> of \(A\) because \(A^{\dagger}A=I\).</p>
 
 <h3 id="underdetermined-systems">Underdetermined Systems</h3>
 <p>Here \(A\) is a fat, full-rank matrix. We can <strong>always</strong> solve such a system, and there will be an infinite # of solutions.</p>
 
-<p>We often choose to find the smallest solution, i.e. the one closest to the origin. We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):</p>
+<p>We often choose to find the smallest solution, i.e. the one closest to the origin</p>
+
+<div align="center">
+<img src="/assets/least_norm_solution.png" width="50%" />
+</div>
+<p>Source: [<a href="https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf">3</a>]</p>
+
+<p>We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+\mbox{minimize} & x^Tx \\
+\mbox{subject to} & Ax = y
+\end{array} %]]></script>
+
+<p>By introducing Lagrange multipliers, we find</p>
+
+<script type="math/tex; mode=display">L(x, \lambda) = x^Tx + \lambda^T(Ax-y)</script>
+
+<p>We have two optimality conditions:</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+\nabla_x L = 2x + A^T \lambda = 0 \\
+\nabla_{\lambda} L = Ax - y = 0
+\end{aligned}</script>
+
+<p>From condition (1), we see that</p>
+
+<script type="math/tex; mode=display">x = -\frac{A^T \lambda}{2}</script>
+
+<p>Substituting this into condition (2), we observe:</p>
+
+<script type="math/tex; mode=display">Ax - y = 0 \\
+A(-\frac{A^T \lambda}{2}) = y \\
+\lambda = -2(AA^T)^{-1}y</script>
 
 <script type="math/tex; mode=display">x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y</script>
 
@@ -197,18 +326,62 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} 
 
 <script type="math/tex; mode=display">A^TA = (V\Sigma U^T) (U \Sigma V^T)</script>
 
-<p>This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(V_i\)’s are simply the eigenvectors of \(A^TA\).</p>
+<p>This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(v_i\)’s are simply the eigenvectors of \(A^TA\).</p>
 
 <p>Now, we’ll need to compute the \(U\)’s.</p>
 
 <script type="math/tex; mode=display">AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T</script>
 
-<p>The \(U_i\)’s are the eigenvectors of \(AA^T\).</p>
+<p>The \(u_i\)’s are the eigenvectors of \(AA^T\). Furthermore,  \(u_1, \dots u_r\) are an orthonormal basis for \(\mbox{range}(A)\).</p>
+
+<h3 id="how-can-we-interpret-the-svd-from-2">How Can We Interpret the SVD? (From [<a href="http://ee263.stanford.edu/lectures/svd-v2.pdf">2</a>])</h3>
+
+<p>If \(A = U \Sigma V^T\), then we can decompose the the linear mapping \(y = Ax\) to a series of steps, e.g.</p>
+<ul>
+  <li>I compute coefficients of \(x\) along input directions \(v_1, \dots , v_r\)</li>
+  <li>I scale coefficients by \(\sigma_i\)</li>
+  <li>I reconstitute along output directions \(u_1, \dots , u_r\)</li>
+</ul>
+
+<div align="center">
+<img src="/assets/svd_interpretation_decomposition.png" width="75%" />
+</div>
+
+<p>How can we visualize this transformation? Consider the image of a unit ball under \(A\):</p>
+
+<div align="center">
+<img src="/assets/svd_interpretation_unit_ball_to_ellipsoid.png" width="75%" />
+</div>
+
+<p>The unit ball is transformed into an ellipsoid. Specifically, 
+<script type="math/tex">\{ Ax \mid \|x\| \leq 1 \}</script>
+is an ellipsoid with principal axes \(\sigma_iu_i.\)</p>
+
 <h3 id="svd-applications">SVD Applications</h3>
 
-<p>We can use the SVD to compute the general pseudo-inverse of a matrix for \(y=Ax\):</p>
+<p>If \(A\) has SVD \(A = U \Sigma V^T\), we can use the SVD to compute the general pseudo-inverse of a matrix:</p>
 
-<p>For skinny/full-rank matrices:</p>
+<script type="math/tex; mode=display">y=Ax</script>
+
+<p>We substitute in the SVD decomposition of \(A\):</p>
+
+<script type="math/tex; mode=display">y= (U \Sigma V^T)x</script>
+
+<p>We now wish to find</p>
+
+<script type="math/tex; mode=display">(U \Sigma V^T)^{-1} y= x</script>
+
+<p>Since \((AB)^{−1} = B^{−1}A^{−1}\), we can say</p>
+
+<script type="math/tex; mode=display">(U \Sigma V^T)^{-1} =  (V^T)^{-1} \Sigma^{-1} U^{-1}</script>
+
+<p>Since \(U,V\) are orthogonal matrices, we know \(U^{-1}=U^T\) and \(V^{-1}=V^T\), so</p>
+
+<script type="math/tex; mode=display">(V^T)^{-1} \Sigma^{-1} U^{-1} = (V^T)^{T} \Sigma^{-1} U^{T} = V \Sigma^{-1} U^{T}</script>
+
+<p>Thus, we have:</p>
+
+<script type="math/tex; mode=display">A^{\dagger} = V \Sigma^{-1}U^T</script>
 
 <h2 id="extremal-trace-problems">Extremal Trace Problems</h2>
 
@@ -217,7 +390,15 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} 
 <p>References:</p>
 
 <ol>
-  <li>Duchi, John. <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">Properties of the Trace and Matrix Derivatives</a>.</li>
+  <li>
+    <p>Duchi, John. <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">Properties of the Trace and Matrix Derivatives</a>.</p>
+  </li>
+  <li>
+    <p>Boyd, Stephen. <a href="http://ee263.stanford.edu/lectures/svd-v2.pdf">Linear Dynamical Systems, (EE263) Lecture Slides</a>.</p>
+  </li>
+  <li>
+    <p>Boyd, Stephen. <a href="https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf">Linear Dynamical Systems, (EE263) Lecture 8: Least-norm solutions of undetermined equations</a>.</p>
+  </li>
 </ol>
 
 

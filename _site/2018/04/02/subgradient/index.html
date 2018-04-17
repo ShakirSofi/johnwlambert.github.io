@@ -7,7 +7,7 @@
     <title>Subgradient Methods in 10 Minutes</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Notes on Machine Learning and Optimization.">
-    <link rel="canonical" href="http://localhost:4000/2018/04/02/subgradient/">
+    <link rel="canonical" href="http://johnwlambert.github.io/2018/04/02/subgradient/">
     <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="John Lambert blog posts" />
 
     <!-- Custom CSS -->
@@ -115,7 +115,8 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 <img src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
 </div>
 
-<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).</p>
+<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. 
+&lt;!– But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).</p>
 
 <div align="center">
 <img src="/assets/tangent_underestimates_4cases.jpg" width="50%" />
@@ -130,7 +131,7 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 <p>-If \(x&gt;y\), our \(\delta &lt; 0\):</p>
 <ul>
   <li>(Case 3 above) If we are to the right of \(0,0)\), then \(\nabla f&gt;0\). We predict too large of a function decrease and underestimate.</li>
-  <li>(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&lt;0\). We overestimate the function decrease, so we underestimate.</li>
+  <li>(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&lt;0\). We overestimate the function decrease, so we underestimate. –&gt;</li>
 </ul>
 
 <h2 id="subgradients">Subgradients</h2>
