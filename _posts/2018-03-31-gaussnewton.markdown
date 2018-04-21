@@ -59,7 +59,7 @@ $$
 || \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2
 $$
 
-Suppose we have some input data \\(x\\) and labels \\(y\\). Our prediction function could be 
+<!-- Suppose we have some input data \\(x\\) and labels \\(y\\). Our prediction function could be 
 
 $$
 \hat{f} = x^T\theta_1 + \theta_2
@@ -174,4 +174,4 @@ for itr = 1:15
 	% stopping condition ...
 end
 
-```
+``` -->

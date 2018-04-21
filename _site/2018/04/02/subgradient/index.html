@@ -117,24 +117,21 @@ f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
 <img src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
 </div>
 
-<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function. 
-&lt;!– But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \(\delta\), where usually \(\delta=1\), if we multiply slope by \(\delta = y-x = \) “run”, then we will be left with only the change in function value over the interval (\(slope=\frac{rise}{run}\) and \(\frac{rise}{run}\cdot(run)=rise\) ).</p>
+<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function.</p>
+
+<!-- But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \\(\delta\\), where usually \\(\delta=1\\), if we multiply slope by \\(\delta = y-x = \\) "run", then we will be left with only the change in function value over the interval (\\(slope=\frac{rise}{run}\\) and \\(\frac{rise}{run}\cdot(run)=rise\\) ).
 
 <div align="center">
-<img src="/assets/tangent_underestimates_4cases.jpg" width="50%" />
+<img  src="/assets/tangent_underestimates_4cases.jpg" width="50%" />
 </div>
 
-<p>If \(y&gt;x\), then \(\delta &gt; 0\):</p>
-<ul>
-  <li>(Case 1 above) If we are to the right of the stationary point (here global minimum) \(0,0)\) then \(\nabla f&gt;0\), and since the derivative is increasing (which an affine function cannot account for), we never predict a large enough function increase (underestimating).</li>
-  <li>(Case 2 above) If we are to the left of \(0,0)\) then \(\nabla f&lt;0\), we estimate too large of a function decrease (the derivative is increasing). So we underestimate.</li>
-</ul>
+If \\(y>x\\), then \\(\delta > 0\\):
+- (Case 1 above) If we are to the right of the stationary point (here global minimum) \\(0,0)\\) then \\(\nabla f>0\\), and since the derivative is increasing (which an affine function cannot account for), we never predict a large enough function increase (underestimating).
+- (Case 2 above) If we are to the left of \\(0,0)\\) then \\(\nabla f<0\\), we estimate too large of a function decrease (the derivative is increasing). So we underestimate.
 
-<p>-If \(x&gt;y\), our \(\delta &lt; 0\):</p>
-<ul>
-  <li>(Case 3 above) If we are to the right of \(0,0)\), then \(\nabla f&gt;0\). We predict too large of a function decrease and underestimate.</li>
-  <li>(Case 4 above) If we are to the left of \(0,0)\), then \(\nabla f&lt;0\). We overestimate the function decrease, so we underestimate. –&gt;</li>
-</ul>
+-If \\(x>y\\), our \\(\delta < 0\\):
+- (Case 3 above) If we are to the right of \\(0,0)\\), then \\(\nabla f>0\\). We predict too large of a function decrease and underestimate.
+- (Case 4 above) If we are to the left of \\(0,0)\\), then \\(\nabla f<0\\). We overestimate the function decrease, so we underestimate. -->
 
 <h2 id="subgradients">Subgradients</h2>
 
