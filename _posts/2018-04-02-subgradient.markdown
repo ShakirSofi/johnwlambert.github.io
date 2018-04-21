@@ -54,6 +54,7 @@ $$
 </div>
 
 From the picture, it's obvious that an affine function is always an underestimator for this quadratic (thus convex) function. 
+
 <!-- But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \\(\delta\\), where usually \\(\delta=1\\), if we multiply slope by \\(\delta = y-x = \\) "run", then we will be left with only the change in function value over the interval (\\(slope=\frac{rise}{run}\\) and \\(\frac{rise}{run}\cdot(run)=rise\\) ).
 
 <div align="center">
