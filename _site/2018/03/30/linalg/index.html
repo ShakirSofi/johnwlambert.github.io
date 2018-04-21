@@ -200,7 +200,20 @@ C \cdot C = (A-B)^T (A-B) \\
 </div>
 
 <p>We know that the vector 
-<script type="math/tex">\vec{e}_y = \frac{y}{||y||}</script>. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is</p>
+<script type="math/tex">\vec{e}_y = \frac{y}{||y||}</script>. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is
+equivalent to computing \( cos(\theta) = \frac{adj}{hyp} \), where the adjacent side of the triangle is the vector \(\vec{y}\) and the hypotenuse is the vector \(\vec{x}\). We can reformulate this equation as</p>
+
+<script type="math/tex; mode=display">\mbox{hyp} * \mbox{ cos }(\theta) = \mbox{adj}</script>
+
+<p>In our case, this becomes</p>
+
+<script type="math/tex; mode=display">\| \vec{x} \| \mbox{cos }(\theta) = \|X_y\|</script>
+
+<p>We recognize this as part of the cosine rule for dot products. Plugging this expression into the cosine rule, we see:</p>
+
+<script type="math/tex; mode=display">x \cdot y = \|y\| \|x\| \mbox{cos } \theta</script>
+
+<p>We can easily write out the projection at this point, as merely the computation of the vector \(X_y\). We have obtained a closed form expression above for its length, and multiplying it by the unit vector in the direction of \(\vec{y}\), we see:</p>
 
 <script type="math/tex; mode=display">P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y</script>
 
@@ -394,6 +407,8 @@ is an ellipsoid with principal axes \(\sigma_iu_i.\)</p>
 <h2 id="extremal-trace-problems">Extremal Trace Problems</h2>
 
 <h2 id="eigenvectors">Eigenvectors</h2>
+
+<p>These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford’s EE 263 course (Linear Dynamical Systems).</p>
 
 <p>References:</p>
 
