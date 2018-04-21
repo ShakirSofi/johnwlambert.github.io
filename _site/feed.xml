@@ -5,8 +5,8 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 20 Apr 2018 19:47:08 -0700</pubDate>
-    <lastBuildDate>Fri, 20 Apr 2018 19:47:08 -0700</lastBuildDate>
+    <pubDate>Sat, 21 Apr 2018 01:52:14 -0700</pubDate>
+    <lastBuildDate>Sat, 21 Apr 2018 01:52:14 -0700</lastBuildDate>
     <generator>Jekyll v3.7.3</generator>
     
       <item>
@@ -746,7 +746,20 @@ C \cdot C = (A-B)^T (A-B) \\
 &lt;/div&gt;
 
 &lt;p&gt;We know that the vector 
-&lt;script type=&quot;math/tex&quot;&gt;\vec{e}_y = \frac{y}{||y||}&lt;/script&gt;. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is&lt;/p&gt;
+&lt;script type=&quot;math/tex&quot;&gt;\vec{e}_y = \frac{y}{||y||}&lt;/script&gt;. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is
+equivalent to computing \( cos(\theta) = \frac{adj}{hyp} \), where the adjacent side of the triangle is the vector \(\vec{y}\) and the hypotenuse is the vector \(\vec{x}\). We can reformulate this equation as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{hyp} * \mbox{ cos }(\theta) = \mbox{adj}&lt;/script&gt;
+
+&lt;p&gt;In our case, this becomes&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\| \vec{x} \| \mbox{cos }(\theta) = \|X_y\|&lt;/script&gt;
+
+&lt;p&gt;We recognize this as part of the cosine rule for dot products. Plugging this expression into the cosine rule, we see:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x \cdot y = \|y\| \|x\| \mbox{cos } \theta&lt;/script&gt;
+
+&lt;p&gt;We can easily write out the projection at this point, as merely the computation of the vector \(X_y\). We have obtained a closed form expression above for its length, and multiplying it by the unit vector in the direction of \(\vec{y}\), we see:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y&lt;/script&gt;
 
@@ -940,6 +953,8 @@ is an ellipsoid with principal axes \(\sigma_iu_i.\)&lt;/p&gt;
 &lt;h2 id=&quot;extremal-trace-problems&quot;&gt;Extremal Trace Problems&lt;/h2&gt;
 
 &lt;h2 id=&quot;eigenvectors&quot;&gt;Eigenvectors&lt;/h2&gt;
+
+&lt;p&gt;These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford’s EE 263 course (Linear Dynamical Systems).&lt;/p&gt;
 
 &lt;p&gt;References:&lt;/p&gt;
 
