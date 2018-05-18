@@ -1,0 +1,156 @@
+<!-- 
+<svg width="800" height="200">
+	<rect width="800" height="200" style="fill:rgb(98,51,20)" />
+	<rect width="20" height="50" x="20" y="100" style="fill:rgb(189,106,53)" />
+	<rect width="20" height="50" x="760" y="30" style="fill:rgb(77,175,75)" />
+	<rect width="10" height="10" x="400" y="60" style="fill:rgb(225,229,224)" />
+</svg>
+ -->
+
+<p>Now that we’ve covered topics from convex optimization in a very shallow manner, it’s time to go deeper.</p>
+
+<h2 id="subgradient-methods">Subgradient methods</h2>
+
+<h3 id="convexity-review">Convexity Review</h3>
+
+<p>To understand subgradients, first we need to review convexity. The Taylor series of a real valued function that is infinitely differentiable at a real number \(x\) is given by</p>
+
+<script type="math/tex; mode=display">f(y) \approx \sum\limits_{k=0}^{\infty} \frac{f^{(k)}(x)}{k!}(y-x)^k</script>
+
+<p>Expanding terms, the series resembles</p>
+
+<script type="math/tex; mode=display">f(y) \approx  f(x) + \frac{f^{\prime}(x)}{1!}(y-x) + \frac{f^{\prime\prime}(x)}{2!}(y-x)^2 + \frac{f^{\prime\prime\prime}(x)}{3!}(y-x)^3 + \cdots.</script>
+
+<p>If a function is convex, its first order Taylor expansion (a tangent line) will always be a global underestimator:</p>
+
+<script type="math/tex; mode=display">f(y) \geq f(x) + \frac{f^{\prime}(x)}{1!}(y-x)</script>
+
+<p>If \(y=x + \delta\), then:</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+f(x+ \delta) \geq f(x) + \nabla f(x)^T (x+\delta-x) \\
+f(x+ \delta) \geq f(x) + \nabla f(x)^T \delta
+\end{aligned}</script>
+
+<div align="center">
+<img src="/assets/tangent_underestimates_quadratic.jpg" width="25%" />
+</div>
+
+<p>From the picture, it’s obvious that an affine function is always an underestimator for this quadratic (thus convex) function.</p>
+
+<!-- But there is also intuition behind why this is true. A univariate function is convex if its derivative is increasing (thus second derivative is positive). Since slope is a measure of function increase/decrease over some interval \\(\delta\\), where usually \\(\delta=1\\), if we multiply slope by \\(\delta = y-x = \\) "run", then we will be left with only the change in function value over the interval (\\(slope=\frac{rise}{run}\\) and \\(\frac{rise}{run}\cdot(run)=rise\\) ).
+
+<div align="center">
+<img  src="/assets/tangent_underestimates_4cases.jpg" width="50%" />
+</div>
+
+If \\(y>x\\), then \\(\delta > 0\\):
+- (Case 1 above) If we are to the right of the stationary point (here global minimum) \\(0,0)\\) then \\(\nabla f>0\\), and since the derivative is increasing (which an affine function cannot account for), we never predict a large enough function increase (underestimating).
+- (Case 2 above) If we are to the left of \\(0,0)\\) then \\(\nabla f<0\\), we estimate too large of a function decrease (the derivative is increasing). So we underestimate.
+
+-If \\(x>y\\), our \\(\delta < 0\\):
+- (Case 3 above) If we are to the right of \\(0,0)\\), then \\(\nabla f>0\\). We predict too large of a function decrease and underestimate.
+- (Case 4 above) If we are to the left of \\(0,0)\\), then \\(\nabla f<0\\). We overestimate the function decrease, so we underestimate. -->
+
+<h2 id="subgradients">Subgradients</h2>
+
+<p>Consider a function \(f\) with a kink inside of it, rendering the function non-differentiable at a point \(x_2\).</p>
+
+<div align="center">
+<img src="/assets/subgradients.png" width="50%" />
+</div>
+
+<p>The derivative jumps up by some amount (over some interval) at this kink. Any slope within that interval is a valid subgradient. A subgradient is also a supporting hyperplane to the epigraph of the function. The set of subgradients of \(f\) at \(x\) is called the subdifferential \(\partial f(x)\) (a point-to-set mapping). To determine if a function is subdifferentiable at \(x_0\), we must ask, “is there a global affine lower bound on this function that is tight at this point?”.</p>
+<ul>
+  <li>If a function is convex, it has at least one point in the relative interior of the domain.</li>
+  <li>If a function is differentiable at \(x\), then \(\partial f(x) = {\nabla f(x)} \) (a singleton set).</li>
+</ul>
+
+<p>For example, for absolute value, we could say the interval \( [\nabla f_{\text{left}}(x_0), \nabla f_{\text{right}}(x_0)] \) is the range of possible slopes (subgradients):</p>
+
+<div align="center">
+<img src="/assets/subdifferential.png" width="50%" />
+</div>
+
+<h3 id="basic-subgradient-method-negative-subgradient-update">Basic Subgradient Method: Negative Subgradient Update</h3>
+
+<p>From [1]: Given a convex function \(f:\mathbb{R}^n \rightarrow \mathbb{R}\), not necessarily differentiable. The subgradient method is just like gradient descent, but replacing gradients with subgradients. i.e., initialize \(x^{(0)}\), then repeat</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, & k = 0, 1, 2, 3, \cdots
+\end{array} %]]></script>
+
+<p>where \(g^{(k)}\) is <strong>any</strong> subgradient of \(f\) at \(x^{(k)}\), and \(\alpha_k &gt;0 \) is the \(k\)’th step size.</p>
+
+<p>Unlike gradient descent, in the negative subgradient update it’s entirely possible that \(-g^{(k)}\) is not a descent direction for \(f\) at \(x^{(k)}\). In such cases, we always have \(f(x^{(k+1)}) &gt; f(x^{(k)})\), meaning an iteration of the subgradient method can increase the objective function. To resolve this issue, we keep track of best iterate \(x_{best}^k\) among \(x^{(1)}, \cdots , x^{(k)}\):</p>
+
+<script type="math/tex; mode=display">f(x_{best}^{(k)}) = \underset{i=1,\cdots ,k}{\mbox{ min  }}  f(x^{(i)})</script>
+
+<p>To update each \(x^{(i)}\), there are at least 5 common ways to select the step size, all with different convergence properties:</p>
+<ul>
+  <li>Constant step size</li>
+  <li>Constant step length</li>
+  <li>Square summable but not summable.</li>
+  <li>Nonsummable diminishing</li>
+  <li>Nonsummable diminishing step lengths.</li>
+</ul>
+
+<p>See <a href="https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf">[2]</a> for details regarding each of these possible step size choices and the <strong>associated guarantees on convergence</strong>.</p>
+
+<h3 id="subgradient-methods-for-constrained-problems">Subgradient methods for constrained problems</h3>
+
+<h3 id="primal-dual-subgradient-methods">Primal-dual subgradient methods</h3>
+
+<h3 id="stochastic-subgradient-method">Stochastic subgradient method</h3>
+
+<h3 id="mirror-descent-and-variable-metric-methods">Mirror descent and variable metric methods</h3>
+
+<h2 id="localization-methods">Localization methods</h2>
+
+<h3 id="localization-and-cutting-plane-methods">Localization and cutting-plane methods</h3>
+
+<h3 id="analytic-center-cutting-plane-method">Analytic center cutting-plane method</h3>
+
+<h3 id="ellipsoid-method">Ellipsoid method</h3>
+
+<h2 id="decomposition-and-distributed-optimization">Decomposition and distributed optimization</h2>
+
+<h3 id="primal-and-dual-decomposition">Primal and dual decomposition</h3>
+
+<h3 id="decomposition-applications">Decomposition applications</h3>
+
+<h3 id="distributed-optimization-via-circuits">Distributed optimization via circuits</h3>
+
+<h2 id="proximal-and-operator-splitting-methods">Proximal and operator splitting methods</h2>
+
+<h3 id="proximal-algorithms">Proximal algorithms</h3>
+
+<h3 id="monotone-operators">Monotone operators</h3>
+
+<h3 id="monotone-operator-splitting-methods">Monotone operator splitting methods</h3>
+
+<h3 id="alternating-direction-method-of-multipliers-admm">Alternating direction method of multipliers (ADMM)</h3>
+
+<h2 id="conjugate-gradients">Conjugate gradients</h2>
+
+<h3 id="conjugate-gradient-method">Conjugate-gradient method</h3>
+
+<h3 id="truncated-newton-methods">Truncated Newton methods</h3>
+
+<h2 id="nonconvex-problems">Nonconvex problems</h2>
+
+<h3 id="l_1-methods-for-convex-cardinality-problems">\(l_1\) methods for convex-cardinality problems</h3>
+
+<h3 id="l_1-methods-for-convex-cardinality-problems-part-ii">\(l_1\) methods for convex-cardinality problems, part II</h3>
+
+<h3 id="sequential-convex-programming">Sequential convex programming</h3>
+
+<h2 id="branch-and-bound-methods">Branch-and-bound methods</h2>
+
+<h2 id="references">References</h2>
+
+<p>[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, <a href="https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf">Lecture 6</a>.</p>
+
+<p>[2] Boyd, Stephen. <a href="https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf">Subgradient Methods: Notes for EE 364B</a>, January 2007.</p>
+
