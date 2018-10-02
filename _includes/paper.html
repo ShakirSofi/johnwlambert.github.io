@@ -1,0 +1,70 @@
+{% if include.dataset_name %}
+{% assign imgwidth = "150" %}
+{% else %}
+{% assign imgwidth = "300" %}
+{% endif %}
+<tr>
+{% if include.image %}
+<td valign="top">
+    {% if include.doi %}
+    {% include image.html url=include.image width=imgwidth href=include.doi %}
+    {% elsif include.arxiv %}
+    {% include image.html url=include.image width=imgwidth href=include.arxiv %}
+    {% elsif include.preprint %}
+    {% include image.html url=include.image width=imgwidth href=include.preprint %}
+    {% else %}
+    {% include image.html url=include.image width=imgwidth %}
+    {% endif %}
+</td>
+<td>
+{% else %}
+<td colspan="2">
+{% endif %}
+    {% if include.dataset_name %}
+    <b>{{ include.dataset_name }}</b><br>
+    {% endif %}
+    {% if include.award %}
+    <small><i><b>{{include.award}}</b></i></small><br>
+    {% endif %}
+    {% if include.doi %}
+    <a href="{{include.doi}}">{{ include.title }}</a>
+    {% elsif include.arxiv %}
+    <a href="{{include.arxiv}}">{{ include.title }}</a>
+    {% elsif include.preprint %}
+    <a href="{{include.preprint}}">{{ include.title }}</a>
+    {% else %}
+    <i>{{ include.title}}</i>
+    {% endif %}
+    <br>
+    {{ include.authors }}<br>
+    <i>{{ include.venue }}</i><br>
+    {% if include.location %}
+        {{ include.location }}.
+    {% endif %}
+    {{ include.date }}.<br>
+    {% if include.arxiv %}
+    [<a href="{{ include.arxiv }}">arXiv</a>]
+    {% endif %}
+    {% if include.project %}
+    [<a href="{{ include.project }}">Project</a>]
+    {% endif %}
+    {% if include.video %}
+    [<a href="{{ include.video }}">Video</a>]
+    {% endif %}
+    {% if include.code %}
+    [<a href="{{ include.code }}">Code</a>]
+    {% endif %}
+    {% if include.data %}
+    [<a href="{{ include.data }}">Data</a>]
+    {% endif %}
+    {% if include.slides %}
+    [<a href="{{ include.slides }}">Slides</a>]
+    {% endif %}
+    {% if include.poster %}
+    [<a href="{{ include.poster }}">Poster</a>]
+    {% endif %}
+    {% if include.talk %}
+    [<a href="{{ include.talk }}">Talk</a>]
+    {% endif %}
+</td>
+</tr>

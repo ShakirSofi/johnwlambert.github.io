@@ -5,9 +5,9 @@
     <description>Notes on Machine Learning and Optimization.</description>
     <link>http://johnwlambert.github.io/</link>
     <atom:link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 18 May 2018 12:06:22 -0700</pubDate>
-    <lastBuildDate>Fri, 18 May 2018 12:06:22 -0700</lastBuildDate>
-    <generator>Jekyll v3.7.3</generator>
+    <pubDate>Tue, 02 Oct 2018 14:57:22 -0400</pubDate>
+    <lastBuildDate>Tue, 02 Oct 2018 14:57:22 -0400</lastBuildDate>
+    <generator>Jekyll v3.8.4</generator>
     
       <item>
         <title>Subgradient Methods in 10 Minutes</title>
@@ -168,7 +168,7 @@ x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 &lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 02 Apr 2018 04:00:00 -0700</pubDate>
+        <pubDate>Mon, 02 Apr 2018 07:00:00 -0400</pubDate>
         <link>http://johnwlambert.github.io/2018/04/02/subgradient/</link>
         <guid isPermaLink="true">http://johnwlambert.github.io/2018/04/02/subgradient/</guid>
         
@@ -473,7 +473,7 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 &lt;/ol&gt;
 
 </description>
-        <pubDate>Sun, 01 Apr 2018 04:00:00 -0700</pubDate>
+        <pubDate>Sun, 01 Apr 2018 07:00:00 -0400</pubDate>
         <link>http://johnwlambert.github.io/2018/04/01/cvx/</link>
         <guid isPermaLink="true">http://johnwlambert.github.io/2018/04/01/cvx/</guid>
         
@@ -615,7 +615,7 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </description>
-        <pubDate>Sat, 31 Mar 2018 04:00:00 -0700</pubDate>
+        <pubDate>Sat, 31 Mar 2018 07:00:00 -0400</pubDate>
         <link>http://johnwlambert.github.io/2018/03/31/gaussnewton/</link>
         <guid isPermaLink="true">http://johnwlambert.github.io/2018/03/31/gaussnewton/</guid>
         
@@ -970,7 +970,7 @@ is an ellipsoid with principal axes \(\sigma_iu_i.\)&lt;/p&gt;
 &lt;/ol&gt;
 
 </description>
-        <pubDate>Fri, 30 Mar 2018 04:00:00 -0700</pubDate>
+        <pubDate>Fri, 30 Mar 2018 07:00:00 -0400</pubDate>
         <link>http://johnwlambert.github.io/2018/03/30/linalg/</link>
         <guid isPermaLink="true">http://johnwlambert.github.io/2018/03/30/linalg/</guid>
         
