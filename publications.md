@@ -15,6 +15,7 @@ permalink: /publications/
 
 <table cellpadding="4">
 
+
 {% include paper.html
 authors=" <b>John Lambert</b>, Ozan Sener, Silvio Savarese"
 title="Deep Learning under Privileged Information Using Heteroscedastic Dropout"
@@ -23,6 +24,9 @@ location="Salt Lake City, Utah"
 date="June 2018"
 award="Spotlight"
 arxiv="https://arxiv.org/abs/1805.11614"
+video="https://youtu.be/sIkUzmgUaxc?t=4648"
+code="https://github.com/johnwlambert/dlupi-heteroscedastic-dropout"
+image="/images/cvpr2018-dlupi.png"
 %}
 
 {% include paper.html
@@ -33,6 +37,7 @@ location="Long Beach, California"
 date="Dec 2017"
 award="Spotlight"
 arxiv="http://bayesiandeeplearning.org/2017/papers/62.pdf"
+image="/images/nips2017-dlupi.png"
 %}
 
 
@@ -43,6 +48,7 @@ venue="Workshop on Machine Learning in Healthcare, Advances in Neural Informatio
 location="Barcelona, Spain"
 date="Dec 2016"
 arxiv="https://arxiv.org/abs/1703.06418"
+image="/images/nips2016-lesion-segmentation.png"
 %}
 
 

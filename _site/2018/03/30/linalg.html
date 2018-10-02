@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Linear Algebra Without the Agonizing Pain</title>
+  <meta name="description" content="Necessary Linear Algebra Overview">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/2018/03/30/linalg.html">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Linear Algebra Without the Agonizing Pain</h1>
+    <p class="meta">Mar 30, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <!-- 
+<svg width="800" height="200">
+	<rect width="800" height="200" style="fill:rgb(98,51,20)" />
+	<rect width="20" height="50" x="20" y="100" style="fill:rgb(189,106,53)" />
+	<rect width="20" height="50" x="760" y="30" style="fill:rgb(77,175,75)" />
+	<rect width="10" height="10" x="400" y="60" style="fill:rgb(225,229,224)" />
+</svg>
+ -->
+<h2 id="linear-algebra-definitions">Linear Algebra Definitions</h2>
+<p>Before we do anything interesting with machine learning or optimization, we’ll need to review some absolutely <strong>essential</strong> linear algebra concepts.</p>
+<h3 id="matrix-rank">Matrix Rank</h3>
+
+<h3 id="vector-space">Vector Space</h3>
+
+<h3 id="null-space-of-a-matrix">Null Space of a Matrix</h3>
+
+<p>Given \(A \in \mathbb{R}^{m \times n}\), the <strong>null space</strong> of \(A\) is the set of vectors which are sent to the zero vector:</p>
+
+<script type="math/tex; mode=display">\mathcal{N}(A) = \{ x \in \mathbb{R}^n \mid Ax = 0 \}</script>
+
+<p>Multiplication by \(A\) can be seen as a function which sends a vector \(x \in \mathbb{R}^n\) to a vector \(Ax \in \mathbb{R}^m\).</p>
+
+<p>Of course, \(\mathcal{N}(A)\) always contains the zero vector, i.e. \({0} \in \mathcal{N}(A)\). But the question is, does it contain any other vectors? If the columns of \(A\) are linearly independent, then we can always say \(\mathcal{N}(A) = {0} \).</p>
+
+<h3 id="column-space-range-of-a-matrix">Column Space (Range) of a Matrix</h3>
+
+<p>Given an \(m \times n\) matrix \(A\), we would like to know for which vectors \(b \in \mathbb{R}^m\) the system \(Ax = b\) has a solution. Let’s define the columns of \(A\) as:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{bmatrix} %]]></script>
+
+<p>The column space of \(A\) is</p>
+
+<script type="math/tex; mode=display">C(A) = \mbox{span}(v_1, v_2, \dots, v_n)</script>
+
+<script type="math/tex; mode=display">C(A) = \{ Ax \mid x \in \mathbb{R}^n \}</script>
+
+<p>The system \(Ax = b\) has a solution <strong>if and only if</strong> \(b \in C(A)\), equivalent to stating \(b\) is in the range of \(A\): \(b \in R(A)\).</p>
+
+<h3 id="rank-nullity-theorem">Rank-Nullity Theorem</h3>
+<p>Let \(A\) be any matrix such that \(A \in \mathbb{R}^{m \times n}\).</p>
+
+<script type="math/tex; mode=display">\mbox{rank}(A) + \mbox{nullity}(A) = n</script>
+
+<script type="math/tex; mode=display">\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n</script>
+
+<h3 id="orthogonal-complement">Orthogonal Complement</h3>
+
+<h3 id="matrix-calculus">Matrix Calculus</h3>
+
+<p>Two identities are essential: gradients of matrix-vector products and of quadratic forms.</p>
+<ul>
+  <li>\( \nabla_x (Ax) = A^T\)</li>
+  <li>\(\nabla_x (x^TAx) = Ax + A^Tx\)</li>
+</ul>
+
+<p>When \(A\) is symmetric, which is often the case, \(A = A^T\) and thus \(\nabla_x (x^TAx) = 2Ax \)</p>
+
+<p>John Duchi explains exactly why identies are true in <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">[1]</a>.</p>
+
+<h2 id="projection">Projection</h2>
+
+<h3 id="cosine-rule">Cosine Rule</h3>
+
+<p>Consider the following triangle, which can be divided into two right triangles by drawing a line that passes through point \(B\) and is perpendicular to side \(b\).</p>
+
+<p>Consider the right subtriangle, which is a “right triangle” with edge length \(c\) as its hypotenuse. By the Pythagorean Theorem,</p>
+
+<div align="center">
+<img src="/assets/cosine_law_dot_product.png" width="50%" />
+</div>
+
+<script type="math/tex; mode=display">\begin{aligned}
+c^2 = (a \mbox{ sin } C)^2 + (b-a \mbox{ cos } C)^2 \\
+ = a^2 \mbox{ sin }^2 C + b^2 - 2ab \mbox{ cos } C + a^2 \mbox{ cos }^2 C \\
+  = a^2 \Big( \mbox{ sin }^2 C + \mbox{ cos }^2 C\Big) + b^2 - 2ab \mbox{ cos } C \\
+   = a^2 \Big( 1 \Big) + b^2 - 2ab \mbox{ cos } C
+\end{aligned}</script>
+
+<h3 id="dot-product-as-a-cosine">Dot Product as a Cosine</h3>
+
+<p>Consider two arbitrary vectors \(A\) and \(B\). We can form a triangle with these two sides and a third side connecting the ends of \(A\) and \(B\). We let \(\theta\) be the angle between \(A\) and \(B\).</p>
+
+<div align="center">
+<img src="/assets/cosine_law_dot_product_im2.png" width="50%" />
+</div>
+
+<script type="math/tex; mode=display">\begin{aligned}
+B + C = A \\
+C = A - B \\
+C \cdot C = (A-B) \cdot (A-B) \\
+C \cdot C = (A-B)^T (A-B) \\
+ = A^A - B^TA - A^TB + B^B \\
+ = \|A\| - 2B^TA + \|B\| \\
+  = \|A\| + \|B\| - 2B^TA \\
+  = \|A\| + \|B\| - 2 A \cdot B
+\end{aligned}</script>
+
+<p>We showed above via the Law of Cosines that
+<script type="math/tex">C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta)</script>
+, thus</p>
+
+<script type="math/tex; mode=display">A \cdot B = \|A\| \|B\| \mbox{ cos }(\theta)</script>
+
+<h3 id="inner-products">Inner Products</h3>
+
+<p>Consider two vectors \(x,y \in \mathbb{R}^n\). We write their “inner product” as</p>
+
+<script type="math/tex; mode=display">\langle x, y \rangle  = x^Ty = x_1y_1 + \dots + x_iy_i + \dots + x_ny_n</script>
+
+<p>The “norm” of a vector \(x\), a measure of its length, is computed as</p>
+
+<script type="math/tex; mode=display">||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}</script>
+
+<p>By trigonometry, we see a triangle:</p>
+
+<div align="center">
+<img src="/assets/dot_product_im3.JPG" width="25%" />
+</div>
+
+<p>We know that the vector 
+<script type="math/tex">\vec{e}_y = \frac{y}{||y||}</script>. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is
+equivalent to computing \( cos(\theta) = \frac{adj}{hyp} \), where the adjacent side of the triangle is the vector \(\vec{y}\) and the hypotenuse is the vector \(\vec{x}\). We can reformulate this equation as</p>
+
+<script type="math/tex; mode=display">\mbox{hyp} * \mbox{ cos }(\theta) = \mbox{adj}</script>
+
+<p>In our case, this becomes</p>
+
+<script type="math/tex; mode=display">\| \vec{x} \| \mbox{cos }(\theta) = \|X_y\|</script>
+
+<p>We recognize this as part of the cosine rule for dot products. Plugging this expression into the cosine rule, we see:</p>
+
+<script type="math/tex; mode=display">x \cdot y = \|y\| \|x\| \mbox{cos } \theta</script>
+
+<p>We can easily write out the projection at this point, as merely the computation of the vector \(X_y\). We have obtained a closed form expression above for its length, and multiplying it by the unit vector in the direction of \(\vec{y}\), we see:</p>
+
+<script type="math/tex; mode=display">P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y</script>
+
+<p>where 
+<script type="math/tex">\frac{x^Ty}{||y||^2}</script>
+is just a scalar coefficient.</p>
+<h3 id="the-gram-schmidt-procedure">The Gram Schmidt Procedure</h3>
+
+<p>Suppose we have a set of \(k\) vectors
+<script type="math/tex">\{a_1, \dots, a_k\}</script>
+such that \(a_i \in \mathbb{R}^n\) are all independent. The objective of the Gram Schmidt procedure is to produce an orthonormal set of vectors
+<script type="math/tex">\{ q_1, \dots, q_k \}</script>
+such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the portion of the next vector \(a_{i+1}\) that projects onto \(a_i\). For example, to find a vector which is orthogonal to the first, we could compute</p>
+
+<div align="center">
+<img src="/assets/gram_schmidt_projection.JPG" width="40%" />
+</div>
+
+<p>To find many vectors, we can follow an iterative procedure:</p>
+
+<p><script type="math/tex">% <![CDATA[
+\begin{aligned}
+\begin{array}{ll}
+\mbox{Step 1a:} & \tilde{q_1} = a_1 \\
+\mbox{Step 1b:} & q_1 = \frac{\tilde{q_1} }{\|\tilde{q_1}\|} \\
+\mbox{Step 2a:} & \tilde{q_2} = a_2 - P_{q_1}(a_2) = a_2 - (a_2^Tq_1)q_1\\
+\mbox{Step 2b:} & q_2 = \frac{\tilde{q_2} }{\|\tilde{q_2}\|}\\
+\mbox{Step 3a:} & \tilde{q_3} = a_3 - P_{q_2}(a_3) - P_{q_1}(a_3)\\ 
+ &  = a_3 - (a_3^Tq_2)q_2 - (a_3^Tq_1)q_1 \\
+\mbox{Step 3b:} & q_3 = \frac{\tilde{q_3} }{\|\tilde{q_3}\|} \\
+\end{array}
+\end{aligned} %]]></script></p>
+<h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
+
+<h3 id="overdetermined-systems">Overdetermined Systems</h3>
+<p>Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\).</p>
+
+<div align="center">
+<img src="/assets/least_squares_solution.png" width="50%" />
+</div>
+
+<p>Formally, we minimize some objective function \(J\):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+\begin{array}{ll}
+\mbox{minimize} & J \\
+& \lVert r \rVert^2 \\
+ &  \lVert Ax-y \rVert^2 \\
+& (Ax-y)^T (Ax-y) \\
+& (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
+& x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
+\end{array}
+\end{align} %]]></script>
+
+<p>We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:</p>
+
+<script type="math/tex; mode=display">\nabla_x J = 2(A^TA)x - 2A^Ty = 0</script>
+
+<script type="math/tex; mode=display">2(A^TA)x = 2A^Ty</script>
+
+<script type="math/tex; mode=display">(A^TA)x = A^Ty</script>
+
+<p>Multiply on the left by \((A^TA)^{-1}\), and we recover the least squares solution:</p>
+
+<script type="math/tex; mode=display">x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y</script>
+
+<p>We are projecting \(y\) onto the the range of \(A\):</p>
+
+<p>We call \(A^{\dagger}\) a <strong>left-inverse</strong> of \(A\) because \(A^{\dagger}A=I\).</p>
+
+<h3 id="underdetermined-systems">Underdetermined Systems</h3>
+<p>Here \(A\) is a fat, full-rank matrix. We can <strong>always</strong> solve such a system, and there will be an infinite # of solutions.</p>
+
+<p>We often choose to find the smallest solution, i.e. the one closest to the origin</p>
+
+<div align="center">
+<img src="/assets/least_norm_solution.png" width="50%" />
+</div>
+<p>Source: [<a href="https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf">3</a>]</p>
+
+<p>We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+\mbox{minimize} & x^Tx \\
+\mbox{subject to} & Ax = y
+\end{array} %]]></script>
+
+<p>By introducing Lagrange multipliers, we find</p>
+
+<script type="math/tex; mode=display">L(x, \lambda) = x^Tx + \lambda^T(Ax-y)</script>
+
+<p>We have two optimality conditions:</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+\nabla_x L = 2x + A^T \lambda = 0 \\
+\nabla_{\lambda} L = Ax - y = 0
+\end{aligned}</script>
+
+<p>From condition (1), we see that</p>
+
+<script type="math/tex; mode=display">x = -\frac{A^T \lambda}{2}</script>
+
+<p>Substituting this into condition (2), we observe:</p>
+
+<script type="math/tex; mode=display">Ax - y = 0 \\
+A(-\frac{A^T \lambda}{2}) = y \\
+\lambda = -2(AA^T)^{-1}y</script>
+
+<script type="math/tex; mode=display">x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y</script>
+
+<p>We call \(A^{\dagger}\) a right-inverse of \(A\) because \(AA^{\dagger}=I\).</p>
+
+<h2 id="singular-value-decomposition-svd">Singular Value Decomposition (SVD)</h2>
+
+<h3 id="svd-definition">SVD Definition</h3>
+
+<script type="math/tex; mode=display">% <![CDATA[
+A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} \sigma_1 & & \\ & \ddots & \\ & & \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix} %]]></script>
+
+<p>where \(U\), \(V\) are orthogonal matrices, meaning \(U^TU = I\), \(UU^T=I\).</p>
+
+<p>We call \(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\) the right/input singular vectors, because this is the first matrix to interact with an input vector \(x\) when we compute \(y=Ax\).</p>
+
+<p>We call \(U=\begin{bmatrix} u_1, \dots, u_r \end{bmatrix}\) the left/output singular vectors, because this is the last matrix that the intermediate results are multiplied before we obtain our result ( \(y=Ax\) ).</p>
+
+<h3 id="computation-of-the-svd">Computation of the SVD</h3>
+
+<p>To find this decomposition for a matrix \(A\), we’ll need to compute the \(V\)’s.</p>
+
+<script type="math/tex; mode=display">A^TA = (V\Sigma U^T) (U \Sigma V^T)</script>
+
+<p>This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(v_i\)’s are simply the eigenvectors of \(A^TA\).</p>
+
+<p>Now, we’ll need to compute the \(U\)’s.</p>
+
+<script type="math/tex; mode=display">AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T</script>
+
+<p>The \(u_i\)’s are the eigenvectors of \(AA^T\). Furthermore,  \(u_1, \dots u_r\) are an orthonormal basis for \(\mbox{range}(A)\).</p>
+
+<h3 id="how-can-we-interpret-the-svd-from-2">How Can We Interpret the SVD? (From [<a href="http://ee263.stanford.edu/lectures/svd-v2.pdf">2</a>])</h3>
+
+<p>If \(A = U \Sigma V^T\), then we can decompose the the linear mapping \(y = Ax\) to a series of steps, e.g.</p>
+<ul>
+  <li>I compute coefficients of \(x\) along input directions \(v_1, \dots , v_r\)</li>
+  <li>I scale coefficients by \(\sigma_i\)</li>
+  <li>I reconstitute along output directions \(u_1, \dots , u_r\)</li>
+</ul>
+
+<div align="center">
+<img src="/assets/svd_interpretation_decomposition.png" width="75%" />
+</div>
+
+<p>How can we visualize this transformation? Consider the image of a unit ball under \(A\):</p>
+
+<div align="center">
+<img src="/assets/svd_interpretation_unit_ball_to_ellipsoid.png" width="75%" />
+</div>
+
+<p>The unit ball is transformed into an ellipsoid. Specifically, 
+<script type="math/tex">\{ Ax \mid \|x\| \leq 1 \}</script>
+is an ellipsoid with principal axes \(\sigma_iu_i.\)</p>
+
+<h3 id="svd-applications">SVD Applications</h3>
+
+<p>If \(A\) has SVD \(A = U \Sigma V^T\), we can use the SVD to compute the general pseudo-inverse of a matrix:</p>
+
+<script type="math/tex; mode=display">y=Ax</script>
+
+<p>We substitute in the SVD decomposition of \(A\):</p>
+
+<script type="math/tex; mode=display">y= (U \Sigma V^T)x</script>
+
+<p>We now wish to find</p>
+
+<script type="math/tex; mode=display">(U \Sigma V^T)^{-1} y= x</script>
+
+<p>Since \((AB)^{−1} = B^{−1}A^{−1}\), we can say</p>
+
+<script type="math/tex; mode=display">(U \Sigma V^T)^{-1} =  (V^T)^{-1} \Sigma^{-1} U^{-1}</script>
+
+<p>Since \(U,V\) are orthogonal matrices, we know \(U^{-1}=U^T\) and \(V^{-1}=V^T\), so</p>
+
+<script type="math/tex; mode=display">(V^T)^{-1} \Sigma^{-1} U^{-1} = (V^T)^{T} \Sigma^{-1} U^{T} = V \Sigma^{-1} U^{T}</script>
+
+<p>Thus, we have:</p>
+
+<script type="math/tex; mode=display">A^{\dagger} = V \Sigma^{-1}U^T</script>
+
+<h2 id="extremal-trace-problems">Extremal Trace Problems</h2>
+
+<h2 id="eigenvectors">Eigenvectors</h2>
+
+<p>These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford’s EE 263 course (Linear Dynamical Systems).</p>
+
+<p>References:</p>
+
+<ol>
+  <li>
+    <p>Duchi, John. <a href="https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf">Properties of the Trace and Matrix Derivatives</a>.</p>
+  </li>
+  <li>
+    <p>Boyd, Stephen. <a href="http://ee263.stanford.edu/lectures/svd-v2.pdf">Linear Dynamical Systems, (EE263) Lecture Slides</a>.</p>
+  </li>
+  <li>
+    <p>Boyd, Stephen. <a href="https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf">Linear Dynamical Systems, (EE263) Lecture 8: Least-norm solutions of undetermined equations</a>.</p>
+  </li>
+</ol>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--  
+ <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Ph.D. Candidate in Computer Vision.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
