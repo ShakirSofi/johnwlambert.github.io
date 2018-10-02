@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Fast Nearest Neighbors</title>
+  <meta name="description" content="Table of Contents: Brute Force Fast Affinity Matrices Speedup">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/fast-nearest-neighbor/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Fast Nearest Neighbors</h1>
+    <p class="meta">Oct 2, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#rank">Brute Force</a></li>
+  <li><a href="#fastaffinitymatrices">Fast Affinity Matrices</a></li>
+  <li><a href="#nullspace">Speedup</a></li>
+</ul>
+
+<h2 id="nearest-neighbor">Nearest Neighbor</h2>
+<p>Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with <a href="https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf">SIFT</a>).</p>
+
+<p>Brute force methods can be prohibitively slow and much faster ways exist of computing with a bit of linear algebra.</p>
+
+<p>We are interested in the quantity</p>
+
+<p>Since \(a,b \in R^n\) are vectors, we can expand the Mahalanobis distance. When \(A=I\), we are working in Euclidean space (computing \(\ell_2\) norms):</p>
+
+<script type="math/tex; mode=display">=(a-b)^TA(a-b)</script>
+
+<script type="math/tex; mode=display">=(a^T-b^T)A(a-b)</script>
+
+<script type="math/tex; mode=display">=(a^TA-b^TA)(a-b)</script>
+
+<script type="math/tex; mode=display">=a^TAa-b^TAa - a^TAa + b^TAb</script>
+
+<p>Now we wish to compute these on entire datasets simultaneously. We can form matrices \(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\) that hold our high-dimensional points.</p>
+
+<p>Consider \(AB^T\):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix} %]]></script>
+
+<p><a name="extremaltrace"></a></p>
+<h2 id="brute-force-nearest-neighbors">Brute Force Nearest Neighbors</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">naive_upper_triangular_compute_affinity_matrix</span><span class="p">(</span><span class="n">pts1</span><span class="p">,</span> <span class="n">pts2</span><span class="p">):</span>
+    <span class="s">"""
+    Create an mxn matrix, where each (i,j) entry denotes
+    the Mahalanobis distance between point i and point j,
+    as defined by the metric "A". A has dimension (dim x dim).
+    Use of a for loop makes this function somewhat slow.
+
+    not symmetric
+    """</span>
+    <span class="n">m1</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">pts1</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="c"># make sure feature vectors have the same length</span>
+    <span class="k">assert</span> <span class="n">pts1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">pts2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">m2</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">pts2</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">affinity_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m1</span><span class="p">,</span><span class="n">m2</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m1</span><span class="p">):</span> <span class="c"># rows</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m2</span><span class="p">):</span> <span class="c"># cols</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">pts1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">affinity_mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span>
+
+    <span class="c">#affinity matrix contains the Mahalanobis distances</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">affinity_mat</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a name="fastaffinitymatrices"></a></p>
+<h2 id="fast-affinity-matrix-computation">Fast Affinity Matrix Computation</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+
+<span class="k">def</span> <span class="nf">fast_affinity_mat_compute</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span><span class="n">X2</span><span class="p">):</span>
+    <span class="s">"""
+    X is (m,n)
+    A is (n,n)
+    K is (m,m)
+    """</span>
+    <span class="n">m1</span><span class="p">,</span><span class="n">n</span> <span class="o">=</span> <span class="n">X1</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">X2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">m2</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">X2</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">ab_T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span> <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
+    <span class="n">a_sqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+    <span class="n">b_sqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">X2</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X2</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+    <span class="n">a_sqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span> <span class="n">a_sqr</span><span class="p">,</span> <span class="p">(</span><span class="n">m2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">b_sqr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span> <span class="n">b_sqr</span><span class="p">,</span> <span class="p">(</span><span class="n">m1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">a_sqr</span> <span class="o">+</span> <span class="n">b_sqr</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ab_T</span>
+</code></pre></div></div>
+
+<p>We now demonstrate the</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">unit_test_arr_arr</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span><span class="n">m2</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+  <span class="s">""" """</span>
+  <span class="n">pts1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+  <span class="n">pts2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+
+  <span class="n">gt_aff</span> <span class="o">=</span> <span class="n">naive_upper_triangular_compute_affinity_matrix</span><span class="p">(</span><span class="n">pts1</span><span class="p">,</span> <span class="n">pts2</span><span class="p">)</span>
+
+  <span class="n">pred_aff</span> <span class="o">=</span> <span class="n">fast_affinity_mat_compute</span><span class="p">(</span><span class="n">pts1</span><span class="p">,</span><span class="n">pts2</span><span class="p">)</span>
+
+  <span class="k">print</span><span class="p">(</span><span class="n">gt_aff</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">pred_aff</span><span class="p">)</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">gt_aff</span> <span class="o">-</span> <span class="n">pred_aff</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+
+  <span class="n">m1</span> <span class="o">=</span> <span class="mi">3</span> <span class="c"># 100</span>
+  <span class="n">m2</span> <span class="o">=</span> <span class="mi">4</span> <span class="c"># 135</span>
+  <span class="n">n</span> <span class="o">=</span> <span class="mi">128</span>
+
+  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+  <span class="c"># unit_test_pt_arr(m1,m2,n)</span>
+  <span class="n">unit_test_arr_arr</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span><span class="n">m2</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now consider the speedup we’ve achieved:</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Ph.D. Candidate in Computer Vision.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
