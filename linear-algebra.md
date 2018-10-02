@@ -1,0 +1,470 @@
+---
+layout: page
+permalink: /linear-algebra/
+mathjax: true
+---
+Table of Contents:
+- [Matrix Rank](#rank)
+- [Vector Space](#vectorspace)
+- [Null Space](#nullspace)
+- [Column Space](#columnspace)
+- [Matrix Calculus](#matrixcalculus)
+- [Orthogonal Complement](#orthogonalcomplement)
+- [Projection](#projection)
+  - [Gram Schmidt](#gramschmidt)
+- [SVD](#svd)
+- [Extremal Trace](#extremaltrace)
+- [Eigendecomposition](#eigendecomposition)
+
+## Linear Algebra Definitions
+Before we do anything interesting with machine learning or optimization, we'll need to review some absolutely **essential** linear algebra concepts.
+<a name='rank'></a>
+### Matrix Rank
+<a name='vectorspace'></a>
+### Vector Space
+<a name='nullspace'></a>
+### Null Space of a Matrix
+
+Given \\(A \in \mathbb{R}^{m \times n}\\), the **null space** of \\(A\\) is the set of vectors which are sent to the zero vector:
+
+$$
+\mathcal{N}(A) = \{ x \in \mathbb{R}^n \mid Ax = 0 \}
+$$
+
+Multiplication by \\(A\\) can be seen as a function which sends a vector \\(x \in \mathbb{R}^n\\) to a vector \\(Ax \in \mathbb{R}^m\\).
+
+Of course, \\(\mathcal{N}(A)\\) always contains the zero vector, i.e. \\({0} \in \mathcal{N}(A)\\). But the question is, does it contain any other vectors? If the columns of \\(A\\) are linearly independent, then we can always say \\(\mathcal{N}(A) = {0} \\).
+<a name='columnspace'></a>
+### Column Space (Range) of a Matrix
+
+Given an \\(m \times n\\) matrix \\(A\\), we would like to know for which vectors \\(b \in \mathbb{R}^m\\) the system \\(Ax = b\\) has a solution. Let's define the columns of \\(A\\) as:
+
+$$
+A = \begin{bmatrix} | & | & & | \\ v_1 & v_2 & \cdots & v_n \\ | & | & & | \end{bmatrix}
+$$
+
+The column space of \\(A\\) is
+
+$$
+C(A) = \mbox{span}(v_1, v_2, \dots, v_n)
+$$
+
+$$
+C(A) = \{ Ax \mid x \in \mathbb{R}^n \}
+$$
+
+The system \\(Ax = b\\) has a solution **if and only if** \\(b \in C(A)\\), equivalent to stating \\(b\\) is in the range of \\(A\\): \\(b \in R(A)\\). 
+
+### Rank-Nullity Theorem
+Let \\(A\\) be any matrix such that \\(A \in \mathbb{R}^{m \times n}\\).
+
+$$
+\mbox{rank}(A) + \mbox{nullity}(A) = n
+$$
+
+$$
+\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n
+$$
+<a name='orthogonalcomplement'></a>
+### Orthogonal Complement
+<a name='matrixcalculus'></a>
+### Matrix Calculus
+
+Two identities are essential: gradients of matrix-vector products and of quadratic forms.
+- \\( \nabla_x (Ax) = A^T\\)
+- \\(\nabla_x (x^TAx) = Ax + A^Tx\\)
+
+When \\(A\\) is symmetric, which is often the case, \\(A = A^T\\) and thus \\(\nabla_x (x^TAx) = 2Ax \\)
+
+John Duchi explains exactly why identies are true in [[1]](https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf).
+
+<a name='projection'></a>
+## Projection
+
+### Cosine Rule
+
+Consider the following triangle, which can be divided into two right triangles by drawing a line that passes through point \\(B\\) and is perpendicular to side \\(b\\).
+
+Consider the right subtriangle, which is a "right triangle" with edge length \\(c\\) as its hypotenuse. By the Pythagorean Theorem,
+
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/cosine_law_dot_product.png" width="50%" />
+  <div class="figcaption">
+    Dot products and the cosine law, visualized.
+  </div>
+</div>
+
+$$
+\begin{aligned}
+c^2 = (a \mbox{ sin } C)^2 + (b-a \mbox{ cos } C)^2 \\
+ = a^2 \mbox{ sin }^2 C + b^2 - 2ab \mbox{ cos } C + a^2 \mbox{ cos }^2 C \\
+  = a^2 \Big( \mbox{ sin }^2 C + \mbox{ cos }^2 C\Big) + b^2 - 2ab \mbox{ cos } C \\
+   = a^2 \Big( 1 \Big) + b^2 - 2ab \mbox{ cos } C
+\end{aligned}
+$$
+
+### Dot Product as a Cosine
+
+Consider two arbitrary vectors \\(A\\) and \\(B\\). We can form a triangle with these two sides and a third side connecting the ends of \\(A\\) and \\(B\\). We let \\(\theta\\) be the angle between \\(A\\) and \\(B\\).
+
+
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/cosine_law_dot_product_im2.png" width="50%" />
+  <div class="figcaption">
+    Dot products and the cosine law, visualized (part 2).
+  </div>
+</div>
+
+
+
+$$
+\begin{aligned}
+B + C = A \\
+C = A - B \\
+C \cdot C = (A-B) \cdot (A-B) \\
+C \cdot C = (A-B)^T (A-B) \\
+ = A^A - B^TA - A^TB + B^B \\
+ = \|A\| - 2B^TA + \|B\| \\
+  = \|A\| + \|B\| - 2B^TA \\
+  = \|A\| + \|B\| - 2 A \cdot B
+\end{aligned}
+$$
+
+We showed above via the Law of Cosines that
+$$
+  C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta) 
+$$
+, thus
+
+$$
+A \cdot B = \|A\| \|B\| \mbox{ cos }(\theta)
+$$
+
+### Inner Products
+
+Consider two vectors \\(x,y \in \mathbb{R}^n\\). We write their "inner product" as
+
+$$
+\langle x, y \rangle  = x^Ty = x_1y_1 + \dots + x_iy_i + \dots + x_ny_n
+$$
+
+The "norm" of a vector \\(x\\), a measure of its length, is computed as
+
+$$
+||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}
+$$
+
+By trigonometry, we see a triangle:
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/dot_product_im3.JPG" width="25%" />
+  <div class="figcaption">
+    The right triangle we use in projection.
+  </div>
+</div>
+
+We know that the vector 
+$$\vec{e}_y = \frac{y}{||y||}
+$$. The projection of \\(x\\) onto the vector \\(y\\), denoted as \\(P_y(x)\\), is
+equivalent to computing \\( cos(\theta) = \frac{adj}{hyp} \\), where the adjacent side of the triangle is the vector \\(\vec{y}\\) and the hypotenuse is the vector \\(\vec{x}\\). We can reformulate this equation as
+
+$$
+\mbox{hyp} * \mbox{ cos }(\theta) = \mbox{adj}
+$$
+
+In our case, this becomes
+
+$$
+\| \vec{x} \| \mbox{cos }(\theta) = \|X_y\|
+$$
+
+We recognize this as part of the cosine rule for dot products. Plugging this expression into the cosine rule, we see:
+
+$$
+x \cdot y = \|y\| \|x\| \mbox{cos } \theta
+$$
+
+We can easily write out the projection at this point, as merely the computation of the vector \\(X_y\\). We have obtained a closed form expression above for its length, and multiplying it by the unit vector in the direction of \\(\vec{y}\\), we see:
+
+$$
+P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y
+$$
+
+where 
+$$
+\frac{x^Ty}{||y||^2}
+$$
+is just a scalar coefficient.
+<a name='gramschmidt'></a>
+### The Gram Schmidt Procedure
+
+Suppose we have a set of \\(k\\) vectors
+$$
+\{a_1, \dots, a_k\}
+$$
+such that \\(a_i \in \mathbb{R}^n\\) are all independent. The objective of the Gram Schmidt procedure is to produce an orthonormal set of vectors
+$$
+\{ q_1, \dots, q_k \}
+$$
+such that \\(q_i \in \mathbb{R}^n\\). We can do so by iteratively subtracting the portion of the next vector \\(a_{i+1}\\) that projects onto \\(a_i\\). For example, to find a vector which is orthogonal to the first, we could compute
+
+
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/gram_schmidt_projection.JPG" width="40%" />
+  <div class="figcaption">
+    A step in Gram-Schmidt.
+  </div>
+</div>
+
+
+To find many vectors, we can follow an iterative procedure:
+
+$$
+\begin{aligned}
+\begin{array}{ll}
+\mbox{Step 1a:} & \tilde{q_1} = a_1 \\
+\mbox{Step 1b:} & q_1 = \frac{\tilde{q_1} }{\|\tilde{q_1}\|} \\
+\mbox{Step 2a:} & \tilde{q_2} = a_2 - P_{q_1}(a_2) = a_2 - (a_2^Tq_1)q_1\\
+\mbox{Step 2b:} & q_2 = \frac{\tilde{q_2} }{\|\tilde{q_2}\|}\\
+\mbox{Step 3a:} & \tilde{q_3} = a_3 - P_{q_2}(a_3) - P_{q_1}(a_3)\\ 
+ &  = a_3 - (a_3^Tq_2)q_2 - (a_3^Tq_1)q_1 \\
+\mbox{Step 3b:} & q_3 = \frac{\tilde{q_3} }{\|\tilde{q_3}\|} \\
+\end{array}
+\end{aligned}
+$$
+## Solving Systems of Equations
+
+### Overdetermined Systems
+Here, matrix \\(A\\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \\(r\\), i.e. we minimize \\(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\\).  We find an approximate solution to \\(Y=Ax\\). 
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/least_squares_solution.png" width="50%" />
+  <div class="figcaption">
+    A step in Gram-Schmidt.
+  </div>
+</div>
+
+Formally, we minimize some objective function \\(J\\):
+
+$$
+\begin{align}
+\begin{array}{ll}
+\mbox{minimize} & J \\
+& \lVert r \rVert^2 \\
+ &  \lVert Ax-y \rVert^2 \\
+& (Ax-y)^T (Ax-y) \\
+& (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
+& x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
+\end{array}
+\end{align}
+$$
+
+We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:
+
+$$
+\nabla_x J = 2(A^TA)x - 2A^Ty = 0
+$$
+
+$$
+2(A^TA)x = 2A^Ty
+$$
+
+$$
+(A^TA)x = A^Ty
+$$
+
+Multiply on the left by \\((A^TA)^{-1}\\), and we recover the least squares solution:
+
+$$
+x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y
+$$
+
+We are projecting \\(y\\) onto the the range of \\(A\\):
+
+We call \\(A^{\dagger}\\) a **left-inverse** of \\(A\\) because \\(A^{\dagger}A=I\\).
+
+### Underdetermined Systems
+Here \\(A\\) is a fat, full-rank matrix. We can **always** solve such a system, and there will be an infinite # of solutions.
+
+We often choose to find the smallest solution, i.e. the one closest to the origin 
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/least_norm_solution.png" width="50%" />
+  <div class="figcaption">
+    Visualizing the least-norm solution.
+  </div>
+</div>
+
+
+Source: [[3](https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf)]
+
+We call this a least-norm (\\(x_{ln}\\) ) solution, because we minimize \\(\lVert x \rVert\\):
+
+$$
+\begin{array}{ll}
+\mbox{minimize} & x^Tx \\
+\mbox{subject to} & Ax = y
+\end{array}
+$$
+
+By introducing Lagrange multipliers, we find
+
+$$
+L(x, \lambda) = x^Tx + \lambda^T(Ax-y)
+$$
+
+We have two optimality conditions:
+
+$$
+\begin{aligned}
+\nabla_x L = 2x + A^T \lambda = 0 \\
+\nabla_{\lambda} L = Ax - y = 0
+\end{aligned}
+$$
+
+From condition (1), we see that 
+
+$$
+x = -\frac{A^T \lambda}{2}
+$$
+
+Substituting this into condition (2), we observe:
+
+$$
+Ax - y = 0 \\
+A(-\frac{A^T \lambda}{2}) = y \\
+\lambda = -2(AA^T)^{-1}y
+$$
+
+$$
+x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y
+$$
+
+We call \\(A^{\dagger}\\) a right-inverse of \\(A\\) because \\(AA^{\dagger}=I\\).
+<a name='svd'></a>
+## Singular Value Decomposition (SVD)
+
+### SVD Definition
+
+$$
+A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} \sigma_1 & & \\ & \ddots & \\ & & \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix}
+$$
+
+where \\(U\\), \\(V\\) are orthogonal matrices, meaning \\(U^TU = I\\), \\(UU^T=I\\). 
+
+We call \\(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\\) the right/input singular vectors, because this is the first matrix to interact with an input vector \\(x\\) when we compute \\(y=Ax\\).
+
+We call \\(U=\begin{bmatrix} u_1, \dots, u_r \end{bmatrix}\\) the left/output singular vectors, because this is the last matrix that the intermediate results are multiplied before we obtain our result ( \\(y=Ax\\) ).
+
+### Computation of the SVD
+
+To find this decomposition for a matrix \\(A\\), we'll need to compute the \\(V\\)'s.
+
+$$
+A^TA = (V\Sigma U^T) (U \Sigma V^T)
+$$
+
+This reduces to \\(V \Sigma^2 V^T\\). We need to find orthonormal eigenvectors, and the \\(v_i\\)'s are simply the eigenvectors of \\(A^TA\\).
+
+Now, we'll need to compute the \\(U\\)'s.
+
+$$
+AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T
+$$
+
+The \\(u_i\\)'s are the eigenvectors of \\(AA^T\\). Furthermore,  \\(u_1, \dots u_r\\) are an orthonormal basis for \\(\mbox{range}(A)\\).
+
+### How Can We Interpret the SVD? (From [[2](http://ee263.stanford.edu/lectures/svd-v2.pdf)])
+
+If \\(A = U \Sigma V^T\\), then we can decompose the the linear mapping \\(y = Ax\\) to a series of steps, e.g. 
+- I compute coefficients of \\(x\\) along input directions \\(v_1, \dots , v_r\\)
+- I scale coefficients by \\(\sigma_i\\)
+- I reconstitute along output directions \\(u_1, \dots , u_r\\)
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/svd_interpretation_decomposition.png" width="75%" />
+  <div class="figcaption">
+    SVD interprestation of decomposition.
+  </div>
+</div>
+
+How can we visualize this transformation? Consider the image of a unit ball under \\(A\\):
+
+<div class="fig figcenter fighighlight">
+  <img  src="/assets/svd_interpretation_unit_ball_to_ellipsoid.png" width="75%" />
+  <div class="figcaption">
+    Unit ball to ellipsoid.
+  </div>
+</div>
+
+The unit ball is transformed into an ellipsoid. Specifically, 
+$$
+\{ Ax \mid \|x\| \leq 1 \}
+$$
+is an ellipsoid with principal axes \\(\sigma_iu_i.\\)
+
+
+
+
+
+### SVD Applications
+
+If \\(A\\) has SVD \\(A = U \Sigma V^T\\), we can use the SVD to compute the general pseudo-inverse of a matrix:
+
+$$
+y=Ax
+$$
+
+We substitute in the SVD decomposition of \\(A\\):
+
+$$
+y= (U \Sigma V^T)x
+$$
+
+We now wish to find
+
+$$
+(U \Sigma V^T)^{-1} y= x
+$$
+
+Since \\((AB)^{−1} = B^{−1}A^{−1}\\), we can say
+
+$$
+(U \Sigma V^T)^{-1} =  (V^T)^{-1} \Sigma^{-1} U^{-1}
+$$
+
+Since \\(U,V\\) are orthogonal matrices, we know \\(U^{-1}=U^T\\) and \\(V^{-1}=V^T\\), so
+
+$$
+(V^T)^{-1} \Sigma^{-1} U^{-1} = (V^T)^{T} \Sigma^{-1} U^{T} = V \Sigma^{-1} U^{T}
+$$
+
+Thus, we have:
+
+$$
+A^{\dagger} = V \Sigma^{-1}U^T
+$$
+
+
+<a name='extremaltrace'></a>
+## Extremal Trace Problems
+
+<a name='eigendecomposition'></a>
+## Eigenvectors
+
+These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford's EE 263 course (Linear Dynamical Systems).
+
+References:
+
+1. Duchi, John. [Properties of the Trace and Matrix Derivatives](https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf).
+
+2. Boyd, Stephen. [Linear Dynamical Systems, (EE263) Lecture Slides](http://ee263.stanford.edu/lectures/svd-v2.pdf).
+
+3. Boyd, Stephen. [Linear Dynamical Systems, (EE263) Lecture 8: Least-norm solutions of undetermined equations](https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf).
+
+
+
+
