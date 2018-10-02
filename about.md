@@ -10,4 +10,6 @@ I completed my Bachelor's and Master's degrees in computer science at Stanford U
 
 You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found here](http://github.com/johnwlambert/).
 
+Office: College of Computing Building (CCB) 3rd Floor, Georgia Tech
+
  [[My CV]](/assets/cv.pdf)
