@@ -4,8 +4,10 @@ title: About
 permalink: /about/
 ---
 
-I am **John Lambert**, a current Master's student at Stanford working in the field of computer vision, a field which relies heavily upon optimization and machine learning. Some of my code can be [found here](http://github.com/johnwlambert/).
+I am **John Lambert**, a current Ph.D. student at Georgia Tech working in the field of computer vision, a field which relies heavily upon numerical optimization and statistical machine learning.  I am advised by Professor [James Hays](https://www.cc.gatech.edu/~hays/).
 
-I am an incoming Ph.D. student at Georgia Tech. You can reach me at johnwl AT stanford DOT edu.
+I completed my Bachelor's and Master's degrees in computer science at Stanford University, specializing in artificial intelligence.
+
+You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found here](http://github.com/johnwlambert/).
 
  [[My CV]](/assets/cv.pdf)
