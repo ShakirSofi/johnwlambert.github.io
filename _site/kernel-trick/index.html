@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Kernel Trick</title>
-  <meta name="description" content="Table of Contents: Kernel Trick">
+  <meta name="description" content="The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.">
 
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="canonical" href="http://johnwlambert.github.io/kernel-trick/">
@@ -89,40 +89,34 @@
   </header>
 
   <article class="post-content">
-  <p>Table of Contents:</p>
-<ul>
-  <li><a href="#rank">Kernel Trick</a></li>
-</ul>
-
-<h2 id="the-kernel-trick">The Kernel Trick</h2>
+  <h2 id="the-kernel-trick">The Kernel Trick</h2>
 <p>The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</p>
 
 <script type="math/tex; mode=display">K(x,z) = (x^Tz)^2 = (\sum\limits_{i=1}^n x_iz_i)^2</script>
 
-<p>You might be tempted to simplify this immediately to, but this square of sums, which involves a large product (Remember expanding binomial products like \( (a-b)(a-b) \) ).</p>
+<p>You might be tempted to simplify this immediately to \( \sum\limits_{i=1}^n (x_iz_i)^2 \), but this would be incorrect. This expression is actually a square of sums, which involves a large product (remember expanding binomial products like \( (a-b)(a-b) \) which involve \(2^2\) terms ).</p>
 
 <p>We can expand the square of sums, and we’ll use different indices \(i,j\) to keep track of the respective terms:</p>
 
-<script type="math/tex; mode=display">=(\sum\limits_{i=1}^n x_iz_i)^2 (\sum\limits_{j=1}^n x_jz_j)^2</script>
+<script type="math/tex; mode=display">K(x,z) = (\sum\limits_{i=1}^n x_iz_i) (\sum\limits_{j=1}^n x_jz_j)</script>
 
-<script type="math/tex; mode=display">=\sum\limits_{i=1}^n \sum\limits_{j=1}^n (x_ix_j) (z_iz_j)</script>
+<script type="math/tex; mode=display">K(x,z) = \sum\limits_{i=1}^n \sum\limits_{j=1}^n (x_ix_j) (z_iz_j)</script>
 
 <p>This is much easier to understand with an example. Consider \(n=3\):</p>
 
-<script type="math/tex; mode=display">\begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix} \begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix}</script>
+<script type="math/tex; mode=display">K(x,z) = \begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix} \begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix}</script>
 
 <p>Expanding terms, we get a sum with 9 total terms:</p>
 
-<script type="math/tex; mode=display">= (x_1z_1x_1z_1 +  x_1z_1x_2z_2 + x_1z_1x_3z_3) + (x_2z_2 x_1z_1 +  x_2z_2 x_2z_2 +   x_2z_2x_3z_3) +  x_3z_3x_1z_1 + x_3z_3x_2z_2 + x_3z_3x_3z_3</script>
+<script type="math/tex; mode=display">K(x,z) = \bigg(x_1z_1x_1z_1 +  x_1z_1x_2z_2 + x_1z_1x_3z_3\bigg) + \bigg(x_2z_2 x_1z_1 +  x_2z_2 x_2z_2 +   x_2z_2x_3z_3\bigg) + \bigg( x_3z_3x_1z_1 + x_3z_3x_2z_2 + x_3z_3x_3z_3 \bigg)</script>
 
 <p>Surprisingly, this sum can be written as a simple inner product of two vectors</p>
 
-<script type="math/tex; mode=display">=\phi(x)^T \phi(z) = \begin{bmatrix} x_1x_1  \\ x_1x_2 \\ x_1x_3 \\ x_2x_1 \\ x_2x_2 \\ x_2x_3  \\ \vdots  \\ \end{bmatrix} \begin{bmatrix} z_1z_1  \\ z_1z_2 \\ z_1z_3 \\ z_2z_1 \\ z_2z_2 \\ z_2z_3  \\ \vdots  \\ \end{bmatrix}</script>
+<script type="math/tex; mode=display">K(x,z) =\phi(x)^T \phi(z) = \begin{bmatrix} x_1x_1  \\ x_1x_2 \\ x_1x_3 \\ x_2x_1 \\ x_2x_2 \\ x_2x_3  \\ \vdots  \\ \end{bmatrix} \begin{bmatrix} z_1z_1  \\ z_1z_2 \\ z_1z_3 \\ z_2z_1 \\ z_2z_2 \\ z_2z_3  \\ \vdots  \\ \end{bmatrix}</script>
 
 <p>Thus, we’ve shown that for \(n=3\),
-<script type="math/tex">K(x,z) = \phi(x)^T \phi(z)</script></p>
-
-<p>which contains all of the cross-product terms.</p>
+<script type="math/tex">K(x,z) = \phi(x)^T \phi(z)</script>
+which contains all of the cross-product terms.</p>
 
 
   </article>
@@ -181,8 +175,15 @@
       </div>
 
       <div class="footer-col footer-col-3">
-        <p>Ph.D. Candidate in Computer Vision.
-</p>
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
       </div>
     </div>
 
