@@ -8,7 +8,7 @@ layout: default
 
 I am a Ph.D. student at Georgia Tech, advised by Professor [James Hays](https://www.cc.gatech.edu/~hays/). I completed my Bachelor's and Master's degrees in Computer Science at Stanford University in 2018, specializing in artificial intelligence.  My research interests revolve around the semantic understanding of geometric data.
 
-I enjoy creating teaching materials for topics in computer vision, a field which relies heavily upon numerical optimization and statistical machine learning tools.  I am 
+I enjoy creating teaching materials for topics in computer vision, a field which relies heavily upon numerical optimization and statistical machine learning tools.
 
 You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found here](http://github.com/johnwlambert/).
 
