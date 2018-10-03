@@ -28,17 +28,79 @@ Humans have an amazing ability to understand the world through their visual syst
 Today, the computer vision community is learning how to use statistical learning and numerical optimization techniques for handling 3D sensor data. Accurate 3D understanding of environments will have enormous benefit for people all over the world, with implications for safer transportation and safer workplaces.
 
 ## Teaching
-<div class="home">
-  
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        <br>
-        {{ post.excerpt }}
-      </li>
-    {% endfor %}
-  </ul>
 
+<div class="teaching-home">
+  <div class="materials-wrap">
+
+    <div class="module-header">Module 1: Linear Algebra</div>
+
+    <div class="materials-item">
+      <a href="linear-algebra/">
+        Linear Algebra Without the Agonizing Pain
+      </a>
+      <div class="kw">
+        Necessary Linear Algebra Overview
+      </div>
+    </div>
+
+    <div class="materials-item">
+      <a href="fast-nearest-neighbor/">
+         Fast Nearest Neighbors
+      </a>
+      <div class="kw">
+        Vectorizing nearest neighbors (with no for-loops!)
+      </div>
+    </div>
+
+
+
+    <div class="module-header">Module 2: SVMs and Optimization </div>
+
+    <div class="materials-item">
+      <a href="kernel-trick/">
+        The Kernel Trick
+      </a>
+      <div class="kw">
+          poorly taught but beautiful piece of insight that makes SVMs work
+      </div>
+    </div>
+
+    <div class="materials-item">
+      <a href="gauss-newton/">
+        Gauss-Newton Optimization in 10 Minutes
+      </a>
+      <div class="kw">
+        Including Trust-Region Variant (Levenberg-Marquardt)
+      </div>
+    </div>
+
+
+    <div class="materials-item">
+      <a href="convex-opt/">
+        Convex Optimization Without the Agonizing Pain
+      </a>
+      <div class="kw">
+        Constrained Optimization, Lagrangians, Duality, and Interior Point Methods
+      </div>
+    </div>
+
+    <div class="materials-item">
+      <a href="subgradient-methods/">
+        Subgradient Methods in 10 Minutes
+      </a>
+      <div class="kw">
+        Convex Optimization Part II
+      </div>
+    </div>
+
+
+    <div class="module-header">Module 3: MPI </div>
+
+    <div class="module-header">Module 4: State Estimation </div>
+
+    <div class="module-header">Module 5: Geometry and Camera Calibration </div>
+
+ 
+  </div>
 </div>
+

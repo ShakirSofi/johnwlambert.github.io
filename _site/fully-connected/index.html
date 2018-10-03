@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Fully Connected Neural Networks From Scratch</title>
+  <meta name="description" content="Demystify backprop.">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/fully-connected/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Fully Connected Neural Networks From Scratch</h1>
+    <p class="meta">Oct 2, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.</p>
+
+<p>Suppose we wish to implement a fully-connected feedforward neural network with 1 input layer, 1 hidden layer, and 1 output layer. We call such a network to be a two-layer neural network (ignoring the input layer as it is trivially present).</p>
+
+<p>In the feedforward step, we feed an input \(x \in R^{1 \times d}\) through the network.</p>
+
+<script type="math/tex; mode=display">z^{(1)} = W^{(1)}x + b^{(1)}</script>
+
+<script type="math/tex; mode=display">a^{(1)} = \sigma(z^{(1)})</script>
+
+<script type="math/tex; mode=display">z^{(2)} = W^{(2)}a^{(1)} + b^{(2)}</script>
+
+<script type="math/tex; mode=display">\hat{y} = a^{(2)} = \mbox{ softmax }(z^{(2)} )</script>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">python_feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cache</span><span class="p">):</span>
+	<span class="k">assert</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'X'</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+
+	<span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+	<span class="n">z1</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">matlib</span><span class="o">.</span><span class="n">repmat</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'b1'</span><span class="p">],</span> <span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'z1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">z1</span>
+
+	<span class="n">a1</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z1</span><span class="p">))</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'a1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">a1</span>
+
+	<span class="k">assert</span><span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+	<span class="n">z2</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">matlib</span><span class="o">.</span><span class="n">repmat</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'b2'</span><span class="p">],</span> <span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'z2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">z2</span>
+
+	<span class="c">#logits = np.exp(z2) / np.matlib.repmat( np.sum(np.exp(z2.T),axis=1).T, cache['D_out'], 1)</span>
+	<span class="n">logits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">matlib</span><span class="o">.</span><span class="n">repmat</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z2</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">cache</span><span class="p">[</span><span class="s">'D_out'</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'logits'</span><span class="p">]</span> <span class="o">=</span> <span class="n">logits</span> <span class="c"># also called cache.yc, a2</span>
+	<span class="k">return</span> <span class="n">logits</span>
+</code></pre></div></div>
+
+<p>We’ll add L2 regularization on the weights of the network:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">norms</span><span class="p">(</span><span class="n">cache</span><span class="p">):</span>
+	<span class="n">all_sum</span> <span class="o">=</span>  <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">])</span> <span class="o">**</span><span class="mi">2</span>
+	<span class="n">all_sum</span> <span class="o">+=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'W2'</span><span class="p">])</span> <span class="o">**</span><span class="mi">2</span>
+	<span class="k">return</span> <span class="n">all_sum</span>
+</code></pre></div></div>
+
+<p>We use a cross-entropy loss:</p>
+
+<script type="math/tex; mode=display">CE(y, \hat{y}) = - \sum\limits_{i=0}^{C-1} y_i \mbox{ log }(\hat{y}_i)</script>
+
+<p>And we also add the penalization term for the magnitude of \(W\):</p>
+
+<script type="math/tex; mode=display">J(W,b;x,y) = \frac{1}{N} \sum\limits_{i=1}^N CE^{(i)}(y, \hat{y}) + 0.5 \lambda \| p \|^2</script>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">python_loss</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+	<span class="s">"""
+	a = array([[ 0,  1,  2],
+		       [ 3,  4,  5],
+		       [ 6,  7,  8],
+		       [ 9, 10, 11]])
+	logits[np.array([3,2,1]),np.arange(3)]
+	
+	returns array([9, 7, 5])
+	"""</span>
+	<span class="n">yc_scores</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s">'logits'</span><span class="p">][</span><span class="n">y</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">])]</span>
+	<span class="n">ce_sum</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">yc_scores</span><span class="p">))</span>
+
+	<span class="n">data_loss</span> <span class="o">=</span> <span class="n">ce_sum</span> <span class="o">/</span> <span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">]</span> <span class="c"># divide by batch size</span>
+	<span class="n">reg_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cache</span><span class="p">[</span><span class="s">'reg'</span><span class="p">]</span> <span class="o">*</span> <span class="n">norms</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span>
+	<span class="n">loss</span> <span class="o">=</span> <span class="n">data_loss</span> <span class="o">+</span> <span class="n">reg_loss</span>
+	<span class="k">print</span> <span class="s">"Loss: "</span><span class="p">,</span> <span class="n">loss</span>
+	<span class="k">return</span> <span class="n">loss</span>
+</code></pre></div></div>
+
+<p>Now we use the chain rule to backpropagate gradients:</p>
+
+<script type="math/tex; mode=display">\frac{\partial CE(y, \hat{y}) }{ \partial z^{(2)}} = \hat{y} − y</script>
+
+<p>Recall that \(z^{(2)} = W^{(2)}a^{(1)} + b^{(2)} \). Therefore,</p>
+
+<script type="math/tex; mode=display">\frac{ \partial CE(y, \hat{y} )}{\partial W^{(2)}} =
+\frac{ \partial CE(y, \hat{y} )}{\partial z^{(2)}} \frac{\partial z^{(2)}}{\partial W^{(2)}}</script>
+
+<script type="math/tex; mode=display">\frac{ \partial CE(y, \hat{y} )}{ \partial W^{(2)} }= ( \hat{y} − y) a^{(1)^T}</script>
+
+<p>Similarly,</p>
+
+<script type="math/tex; mode=display">\frac{ \partial CE(y, yˆ) }{ \partial b^{(2)} }= \hat{y} − y</script>
+
+<p>Going across L2:</p>
+
+<script type="math/tex; mode=display">\frac{ \partial z^{(2)} }{\partial a^{(1)} }= W^{(2)^T}</script>
+
+<script type="math/tex; mode=display">\frac{ \partial CE(y, yˆ) }{\partial a^{(1)} } = \frac{\partial CE(y, yˆ)}{\partial z^{(2)} } \frac{ \partial z^{(2)} }{\partial a^{(1)} } = W^{(2)^T} ( \hat{y} − y)</script>
+
+<p>Going across the non-linearity of L1:</p>
+
+<script type="math/tex; mode=display">\frac{\partial CE(y, yˆ) }{\partial z^{(1)} }= \frac{ \partial CE(y, yˆ)}{ \partial a^{(1)}} \frac{ \partial σ(z)}{ \partial z^{(1)} }</script>
+
+<script type="math/tex; mode=display">= \frac{\partial CE(y, yˆ)}{\partial a^{(1)} } ◦ σ(z^{(1)}) ◦ (1 − \sigma(z^{(1)}))</script>
+
+<p>Note that we have assumed that <script type="math/tex">\sigma(·)</script> works on matrices by applying an element-wise sigmoid, and ◦ is the
+element-wise (Hadamard) product.
+That brings us to our final gradients:
+\partial CE(y, yˆ)
+\partial W(1) =
+\partial CE(y, yˆ)
+\partial z(1)
+\partial z(1)
+\partial W(1)
+\partial CE(y, yˆ)
+\partial W(1) =
+∂CE(y, yˆ)
+∂z(1) 
+x
+T
+(6)
+Similarly,
+\partial CE(y, yˆ)
+\partial b(1) =
+\partial CE(y, yˆ)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">python_backprop</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">grads</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+	<span class="c"># divide by batch size</span>
+	<span class="n">one_hot_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">cache</span><span class="p">[</span><span class="s">'D_out'</span><span class="p">],</span><span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">]))</span>
+	<span class="n">one_hot_y</span><span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">])]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">])</span>
+	<span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'logits'</span><span class="p">]</span> <span class="o">-</span> <span class="n">one_hot_y</span><span class="p">)</span>
+	<span class="n">grads</span><span class="p">[</span><span class="s">'dW2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mm</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">cache</span><span class="p">[</span><span class="s">'a1'</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">cache</span><span class="p">[</span><span class="s">'reg'</span><span class="p">]</span> <span class="o">*</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span> <span class="c"># 0.5 cancels</span>
+	<span class="c">#grads['db2'] = np.sum(diff, axis=1)</span>
+	<span class="n">grads</span><span class="p">[</span><span class="s">'db2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+	<span class="n">da1</span> <span class="o">=</span> <span class="n">mm</span><span class="p">(</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">diff</span> <span class="p">)</span>
+	<span class="c"># elementwise</span>
+	<span class="n">dz1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">da1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span> <span class="n">cache</span><span class="p">[</span><span class="s">'a1'</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">cache</span><span class="p">[</span><span class="s">'a1'</span><span class="p">])</span> <span class="p">)</span> <span class="p">)</span>
+
+	<span class="n">grads</span><span class="p">[</span><span class="s">'dW1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mm</span><span class="p">(</span><span class="n">dz1</span><span class="p">,</span> <span class="n">cache</span><span class="p">[</span><span class="s">'X'</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span> <span class="o">+</span> <span class="n">cache</span><span class="p">[</span><span class="s">'reg'</span><span class="p">]</span> <span class="o">*</span> <span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span>  <span class="c"># 0.5 cancels</span>
+	<span class="c">#grads['db1'] = np.sum(dz1, axis=1)</span>
+	<span class="n">grads</span><span class="p">[</span><span class="s">'db1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">dz1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</code></pre></div></div>
+
+<h2 id="implementing-the-same-network-in-pytorch">Implementing the same network in Pytorch</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="n">optim</span>
+<span class="kn">import</span> <span class="nn">pdb</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="kn">import</span> <span class="nn">numpy.matlib</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">matmul</span> <span class="k">as</span> <span class="n">mm</span>
+
+
+<span class="k">class</span> <span class="nc">PytorchFCNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">PytorchFCNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span> <span class="n">cache</span><span class="p">[</span><span class="s">'D_in'</span><span class="p">],</span> <span class="n">cache</span><span class="p">[</span><span class="s">'H'</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">fc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span> <span class="n">cache</span><span class="p">[</span><span class="s">'H'</span><span class="p">],</span> <span class="n">cache</span><span class="p">[</span><span class="s">'D_out'</span><span class="p">])</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">weights_init</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">weights_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">()</span> <span class="p">):</span>
+			<span class="c">#classname = m.__class__.__name__</span>
+			<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">):</span>
+				<span class="k">print</span> <span class="s">'idx = </span><span class="si">%</span><span class="s">d'</span> <span class="o">%</span> <span class="n">idx</span>
+				<span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+					<span class="c">#m.weight.data = torch.from_numpy(self.cache['W1'])</span>
+					<span class="c">#m.bias.data = torch.from_numpy(self.cache['b1'])</span>
+					<span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+					<span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+					<span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+					<span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+					<span class="c">#m.weight.data = torch.from_numpy(self.cache['W2'])</span>
+					<span class="c">#m.bias.data = torch.from_numpy(self.cache['b2'])</span>
+					<span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+					<span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+		<span class="c"># # Create random Tensors for weights; setting requires_grad=True means that we</span>
+		<span class="c"># # want to compute gradients for these Tensors during the backward pass.</span>
+		<span class="c"># W1 = torch.fromnumpy(cache['W1'] , requires_grad=True)</span>
+		<span class="c"># b1 = torch.fromnumpy(cache['b1'] device=device, requires_grad=True)</span>
+
+		<span class="c"># W2 = torch.fromnumpy(cache['W2'] device=device, requires_grad=True)</span>
+		<span class="c"># b2 = torch.fromnumpy(cache['b2'] device=device, requires_grad=True)</span>
+
+		<span class="c"># W1 = torch.as_tensor(W1, device=device)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+		<span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">x</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_pytorch_fc_net</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">):</span>
+
+	<span class="n">model</span> <span class="o">=</span> <span class="n">PytorchFCNet</span><span class="p">(</span><span class="n">cache</span><span class="p">)</span>
+	<span class="c">#device = torch.device('cpu')</span>
+
+	<span class="c"># Create random Tensors to hold input and outputs</span>
+	<span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="c">#, device=device)</span>
+	<span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="c">#, device=device)</span>
+
+	<span class="n">X</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">),</span> <span class="n">volatile</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+	<span class="n">y</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">),</span> <span class="n">volatile</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+	<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+	<span class="c">#optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, weight_decay=cache['reg'])</span>
+
+
+
+	<span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+	<span class="n">logits</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span> <span class="c">#, dim=1)</span>
+	<span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">size_average</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+	
+	<span class="c"># exclude bias weights</span>
+	<span class="n">norms</span> <span class="o">=</span>  <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span> <span class="o">**</span><span class="mi">2</span>
+	<span class="n">norms</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span> <span class="o">**</span><span class="mi">2</span>
+
+	<span class="n">loss</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cache</span><span class="p">[</span><span class="s">'reg'</span><span class="p">]</span> <span class="o">*</span> <span class="n">norms</span>
+
+
+	<span class="k">print</span> <span class="n">loss</span> <span class="c"># sum up batch loss</span>
+
+	<span class="c"># Use autograd to compute the backward pass. This call will compute the</span>
+	<span class="c"># gradient of loss with respect to all Tensors with requires_grad=True.</span>
+	<span class="c"># After this call w1.grad and w2.grad will be Tensors holding the gradient</span>
+	<span class="c"># of the loss with respect to w1 and w2 respectively.</span>
+	<span class="c">#optimizer.zero_grad()</span>
+
+
+	<span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+	<span class="c">#optimizer.step()</span>
+
+
+	<span class="c"># optimizer weight_decay=0</span>
+
+	<span class="k">print</span> <span class="s">'W1 grad:'</span>
+	<span class="k">print</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span>
+
+	<span class="k">print</span> <span class="s">'b1 grad:'</span>
+	<span class="k">print</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span>
+
+	<span class="k">print</span> <span class="s">'W2 grad:'</span>
+	<span class="k">print</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span>
+
+	<span class="k">print</span> <span class="s">'b2 grad:'</span>
+	<span class="k">print</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span>
+
+
+	<span class="c"># print 'W1 weight:'</span>
+	<span class="c"># print list(model.modules())[1].weight.data</span>
+
+	<span class="c"># print 'b1 weight:'</span>
+	<span class="c"># print list(model.modules())[1].bias.data</span>
+
+	<span class="c"># print 'W2 weight:'</span>
+	<span class="c"># print list(model.modules())[2].weight.data</span>
+
+	<span class="c"># print 'b2 weight:'</span>
+	<span class="c"># print list(model.modules())[2].bias.data</span>
+
+	<span class="c"># Update weights using gradient descent. For this step we just want to mutate</span>
+	<span class="c"># the values of w1 and w2 in-place; we don't want to build up a computational</span>
+	<span class="c"># graph for the update steps, so we use the torch.no_grad() context manager</span>
+	<span class="c"># to prevent PyTorch from building a computational graph for the updates</span>
+	<span class="c"># with torch.no_grad():</span>
+	<span class="c"># list(model.modules())[1].weight.data -= learning_rate * list(model.modules())[1].weight.grad.data</span>
+	<span class="c"># list(model.modules())[2].weight.data -= learning_rate * list(model.modules())[2].weight.grad.data</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_python_fc_net</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">):</span>
+	<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+	<span class="n">grads</span> <span class="o">=</span> <span class="p">{}</span>
+
+	<span class="n">python_feedforward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+	<span class="k">print</span> <span class="s">'logits:'</span>
+	<span class="k">print</span> <span class="n">cache</span><span class="p">[</span><span class="s">'logits'</span><span class="p">]</span>
+	<span class="n">python_loss</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+	<span class="n">python_backprop</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">grads</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+	<span class="k">print</span> <span class="s">'W1 grad'</span>
+	<span class="k">print</span> <span class="n">grads</span><span class="p">[</span><span class="s">'dW1'</span><span class="p">]</span>
+
+	<span class="k">print</span> <span class="s">'b1 grad'</span>
+	<span class="k">print</span> <span class="n">grads</span><span class="p">[</span><span class="s">'db1'</span><span class="p">]</span>
+
+	<span class="k">print</span> <span class="s">'W2 grad'</span>
+	<span class="k">print</span> <span class="n">grads</span><span class="p">[</span><span class="s">'dW2'</span><span class="p">]</span>
+
+	<span class="k">print</span> <span class="s">'b2 grad'</span>
+	<span class="k">print</span> <span class="n">grads</span><span class="p">[</span><span class="s">'db2'</span><span class="p">]</span>
+
+	<span class="c"># # Update weights using gradient descent</span>
+	<span class="c"># cache['W1'] -= learning_rate * grads['dW1']</span>
+	<span class="c"># cache['b1'] -= learning_rate * grads['db1']</span>
+
+	<span class="c"># cache['W2'] -= learning_rate * grads['dW2']</span>
+	<span class="c"># cache['b2'] -= learning_rate * grads['db2']</span>
+
+
+	<span class="c"># print 'weight for W1', cache['W1']</span>
+	<span class="c"># print 'weight for b1', cache['b1']</span>
+	<span class="c"># print 'weight for W2', cache['W2']</span>
+	<span class="c"># print 'weight for b2', cache['b2']</span>
+
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+	<span class="c"># N is batch size; D_in is input dimension;</span>
+	<span class="c"># H is hidden dimension; D_out is output dimension.</span>
+	<span class="n">N</span> <span class="o">=</span> <span class="mi">2</span>
+	<span class="n">D_in</span> <span class="o">=</span> <span class="mi">3</span>
+	<span class="n">H</span> <span class="o">=</span> <span class="mi">4</span>
+	<span class="n">D_out</span> <span class="o">=</span> <span class="mi">5</span>
+
+	<span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'reg'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+	<span class="n">cache</span><span class="p">[</span><span class="s">'N'</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'D_in'</span><span class="p">]</span> <span class="o">=</span> <span class="n">D_in</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'H'</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'D_out'</span><span class="p">]</span> <span class="o">=</span> <span class="n">D_out</span>
+
+	<span class="c"># Create random input and output data</span>
+	<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">D_in</span><span class="o">*</span><span class="n">N</span><span class="p">))</span>
+	<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">(</span><span class="n">D_in</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span> 
+	<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span> 
+				<span class="c">#	[1,0],</span>
+				<span class="c">#	[0,1],</span>
+				<span class="c">#	[0,0]]	)</span>
+
+
+		<span class="c">#np.random.randn(D_out,N)</span>
+
+	<span class="c"># Randomly initialize weights</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">H</span><span class="p">,</span> <span class="n">D_in</span><span class="p">))</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">][:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">2.</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'W1'</span><span class="p">][:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">3.</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'W2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">D_out</span><span class="p">,</span> <span class="n">H</span><span class="p">))</span> <span class="o">*</span> <span class="mf">2.</span>
+
+	<span class="n">cache</span><span class="p">[</span><span class="s">'b1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'H'</span><span class="p">])</span>
+	<span class="n">cache</span><span class="p">[</span><span class="s">'b2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s">'D_out'</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.</span>
+	<span class="n">run_pytorch_fc_net</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+	<span class="n">run_python_fc_net</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>References:</p>
+
+<p>(1) Eric Darve, Stanford University.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

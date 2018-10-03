@@ -1,6 +1,7 @@
 ---
 layout: post
 comments: true
+permalink: /convex-opt/
 title:  "Convex Optimization Without the Agonizing Pain"
 excerpt: "Constrained Optimization, Lagrangians, Duality, and Interior Point Methods"
 date:   2018-04-01 11:00:00

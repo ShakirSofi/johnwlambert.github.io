@@ -1,6 +1,7 @@
 ---
 layout: post
 comments: true
+permalink: /gauss-newton/
 title:  "Gauss-Newton Optimization in 10 Minutes"
 excerpt: "Including Trust-Region Variant (Levenberg-Marquardt)"
 date:   2018-03-31 11:00:00

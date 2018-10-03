@@ -1,6 +1,7 @@
 ---
 layout: post
 comments: true
+permalink: /linear-algebra/
 title:  "Linear Algebra Without the Agonizing Pain"
 excerpt: "Necessary Linear Algebra Overview"
 date:   2018-03-30 11:00:00

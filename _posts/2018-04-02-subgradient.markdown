@@ -1,6 +1,7 @@
 ---
 layout: post
 comments: true
+permalink: /subgradient-methods/
 title:  "Subgradient Methods in 10 Minutes"
 excerpt: "Convex Optimization Part II"
 date:   2018-04-02 11:00:00
