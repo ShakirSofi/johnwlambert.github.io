@@ -2,7 +2,7 @@
 layout: default
 ---
 
-|![](/images/mom_melissa_huntington_small.jpg) | Ph.D. Candidate<br>[School of Interactive Computing](https://www.ic.gatech.edu/)<br>[Georgia Institute of Technology](https://www.gatech.edu/) | | 
+|![](/images/mom_melissa_huntington_small.jpg) | Ph.D. Candidate<br>[School of Interactive Computing](https://www.ic.gatech.edu/)<br>[Georgia Institute of Technology](https://www.gatech.edu/) | 
 
 ## Bio
 
