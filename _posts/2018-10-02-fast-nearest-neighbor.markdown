@@ -2,6 +2,7 @@
 layout: post
 title:  "Fast Nearest Neighbors"
 permalink: /fast-nearest-neighbor/
+excerpt: "Vectorizing nearest neighbors (with no for-loops!)"
 mathjax: true
 date:   2018-10-02 11:00:00
 mathjax: true

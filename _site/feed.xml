@@ -1,38 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-10-02T23:02:18-04:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Kernel Trick</title><link href="http://johnwlambert.github.io/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/kernel-trick</id><content type="html" xml:base="http://johnwlambert.github.io/kernel-trick/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#rank&quot;&gt;Kernel Trick&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-10-02T23:27:17-04:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Kernel Trick</title><link href="http://johnwlambert.github.io/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/kernel-trick</id><content type="html" xml:base="http://johnwlambert.github.io/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
 &lt;p&gt;The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = (x^Tz)^2 = (\sum\limits_{i=1}^n x_iz_i)^2&lt;/script&gt;
 
-&lt;p&gt;You might be tempted to simplify this immediately to, but this square of sums, which involves a large product (Remember expanding binomial products like \( (a-b)(a-b) \) ).&lt;/p&gt;
+&lt;p&gt;You might be tempted to simplify this immediately to \( \sum\limits_{i=1}^n (x_iz_i)^2 \), but this would be incorrect. This expression is actually a square of sums, which involves a large product (remember expanding binomial products like \( (a-b)(a-b) \) which involve \(2^2\) terms ).&lt;/p&gt;
 
 &lt;p&gt;We can expand the square of sums, and we’ll use different indices \(i,j\) to keep track of the respective terms:&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;=(\sum\limits_{i=1}^n x_iz_i)^2 (\sum\limits_{j=1}^n x_jz_j)^2&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = (\sum\limits_{i=1}^n x_iz_i) (\sum\limits_{j=1}^n x_jz_j)&lt;/script&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;=\sum\limits_{i=1}^n \sum\limits_{j=1}^n (x_ix_j) (z_iz_j)&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = \sum\limits_{i=1}^n \sum\limits_{j=1}^n (x_ix_j) (z_iz_j)&lt;/script&gt;
 
 &lt;p&gt;This is much easier to understand with an example. Consider \(n=3\):&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix} \begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix}&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = \begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix} \begin{bmatrix} x_1z_1 + x_2z_2 + x_3z_3 \end{bmatrix}&lt;/script&gt;
 
 &lt;p&gt;Expanding terms, we get a sum with 9 total terms:&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;= (x_1z_1x_1z_1 +  x_1z_1x_2z_2 + x_1z_1x_3z_3) + (x_2z_2 x_1z_1 +  x_2z_2 x_2z_2 +   x_2z_2x_3z_3) +  x_3z_3x_1z_1 + x_3z_3x_2z_2 + x_3z_3x_3z_3&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = \bigg(x_1z_1x_1z_1 +  x_1z_1x_2z_2 + x_1z_1x_3z_3\bigg) + \bigg(x_2z_2 x_1z_1 +  x_2z_2 x_2z_2 +   x_2z_2x_3z_3\bigg) + \bigg( x_3z_3x_1z_1 + x_3z_3x_2z_2 + x_3z_3x_3z_3 \bigg)&lt;/script&gt;
 
 &lt;p&gt;Surprisingly, this sum can be written as a simple inner product of two vectors&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;=\phi(x)^T \phi(z) = \begin{bmatrix} x_1x_1  \\ x_1x_2 \\ x_1x_3 \\ x_2x_1 \\ x_2x_2 \\ x_2x_3  \\ \vdots  \\ \end{bmatrix} \begin{bmatrix} z_1z_1  \\ z_1z_2 \\ z_1z_3 \\ z_2z_1 \\ z_2z_2 \\ z_2z_3  \\ \vdots  \\ \end{bmatrix}&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) =\phi(x)^T \phi(z) = \begin{bmatrix} x_1x_1  \\ x_1x_2 \\ x_1x_3 \\ x_2x_1 \\ x_2x_2 \\ x_2x_3  \\ \vdots  \\ \end{bmatrix} \begin{bmatrix} z_1z_1  \\ z_1z_2 \\ z_1z_3 \\ z_2z_1 \\ z_2z_2 \\ z_2z_3  \\ \vdots  \\ \end{bmatrix}&lt;/script&gt;
 
 &lt;p&gt;Thus, we’ve shown that for \(n=3\),
-&lt;script type=&quot;math/tex&quot;&gt;K(x,z) = \phi(x)^T \phi(z)&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">Table of Contents: Kernel Trick</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://johnwlambert.github.io/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/fast-nearest-neighbor</id><content type="html" xml:base="http://johnwlambert.github.io/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;script type=&quot;math/tex&quot;&gt;K(x,z) = \phi(x)^T \phi(z)&lt;/script&gt;
+which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://johnwlambert.github.io/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/fast-nearest-neighbor</id><content type="html" xml:base="http://johnwlambert.github.io/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#rank&quot;&gt;Brute Force&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#fastaffinitymatrices&quot;&gt;Fast Affinity Matrices&lt;/a&gt;&lt;/li&gt;
@@ -142,7 +136,7 @@ AB^T = \begin{bmatrix} - &amp; a_1 &amp; - \\ - &amp; a_2 &amp; - \\ - &amp; a_3
   &lt;span class=&quot;n&quot;&gt;unit_test_arr_arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Table of Contents: Brute Force Fast Affinity Matrices Speedup</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://johnwlambert.github.io/2018/04/02/subgradient.html" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/2018/04/02/subgradient</id><content type="html" xml:base="http://johnwlambert.github.io/2018/04/02/subgradient.html">&lt;!-- 
+&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://johnwlambert.github.io/2018/04/02/subgradient.html" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/2018/04/02/subgradient</id><content type="html" xml:base="http://johnwlambert.github.io/2018/04/02/subgradient.html">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
