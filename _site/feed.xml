@@ -1,5 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-10-03T12:30:18-04:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://johnwlambert.github.io/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/fully-connected-network</id><content type="html" xml:base="http://johnwlambert.github.io/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-10-03T12:33:42-04:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Parallel Computing with MPI</title><link href="http://johnwlambert.github.io/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/mpi</id><content type="html" xml:base="http://johnwlambert.github.io/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
+
+&lt;p&gt;mpirun –np 2 nvprof –log-file profile.out.%p&lt;/p&gt;
+
+&lt;p&gt;nvprof ./addMatrices -n 4000&lt;/p&gt;
+
+&lt;p&gt;cuda-memcheck ./memcheck_demo&lt;/p&gt;
+
+&lt;p&gt;MV2_USE_CUDA=1 mpirun -np 4 nvprof –output-profile profile.%p.nvprof ./main [args]&lt;/p&gt;
+
+&lt;p&gt;MV2_USE_CUDA=1 makes MVAPICH2 CUDA aware.&lt;/p&gt;
+
+&lt;p&gt;MV2_USE_CUDA=1 mpirun -np 1 nvprof –kernels gpu_GEMM –analysis-metrics
+–output-profile GEMMmetrics.out.%p.nvprof ./main [args]&lt;/p&gt;
+
+&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://johnwlambert.github.io/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/fully-connected-network</id><content type="html" xml:base="http://johnwlambert.github.io/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
 
 &lt;p&gt;Suppose we wish to implement a fully-connected feedforward neural network with 1 input layer, 1 hidden layer, and 1 output layer. We call such a network to be a two-layer neural network (ignoring the input layer as it is trivially present).&lt;/p&gt;
 
