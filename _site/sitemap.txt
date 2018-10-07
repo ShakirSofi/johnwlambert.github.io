@@ -1,5 +1,10 @@
-http://johnwlambert.github.io/
-http://johnwlambert.github.io/teaching/
-http://johnwlambert.github.io/collaborators/
-http://johnwlambert.github.io/publications/
-
+https://johnwlambert.github.io/
+https://johnwlambert.github.io/teaching/
+https://johnwlambert.github.io/collaborators/
+https://johnwlambert.github.io/publications/
+https://johnwlambert.github.io/linear-algebra/
+https://johnwlambert.github.io/fast-nearest-neighbor/
+https://johnwlambert.github.io/kernel-trick/
+https://johnwlambert.github.io/gauss-newton/
+https://johnwlambert.github.io/convex-opt/
+https://johnwlambert.github.io/subgradient-methods/
