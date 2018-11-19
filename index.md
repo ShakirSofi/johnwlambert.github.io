@@ -100,6 +100,15 @@ Today, the computer vision community is learning how to use statistical learning
 
     <div class="module-header">Module 5: Geometry and Camera Calibration </div>
 
+    <div class="materials-item">
+      <a href="epipolar-geometry/">
+        Epipolar Geometry and the Fundamental Matrix
+      </a>
+      <div class="kw">
+          simple ideas that are normally poorly explained 
+      </div>
+    </div>
+
  
   </div>
 </div>
