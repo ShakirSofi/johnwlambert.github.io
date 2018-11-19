@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/epipolar-geometry/">
+  <link rel="canonical" href="http://localhost:4000/epipolar-geometry/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -96,7 +96,7 @@
 
 <h2 id="the-fundamental-matrix">The Fundamental Matrix</h2>
 
-<p>The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x^{\prime},\) are 2D corresponding points in separate images. In other words,</p>
+<p>The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x,x^{\prime}\) are 2D corresponding points in separate images. In other words,</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{bmatrix} u^{\prime} & v^{\prime} & 1 \end{bmatrix} \begin{bmatrix} f_{11} & f_{12} & f_{13} \\ f_{21} & f_{22} & f_{23} \\ f_{31} & f_{32} & f_{33} \end{bmatrix} \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = 0 %]]></script>
@@ -119,22 +119,24 @@ Af = \begin{bmatrix} u_1 u_1^{\prime} & u_1v_1^{\prime} & u_1 & v_1 u_1^{\prime}
 
 <p>meaning the eigenvector associated with the smallest eigenvalue \(\lambda_n\) of \(B\) is the solution \(x^{\star}\). The vector \(x^{\star}\) contains the 9 entries of the Fundamental matrix \(F^{\star}\).</p>
 
-<p>This is a specific instance of the extremal trace \([2]\) (or trace minimization on a unit sphere) problem, with \(k=1\), i.e.
-\begin{equation}
-    \begin{array}{ll}
-    \mbox{minimize} &amp; \mathbf{\mbox{Tr}}(X^TBX) <br />
-    \mbox{subject to} &amp; X^TX=I_k
-    \end{array}
-\end{equation}
-where \(I_k\) denotes the \(k \times k\) identity matrix. The unit ball constraint avoids the trivial solution when all eigenvalues \(\lambda_i\) are zero instead of a single zero eigenvalue.</p>
+<p>This is a specific instance of the extremal trace \([2]\) (or trace minimization on a unit sphere) problem, with \(k=1\), i.e.</p>
 
-<p>In our case, since $U,V$ are orthogonal matrices (with orthonormal columns), then \(U^TU=I\). Thus, the SVD of \(B\) yields 
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+    \begin{array}{ll}
+    \mbox{minimize} & \mathbf{\mbox{Tr}}(X^TBX) \\
+    \mbox{subject to} & X^TX=I_k
+    \end{array}
+\end{aligned} %]]></script>
+
+<p>where \(I_k\) denotes the \(k \times k\) identity matrix. The unit ball constraint avoids the trivial solution when all eigenvalues \(\lambda_i\) are zero instead of a single zero eigenvalue.</p>
+
+<p>In our case, since \(U,V\) are orthogonal matrices (with orthonormal columns), then \(U^TU=I\). Thus, the SVD of \(B\) yields 
 \begin{equation}
 A^TA = (U\Sigma V^T)^T (U\Sigma V^T) = V\Sigma U^TU \Sigma V^T = V \Sigma^2 V^T.
 \end{equation}</p>
 
-<p>Since \(B=A^TA\), \(B\) is symmetric, and thus the columns of \(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\) are eigenvectors of \(B\). \(V\) can equivalently be computed with the SVD of \(A\) or \(B\), since \(V\) appeares in both decompositions: \(A=U \Sigma V^T\) and \(B=V\Sigma^2V^T\).
-\ \</p>
+<p>Since \(B=A^TA\), \(B\) is symmetric, and thus the columns of \(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\) are eigenvectors of \(B\). \(V\) can equivalently be computed with the SVD of \(A\) or \(B\), since \(V\) appears in both decompositions: \(A=U \Sigma V^T\) and \(B=V\Sigma^2V^T\).</p>
 
 <h2 id="proof-the-svd-provides-the-solution">Proof: the SVD provides the solution</h2>
 <p>The proof is almost always taken for granted, but we will provide it here for completeness. Because \(B\) is symmetric, there exists a set of \(n\) orthonormal eigenvectors, yielding an eigendecomposition \(B=V^T \Lambda V\). Thus,</p>

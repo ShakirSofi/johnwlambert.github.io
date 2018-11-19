@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-11-19T10:53:25-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Epipolar Geometry</title><link href="http://johnwlambert.github.io/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://johnwlambert.github.io/epipolar-geometry</id><content type="html" xml:base="http://johnwlambert.github.io/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-11-19T12:24:55-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Epipolar Geometry</title><link href="http://localhost:4000/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://localhost:4000/epipolar-geometry</id><content type="html" xml:base="http://localhost:4000/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
 &lt;p&gt;Modern robotic computer vision tasks like Structure from Motion (SfM) and Simultaneous Localization and Mapping (SLAM) would not be possible without feature matching. Tools from Epipolar Geometry are an easy way to discard outliers in feature matching and are widely used.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-fundamental-matrix&quot;&gt;The Fundamental Matrix&lt;/h2&gt;
 
-&lt;p&gt;The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x^{\prime},\) are 2D corresponding points in separate images. In other words,&lt;/p&gt;
+&lt;p&gt;The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x,x^{\prime}\) are 2D corresponding points in separate images. In other words,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{bmatrix} u^{\prime} &amp; v^{\prime} &amp; 1 \end{bmatrix} \begin{bmatrix} f_{11} &amp; f_{12} &amp; f_{13} \\ f_{21} &amp; f_{22} &amp; f_{23} \\ f_{31} &amp; f_{32} &amp; f_{33} \end{bmatrix} \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = 0 %]]&gt;&lt;/script&gt;
@@ -27,22 +27,24 @@ Af = \begin{bmatrix} u_1 u_1^{\prime} &amp; u_1v_1^{\prime} &amp; u_1 &amp; v_1 
 
 &lt;p&gt;meaning the eigenvector associated with the smallest eigenvalue \(\lambda_n\) of \(B\) is the solution \(x^{\star}\). The vector \(x^{\star}\) contains the 9 entries of the Fundamental matrix \(F^{\star}\).&lt;/p&gt;
 
-&lt;p&gt;This is a specific instance of the extremal trace \([2]\) (or trace minimization on a unit sphere) problem, with \(k=1\), i.e.
-\begin{equation}
-    \begin{array}{ll}
-    \mbox{minimize} &amp;amp; \mathbf{\mbox{Tr}}(X^TBX) &lt;br /&gt;
-    \mbox{subject to} &amp;amp; X^TX=I_k
-    \end{array}
-\end{equation}
-where \(I_k\) denotes the \(k \times k\) identity matrix. The unit ball constraint avoids the trivial solution when all eigenvalues \(\lambda_i\) are zero instead of a single zero eigenvalue.&lt;/p&gt;
+&lt;p&gt;This is a specific instance of the extremal trace \([2]\) (or trace minimization on a unit sphere) problem, with \(k=1\), i.e.&lt;/p&gt;
 
-&lt;p&gt;In our case, since $U,V$ are orthogonal matrices (with orthonormal columns), then \(U^TU=I\). Thus, the SVD of \(B\) yields 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{aligned}
+    \begin{array}{ll}
+    \mbox{minimize} &amp; \mathbf{\mbox{Tr}}(X^TBX) \\
+    \mbox{subject to} &amp; X^TX=I_k
+    \end{array}
+\end{aligned} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where \(I_k\) denotes the \(k \times k\) identity matrix. The unit ball constraint avoids the trivial solution when all eigenvalues \(\lambda_i\) are zero instead of a single zero eigenvalue.&lt;/p&gt;
+
+&lt;p&gt;In our case, since \(U,V\) are orthogonal matrices (with orthonormal columns), then \(U^TU=I\). Thus, the SVD of \(B\) yields 
 \begin{equation}
 A^TA = (U\Sigma V^T)^T (U\Sigma V^T) = V\Sigma U^TU \Sigma V^T = V \Sigma^2 V^T.
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;Since \(B=A^TA\), \(B\) is symmetric, and thus the columns of \(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\) are eigenvectors of \(B\). \(V\) can equivalently be computed with the SVD of \(A\) or \(B\), since \(V\) appeares in both decompositions: \(A=U \Sigma V^T\) and \(B=V\Sigma^2V^T\).
-\ \&lt;/p&gt;
+&lt;p&gt;Since \(B=A^TA\), \(B\) is symmetric, and thus the columns of \(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\) are eigenvectors of \(B\). \(V\) can equivalently be computed with the SVD of \(A\) or \(B\), since \(V\) appears in both decompositions: \(A=U \Sigma V^T\) and \(B=V\Sigma^2V^T\).&lt;/p&gt;
 
 &lt;h2 id=&quot;proof-the-svd-provides-the-solution&quot;&gt;Proof: the SVD provides the solution&lt;/h2&gt;
 &lt;p&gt;The proof is almost always taken for granted, but we will provide it here for completeness. Because \(B\) is symmetric, there exists a set of \(n\) orthonormal eigenvectors, yielding an eigendecomposition \(B=V^T \Lambda V\). Thus,&lt;/p&gt;
@@ -74,7 +76,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 
 &lt;p&gt;[1] H. Longuet Higgins. A computer algorithm for reconstructing a scene from two projections. &lt;em&gt;Nature&lt;/em&gt;, 293, 1981.&lt;/p&gt;
 
-&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://johnwlambert.github.io/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/mpi</id><content type="html" xml:base="http://johnwlambert.github.io/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
+&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://localhost:4000/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/mpi</id><content type="html" xml:base="http://localhost:4000/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
 
 &lt;p&gt;mpirun –np 2 nvprof –log-file profile.out.%p&lt;/p&gt;
 
@@ -89,7 +91,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 &lt;p&gt;MV2_USE_CUDA=1 mpirun -np 1 nvprof –kernels gpu_GEMM –analysis-metrics
 –output-profile GEMMmetrics.out.%p.nvprof ./main [args]&lt;/p&gt;
 
-&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://johnwlambert.github.io/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/fully-connected-network</id><content type="html" xml:base="http://johnwlambert.github.io/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
+&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://localhost:4000/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/fully-connected-network</id><content type="html" xml:base="http://localhost:4000/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
 
 &lt;p&gt;Suppose we wish to implement a fully-connected feedforward neural network with 1 input layer, 1 hidden layer, and 1 output layer. We call such a network to be a two-layer neural network (ignoring the input layer as it is trivially present).&lt;/p&gt;
 
@@ -443,7 +445,7 @@ Similarly,
 
 &lt;p&gt;References:&lt;/p&gt;
 
-&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://johnwlambert.github.io/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/kernel-trick</id><content type="html" xml:base="http://johnwlambert.github.io/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
+&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://localhost:4000/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/kernel-trick</id><content type="html" xml:base="http://localhost:4000/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
 &lt;p&gt;The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = (x^Tz)^2 = (\sum\limits_{i=1}^n x_iz_i)^2&lt;/script&gt;
@@ -470,7 +472,7 @@ Similarly,
 
 &lt;p&gt;Thus, we’ve shown that for \(n=3\),
 &lt;script type=&quot;math/tex&quot;&gt;K(x,z) = \phi(x)^T \phi(z)&lt;/script&gt;
-which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://johnwlambert.github.io/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/fast-nearest-neighbor</id><content type="html" xml:base="http://johnwlambert.github.io/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://localhost:4000/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://localhost:4000/fast-nearest-neighbor</id><content type="html" xml:base="http://localhost:4000/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#rank&quot;&gt;Brute Force&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#fastaffinitymatrices&quot;&gt;Fast Affinity Matrices&lt;/a&gt;&lt;/li&gt;
@@ -580,7 +582,7 @@ AB^T = \begin{bmatrix} - &amp; a_1 &amp; - \\ - &amp; a_2 &amp; - \\ - &amp; a_3
   &lt;span class=&quot;n&quot;&gt;unit_test_arr_arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://johnwlambert.github.io/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/subgradient</id><content type="html" xml:base="http://johnwlambert.github.io/subgradient-methods/">&lt;!-- 
+&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://localhost:4000/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://localhost:4000/subgradient</id><content type="html" xml:base="http://localhost:4000/subgradient-methods/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -734,7 +736,7 @@ x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 
 &lt;p&gt;[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf&quot;&gt;Lecture 6&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://johnwlambert.github.io/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://johnwlambert.github.io/cvx</id><content type="html" xml:base="http://johnwlambert.github.io/convex-opt/">&lt;!-- 
+&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://localhost:4000/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://localhost:4000/cvx</id><content type="html" xml:base="http://localhost:4000/convex-opt/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -1027,7 +1029,7 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
   &lt;li&gt;
     &lt;p&gt;Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf&quot;&gt;Lecture 16&lt;/a&gt;.&lt;/p&gt;
   &lt;/li&gt;
-&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Gauss-Newton Optimization in 10 Minutes</title><link href="http://johnwlambert.github.io/gauss-newton/" rel="alternate" type="text/html" title="Gauss-Newton Optimization in 10 Minutes" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://johnwlambert.github.io/gaussnewton</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-newton/">&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Gauss-Newton Optimization in 10 Minutes</title><link href="http://localhost:4000/gauss-newton/" rel="alternate" type="text/html" title="Gauss-Newton Optimization in 10 Minutes" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://localhost:4000/gaussnewton</id><content type="html" xml:base="http://localhost:4000/gauss-newton/">&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
 
 &lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
 
@@ -1158,7 +1160,7 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 	&lt;span class=&quot;c1&quot;&gt;% stopping condition ...&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry><entry><title type="html">Linear Algebra Without the Agonizing Pain</title><link href="http://johnwlambert.github.io/linear-algebra/" rel="alternate" type="text/html" title="Linear Algebra Without the Agonizing Pain" /><published>2018-03-30T07:00:00-04:00</published><updated>2018-03-30T07:00:00-04:00</updated><id>http://johnwlambert.github.io/linalg</id><content type="html" xml:base="http://johnwlambert.github.io/linear-algebra/">&lt;!-- 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry><entry><title type="html">Linear Algebra Without the Agonizing Pain</title><link href="http://localhost:4000/linear-algebra/" rel="alternate" type="text/html" title="Linear Algebra Without the Agonizing Pain" /><published>2018-03-30T07:00:00-04:00</published><updated>2018-03-30T07:00:00-04:00</updated><id>http://localhost:4000/linalg</id><content type="html" xml:base="http://localhost:4000/linear-algebra/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;

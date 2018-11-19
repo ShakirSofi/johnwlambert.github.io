@@ -16,7 +16,7 @@ Modern robotic computer vision tasks like Structure from Motion (SfM) and Simult
 ## The Fundamental Matrix
 
 
-The Fundamental matrix provides a correspondence \\(x^TFx^{\prime} = 0\\), where \\(x^{\prime},\\) are 2D corresponding points in separate images. In other words,
+The Fundamental matrix provides a correspondence \\(x^TFx^{\prime} = 0\\), where \\(x,x^{\prime}\\) are 2D corresponding points in separate images. In other words,
 
 $$
 \begin{bmatrix} u^{\prime} & v^{\prime} & 1 \end{bmatrix} \begin{bmatrix} f_{11} & f_{12} & f_{13} \\ f_{21} & f_{22} & f_{23} \\ f_{31} & f_{32} & f_{33} \end{bmatrix} \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = 0
@@ -45,21 +45,26 @@ $$
 meaning the eigenvector associated with the smallest eigenvalue \\(\lambda_n\\) of \\(B\\) is the solution \\(x^{\star}\\). The vector \\(x^{\star}\\) contains the 9 entries of the Fundamental matrix \\(F^{\star}\\).
 
 This is a specific instance of the extremal trace \\([2]\\) (or trace minimization on a unit sphere) problem, with \\(k=1\\), i.e.
-\begin{equation}
+
+$$
+\begin{aligned}
     \begin{array}{ll}
     \mbox{minimize} & \mathbf{\mbox{Tr}}(X^TBX) \\
     \mbox{subject to} & X^TX=I_k
     \end{array}
-\end{equation}
+\end{aligned}
+$$
+
 where \\(I_k\\) denotes the \\(k \times k\\) identity matrix. The unit ball constraint avoids the trivial solution when all eigenvalues \\(\lambda_i\\) are zero instead of a single zero eigenvalue.
 
-In our case, since $U,V$ are orthogonal matrices (with orthonormal columns), then \\(U^TU=I\\). Thus, the SVD of \\(B\\) yields 
+In our case, since \\(U,V\\) are orthogonal matrices (with orthonormal columns), then \\(U^TU=I\\). Thus, the SVD of \\(B\\) yields 
 \begin{equation}
 A^TA = (U\Sigma V^T)^T (U\Sigma V^T) = V\Sigma U^TU \Sigma V^T = V \Sigma^2 V^T.
 \end{equation}
 
-Since \\(B=A^TA\\), \\(B\\) is symmetric, and thus the columns of \\(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\\) are eigenvectors of \\(B\\). \\(V\\) can equivalently be computed with the SVD of \\(A\\) or \\(B\\), since \\(V\\) appeares in both decompositions: \\(A=U \Sigma V^T\\) and \\(B=V\Sigma^2V^T\\).
-\\ \\
+Since \\(B=A^TA\\), \\(B\\) is symmetric, and thus the columns of \\(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\\) are eigenvectors of \\(B\\). \\(V\\) can equivalently be computed with the SVD of \\(A\\) or \\(B\\), since \\(V\\) appears in both decompositions: \\(A=U \Sigma V^T\\) and \\(B=V\Sigma^2V^T\\).
+
+
 
 ## Proof: the SVD provides the solution
  The proof is almost always taken for granted, but we will provide it here for completeness. Because \\(B\\) is symmetric, there exists a set of \\(n\\) orthonormal eigenvectors, yielding an eigendecomposition \\(B=V^T \Lambda V\\). Thus,
