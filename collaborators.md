@@ -9,9 +9,10 @@ permalink: /collaborators/
 * [Patsorn Sangkloy](https://www.cc.gatech.edu/~psangklo/)
 * [James Hays](https://www.cc.gatech.edu/~hays/)
 * [Simon Lucey](https://www.simonlucey.com/)
-* [Ersin Yumer](http://www.meyumer.com/)
+* Allie Chang
+* Jagjeet Singh
 
-## Past Collaboratos
+## Past Collaborators
 * [Ozan Sener](http://ozansener.net/)
 * [Silvio Savarese](http://cvgl.stanford.edu/silvio/)
 * [Alan Luo](http://alan.vision/)

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Understanding Policy Gradients</title>
+  <meta name="description" content="Including Trust-Region Variant (Levenberg-Marquardt)">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/policy-gradients/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Understanding Policy Gradients</h1>
+    <p class="meta">Mar 31, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <h2 id="policy-gradients">Policy Gradients</h2>
+
+<p>As opposed to Deep Q-Learning, policy gradients is a method to directly output probabilities of actions. We scale gradients of actions by reward.</p>
+
+<p>Pros:</p>
+<ul>
+  <li>A <strong>policy is often easier to approximate than value function</strong>. For example, if playing Pong, it is hard to assign a specific score to moving your paddle up vs. down.</li>
+  <li>Policy Gradients <strong>works well empirically</strong> and was a key to AlphaGo’s success.</li>
+  <li>Policy gradients <strong>learns stochastic optimal policies</strong>, which is crucial for many applications. For example, in the game of <em>Rock, Paper, Scissors</em>, a deterministic policy is easily exploited, but a uniform random policy is optimal.</li>
+</ul>
+
+<p>Cons:</p>
+<ul>
+  <li>Training takes forever. The use of sampled data is not efficient. High variance confounds actions. Need tons of data for estimator to be good enough.</li>
+  <li>Converge to local optima. Often there are many optima.</li>
+  <li>Unlike human learning: humans can use rapid, abstract model building.</li>
+</ul>
+
+<h3 id="background">Background</h3>
+
+<h3 id="geometric-intuition">Geometric Intuition</h3>
+
+<p>Suppose we have a function \(f(x)\), such that \(f(x) \geq 0 \forall x\)
+For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its density.</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/policy_gradients_geometric_intuition.png" width="65%" />
+  <div class="figcaption">
+    With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
+  </div>
+</div>
+
+<h3 id="math-background">Math Background</h3>
+<p>To understand the proofs, you’ll need to understand 3 simple tricks:</p>
+
+<ul>
+  <li>The derivative of the natural logarithm: \( \nabla_{\theta} \mbox{log }z = \frac{1}{z} \nabla_{\theta} z \)</li>
+  <li>The definition of expectation:</li>
+</ul>
+
+<script type="math/tex; mode=display">\begin{align}
+\mathbb{E}_{x \sim p(x)}[f(x)] = \sum\limits_x p(x) f(x) \\
+\mathbb{E}_{x \sim p(x)}[f(x)] = \int_x p(x) f(x) \,dx
+\end{align}</script>
+
+<ul>
+  <li>Multiplying a fraction’s numerator and denominator by some arbitrary, non-zero constant does not change the fraction’s value.</li>
+</ul>
+
+<script type="math/tex; mode=display">\frac{a}{b} = \frac{a \cdot p(x)}{b \cdot p(x)}</script>
+
+<h2 id="policy-gradient-theorem">Policy Gradient Theorem</h2>
+
+<p>Let \(x\) be the action we will choose, \(s\) be the parameterization of our current state, \(\theta\) be the weights of our neural network. Then our neural network will directly output probabilities \(p(x \mid s; \theta)\) that depend upon the input (\(s\)) and the network weights (\( \theta \)).</p>
+
+<p>We start with a desire to maximize our expected reward. Our reward function is \(r(x)\), which is dependent upon the action \(x\) that we take.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+\nabla_{\theta} \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x)] &= \nabla_{\theta} \sum_x p(x \mid s; \theta) r(x) & \text{Defn. of expectation} \\
+& = \sum_x r(x) \nabla_{\theta} p(x \mid s; \theta) & \text{Push gradient inside sum} \\
+& = \sum_x r(x) p(x \mid s; \theta) \frac{\nabla_{\theta} p(x \mid s; \theta)}{p(x \mid s; \theta)}  & \text{Multiply and divide by } p(x \mid s; \theta) \\
+& = \sum_x r(x) p(x \mid s; \theta) \nabla_{\theta} \log p(x \mid s; \theta) & \text{Apply } \nabla_{\theta} \log(z) = \frac{1}{z} \nabla_{\theta} z \\
+& = \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x) \nabla_{\theta} \log p(x \mid s; \theta) ] & \text{Definition of expectation}
+\end{align} %]]></script>
+
+<p>A similar derivation can be found in [1] or in [2].</p>
+
+<p>What does this mean for us? It means that if you want to maximize your expected reward, you could do something like gradient ascent. It turns out that the gradient of the expected reward is simple to compute and analytical – it is simply <strong>the expectation of the reward times the log probabilities of actions</strong>.</p>
+
+<h2 id="consider-trajectories">Consider Trajectories</h2>
+<p>Now, let’s consider trajectories, which are sequences of actions.</p>
+
+<p>The <em>Markov Property</em> states that Markov Property: the next state \(s^{\prime}\) depends on the current state \(s\) and the decision maker’s action \(a\). But given \(s\) and \(a\), it is conditionally independent of all previous states and actions.</p>
+
+<p>The probability of a trajectory is defined as:</p>
+
+<script type="math/tex; mode=display">p(\tau \mid \theta) = \underbrace{ \mu(s_0) }_{\text{initial state distribution}}  \cdot \prod\limits_{t=0}^{T-1} \Big[ \underbrace{\pi (a_t \mid s_t, \theta)}_{\text{policy}} \cdot \underbrace{p(s_{t+1},r_t \mid s_t, a_t)}_{\text{transition fn.}} \Big]</script>
+
+<p>Before we had:</p>
+
+<script type="math/tex; mode=display">\nabla_{\theta} \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x)] = \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x) \nabla_{\theta} \log p(x \mid s; \theta) ]</script>
+
+<p>Consider a stochastic generating process that gives us a trajectory of \((s,a,r)\) tuples:</p>
+
+<script type="math/tex; mode=display">\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_{T-1}, a_{T-1} r_{T-1}, s_T)</script>
+
+<p>We want the expected reward over a trajectory…</p>
+
+<script type="math/tex; mode=display">\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} [ \underbrace{\nabla_{\theta} \log p(\tau \mid \theta)}_{\text{What is this?}} \underbrace{R(\tau)}_{\text{Reward of a trajectory}}  ]</script>
+
+<p>The reward over a trajectory is simple: \(R(\tau) = \sum\limits_{t=0}^{T-1}r_t\)</p>
+
+<h2 id="the-probability-of-a-trajectory-given-a-policy">The Probability of a Trajectory, Given a Policy</h2>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+p(\tau \mid \theta) &= \underbrace{ \mu(s_0) }_{\text{initial state distribution}}  \cdot \prod\limits_{t=0}^{T-1} \Big[ \underbrace{\pi (a_t \mid s_t, \theta)}_{\text{policy}} \cdot \underbrace{p(s_{t+1},r_t \mid s_t, a_t)}_{\text{transition fn.}} \Big] & \text{Markov Property} \\
+\mbox{log } p(\tau \mid \theta) &= \mbox{log } \mu(s_0) + \mbox{log } \prod\limits_{t=0}^{T-1} \Big[ \pi (a_t \mid s_t, \theta) \cdot p(s_{t+1},r_t \mid s_t, a_t) \Big] & \text{Log of product = sum of logs} \\
+ &= \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \mbox{log }\Big[ \pi (a_t \mid s_t, \theta) \cdot p(s_{t+1},r_t \mid s_t, a_t) \Big] & \text{Log of product = sum of logs} \\
+ &= \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \Big[ \mbox{log }\pi (a_t \mid s_t, \theta) + \mbox{log } p(s_{t+1},r_t \mid s_t, a_t) \Big] & \text{Log of product = sum of logs} \\
+\end{align} %]]></script>
+
+<h2 id="maximizing-expected-return-of-a-trajectory">Maximizing Expected Return of a Trajectory</h2>
+<p>As we discussed earlier, in order to perform gradient ascent, we’ll need to be able to compute:</p>
+
+<script type="math/tex; mode=display">\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} [ \underbrace{\nabla_{\theta} \log p(\tau \mid \theta)}_{\text{Derived Above}} \underbrace{R(\tau)}_{\text{Reward of a trajectory}}  ]</script>
+
+<p>We have just shown that the inner term is simply:</p>
+
+<script type="math/tex; mode=display">\log p(\tau \mid \theta) = \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \Big[ \mbox{log }\pi (a_t \mid s_t, \theta) + \mbox{log } p(s_{t+1},r_t \mid s_t, a_t) \Big]</script>
+
+<p>We need its gradient. Only one term depends upon \(\theta\) above, so all other terms fall out in the gradient:</p>
+
+<script type="math/tex; mode=display">\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} \Big[ R(\tau) \nabla_{\theta} \sum\limits_{t=0}^{T-1} \mbox{log }\pi (a_t \mid s_t, \theta) \Big]</script>
+
+<p>This concludes the derivation of the Policy Gradient Theorem for entire trajectories.</p>
+
+<h2 id="the-reinforce-algorithm">The REINFORCE Algorithm</h2>
+
+<p>The REINFORCE algorithm is a Monte-Carlo Policy-Gradient Method. Below we describe the episodic version:</p>
+
+<ul>
+  <li>Input: a differentiable policy parameterization \(\pi(a \mid s, \theta)\)</li>
+  <li>Initialize policy parameter \(\theta \in \mathbb{R}^d\)</li>
+  <li>Repeat forever:
+    <ul>
+      <li>Generate an episode \(S_0\), \(A_0\), \(R_1\), … , \(S_{T−1}\), \(A_{T−1}\), \(R_T\) , following \( \pi(\cdot \mid \cdot, \theta) \)</li>
+      <li>For each step of the episode \(t = 0, … , T-1\):
+        <ul>
+          <li>\(G \leftarrow\) return from step \(t\)</li>
+          <li>\( \theta \leftarrow \theta + \alpha \gamma^t G \nabla_{\theta} \mbox{ ln }\pi(A_t \mid S_t, \theta) \)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>See page 271 of [1] for more details. Andrej Karpathy has a <a href="https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5">very simple 130-line script here</a> that illustrates this in Python.</p>
+
+<h2 id="reinforce-with-a-baseline">REINFORCE With a Baseline</h2>
+
+<!--- TODO: FIX THIS PART -->
+
+<p>In the section on geometric intuition, we discussed how:
+Suppose we have a function \(f(x)\), such that \(f(x) \geq 0 \forall x\)
+For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its density.</p>
+
+<p>However, we really want to only push up on the density for better-than-average \(x_i\):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+\nabla_{\theta} \mathbb{E}_x [f(x)] &= \nabla_{\theta} \mathbb{E}_x [f(x) -b] \\
+&= \mathbb{E}_x \Big[ \nabla_{\theta}  \mbox{log } p(x \mid \theta) (f(x) -b) \Big]
+\end{align} %]]></script>
+
+<p>A near optimal choice of baseline \(b\) is always the mean return, \( \mathbb{E}[f(x)]\).</p>
+
+<h2 id="actor-critic">Actor Critic</h2>
+
+<p>Monte Carlo Policy Gradient has high variance. What if we used a critic to estimate the action-value function?</p>
+
+<script type="math/tex; mode=display">Q_w(s,a) \approx Q^{\pi_\theta}(s,a)</script>
+
+<p>The Actor contains the policy and is the agent that makes decisions. The Critic makes no decisions or actions, but merely watches what the critic does and evaluates if it was good or bad.</p>
+
+<h2 id="actor-critic-with-approximate-policy-gradient">Actor-Critic with Approximate Policy Gradient</h2>
+
+<p>The critic says, “Hey, I think if you go in this direction, you can actually do better!”</p>
+
+<p>In each step, move a little bit in the direction that the critic says is good or bad.</p>
+
+<h2 id="advantage-function">Advantage Function</h2>
+
+<p>We remember the state-value function \(V^{\pi}(s)\), which tells us the goodness of a state.
+We remember the state-action function \(Q(s,a)\).     <br />
+We want an advantage function \(A^{\pi}(s,a)\)  to tell us how much better is action \(a\) than what the policy \(\pi\) would have done otherwise:</p>
+
+<script type="math/tex; mode=display">A^{\pi}(s,a) = Q(s,a) - V^{\pi}(s)</script>
+
+<p>Did things get better after one time step? Of course, a Critic could estimate both. But there’s a better way!</p>
+
+<h3 id="td-error-as-advantage-function">TD Error as Advantage Function</h3>
+
+<p>Make the good trajectories more probable, make the bad trajectories less probable (high variance)</p>
+
+<p>Monte Carlo</p>
+<ul>
+  <li>unbiased but high variance</li>
+  <li>conflates actions over whole trajectory</li>
+</ul>
+
+<p>TD Learning</p>
+<ul>
+  <li>introduces bias (treating guess as truth) but estimate have lower variance</li>
+  <li>incorporates 1 step</li>
+  <li>usually more efficient</li>
+</ul>
+
+<p>For the true value function \(V^{\pi_{\theta}}(s)\), the TD error \( \delta^{\pi_{\theta}}(s)\)</p>
+
+<script type="math/tex; mode=display">\delta^{\pi_{\theta}}(s) = r + \gamma V^{\pi_{\theta}}(s^{\prime}) - V^{\pi_{\theta}}(s)</script>
+
+<p>is an unbiased estimate of the advantage function.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+\mathbb{E}_{\pi_{\theta}} \Big[\delta^{\pi_{\theta}}(s) \mid s,a \Big] &= \mathbb{E}_{\pi_{\theta}} \Big[ r + \gamma V^{\pi_{\theta}}(s^{\prime}) - V^{\pi_{\theta}}(s) \Big] \\
+= Q^{\pi_{\theta}}(s,a) - V^{\pi_{\theta}}(s) \\
+= A^{\pi_{\theta}}(s,a)
+\end{aligned} %]]></script>
+
+<h2 id="trpo-from-1st-order-to-2nd-order">TRPO: From 1st Order to 2nd Order</h2>
+
+<p>We don’t have access to the objective function in analytic form. However, we can estimate the gradient as the expected return of our policy by sampling trajectories. The gradient ascent update is correct if we make an infinitesimally small change.</p>
+
+<p>A local approximation is only accurate closeby:</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/trpo_local_approx.png" width="65%" />
+  <div class="figcaption">
+    With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
+  </div>
+</div>
+
+<p>Trust-region methods penalize large steps. Let’s call our surrogate objective \(L_{\pi_{old}}(\pi)\).
+Let’s call our true objective \( \eta(\pi)\). We will add a penalty for moving \( \theta \) from \( \theta_{old} \) (KL Divergence between the old and new policy).</p>
+
+<script type="math/tex; mode=display">\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \max\limits_s KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]</script>
+
+<p>Monotonic improvement will be guaranteed.Since the max is not good for Monte Carlo estimation, a practical approximation is:</p>
+
+<script type="math/tex; mode=display">\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]</script>
+
+<h3 id="second-order-optimization-method">Second Order Optimization Method</h3>
+
+<p>What if we used a 2nd order optimization method instead of our vanilla 1st order optimization method?
+We would compute the Hessian of the KL divergence, not of our objective</p>
+
+<p>Hessian computation is extremely expensive…( 100,000 x 100,000 )</p>
+
+<h3 id="truncated-natural-gradient-policy-algorithm">Truncated Natural Gradient Policy Algorithm</h3>
+
+<ul>
+  <li>for iteration 1,2,..  do
+    <ul>
+      <li>Run policy for \(T\) timesteps or \(N\) trajectories</li>
+      <li>Estimate advantage function at all timesteps</li>
+      <li>Compute policy gradient \(g\)</li>
+      <li>Use Conjugate Gradient (with Hessian-vector products) to compute \( H^{-1}g \)</li>
+      <li>Update policy parameter \( \theta = \theta_{old} + \alpha H^{-1}g \)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="trust-region-policy-optimization-trpo">Trust Region Policy Optimization (TRPO)</h3>
+
+<p>The Truncated Natural Policy Gradient algorithm was an unconstrained problem:</p>
+
+<script type="math/tex; mode=display">\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]</script>
+
+<p>TRPO is a constrained problem (otherwise, algorithm is identical):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+\mbox{max } & L_{\pi_{old}}(\pi) \\
+\mbox{subject to } & \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big] \leq \delta
+\end{aligned} %]]></script>
+
+<p>Easier to set hyper parameter \(\delta\) rather than \(C\). \(\delta\) can remain fixed over whole learning process… Simply rescale step by some scalar.</p>
+
+<h2 id="references">References:</h2>
+
+<p>[1] Richard Sutton and Andrew Barto. Reinforcement Learning:
+An Introduction. Chapter 13. <a href="http://incompleteideas.net/book/bookdraft2017nov5.pdf">http://incompleteideas.net/book/bookdraft2017nov5.pdf</a>.</p>
+
+<p>[2] John Schulman. Deep Reinforcement Learning: Policy Gradients and Q-Learning.Bay Area Deep Learning School, September 24, 2016.</p>
+
+<p>[3] Andrej Karpathy. Deep Reinforcement Learning: Pong from Pixels. May 31, 2016. <a href="http://karpathy.github.io/2016/05/31/rl/">http://karpathy.github.io/2016/05/31/rl/</a>.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--  
+ <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Piazza Answers</title>
+  <meta name="description" content="">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/2018/11/28/piazza-answers.html">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Piazza Answers</h1>
+    <p class="meta">Nov 28, 2018</p>
+  </header>
+
+  <article class="post-content">
+  
+<h2 id="visualizing-cnns-via-deconvolution">Visualizing CNNs via deconvolution</h2>
+
+<p>It concerns slide 4 in this presentation.
+http://places.csail.mit.edu/slide_iclr2015.pdf</p>
+
+<p>I’m having a hard time understanding the deconvolution part of the slide.</p>
+
+<p>Great question. You can see a presentation from Matt Zeiler on the method here: https://www.youtube.com/watch?v=ghEmQSxT6tw. He summarizes his method from about minutes 8:40-20:00 in the presentation.</p>
+
+<p>Suppose there is some layer you want to visualize. Zeiler feeds in 50,000 ImageNet images through a learned convnet, and gets the activation at that layer for all of the images. Then they feed in the highest activations into their deconvolutional network.</p>
+
+<p>Their inverse network needs to make max pooling and convolution reversible. So they use unpooling and deconvolution to go backwards. This is how they can visualize individual layers.</p>
+
+<h2 id="backprop-per-layer-equations">Backprop per-layer equations</h2>
+
+<p>I would expect the quiz to include content from the lecture slides and what was discussed in lecture. Professor Hays didn’t go into detail how to perform backprop through every single layer, so I wouldn’t expect a detailed derivation for each layer. You can find the slides on backprop here.</p>
+
+<p>https://www.cc.gatech.edu/~hays/compvision/lectures/20.pdf</p>
+
+<p>If you’re interested in digging deeper into the equations, some basic intuition for derivatives can be found <a href="http://cs231n.github.io/optimization-2/">here</a> and <a href="http://cs231n.stanford.edu/slides/2018/cs231n_2018_lecture04.pdf">here</a>. The chain rules binds together the derivatives of each layer. For two simple examples, the (sub)gradient of a max of two arguments is 1 for the larger argument, 0 for the smaller argument. The derivative for the addition of two arguments is 1 with respect to each argument.</p>
+
+<h2 id="fc-vs-conv2d-maxpool-linear">FC vs. CONV2D MAXPOOL LINEAR</h2>
+
+<p>what are the reasons for not using fully connected layers and using conv2d+maxpool+linear layer combinations ? Is it only because the number in fully connected layers are very large for image processing to prohibits from learning the weights fast enough ? #vvm</p>
+
+<p>John Lambert
+ John Lambert 18 hours ago We use convolutions and hierarchies of processing steps since we showed earlier in the course that this is the most effective way to work with image (gridded data).</p>
+
+<p>We don’t use fully-connected layers at every step because there would be way to many learnable parameters to learn without overfitting, and the memory size would be enormous. The fully-connected layers act as the classifier on top of the automatically-learned features.</p>
+
+<p>From CS 231N at Stanford:
+http://cs231n.github.io/convolutional-networks/</p>
+
+<p>Regular Neural Nets. …Neural Networks receive an input (a single vector), and transform it through a series of hidden layers. Each hidden layer is made up of a set of neurons, where each neuron is fully connected to all neurons in the previous layer, and where neurons in a single layer function completely independently and do not share any connections. The last fully-connected layer is called the “output layer” and in classification settings it represents the class scores.</p>
+
+<p>Regular Neural Nets don’t scale well to full images. In CIFAR-10, images are only of size 32x32x3 (32 wide, 32 high, 3 color channels), so a single fully-connected neuron in a first hidden layer of a regular Neural Network would have 32<em>32</em>3 = 3072 weights. This amount still seems manageable, but clearly this fully-connected structure does not scale to larger images. For example, an image of more respectable size, e.g. 200x200x3, would lead to neurons that have 200<em>200</em>3 = 120,000 weights. Moreover, we would almost certainly want to have several such neurons, so the parameters would add up quickly! Clearly, this full connectivity is wasteful and the huge number of parameters would quickly lead to overfitting.</p>
+
+<p>3D volumes of neurons. Convolutional Neural Networks take advantage of the fact that the input consists of images and they constrain the architecture in a more sensible way. In particular, unlike a regular Neural Network, the layers of a ConvNet have neurons arranged in 3 dimensions: width, height, depth. (Note that the word depthhere refers to the third dimension of an activation volume, not to the depth of a full Neural Network, which can refer to the total number of layers in a network.) For example, the input images in CIFAR-10 are an input volume of activations, and the volume has dimensions 32x32x3 (width, height, depth respectively). As we will soon see, the neurons in a layer will only be connected to a small region of the layer before it, instead of all of the neurons in a fully-connected manner. Moreover, the final output layer would for CIFAR-10 have dimensions 1x1x10, because by the end of the ConvNet architecture we will reduce the full image into a single vector of class scores, arranged along the depth dimension.</p>
+
+<h2 id="why-does-batch-norm-help">Why does Batch Norm help?</h2>
+<p>John: (adding this) I wouldn’t expect batch norm to help by 15% on the simple network. Maybe by about 4% on the SimpleNet. Are you confounding the influence of normalization, more layers, data augmentation, and dropout with the influence of batch norm?</p>
+
+<p>If you train your network to learn a mapping from X-&gt;Y, and then the distribution of X changes, then you might need to retrain your network so that it can understand the changed distribution of X. (Suppose you go learned to classify black cats, and then suddenly you need to classify colored cats, example here).
+https://www.youtube.com/watch?v=nUUqwaxLnWs</p>
+
+<p>Batch Norm speeds up learning. This is because it reduces the amount that the distribution of hidden values moves around. This is often called “reducing internal covariate shift”.  Since all the layers are linked, if the first layer changes, then every other layer was dependent on those values being similar to before (not suddenly huge or small).</p>
+
+<p>General ideas why Batch Norm helps:</p>
+
+<p>Improves gradient flow through the network (want variance=1 in your layers, avoid exponentially vanishing or exploding dynamics in both the forward and the backward pass)
+Allows higher learning rates
+Reduces the strong dependence on initialization
+Acts as a form of regularization because it adds a bit of noise to training (uses statistics from random mini-batches to normalize) and it slightly reduces the need for dropout</p>
+
+<p>https://arxiv.org/pdf/1805.11604.pdf
+Others say that BatchNorm makes the optimization landscape significantly smoother. They theorize that it reduces the Lipschitz constant of the loss function, meaning the loss changes at a smaller rate and the magnitudes of the gradients are smaller too.
+https://en.wikipedia.org/wiki/Lipschitz_continuity</p>
+
+<p>https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf
+In the AlexNet paper, the authors mentioned that local response normalization aids generalization, meaning that the network can accurately understand new examples.</p>
+
+<h2 id="where-to-add-dropout">Where to add Dropout?</h2>
+<p>Dropout was used in older convolutional network architectures like AlexNet and VGG. Dropout should go in between the fully connected layers (also known as 1x1 convolutions). Dropout doesn’t seem to help in the other convolutional layers.  It’s not exactly clear why.</p>
+
+<p>One hypothesis is that you only need to avoid overfitting in the layers with huge amounts of parameters (generally fully-connected layers), and convolutional layers usually have fewer parameters (just a few shared kernels) so there’s less need to avoid overfitting there. Of course, you could have the same number of parameters in both if you had very deep filter banks of kernels, but usually the max filter depth in VGG is only 512 and 384 in AlexNet.</p>
+
+<p>ResNet, a more modern convnet architecture, does not use dropout but rather uses BatchNorm.</p>
+
+<h2 id="convolutions">Convolutions</h2>
+
+<p>Could somebody post answers for Lecture-4 slides 12,13 and Lecture-5 slides 6?</p>
+
+<p>Lecture 4 Slide 12:</p>
+
+<p>(2) this is forward difference derivative approximation.
+https://en.wikipedia.org/wiki/Finite_difference#Forward,_backward,_and_central_differences</p>
+
+<p>Lecture 4 Slide 13</p>
+
+<p>a) y-derivatives of image with Sobel operator</p>
+
+<p>b) derivative of Gaussian computed with Sobel operator</p>
+
+<p>c) image shifted with translated identity filter</p>
+
+<p>For explanations of Lecture 5 Slide 6,FOURIER MAGNITUDE IMAGES
+ believe the answers are the following:</p>
+
+<p>1 and 3 are distinctive because they are not natural images.</p>
+
+<p>1D – Gaussian stays as a circle in the Fourier space.</p>
+
+<p>3A – Sobel has two separated ellipses.</p>
+
+<p>2,4,5 are all similar because natural images have fairly similar Fourier magnitude images</p>
+
+<p>2B – flower image has an even distribution of frequencies, so we see an even circular distribution in all directions in Fourier space.</p>
+
+<p>4E – because we have only lines along the x-axis, so we see a line only on the y-axis in the Fourier amplitude image.</p>
+
+<p>5C – because strong x,y-axis-aligned lines in the natural image related to x,y-axis-aligned lines in the Fourier magnitude images
+For Lecture 4 Slide 12, I have:</p>
+
+<ol>
+  <li></li>
+</ol>
+
+<p>0 -1  0</p>
+
+<p>-1  4 -1</p>
+
+<p>0 -1  0</p>
+
+<p>2.</p>
+
+<p>0 -1 1</p>
+
+<p>For Lecture 4 Slide 13, I have:</p>
+
+<p>a) G = D * B</p>
+
+<p>b) A = B * C</p>
+
+<p>c) F = D * E</p>
+
+<p>d) I = D * D</p>
+
+<p>For Lecture 5 Slide 6, I have:</p>
+
+<p>1 - D</p>
+
+<p>2 - B</p>
+
+<p>3 - A</p>
+
+<p>4 - E</p>
+
+<p>5 - C</p>
+
+<p>I’m not sure if I can explain why all of those are the way they are, but I hope this helps!</p>
+
+<h2 id="factor-graphs">Factor Graphs</h2>
+
+<p>I’m trying to understand the few slides on factor graph variable elimination, does anyone have an intuitive explanation or good resources to explain what’s going on?</p>
+
+<p>A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).</p>
+
+<p>Bayesian Networks are directed graphs where edges in the graph are associated with conditional probability distributions (CPDs), assigning the probability of children in the graph taking on certain values based on the values of the parents.</p>
+
+<p>In undirected models like MRFs and Factor Graphs, instead of specifying CPDs, we specify (non-negative) potential functions (or factors) over sets of variables associated with cliques (complete subgraphs) C of the graph.  Like Conditional Prob. Distributions, a factor/potential can be represented as a table, but it is not normalized (does not sum to one).</p>
+
+<p>A factor graph is a bipartite undirected graph with variable nodes (circles) and factor nodes (squares). Edges are only between the variable nodes and the factor nodes.</p>
+
+<p>The variable nodes can take on certain values, and the likelihood of that event for a set of variables is expressed in the potential (factor node) attached to those variables.  Each factor node is associated with a single potential, whose scope is the set of variables that are neighbors in the factor graph.</p>
+
+<p>A small example might make this clearer. Suppose we have a group of four people: Alex, Bob, Catherine, David A=Alex’s hair color (red, green, blue)</p>
+
+<p>B=Bob’s hair color</p>
+
+<p>C=Catherine’s hair color</p>
+
+<p>D=David’s hair color</p>
+
+<p>Alex and Bob are friends, Bob and Catherine are friends, Catherine and David are friends, David and Alex are friends</p>
+
+<p>Friends never have the same hair color!</p>
+
+<p>It turns out that this distribution p cannot be represented (perfectly) by any Bayesian network. But it is succinctly represented by a Factor Graph or MRF.
+https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmsma7unw07s/Screen_Shot_20181002_at_11.48.05_PM.png</p>
+
+<p>The Factor Graph distribution is same as the MRF – this is just a different graph data structure</p>
+
+<p>If you’re wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.</p>
+
+<p>In the table Prof. Dellaert showed, we have variables as the columns and factors as the rows. He combines factors progressively to involve more and more variables.</p>
+
+<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7d71g2p/Screen_Shot_20181003_at_2.05.56_PM.png</p>
+
+<p>$$ Normalizing SIFT</p>
+
+<p>You’re welcome to experiment with the choice of norm.  However, normally when we say that we’ll normalize every feature vector on its own, we mean normalizing descriptor <script type="math/tex">D</script> such that <script type="math/tex">D_{normalized} = \frac{D}{\|D\|_2}</script>.</p>
+
+<p>We do this because feature descriptors are points in high-dimensional space, so we want them all to have the same length. That way the distance between them is based only upon the different angles the vectors point in, rather than considering their different length.</p>
+
+<h2 id="more-efficient-calculation-of-sift-descriptor">More efficient calculation of sift descriptor</h2>
+
+<p>I’m finding it slightly hard to implement an efficient algorithm for calculating the sift descriptor. The way I’m doing it now is basically like this;</p>
+
+<ul>
+  <li>
+    <p>Calculate all the gradients and their angle</p>
+  </li>
+  <li>
+    <p>Loop over all interest points</p>
+  </li>
+  <li>
+    <p>Loop over the rows of the 4x4 cell</p>
+  </li>
+  <li>
+    <p>Loop over the columns of the 4x4 cell</p>
+  </li>
+  <li>
+    <p>For each cell index, compute the histogram and save it in that cell</p>
+  </li>
+</ul>
+
+<p>I’m feeling like there might be a nice numpy-way to get around my two inner loops (the ones over the cell). Is this possible? Any ideas or tips?</p>
+
+<p>For reference: it can compute the descriptor for around 1000 interest points in one second, don’t know if that’s sufficiently fast?</p>
+
+<p>One good way to reduce your 3 for-loops into 2 for-loops would be to do the following:</p>
+
+<p>Instead of:</p>
+
+<p>for interest point</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  for row
+
+        for col
+</code></pre></div></div>
+
+<p>You could do:</p>
+
+<p>for interest point</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   for 4x4 patch in 16x16 window
+</code></pre></div></div>
+
+<p>Creating those patches can be done by reshaping and swapping the axes. For example, if you had an array x like</p>
+
+<p>x = np.reshape(np.array(range(16)),(4,4))
+It would look like</p>
+
+<p>array([[ 0,  1,  2,  3],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   [ 4,  5,  6,  7],
+
+   [ 8,  9, 10, 11],
+
+   [12, 13, 14, 15]])
+</code></pre></div></div>
+
+<p>You could break it into 2 parts along dimension 0:</p>
+
+<p>x.reshape(2,-1)
+You’d get</p>
+
+<p>array([[ 0,  1,  2,  3,  4,  5,  6,  7],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   [ 8,  9, 10, 11, 12, 13, 14, 15]])
+</code></pre></div></div>
+
+<p>If you kept breaking the innermost array into 2 arrays you’d get</p>
+
+<p>x.reshape(2,2,-1)
+array([[[ 0,  1,  2,  3],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    [ 4,  5,  6,  7]],
+
+
+
+   [[ 8,  9, 10, 11],
+
+    [12, 13, 14, 15]]])
+</code></pre></div></div>
+
+<p>and then finally you would get</p>
+
+<p>x.reshape(2,2,2,2)
+array([[[[ 0,  1],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     [ 2,  3]],
+
+    [[ 4,  5],
+
+     [ 6,  7]]],
+
+
+
+   [[[ 8,  9],
+
+     [10, 11]],
+
+    [[12, 13],
+
+     [14, 15]]]])
+</code></pre></div></div>
+
+<p>At this point you have 2 cubes that are 2x2x2. There are 3 ways you could look at this cube: there are 2 planes along the x-direction, or 2 planes along the y-direction, or 2 planes along the z-direction. If you swap the direction from which you look at the cube (swapaxes), you could now have</p>
+
+<p>array([[[[ 0,  1],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     [ 4,  5]],
+
+    [[ 2,  3],
+
+     [ 6,  7]]],
+
+
+
+   [[[ 8,  9],
+
+     [12, 13]],
+
+    [[10, 11],
+
+     [14, 15]]]])
+</code></pre></div></div>
+
+<p>which you’ll notice is effectively all of the original 2x2 patches with stride 2 from the original 4x4 matrix.</p>
+
+<p>Sad to say it, but the speedup will probably be completely unnoticeable since the for loop is only over 4 iterations, as opposed to something over 40,000 iterations</p>
+
+<h2 id="visualizing-sift">Visualizing SIFT</h2>
+
+<p>Your get_features() function should return a NumPy array of shape (k, feat_dim) representing k stacked feature vectors (row-vectors), where “feat_dim” is the feature_dimensionality (e.g. 128 for standard SIFT).</p>
+
+<p>Since this is a 2D matrix, we can treat it as a grayscale image. Each row in the image would correspond to the feature vector for one interest point. We would hope that each feature vector would unique, so the image shouldn’t be completely uniform in color (all identical features) or completely black (all zero values). That would be a clue that your features are degenerate.</p>
+
+<p>For example, you might see something like this if you were to call:</p>
+
+<p>import matplotlib.pyplot as plt; plt.imshow(image1_features); plt.show()</p>
+
+<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm4fywn2xohb/features.png</p>
+
+<h2 id="trilinear-interpolation">Trilinear Interpolation</h2>
+
+<p>http://paulbourke.net/miscellaneous/interpolation/</p>
+
+<p>On slide 30 of Lecture 7, Professor Hays was discussing trilinear interpolation. Trilinear interpolation is the name given to the process of linearly interpolating points within a box (3D) given values at the vertices of the box. We can think of our histogram as a 3D spatial histogram with <script type="math/tex">N_{\theta} \times N_x \times N_y</script>, bins usually <script type="math/tex">8 \times 4 \times 4</script>.
+https://www.cc.gatech.edu/~hays/compvision/lectures/07.pdf</p>
+
+<p>You aren’t required to implement the trilinear interpolation for this project, but you may if you wish. I would recommend getting a baseline working first where the x and y derivatives at each pixel <script type="math/tex">I_x, I_y</script> form 1 orientation, and that orientation goes into a single bin.</p>
+
+<p>Then you could try the trilinear interpolation afterwards once that is working (without trilinear interpolation, you can still get »80% accuracy on Notre Dame).</p>
+
+<h2 id="sobel-vs-gaussian">Sobel vs. Gaussian</h2>
+
+<p>Hi, I’m trying to decide which is a better way to compute the gradient for the Harris corner detection, before I compute my cornerness function. I’m confused about the difference between both.</p>
+
+<p>If I run just Sobel on my image, that means I’m getting the derivative, and smoothing with Gaussian in one go, right? And if I want to use Gaussian, I find the derivatives of the pixels, and apply Gaussian separately on the image? Not sure if one way is better than the other, and why.</p>
+
+<p>You can also do both with one filter.</p>
+
+<p>Suppose we have the image  <script type="math/tex">I</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+<br/><br/>I = \begin{bmatrix}<br/><br/>a & b & c \\<br/><br/>d & e & f \\<br/><br/>g & h & i<br/><br/>\end{bmatrix}<br/><br/><br/> %]]></script>
+
+<p>One way to think about the Sobel x-derivative filter is that rather than looking at only <script type="math/tex">\frac{rise}{run}=\frac{f-d}{2}</script> (centered at pixel e), we also use the x-derivatives above it and below it, e.g. <script type="math/tex">\frac{c-a}{2}</script> and <script type="math/tex">\frac{i-g}{2}</script>. But we weight the x-derivative in the center the most (this is a form of smoothing) so we use an approximation like</p>
+
+<script type="math/tex; mode=display">\frac{ 2 \cdot (f-d) + (i-g)+ (c-a) }{8}</script>
+
+<p>meaning our kernel resembles</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\frac{1}{8}<br/><br/>\begin{bmatrix}<br/><br/>1 & 0 & -1 \\<br/><br/>2 & 0 & -2 \\<br/><br/>1 & 0 & -1<br/><br/>\end{bmatrix}<br/><br/><br/> %]]></script>
+
+<p>It is actually derived with directional derivatives.
+https://www.researchgate.net/publication/239398674_An_Isotropic_3_3_Image_Gradient_Operator</p>
+
+<p>This is not identical to first blurring the image with a Gaussian filter, and then computing derivatives. We blur the image first because it makes the gradients less noisy.</p>
+
+<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1ficspl6jw/smoothing_gradients.png</p>
+
+<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1fiqeigs2g/derivative_theorem.png</p>
+
+<p>And an elegant fact that can save a step in smoothed gradient computation is to simply blur with the x and y derivatives of a Gaussian filter, by the following property:</p>
+
+<p>http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf
+Slides</p>
+
+<h2 id="nearest-neighbor-distance-ratio-algorithm-418">nearest neighbor distance ratio algorithm 4.18</h2>
+<p>1) in the formula 4.18, what is meant by target descriptor, here it is Da ?</p>
+
+<p>2) In the formula 4.18 what is meant by Db and Dc as being descriptors?</p>
+
+<p>3)  What makes Da to be target descriptor and Db and Dc nearest neighbors ?</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>4) In formular 4.18</td>
+      <td> </td>
+      <td>Da - Db</td>
+      <td> </td>
+      <td>is norm? or euclidean distance ?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>5) how is value of the descriptor such as Da related to the euclidean distance to Db?</p>
+
+<p>6) Is there such a thing as x and y coordinates of the center for a specific descriptor that helps to calculate the distances between the</p>
+
+<p>descriptors ? if so how to calculate the center of each descriptor ?</p>
+
+<p>1) in the formula 4.18, what is meant by target descriptor, here it is Da ?</p>
+
+<p><script type="math/tex">D_A</script> is a high-dimensional point. In the case of SIFT descriptors, <script type="math/tex">D_A</script> would be the SIFT feature vector in <script type="math/tex">R^{128}</script></p>
+
+<p>2) In the formula 4.18 what is meant by Db and Dc as being descriptors?</p>
+
+<p><script type="math/tex">D_B, D_C</script> are high-dimensional points. These are the closest points, as measured by the <script type="math/tex">\ell_2</script> norm, from <script type="math/tex">D_A</script> in this high dimensional space.</p>
+
+<p>3)  What makes Da to be target descriptor and Db and Dc nearest neighbors ?</p>
+
+<p><script type="math/tex">D_A</script> is the feature vector corresponding to an (x,y) location, for which we are trying to find matches in another image. <script type="math/tex">D_A</script> could be from Image1, and <script type="math/tex">D_B, D_C</script> might be feature vectors corresponding to points in Image2</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>4) In formula 4.18</td>
+      <td> </td>
+      <td>Da - Db</td>
+      <td> </td>
+      <td>is norm? or euclidean distance ?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><script type="math/tex">\|D_A-D_B\|</script> is the <script type="math/tex">\ell_2</script> norm, which we often call the Euclidean norm.</p>
+
+<p>5) how is value of the descriptor such as Da related to the euclidean distance to Db?</p>
+
+<p>Euclidean distance from <script type="math/tex">D_B</script> to <script type="math/tex">D_A</script> depends upon knowing the location of <script type="math/tex">D_B,D_A</script> in <script type="math/tex">R^{128}</script>.</p>
+
+<p>6) Is there such a thing as x and y coordinates of the center for a specific descriptor that helps to calculate the distances between the</p>
+
+<p>descriptors ? if so how to calculate the center of each descriptor ?</p>
+
+<p>Each SIFT descriptor corresponds to an (x,y) point. We form the SIFT descriptor by looking at a 16x16 patch, centered at that (x,y) location. This could be considered a “center” of the descriptor, although I think using that terminology could be confusing since the (x,y)  “center” location in <script type="math/tex">R^2</script> is not necessarily related at all to center of the <script type="math/tex">R^{128}</script> space.  It may be possible to use the spatial information in <script type="math/tex">R^2</script> to verify the matching of points in <script type="math/tex">R^{128}</script>.</p>
+
+<h2 id="arctan-vs-arctan2">Arctan vs. Arctan2</h2>
+
+<p>I would use arctan2 instead of arctan. Because of the sign ambiguity, a function cannot determine with certainty in which quadrant the angle falls only by its tangent value. 
+https://stackoverflow.com/questions/283406/what-is-the-difference-between-atan-and-atan2-in-c</p>
+
+<p>Numpy arctan2 returns an “Array of angles in radians, in the range [-pi, pi].” (see here).
+https://docs.scipy.org/doc/numpy/reference/generated/numpy.arctan2.html</p>
+
+<p>As long as you bin all of the gradient orientations consistently, it turns out it doesn’t matter if the histograms are created from 8 uniform intervals from [0,360] or 8 uniform intervals from [-180,180]. Histograms are empirical samples of a distribution, and translating the range won’t affect that distribution.</p>
+
+<p>More on arctan2 from StackOverflow:</p>
+
+<p>From school mathematics we know that the tangent has the definition</p>
+
+<p><em><code>tan(α) = sin(α) / cos(α)</code></em>
+and we differentiate between four quadrants based on the angle that we supply to the functions. The sign of the sin, cos and tan have the following relationship (where we neglect the exact multiples of π/2):</p>
+
+<h2 id="--quadrant----angle--------------sin---cos---tan"><em><code>  Quadrant    Angle              sin   cos   tan</code></em></h2>
+<p>I           0    &lt; α &lt; π/2      +     +     +
+  II          π/2  &lt; α &lt; π        +     -     -
+  III         π    &lt; α &lt; 3π/2     -     -     +
+  IV          3π/2 &lt; α &lt; 2π       -     +     -&lt;/code&gt;&lt;/em&gt;
+Given that the value of tan(α) is positive, we cannot distinguish, whether the angle was from the first or third quadrant and if it is negative, it could come from the second or fourth quadrant. So by convention, atan() returns an angle from the first or fourth quadrant (i.e. -π/2 &lt;= atan() &lt;= π/2), regardless of the original input to the tangent.</p>
+
+<p>In order to get back the full information, we must not use the result of the division sin(α) / cos(α) but we have to look at the values of the sine and cosine separately. And this is what atan2() does. It takes both, the sin(α) and cos(α) and resolves all four quadrants by adding π to the result of atan() whenever the cosine is negative.</p>
+
+<h2 id="autocorrelation-matrix">Autocorrelation Matrix</h2>
+
+<p>Nicolas, that <script type="math/tex">*</script> in the equation you’ve written is not multiplication – it is convolution. Szeliski states that he has “replaced the weighted summations with discrete convolutions with the weighting kernel <script type="math/tex">w</script>”.</p>
+
+<p>So before we had values <script type="math/tex">w(x,y)</script> that could have been values from a Gaussian probability density function. Let <script type="math/tex">z = \begin{bmatrix} x \\ y \end{bmatrix}</script> be the stacked 2D coordinate locations.</p>
+
+<script type="math/tex; mode=display">w(z) = \frac{1}{(2 \pi)^{n/2} |\Sigma|^{1/2}} \mbox{exp} \Bigg( - \frac{1}{2} (z − \mu)^T \Sigma^{-1} (z − \mu) \Bigg)</script>
+
+<p>For example, where <script type="math/tex">\mu</script> is the center pixel location and <script type="math/tex">z</script> is the location of each pixel in the local neighborhood. These were used as weights in summations over a local neighborhood,</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+M = \sum\limits_{x,y} w(x,y) \begin{bmatrix}I_x^2 & I_xI_y \\I_xI_y & I_y^2\end{bmatrix} %]]></script>
+
+<p>But the elegant convolution approach is used here because it is equivalent to summing a bunch of elementwise multiplications –  each point in a local neighborhood with its weight value (as we saw in Proj 1, and here filtering is equivalent to convolution since Gaussian filter is symmetric).</p>
+
+<h2 id="image-derivatives">Image Derivatives</h2>
+
+<p>Great question – there are a number of ways to do it, and they will all give different results.</p>
+
+<p>Prof. Hays discussed in lecture how convolving (not cross-correlation filtering) with the Sobel filter is a good way to approximate image derivatives (here we could treat a Gaussian filter as the image to find its derivatives).</p>
+
+<p>We’ve recommended a number of potentially useful OpenCV and SciPy functions that can do so in the project page. These will be very helpful!</p>
+
+<p>Another simple way to approximate the derivative is to calculate the 1st discrete difference along the given axis. For example, in order to compute horizontal discrete differences, shift the image by 1 pixel to the left and subtract the two</p>
+
+<p>For example, suppose you have a matrix b</p>
+
+<p>b = np.array([[  0,   1,   1,   2],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   [  3,   5,   8,  13],
+
+   [ 21,  34,  55,  89],
+
+   [144, 233, 377, 610]])
+</code></pre></div></div>
+
+<p>b[:,1:] - b[:,:-1]
+We would get:</p>
+
+<p>array([[  1,   0,   1],</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   [  2,   3,   5],
+
+   [ 13,  21,  34],
+
+   [ 89, 144, 233]])
+</code></pre></div></div>
+
+<p>Then we could the pad the matrix with zeros on the right column to bring it back to the original size.</p>
+
+<h2 id="harris">Harris</h2>
+
+<p>A gaussian filter is expressed as <script type="math/tex">g(\sigma_1)</script>.</p>
+
+<p>The second moment matrix at each pixel is convolved as follows:
+<script type="math/tex">% <![CDATA[
+\mu(\sigma_1,\sigma_D) = g(\sigma_1) * \begin{bmatrix} I_x^2 (\sigma_D) & I_xI_y (\sigma_D) \\ I_xI_y (\sigma_D) & I_{y}^2 (\sigma_D) \end{bmatrix} %]]></script>
+Giving a cornerness function in the lecture slides:
+<script type="math/tex">har = \mbox{ det }[\mu(\sigma_1,\sigma_D)] - \alpha[\mbox{trace }\Big(\mu(\sigma_1,\sigma_D)\Big)]</script></p>
+
+<p>or, when evaluated,</p>
+
+<script type="math/tex; mode=display">har = g(I_x^2)g(I_y^2) - [g(I_xI_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2</script>
+
+<p>So in the lecture slides notation, we can write <script type="math/tex">\mu(\sigma_1,\sigma_D)</script> more simply by bringing in the filtering (identical to convolution here) operation:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * I_x^2 (\sigma_D) & g(\sigma_1) * I_xI_y (\sigma_D) \\ g(\sigma_1) * I_xI_y (\sigma_D) & g(\sigma_1) * I_{y}^2 (\sigma_D) \end{bmatrix} %]]></script>
+
+<p>It may be easier to understand if we write the equation in the following syntax:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 & g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] & g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]></script>
+
+<p>I should have explained that above – <script type="math/tex">\odot</script> is the Hadamard product (element wise multiplication).</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
