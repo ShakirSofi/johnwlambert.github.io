@@ -109,6 +109,19 @@ Today, the computer vision community is learning how to use statistical learning
       </div>
     </div>
 
+    <div class="module-header">Module 6: Reinforcement Learning </div>
+
+    <div class="materials-item">
+      <a href="policy-gradients/">
+        Policy Gradients
+      </a>
+      <div class="kw">
+          intuition and simple derivations of REINFORCE, TRPO
+      </div>
+    </div>
+
+
+
  
   </div>
 </div>

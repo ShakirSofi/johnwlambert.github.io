@@ -1,5 +1,538 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-11-19T12:24:55-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Epipolar Geometry</title><link href="http://localhost:4000/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://localhost:4000/epipolar-geometry</id><content type="html" xml:base="http://localhost:4000/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-11-28T12:26:58-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Piazza Answers</title><link href="http://johnwlambert.github.io/2018/11/28/piazza-answers.html" rel="alternate" type="text/html" title="Piazza Answers" /><published>2018-11-28T00:00:00-05:00</published><updated>2018-11-28T00:00:00-05:00</updated><id>http://johnwlambert.github.io/2018/11/28/piazza-answers</id><content type="html" xml:base="http://johnwlambert.github.io/2018/11/28/piazza-answers.html">&lt;h2 id=&quot;visualizing-cnns-via-deconvolution&quot;&gt;Visualizing CNNs via deconvolution&lt;/h2&gt;
+
+&lt;p&gt;It concerns slide 4 in this presentation.
+http://places.csail.mit.edu/slide_iclr2015.pdf&lt;/p&gt;
+
+&lt;p&gt;I’m having a hard time understanding the deconvolution part of the slide.&lt;/p&gt;
+
+&lt;p&gt;Great question. You can see a presentation from Matt Zeiler on the method here: https://www.youtube.com/watch?v=ghEmQSxT6tw. He summarizes his method from about minutes 8:40-20:00 in the presentation.&lt;/p&gt;
+
+&lt;p&gt;Suppose there is some layer you want to visualize. Zeiler feeds in 50,000 ImageNet images through a learned convnet, and gets the activation at that layer for all of the images. Then they feed in the highest activations into their deconvolutional network.&lt;/p&gt;
+
+&lt;p&gt;Their inverse network needs to make max pooling and convolution reversible. So they use unpooling and deconvolution to go backwards. This is how they can visualize individual layers.&lt;/p&gt;
+
+&lt;h2 id=&quot;backprop-per-layer-equations&quot;&gt;Backprop per-layer equations&lt;/h2&gt;
+
+&lt;p&gt;I would expect the quiz to include content from the lecture slides and what was discussed in lecture. Professor Hays didn’t go into detail how to perform backprop through every single layer, so I wouldn’t expect a detailed derivation for each layer. You can find the slides on backprop here.&lt;/p&gt;
+
+&lt;p&gt;https://www.cc.gatech.edu/~hays/compvision/lectures/20.pdf&lt;/p&gt;
+
+&lt;p&gt;If you’re interested in digging deeper into the equations, some basic intuition for derivatives can be found &lt;a href=&quot;http://cs231n.github.io/optimization-2/&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;http://cs231n.stanford.edu/slides/2018/cs231n_2018_lecture04.pdf&quot;&gt;here&lt;/a&gt;. The chain rules binds together the derivatives of each layer. For two simple examples, the (sub)gradient of a max of two arguments is 1 for the larger argument, 0 for the smaller argument. The derivative for the addition of two arguments is 1 with respect to each argument.&lt;/p&gt;
+
+&lt;h2 id=&quot;fc-vs-conv2d-maxpool-linear&quot;&gt;FC vs. CONV2D MAXPOOL LINEAR&lt;/h2&gt;
+
+&lt;p&gt;what are the reasons for not using fully connected layers and using conv2d+maxpool+linear layer combinations ? Is it only because the number in fully connected layers are very large for image processing to prohibits from learning the weights fast enough ? #vvm&lt;/p&gt;
+
+&lt;p&gt;John Lambert
+ John Lambert 18 hours ago We use convolutions and hierarchies of processing steps since we showed earlier in the course that this is the most effective way to work with image (gridded data).&lt;/p&gt;
+
+&lt;p&gt;We don’t use fully-connected layers at every step because there would be way to many learnable parameters to learn without overfitting, and the memory size would be enormous. The fully-connected layers act as the classifier on top of the automatically-learned features.&lt;/p&gt;
+
+&lt;p&gt;From CS 231N at Stanford:
+http://cs231n.github.io/convolutional-networks/&lt;/p&gt;
+
+&lt;p&gt;Regular Neural Nets. …Neural Networks receive an input (a single vector), and transform it through a series of hidden layers. Each hidden layer is made up of a set of neurons, where each neuron is fully connected to all neurons in the previous layer, and where neurons in a single layer function completely independently and do not share any connections. The last fully-connected layer is called the “output layer” and in classification settings it represents the class scores.&lt;/p&gt;
+
+&lt;p&gt;Regular Neural Nets don’t scale well to full images. In CIFAR-10, images are only of size 32x32x3 (32 wide, 32 high, 3 color channels), so a single fully-connected neuron in a first hidden layer of a regular Neural Network would have 32&lt;em&gt;32&lt;/em&gt;3 = 3072 weights. This amount still seems manageable, but clearly this fully-connected structure does not scale to larger images. For example, an image of more respectable size, e.g. 200x200x3, would lead to neurons that have 200&lt;em&gt;200&lt;/em&gt;3 = 120,000 weights. Moreover, we would almost certainly want to have several such neurons, so the parameters would add up quickly! Clearly, this full connectivity is wasteful and the huge number of parameters would quickly lead to overfitting.&lt;/p&gt;
+
+&lt;p&gt;3D volumes of neurons. Convolutional Neural Networks take advantage of the fact that the input consists of images and they constrain the architecture in a more sensible way. In particular, unlike a regular Neural Network, the layers of a ConvNet have neurons arranged in 3 dimensions: width, height, depth. (Note that the word depthhere refers to the third dimension of an activation volume, not to the depth of a full Neural Network, which can refer to the total number of layers in a network.) For example, the input images in CIFAR-10 are an input volume of activations, and the volume has dimensions 32x32x3 (width, height, depth respectively). As we will soon see, the neurons in a layer will only be connected to a small region of the layer before it, instead of all of the neurons in a fully-connected manner. Moreover, the final output layer would for CIFAR-10 have dimensions 1x1x10, because by the end of the ConvNet architecture we will reduce the full image into a single vector of class scores, arranged along the depth dimension.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-does-batch-norm-help&quot;&gt;Why does Batch Norm help?&lt;/h2&gt;
+&lt;p&gt;John: (adding this) I wouldn’t expect batch norm to help by 15% on the simple network. Maybe by about 4% on the SimpleNet. Are you confounding the influence of normalization, more layers, data augmentation, and dropout with the influence of batch norm?&lt;/p&gt;
+
+&lt;p&gt;If you train your network to learn a mapping from X-&amp;gt;Y, and then the distribution of X changes, then you might need to retrain your network so that it can understand the changed distribution of X. (Suppose you go learned to classify black cats, and then suddenly you need to classify colored cats, example here).
+https://www.youtube.com/watch?v=nUUqwaxLnWs&lt;/p&gt;
+
+&lt;p&gt;Batch Norm speeds up learning. This is because it reduces the amount that the distribution of hidden values moves around. This is often called “reducing internal covariate shift”.  Since all the layers are linked, if the first layer changes, then every other layer was dependent on those values being similar to before (not suddenly huge or small).&lt;/p&gt;
+
+&lt;p&gt;General ideas why Batch Norm helps:&lt;/p&gt;
+
+&lt;p&gt;Improves gradient flow through the network (want variance=1 in your layers, avoid exponentially vanishing or exploding dynamics in both the forward and the backward pass)
+Allows higher learning rates
+Reduces the strong dependence on initialization
+Acts as a form of regularization because it adds a bit of noise to training (uses statistics from random mini-batches to normalize) and it slightly reduces the need for dropout&lt;/p&gt;
+
+&lt;p&gt;https://arxiv.org/pdf/1805.11604.pdf
+Others say that BatchNorm makes the optimization landscape significantly smoother. They theorize that it reduces the Lipschitz constant of the loss function, meaning the loss changes at a smaller rate and the magnitudes of the gradients are smaller too.
+https://en.wikipedia.org/wiki/Lipschitz_continuity&lt;/p&gt;
+
+&lt;p&gt;https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf
+In the AlexNet paper, the authors mentioned that local response normalization aids generalization, meaning that the network can accurately understand new examples.&lt;/p&gt;
+
+&lt;h2 id=&quot;where-to-add-dropout&quot;&gt;Where to add Dropout?&lt;/h2&gt;
+&lt;p&gt;Dropout was used in older convolutional network architectures like AlexNet and VGG. Dropout should go in between the fully connected layers (also known as 1x1 convolutions). Dropout doesn’t seem to help in the other convolutional layers.  It’s not exactly clear why.&lt;/p&gt;
+
+&lt;p&gt;One hypothesis is that you only need to avoid overfitting in the layers with huge amounts of parameters (generally fully-connected layers), and convolutional layers usually have fewer parameters (just a few shared kernels) so there’s less need to avoid overfitting there. Of course, you could have the same number of parameters in both if you had very deep filter banks of kernels, but usually the max filter depth in VGG is only 512 and 384 in AlexNet.&lt;/p&gt;
+
+&lt;p&gt;ResNet, a more modern convnet architecture, does not use dropout but rather uses BatchNorm.&lt;/p&gt;
+
+&lt;h2 id=&quot;convolutions&quot;&gt;Convolutions&lt;/h2&gt;
+
+&lt;p&gt;Could somebody post answers for Lecture-4 slides 12,13 and Lecture-5 slides 6?&lt;/p&gt;
+
+&lt;p&gt;Lecture 4 Slide 12:&lt;/p&gt;
+
+&lt;p&gt;(2) this is forward difference derivative approximation.
+https://en.wikipedia.org/wiki/Finite_difference#Forward,_backward,_and_central_differences&lt;/p&gt;
+
+&lt;p&gt;Lecture 4 Slide 13&lt;/p&gt;
+
+&lt;p&gt;a) y-derivatives of image with Sobel operator&lt;/p&gt;
+
+&lt;p&gt;b) derivative of Gaussian computed with Sobel operator&lt;/p&gt;
+
+&lt;p&gt;c) image shifted with translated identity filter&lt;/p&gt;
+
+&lt;p&gt;For explanations of Lecture 5 Slide 6,FOURIER MAGNITUDE IMAGES
+ believe the answers are the following:&lt;/p&gt;
+
+&lt;p&gt;1 and 3 are distinctive because they are not natural images.&lt;/p&gt;
+
+&lt;p&gt;1D – Gaussian stays as a circle in the Fourier space.&lt;/p&gt;
+
+&lt;p&gt;3A – Sobel has two separated ellipses.&lt;/p&gt;
+
+&lt;p&gt;2,4,5 are all similar because natural images have fairly similar Fourier magnitude images&lt;/p&gt;
+
+&lt;p&gt;2B – flower image has an even distribution of frequencies, so we see an even circular distribution in all directions in Fourier space.&lt;/p&gt;
+
+&lt;p&gt;4E – because we have only lines along the x-axis, so we see a line only on the y-axis in the Fourier amplitude image.&lt;/p&gt;
+
+&lt;p&gt;5C – because strong x,y-axis-aligned lines in the natural image related to x,y-axis-aligned lines in the Fourier magnitude images
+For Lecture 4 Slide 12, I have:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;0 -1  0&lt;/p&gt;
+
+&lt;p&gt;-1  4 -1&lt;/p&gt;
+
+&lt;p&gt;0 -1  0&lt;/p&gt;
+
+&lt;p&gt;2.&lt;/p&gt;
+
+&lt;p&gt;0 -1 1&lt;/p&gt;
+
+&lt;p&gt;For Lecture 4 Slide 13, I have:&lt;/p&gt;
+
+&lt;p&gt;a) G = D * B&lt;/p&gt;
+
+&lt;p&gt;b) A = B * C&lt;/p&gt;
+
+&lt;p&gt;c) F = D * E&lt;/p&gt;
+
+&lt;p&gt;d) I = D * D&lt;/p&gt;
+
+&lt;p&gt;For Lecture 5 Slide 6, I have:&lt;/p&gt;
+
+&lt;p&gt;1 - D&lt;/p&gt;
+
+&lt;p&gt;2 - B&lt;/p&gt;
+
+&lt;p&gt;3 - A&lt;/p&gt;
+
+&lt;p&gt;4 - E&lt;/p&gt;
+
+&lt;p&gt;5 - C&lt;/p&gt;
+
+&lt;p&gt;I’m not sure if I can explain why all of those are the way they are, but I hope this helps!&lt;/p&gt;
+
+&lt;h2 id=&quot;factor-graphs&quot;&gt;Factor Graphs&lt;/h2&gt;
+
+&lt;p&gt;I’m trying to understand the few slides on factor graph variable elimination, does anyone have an intuitive explanation or good resources to explain what’s going on?&lt;/p&gt;
+
+&lt;p&gt;A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).&lt;/p&gt;
+
+&lt;p&gt;Bayesian Networks are directed graphs where edges in the graph are associated with conditional probability distributions (CPDs), assigning the probability of children in the graph taking on certain values based on the values of the parents.&lt;/p&gt;
+
+&lt;p&gt;In undirected models like MRFs and Factor Graphs, instead of specifying CPDs, we specify (non-negative) potential functions (or factors) over sets of variables associated with cliques (complete subgraphs) C of the graph.  Like Conditional Prob. Distributions, a factor/potential can be represented as a table, but it is not normalized (does not sum to one).&lt;/p&gt;
+
+&lt;p&gt;A factor graph is a bipartite undirected graph with variable nodes (circles) and factor nodes (squares). Edges are only between the variable nodes and the factor nodes.&lt;/p&gt;
+
+&lt;p&gt;The variable nodes can take on certain values, and the likelihood of that event for a set of variables is expressed in the potential (factor node) attached to those variables.  Each factor node is associated with a single potential, whose scope is the set of variables that are neighbors in the factor graph.&lt;/p&gt;
+
+&lt;p&gt;A small example might make this clearer. Suppose we have a group of four people: Alex, Bob, Catherine, David A=Alex’s hair color (red, green, blue)&lt;/p&gt;
+
+&lt;p&gt;B=Bob’s hair color&lt;/p&gt;
+
+&lt;p&gt;C=Catherine’s hair color&lt;/p&gt;
+
+&lt;p&gt;D=David’s hair color&lt;/p&gt;
+
+&lt;p&gt;Alex and Bob are friends, Bob and Catherine are friends, Catherine and David are friends, David and Alex are friends&lt;/p&gt;
+
+&lt;p&gt;Friends never have the same hair color!&lt;/p&gt;
+
+&lt;p&gt;It turns out that this distribution p cannot be represented (perfectly) by any Bayesian network. But it is succinctly represented by a Factor Graph or MRF.
+https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmsma7unw07s/Screen_Shot_20181002_at_11.48.05_PM.png&lt;/p&gt;
+
+&lt;p&gt;The Factor Graph distribution is same as the MRF – this is just a different graph data structure&lt;/p&gt;
+
+&lt;p&gt;If you’re wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.&lt;/p&gt;
+
+&lt;p&gt;In the table Prof. Dellaert showed, we have variables as the columns and factors as the rows. He combines factors progressively to involve more and more variables.&lt;/p&gt;
+
+&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7d71g2p/Screen_Shot_20181003_at_2.05.56_PM.png&lt;/p&gt;
+
+&lt;p&gt;$$ Normalizing SIFT&lt;/p&gt;
+
+&lt;p&gt;You’re welcome to experiment with the choice of norm.  However, normally when we say that we’ll normalize every feature vector on its own, we mean normalizing descriptor &lt;script type=&quot;math/tex&quot;&gt;D&lt;/script&gt; such that &lt;script type=&quot;math/tex&quot;&gt;D_{normalized} = \frac{D}{\|D\|_2}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;We do this because feature descriptors are points in high-dimensional space, so we want them all to have the same length. That way the distance between them is based only upon the different angles the vectors point in, rather than considering their different length.&lt;/p&gt;
+
+&lt;h2 id=&quot;more-efficient-calculation-of-sift-descriptor&quot;&gt;More efficient calculation of sift descriptor&lt;/h2&gt;
+
+&lt;p&gt;I’m finding it slightly hard to implement an efficient algorithm for calculating the sift descriptor. The way I’m doing it now is basically like this;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Calculate all the gradients and their angle&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Loop over all interest points&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Loop over the rows of the 4x4 cell&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Loop over the columns of the 4x4 cell&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;For each cell index, compute the histogram and save it in that cell&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I’m feeling like there might be a nice numpy-way to get around my two inner loops (the ones over the cell). Is this possible? Any ideas or tips?&lt;/p&gt;
+
+&lt;p&gt;For reference: it can compute the descriptor for around 1000 interest points in one second, don’t know if that’s sufficiently fast?&lt;/p&gt;
+
+&lt;p&gt;One good way to reduce your 3 for-loops into 2 for-loops would be to do the following:&lt;/p&gt;
+
+&lt;p&gt;Instead of:&lt;/p&gt;
+
+&lt;p&gt;for interest point&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  for row
+
+        for col
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You could do:&lt;/p&gt;
+
+&lt;p&gt;for interest point&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   for 4x4 patch in 16x16 window
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Creating those patches can be done by reshaping and swapping the axes. For example, if you had an array x like&lt;/p&gt;
+
+&lt;p&gt;x = np.reshape(np.array(range(16)),(4,4))
+It would look like&lt;/p&gt;
+
+&lt;p&gt;array([[ 0,  1,  2,  3],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [ 4,  5,  6,  7],
+
+   [ 8,  9, 10, 11],
+
+   [12, 13, 14, 15]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You could break it into 2 parts along dimension 0:&lt;/p&gt;
+
+&lt;p&gt;x.reshape(2,-1)
+You’d get&lt;/p&gt;
+
+&lt;p&gt;array([[ 0,  1,  2,  3,  4,  5,  6,  7],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [ 8,  9, 10, 11, 12, 13, 14, 15]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you kept breaking the innermost array into 2 arrays you’d get&lt;/p&gt;
+
+&lt;p&gt;x.reshape(2,2,-1)
+array([[[ 0,  1,  2,  3],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    [ 4,  5,  6,  7]],
+
+
+
+   [[ 8,  9, 10, 11],
+
+    [12, 13, 14, 15]]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and then finally you would get&lt;/p&gt;
+
+&lt;p&gt;x.reshape(2,2,2,2)
+array([[[[ 0,  1],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     [ 2,  3]],
+
+    [[ 4,  5],
+
+     [ 6,  7]]],
+
+
+
+   [[[ 8,  9],
+
+     [10, 11]],
+
+    [[12, 13],
+
+     [14, 15]]]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At this point you have 2 cubes that are 2x2x2. There are 3 ways you could look at this cube: there are 2 planes along the x-direction, or 2 planes along the y-direction, or 2 planes along the z-direction. If you swap the direction from which you look at the cube (swapaxes), you could now have&lt;/p&gt;
+
+&lt;p&gt;array([[[[ 0,  1],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     [ 4,  5]],
+
+    [[ 2,  3],
+
+     [ 6,  7]]],
+
+
+
+   [[[ 8,  9],
+
+     [12, 13]],
+
+    [[10, 11],
+
+     [14, 15]]]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;which you’ll notice is effectively all of the original 2x2 patches with stride 2 from the original 4x4 matrix.&lt;/p&gt;
+
+&lt;p&gt;Sad to say it, but the speedup will probably be completely unnoticeable since the for loop is only over 4 iterations, as opposed to something over 40,000 iterations&lt;/p&gt;
+
+&lt;h2 id=&quot;visualizing-sift&quot;&gt;Visualizing SIFT&lt;/h2&gt;
+
+&lt;p&gt;Your get_features() function should return a NumPy array of shape (k, feat_dim) representing k stacked feature vectors (row-vectors), where “feat_dim” is the feature_dimensionality (e.g. 128 for standard SIFT).&lt;/p&gt;
+
+&lt;p&gt;Since this is a 2D matrix, we can treat it as a grayscale image. Each row in the image would correspond to the feature vector for one interest point. We would hope that each feature vector would unique, so the image shouldn’t be completely uniform in color (all identical features) or completely black (all zero values). That would be a clue that your features are degenerate.&lt;/p&gt;
+
+&lt;p&gt;For example, you might see something like this if you were to call:&lt;/p&gt;
+
+&lt;p&gt;import matplotlib.pyplot as plt; plt.imshow(image1_features); plt.show()&lt;/p&gt;
+
+&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm4fywn2xohb/features.png&lt;/p&gt;
+
+&lt;h2 id=&quot;trilinear-interpolation&quot;&gt;Trilinear Interpolation&lt;/h2&gt;
+
+&lt;p&gt;http://paulbourke.net/miscellaneous/interpolation/&lt;/p&gt;
+
+&lt;p&gt;On slide 30 of Lecture 7, Professor Hays was discussing trilinear interpolation. Trilinear interpolation is the name given to the process of linearly interpolating points within a box (3D) given values at the vertices of the box. We can think of our histogram as a 3D spatial histogram with &lt;script type=&quot;math/tex&quot;&gt;N_{\theta} \times N_x \times N_y&lt;/script&gt;, bins usually &lt;script type=&quot;math/tex&quot;&gt;8 \times 4 \times 4&lt;/script&gt;.
+https://www.cc.gatech.edu/~hays/compvision/lectures/07.pdf&lt;/p&gt;
+
+&lt;p&gt;You aren’t required to implement the trilinear interpolation for this project, but you may if you wish. I would recommend getting a baseline working first where the x and y derivatives at each pixel &lt;script type=&quot;math/tex&quot;&gt;I_x, I_y&lt;/script&gt; form 1 orientation, and that orientation goes into a single bin.&lt;/p&gt;
+
+&lt;p&gt;Then you could try the trilinear interpolation afterwards once that is working (without trilinear interpolation, you can still get »80% accuracy on Notre Dame).&lt;/p&gt;
+
+&lt;h2 id=&quot;sobel-vs-gaussian&quot;&gt;Sobel vs. Gaussian&lt;/h2&gt;
+
+&lt;p&gt;Hi, I’m trying to decide which is a better way to compute the gradient for the Harris corner detection, before I compute my cornerness function. I’m confused about the difference between both.&lt;/p&gt;
+
+&lt;p&gt;If I run just Sobel on my image, that means I’m getting the derivative, and smoothing with Gaussian in one go, right? And if I want to use Gaussian, I find the derivatives of the pixels, and apply Gaussian separately on the image? Not sure if one way is better than the other, and why.&lt;/p&gt;
+
+&lt;p&gt;You can also do both with one filter.&lt;/p&gt;
+
+&lt;p&gt;Suppose we have the image  &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+&lt;br/&gt;&lt;br/&gt;I = \begin{bmatrix}&lt;br/&gt;&lt;br/&gt;a &amp; b &amp; c \\&lt;br/&gt;&lt;br/&gt;d &amp; e &amp; f \\&lt;br/&gt;&lt;br/&gt;g &amp; h &amp; i&lt;br/&gt;&lt;br/&gt;\end{bmatrix}&lt;br/&gt;&lt;br/&gt;&lt;br/&gt; %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;One way to think about the Sobel x-derivative filter is that rather than looking at only &lt;script type=&quot;math/tex&quot;&gt;\frac{rise}{run}=\frac{f-d}{2}&lt;/script&gt; (centered at pixel e), we also use the x-derivatives above it and below it, e.g. &lt;script type=&quot;math/tex&quot;&gt;\frac{c-a}{2}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\frac{i-g}{2}&lt;/script&gt;. But we weight the x-derivative in the center the most (this is a form of smoothing) so we use an approximation like&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{ 2 \cdot (f-d) + (i-g)+ (c-a) }{8}&lt;/script&gt;
+
+&lt;p&gt;meaning our kernel resembles&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\frac{1}{8}&lt;br/&gt;&lt;br/&gt;\begin{bmatrix}&lt;br/&gt;&lt;br/&gt;1 &amp; 0 &amp; -1 \\&lt;br/&gt;&lt;br/&gt;2 &amp; 0 &amp; -2 \\&lt;br/&gt;&lt;br/&gt;1 &amp; 0 &amp; -1&lt;br/&gt;&lt;br/&gt;\end{bmatrix}&lt;br/&gt;&lt;br/&gt;&lt;br/&gt; %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;It is actually derived with directional derivatives.
+https://www.researchgate.net/publication/239398674_An_Isotropic_3_3_Image_Gradient_Operator&lt;/p&gt;
+
+&lt;p&gt;This is not identical to first blurring the image with a Gaussian filter, and then computing derivatives. We blur the image first because it makes the gradients less noisy.&lt;/p&gt;
+
+&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1ficspl6jw/smoothing_gradients.png&lt;/p&gt;
+
+&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1fiqeigs2g/derivative_theorem.png&lt;/p&gt;
+
+&lt;p&gt;And an elegant fact that can save a step in smoothed gradient computation is to simply blur with the x and y derivatives of a Gaussian filter, by the following property:&lt;/p&gt;
+
+&lt;p&gt;http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf
+Slides&lt;/p&gt;
+
+&lt;h2 id=&quot;nearest-neighbor-distance-ratio-algorithm-418&quot;&gt;nearest neighbor distance ratio algorithm 4.18&lt;/h2&gt;
+&lt;p&gt;1) in the formula 4.18, what is meant by target descriptor, here it is Da ?&lt;/p&gt;
+
+&lt;p&gt;2) In the formula 4.18 what is meant by Db and Dc as being descriptors?&lt;/p&gt;
+
+&lt;p&gt;3)  What makes Da to be target descriptor and Db and Dc nearest neighbors ?&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4) In formular 4.18&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+      &lt;td&gt;Da - Db&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+      &lt;td&gt;is norm? or euclidean distance ?&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;5) how is value of the descriptor such as Da related to the euclidean distance to Db?&lt;/p&gt;
+
+&lt;p&gt;6) Is there such a thing as x and y coordinates of the center for a specific descriptor that helps to calculate the distances between the&lt;/p&gt;
+
+&lt;p&gt;descriptors ? if so how to calculate the center of each descriptor ?&lt;/p&gt;
+
+&lt;p&gt;1) in the formula 4.18, what is meant by target descriptor, here it is Da ?&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; is a high-dimensional point. In the case of SIFT descriptors, &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; would be the SIFT feature vector in &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;2) In the formula 4.18 what is meant by Db and Dc as being descriptors?&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;D_B, D_C&lt;/script&gt; are high-dimensional points. These are the closest points, as measured by the &lt;script type=&quot;math/tex&quot;&gt;\ell_2&lt;/script&gt; norm, from &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; in this high dimensional space.&lt;/p&gt;
+
+&lt;p&gt;3)  What makes Da to be target descriptor and Db and Dc nearest neighbors ?&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; is the feature vector corresponding to an (x,y) location, for which we are trying to find matches in another image. &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; could be from Image1, and &lt;script type=&quot;math/tex&quot;&gt;D_B, D_C&lt;/script&gt; might be feature vectors corresponding to points in Image2&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4) In formula 4.18&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+      &lt;td&gt;Da - Db&lt;/td&gt;
+      &lt;td&gt; &lt;/td&gt;
+      &lt;td&gt;is norm? or euclidean distance ?&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\|D_A-D_B\|&lt;/script&gt; is the &lt;script type=&quot;math/tex&quot;&gt;\ell_2&lt;/script&gt; norm, which we often call the Euclidean norm.&lt;/p&gt;
+
+&lt;p&gt;5) how is value of the descriptor such as Da related to the euclidean distance to Db?&lt;/p&gt;
+
+&lt;p&gt;Euclidean distance from &lt;script type=&quot;math/tex&quot;&gt;D_B&lt;/script&gt; to &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; depends upon knowing the location of &lt;script type=&quot;math/tex&quot;&gt;D_B,D_A&lt;/script&gt; in &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;6) Is there such a thing as x and y coordinates of the center for a specific descriptor that helps to calculate the distances between the&lt;/p&gt;
+
+&lt;p&gt;descriptors ? if so how to calculate the center of each descriptor ?&lt;/p&gt;
+
+&lt;p&gt;Each SIFT descriptor corresponds to an (x,y) point. We form the SIFT descriptor by looking at a 16x16 patch, centered at that (x,y) location. This could be considered a “center” of the descriptor, although I think using that terminology could be confusing since the (x,y)  “center” location in &lt;script type=&quot;math/tex&quot;&gt;R^2&lt;/script&gt; is not necessarily related at all to center of the &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt; space.  It may be possible to use the spatial information in &lt;script type=&quot;math/tex&quot;&gt;R^2&lt;/script&gt; to verify the matching of points in &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;arctan-vs-arctan2&quot;&gt;Arctan vs. Arctan2&lt;/h2&gt;
+
+&lt;p&gt;I would use arctan2 instead of arctan. Because of the sign ambiguity, a function cannot determine with certainty in which quadrant the angle falls only by its tangent value. 
+https://stackoverflow.com/questions/283406/what-is-the-difference-between-atan-and-atan2-in-c&lt;/p&gt;
+
+&lt;p&gt;Numpy arctan2 returns an “Array of angles in radians, in the range [-pi, pi].” (see here).
+https://docs.scipy.org/doc/numpy/reference/generated/numpy.arctan2.html&lt;/p&gt;
+
+&lt;p&gt;As long as you bin all of the gradient orientations consistently, it turns out it doesn’t matter if the histograms are created from 8 uniform intervals from [0,360] or 8 uniform intervals from [-180,180]. Histograms are empirical samples of a distribution, and translating the range won’t affect that distribution.&lt;/p&gt;
+
+&lt;p&gt;More on arctan2 from StackOverflow:&lt;/p&gt;
+
+&lt;p&gt;From school mathematics we know that the tangent has the definition&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;&lt;code&gt;tan(α) = sin(α) / cos(α)&lt;/code&gt;&lt;/em&gt;
+and we differentiate between four quadrants based on the angle that we supply to the functions. The sign of the sin, cos and tan have the following relationship (where we neglect the exact multiples of π/2):&lt;/p&gt;
+
+&lt;h2 id=&quot;--quadrant----angle--------------sin---cos---tan&quot;&gt;&lt;em&gt;&lt;code&gt;  Quadrant    Angle              sin   cos   tan&lt;/code&gt;&lt;/em&gt;&lt;/h2&gt;
+&lt;p&gt;I           0    &amp;lt; α &amp;lt; π/2      +     +     +
+  II          π/2  &amp;lt; α &amp;lt; π        +     -     -
+  III         π    &amp;lt; α &amp;lt; 3π/2     -     -     +
+  IV          3π/2 &amp;lt; α &amp;lt; 2π       -     +     -&amp;lt;/code&amp;gt;&amp;lt;/em&amp;gt;
+Given that the value of tan(α) is positive, we cannot distinguish, whether the angle was from the first or third quadrant and if it is negative, it could come from the second or fourth quadrant. So by convention, atan() returns an angle from the first or fourth quadrant (i.e. -π/2 &amp;lt;= atan() &amp;lt;= π/2), regardless of the original input to the tangent.&lt;/p&gt;
+
+&lt;p&gt;In order to get back the full information, we must not use the result of the division sin(α) / cos(α) but we have to look at the values of the sine and cosine separately. And this is what atan2() does. It takes both, the sin(α) and cos(α) and resolves all four quadrants by adding π to the result of atan() whenever the cosine is negative.&lt;/p&gt;
+
+&lt;h2 id=&quot;autocorrelation-matrix&quot;&gt;Autocorrelation Matrix&lt;/h2&gt;
+
+&lt;p&gt;Nicolas, that &lt;script type=&quot;math/tex&quot;&gt;*&lt;/script&gt; in the equation you’ve written is not multiplication – it is convolution. Szeliski states that he has “replaced the weighted summations with discrete convolutions with the weighting kernel &lt;script type=&quot;math/tex&quot;&gt;w&lt;/script&gt;”.&lt;/p&gt;
+
+&lt;p&gt;So before we had values &lt;script type=&quot;math/tex&quot;&gt;w(x,y)&lt;/script&gt; that could have been values from a Gaussian probability density function. Let &lt;script type=&quot;math/tex&quot;&gt;z = \begin{bmatrix} x \\ y \end{bmatrix}&lt;/script&gt; be the stacked 2D coordinate locations.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(z) = \frac{1}{(2 \pi)^{n/2} |\Sigma|^{1/2}} \mbox{exp} \Bigg( - \frac{1}{2} (z − \mu)^T \Sigma^{-1} (z − \mu) \Bigg)&lt;/script&gt;
+
+&lt;p&gt;For example, where &lt;script type=&quot;math/tex&quot;&gt;\mu&lt;/script&gt; is the center pixel location and &lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt; is the location of each pixel in the local neighborhood. These were used as weights in summations over a local neighborhood,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+M = \sum\limits_{x,y} w(x,y) \begin{bmatrix}I_x^2 &amp; I_xI_y \\I_xI_y &amp; I_y^2\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;But the elegant convolution approach is used here because it is equivalent to summing a bunch of elementwise multiplications –  each point in a local neighborhood with its weight value (as we saw in Proj 1, and here filtering is equivalent to convolution since Gaussian filter is symmetric).&lt;/p&gt;
+
+&lt;h2 id=&quot;image-derivatives&quot;&gt;Image Derivatives&lt;/h2&gt;
+
+&lt;p&gt;Great question – there are a number of ways to do it, and they will all give different results.&lt;/p&gt;
+
+&lt;p&gt;Prof. Hays discussed in lecture how convolving (not cross-correlation filtering) with the Sobel filter is a good way to approximate image derivatives (here we could treat a Gaussian filter as the image to find its derivatives).&lt;/p&gt;
+
+&lt;p&gt;We’ve recommended a number of potentially useful OpenCV and SciPy functions that can do so in the project page. These will be very helpful!&lt;/p&gt;
+
+&lt;p&gt;Another simple way to approximate the derivative is to calculate the 1st discrete difference along the given axis. For example, in order to compute horizontal discrete differences, shift the image by 1 pixel to the left and subtract the two&lt;/p&gt;
+
+&lt;p&gt;For example, suppose you have a matrix b&lt;/p&gt;
+
+&lt;p&gt;b = np.array([[  0,   1,   1,   2],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [  3,   5,   8,  13],
+
+   [ 21,  34,  55,  89],
+
+   [144, 233, 377, 610]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;b[:,1:] - b[:,:-1]
+We would get:&lt;/p&gt;
+
+&lt;p&gt;array([[  1,   0,   1],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [  2,   3,   5],
+
+   [ 13,  21,  34],
+
+   [ 89, 144, 233]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then we could the pad the matrix with zeros on the right column to bring it back to the original size.&lt;/p&gt;
+
+&lt;h2 id=&quot;harris&quot;&gt;Harris&lt;/h2&gt;
+
+&lt;p&gt;A gaussian filter is expressed as &lt;script type=&quot;math/tex&quot;&gt;g(\sigma_1)&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;The second moment matrix at each pixel is convolved as follows:
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+\mu(\sigma_1,\sigma_D) = g(\sigma_1) * \begin{bmatrix} I_x^2 (\sigma_D) &amp; I_xI_y (\sigma_D) \\ I_xI_y (\sigma_D) &amp; I_{y}^2 (\sigma_D) \end{bmatrix} %]]&gt;&lt;/script&gt;
+Giving a cornerness function in the lecture slides:
+&lt;script type=&quot;math/tex&quot;&gt;har = \mbox{ det }[\mu(\sigma_1,\sigma_D)] - \alpha[\mbox{trace }\Big(\mu(\sigma_1,\sigma_D)\Big)]&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;or, when evaluated,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;har = g(I_x^2)g(I_y^2) - [g(I_xI_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2&lt;/script&gt;
+
+&lt;p&gt;So in the lecture slides notation, we can write &lt;script type=&quot;math/tex&quot;&gt;\mu(\sigma_1,\sigma_D)&lt;/script&gt; more simply by bringing in the filtering (identical to convolution here) operation:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * I_x^2 (\sigma_D) &amp; g(\sigma_1) * I_xI_y (\sigma_D) \\ g(\sigma_1) * I_xI_y (\sigma_D) &amp; g(\sigma_1) * I_{y}^2 (\sigma_D) \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;It may be easier to understand if we write the equation in the following syntax:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 &amp; g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] &amp; g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Epipolar Geometry</title><link href="http://johnwlambert.github.io/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://johnwlambert.github.io/epipolar-geometry</id><content type="html" xml:base="http://johnwlambert.github.io/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
 &lt;p&gt;Modern robotic computer vision tasks like Structure from Motion (SfM) and Simultaneous Localization and Mapping (SLAM) would not be possible without feature matching. Tools from Epipolar Geometry are an easy way to discard outliers in feature matching and are widely used.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-fundamental-matrix&quot;&gt;The Fundamental Matrix&lt;/h2&gt;
@@ -76,7 +609,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 
 &lt;p&gt;[1] H. Longuet Higgins. A computer algorithm for reconstructing a scene from two projections. &lt;em&gt;Nature&lt;/em&gt;, 293, 1981.&lt;/p&gt;
 
-&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://localhost:4000/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/mpi</id><content type="html" xml:base="http://localhost:4000/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
+&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://johnwlambert.github.io/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/mpi</id><content type="html" xml:base="http://johnwlambert.github.io/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
 
 &lt;p&gt;mpirun –np 2 nvprof –log-file profile.out.%p&lt;/p&gt;
 
@@ -91,7 +624,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 &lt;p&gt;MV2_USE_CUDA=1 mpirun -np 1 nvprof –kernels gpu_GEMM –analysis-metrics
 –output-profile GEMMmetrics.out.%p.nvprof ./main [args]&lt;/p&gt;
 
-&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://localhost:4000/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/fully-connected-network</id><content type="html" xml:base="http://localhost:4000/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
+&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://johnwlambert.github.io/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/fully-connected-network</id><content type="html" xml:base="http://johnwlambert.github.io/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
 
 &lt;p&gt;Suppose we wish to implement a fully-connected feedforward neural network with 1 input layer, 1 hidden layer, and 1 output layer. We call such a network to be a two-layer neural network (ignoring the input layer as it is trivially present).&lt;/p&gt;
 
@@ -445,7 +978,7 @@ Similarly,
 
 &lt;p&gt;References:&lt;/p&gt;
 
-&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://localhost:4000/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/kernel-trick</id><content type="html" xml:base="http://localhost:4000/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
+&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://johnwlambert.github.io/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/kernel-trick</id><content type="html" xml:base="http://johnwlambert.github.io/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
 &lt;p&gt;The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = (x^Tz)^2 = (\sum\limits_{i=1}^n x_iz_i)^2&lt;/script&gt;
@@ -472,7 +1005,7 @@ Similarly,
 
 &lt;p&gt;Thus, we’ve shown that for \(n=3\),
 &lt;script type=&quot;math/tex&quot;&gt;K(x,z) = \phi(x)^T \phi(z)&lt;/script&gt;
-which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://localhost:4000/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://localhost:4000/fast-nearest-neighbor</id><content type="html" xml:base="http://localhost:4000/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://johnwlambert.github.io/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/fast-nearest-neighbor</id><content type="html" xml:base="http://johnwlambert.github.io/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#rank&quot;&gt;Brute Force&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#fastaffinitymatrices&quot;&gt;Fast Affinity Matrices&lt;/a&gt;&lt;/li&gt;
@@ -582,7 +1115,7 @@ AB^T = \begin{bmatrix} - &amp; a_1 &amp; - \\ - &amp; a_2 &amp; - \\ - &amp; a_3
   &lt;span class=&quot;n&quot;&gt;unit_test_arr_arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://localhost:4000/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://localhost:4000/subgradient</id><content type="html" xml:base="http://localhost:4000/subgradient-methods/">&lt;!-- 
+&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://johnwlambert.github.io/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/subgradient</id><content type="html" xml:base="http://johnwlambert.github.io/subgradient-methods/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -736,7 +1269,7 @@ x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 
 &lt;p&gt;[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf&quot;&gt;Lecture 6&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://localhost:4000/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://localhost:4000/cvx</id><content type="html" xml:base="http://localhost:4000/convex-opt/">&lt;!-- 
+&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://johnwlambert.github.io/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://johnwlambert.github.io/cvx</id><content type="html" xml:base="http://johnwlambert.github.io/convex-opt/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -1029,7 +1562,285 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
   &lt;li&gt;
     &lt;p&gt;Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf&quot;&gt;Lecture 16&lt;/a&gt;.&lt;/p&gt;
   &lt;/li&gt;
-&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Gauss-Newton Optimization in 10 Minutes</title><link href="http://localhost:4000/gauss-newton/" rel="alternate" type="text/html" title="Gauss-Newton Optimization in 10 Minutes" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://localhost:4000/gaussnewton</id><content type="html" xml:base="http://localhost:4000/gauss-newton/">&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Understanding Policy Gradients</title><link href="http://johnwlambert.github.io/policy-gradients/" rel="alternate" type="text/html" title="Understanding Policy Gradients" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://johnwlambert.github.io/policy-gradients</id><content type="html" xml:base="http://johnwlambert.github.io/policy-gradients/">&lt;h2 id=&quot;policy-gradients&quot;&gt;Policy Gradients&lt;/h2&gt;
+
+&lt;p&gt;As opposed to Deep Q-Learning, policy gradients is a method to directly output probabilities of actions. We scale gradients of actions by reward.&lt;/p&gt;
+
+&lt;p&gt;Pros:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;A &lt;strong&gt;policy is often easier to approximate than value function&lt;/strong&gt;. For example, if playing Pong, it is hard to assign a specific score to moving your paddle up vs. down.&lt;/li&gt;
+  &lt;li&gt;Policy Gradients &lt;strong&gt;works well empirically&lt;/strong&gt; and was a key to AlphaGo’s success.&lt;/li&gt;
+  &lt;li&gt;Policy gradients &lt;strong&gt;learns stochastic optimal policies&lt;/strong&gt;, which is crucial for many applications. For example, in the game of &lt;em&gt;Rock, Paper, Scissors&lt;/em&gt;, a deterministic policy is easily exploited, but a uniform random policy is optimal.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Cons:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Training takes forever. The use of sampled data is not efficient. High variance confounds actions. Need tons of data for estimator to be good enough.&lt;/li&gt;
+  &lt;li&gt;Converge to local optima. Often there are many optima.&lt;/li&gt;
+  &lt;li&gt;Unlike human learning: humans can use rapid, abstract model building.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;background&quot;&gt;Background&lt;/h3&gt;
+
+&lt;h3 id=&quot;geometric-intuition&quot;&gt;Geometric Intuition&lt;/h3&gt;
+
+&lt;p&gt;Suppose we have a function \(f(x)\), such that \(f(x) \geq 0 \forall x\)
+For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its density.&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;/assets/policy_gradients_geometric_intuition.png&quot; width=&quot;65%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;
+    With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;math-background&quot;&gt;Math Background&lt;/h3&gt;
+&lt;p&gt;To understand the proofs, you’ll need to understand 3 simple tricks:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The derivative of the natural logarithm: \( \nabla_{\theta} \mbox{log }z = \frac{1}{z} \nabla_{\theta} z \)&lt;/li&gt;
+  &lt;li&gt;The definition of expectation:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
+\mathbb{E}_{x \sim p(x)}[f(x)] = \sum\limits_x p(x) f(x) \\
+\mathbb{E}_{x \sim p(x)}[f(x)] = \int_x p(x) f(x) \,dx
+\end{align}&lt;/script&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Multiplying a fraction’s numerator and denominator by some arbitrary, non-zero constant does not change the fraction’s value.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{a}{b} = \frac{a \cdot p(x)}{b \cdot p(x)}&lt;/script&gt;
+
+&lt;h2 id=&quot;policy-gradient-theorem&quot;&gt;Policy Gradient Theorem&lt;/h2&gt;
+
+&lt;p&gt;Let \(x\) be the action we will choose, \(s\) be the parameterization of our current state, \(\theta\) be the weights of our neural network. Then our neural network will directly output probabilities \(p(x \mid s; \theta)\) that depend upon the input (\(s\)) and the network weights (\( \theta \)).&lt;/p&gt;
+
+&lt;p&gt;We start with a desire to maximize our expected reward. Our reward function is \(r(x)\), which is dependent upon the action \(x\) that we take.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\nabla_{\theta} \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x)] &amp;= \nabla_{\theta} \sum_x p(x \mid s; \theta) r(x) &amp; \text{Defn. of expectation} \\
+&amp; = \sum_x r(x) \nabla_{\theta} p(x \mid s; \theta) &amp; \text{Push gradient inside sum} \\
+&amp; = \sum_x r(x) p(x \mid s; \theta) \frac{\nabla_{\theta} p(x \mid s; \theta)}{p(x \mid s; \theta)}  &amp; \text{Multiply and divide by } p(x \mid s; \theta) \\
+&amp; = \sum_x r(x) p(x \mid s; \theta) \nabla_{\theta} \log p(x \mid s; \theta) &amp; \text{Apply } \nabla_{\theta} \log(z) = \frac{1}{z} \nabla_{\theta} z \\
+&amp; = \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x) \nabla_{\theta} \log p(x \mid s; \theta) ] &amp; \text{Definition of expectation}
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;A similar derivation can be found in [1] or in [2].&lt;/p&gt;
+
+&lt;p&gt;What does this mean for us? It means that if you want to maximize your expected reward, you could do something like gradient ascent. It turns out that the gradient of the expected reward is simple to compute and analytical – it is simply &lt;strong&gt;the expectation of the reward times the log probabilities of actions&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;consider-trajectories&quot;&gt;Consider Trajectories&lt;/h2&gt;
+&lt;p&gt;Now, let’s consider trajectories, which are sequences of actions.&lt;/p&gt;
+
+&lt;p&gt;The &lt;em&gt;Markov Property&lt;/em&gt; states that Markov Property: the next state \(s^{\prime}\) depends on the current state \(s\) and the decision maker’s action \(a\). But given \(s\) and \(a\), it is conditionally independent of all previous states and actions.&lt;/p&gt;
+
+&lt;p&gt;The probability of a trajectory is defined as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(\tau \mid \theta) = \underbrace{ \mu(s_0) }_{\text{initial state distribution}}  \cdot \prod\limits_{t=0}^{T-1} \Big[ \underbrace{\pi (a_t \mid s_t, \theta)}_{\text{policy}} \cdot \underbrace{p(s_{t+1},r_t \mid s_t, a_t)}_{\text{transition fn.}} \Big]&lt;/script&gt;
+
+&lt;p&gt;Before we had:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x)] = \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x) \nabla_{\theta} \log p(x \mid s; \theta) ]&lt;/script&gt;
+
+&lt;p&gt;Consider a stochastic generating process that gives us a trajectory of \((s,a,r)\) tuples:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_{T-1}, a_{T-1} r_{T-1}, s_T)&lt;/script&gt;
+
+&lt;p&gt;We want the expected reward over a trajectory…&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} [ \underbrace{\nabla_{\theta} \log p(\tau \mid \theta)}_{\text{What is this?}} \underbrace{R(\tau)}_{\text{Reward of a trajectory}}  ]&lt;/script&gt;
+
+&lt;p&gt;The reward over a trajectory is simple: \(R(\tau) = \sum\limits_{t=0}^{T-1}r_t\)&lt;/p&gt;
+
+&lt;h2 id=&quot;the-probability-of-a-trajectory-given-a-policy&quot;&gt;The Probability of a Trajectory, Given a Policy&lt;/h2&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+p(\tau \mid \theta) &amp;= \underbrace{ \mu(s_0) }_{\text{initial state distribution}}  \cdot \prod\limits_{t=0}^{T-1} \Big[ \underbrace{\pi (a_t \mid s_t, \theta)}_{\text{policy}} \cdot \underbrace{p(s_{t+1},r_t \mid s_t, a_t)}_{\text{transition fn.}} \Big] &amp; \text{Markov Property} \\
+\mbox{log } p(\tau \mid \theta) &amp;= \mbox{log } \mu(s_0) + \mbox{log } \prod\limits_{t=0}^{T-1} \Big[ \pi (a_t \mid s_t, \theta) \cdot p(s_{t+1},r_t \mid s_t, a_t) \Big] &amp; \text{Log of product = sum of logs} \\
+ &amp;= \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \mbox{log }\Big[ \pi (a_t \mid s_t, \theta) \cdot p(s_{t+1},r_t \mid s_t, a_t) \Big] &amp; \text{Log of product = sum of logs} \\
+ &amp;= \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \Big[ \mbox{log }\pi (a_t \mid s_t, \theta) + \mbox{log } p(s_{t+1},r_t \mid s_t, a_t) \Big] &amp; \text{Log of product = sum of logs} \\
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;h2 id=&quot;maximizing-expected-return-of-a-trajectory&quot;&gt;Maximizing Expected Return of a Trajectory&lt;/h2&gt;
+&lt;p&gt;As we discussed earlier, in order to perform gradient ascent, we’ll need to be able to compute:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} [ \underbrace{\nabla_{\theta} \log p(\tau \mid \theta)}_{\text{Derived Above}} \underbrace{R(\tau)}_{\text{Reward of a trajectory}}  ]&lt;/script&gt;
+
+&lt;p&gt;We have just shown that the inner term is simply:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\log p(\tau \mid \theta) = \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \Big[ \mbox{log }\pi (a_t \mid s_t, \theta) + \mbox{log } p(s_{t+1},r_t \mid s_t, a_t) \Big]&lt;/script&gt;
+
+&lt;p&gt;We need its gradient. Only one term depends upon \(\theta\) above, so all other terms fall out in the gradient:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} \Big[ R(\tau) \nabla_{\theta} \sum\limits_{t=0}^{T-1} \mbox{log }\pi (a_t \mid s_t, \theta) \Big]&lt;/script&gt;
+
+&lt;p&gt;This concludes the derivation of the Policy Gradient Theorem for entire trajectories.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-reinforce-algorithm&quot;&gt;The REINFORCE Algorithm&lt;/h2&gt;
+
+&lt;p&gt;The REINFORCE algorithm is a Monte-Carlo Policy-Gradient Method. Below we describe the episodic version:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Input: a differentiable policy parameterization \(\pi(a \mid s, \theta)\)&lt;/li&gt;
+  &lt;li&gt;Initialize policy parameter \(\theta \in \mathbb{R}^d\)&lt;/li&gt;
+  &lt;li&gt;Repeat forever:
+    &lt;ul&gt;
+      &lt;li&gt;Generate an episode \(S_0\), \(A_0\), \(R_1\), … , \(S_{T−1}\), \(A_{T−1}\), \(R_T\) , following \( \pi(\cdot \mid \cdot, \theta) \)&lt;/li&gt;
+      &lt;li&gt;For each step of the episode \(t = 0, … , T-1\):
+        &lt;ul&gt;
+          &lt;li&gt;\(G \leftarrow\) return from step \(t\)&lt;/li&gt;
+          &lt;li&gt;\( \theta \leftarrow \theta + \alpha \gamma^t G \nabla_{\theta} \mbox{ ln }\pi(A_t \mid S_t, \theta) \)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;See page 271 of [1] for more details. Andrej Karpathy has a &lt;a href=&quot;https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5&quot;&gt;very simple 130-line script here&lt;/a&gt; that illustrates this in Python.&lt;/p&gt;
+
+&lt;h2 id=&quot;reinforce-with-a-baseline&quot;&gt;REINFORCE With a Baseline&lt;/h2&gt;
+
+&lt;!--- TODO: FIX THIS PART --&gt;
+
+&lt;p&gt;In the section on geometric intuition, we discussed how:
+Suppose we have a function \(f(x)\), such that \(f(x) \geq 0 \forall x\)
+For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its density.&lt;/p&gt;
+
+&lt;p&gt;However, we really want to only push up on the density for better-than-average \(x_i\):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\nabla_{\theta} \mathbb{E}_x [f(x)] &amp;= \nabla_{\theta} \mathbb{E}_x [f(x) -b] \\
+&amp;= \mathbb{E}_x \Big[ \nabla_{\theta}  \mbox{log } p(x \mid \theta) (f(x) -b) \Big]
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;A near optimal choice of baseline \(b\) is always the mean return, \( \mathbb{E}[f(x)]\).&lt;/p&gt;
+
+&lt;h2 id=&quot;actor-critic&quot;&gt;Actor Critic&lt;/h2&gt;
+
+&lt;p&gt;Monte Carlo Policy Gradient has high variance. What if we used a critic to estimate the action-value function?&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;Q_w(s,a) \approx Q^{\pi_\theta}(s,a)&lt;/script&gt;
+
+&lt;p&gt;The Actor contains the policy and is the agent that makes decisions. The Critic makes no decisions or actions, but merely watches what the critic does and evaluates if it was good or bad.&lt;/p&gt;
+
+&lt;h2 id=&quot;actor-critic-with-approximate-policy-gradient&quot;&gt;Actor-Critic with Approximate Policy Gradient&lt;/h2&gt;
+
+&lt;p&gt;The critic says, “Hey, I think if you go in this direction, you can actually do better!”&lt;/p&gt;
+
+&lt;p&gt;In each step, move a little bit in the direction that the critic says is good or bad.&lt;/p&gt;
+
+&lt;h2 id=&quot;advantage-function&quot;&gt;Advantage Function&lt;/h2&gt;
+
+&lt;p&gt;We remember the state-value function \(V^{\pi}(s)\), which tells us the goodness of a state.
+We remember the state-action function \(Q(s,a)\).     &lt;br /&gt;
+We want an advantage function \(A^{\pi}(s,a)\)  to tell us how much better is action \(a\) than what the policy \(\pi\) would have done otherwise:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^{\pi}(s,a) = Q(s,a) - V^{\pi}(s)&lt;/script&gt;
+
+&lt;p&gt;Did things get better after one time step? Of course, a Critic could estimate both. But there’s a better way!&lt;/p&gt;
+
+&lt;h3 id=&quot;td-error-as-advantage-function&quot;&gt;TD Error as Advantage Function&lt;/h3&gt;
+
+&lt;p&gt;Make the good trajectories more probable, make the bad trajectories less probable (high variance)&lt;/p&gt;
+
+&lt;p&gt;Monte Carlo&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;unbiased but high variance&lt;/li&gt;
+  &lt;li&gt;conflates actions over whole trajectory&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;TD Learning&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;introduces bias (treating guess as truth) but estimate have lower variance&lt;/li&gt;
+  &lt;li&gt;incorporates 1 step&lt;/li&gt;
+  &lt;li&gt;usually more efficient&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For the true value function \(V^{\pi_{\theta}}(s)\), the TD error \( \delta^{\pi_{\theta}}(s)\)&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\delta^{\pi_{\theta}}(s) = r + \gamma V^{\pi_{\theta}}(s^{\prime}) - V^{\pi_{\theta}}(s)&lt;/script&gt;
+
+&lt;p&gt;is an unbiased estimate of the advantage function.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{aligned}
+\mathbb{E}_{\pi_{\theta}} \Big[\delta^{\pi_{\theta}}(s) \mid s,a \Big] &amp;= \mathbb{E}_{\pi_{\theta}} \Big[ r + \gamma V^{\pi_{\theta}}(s^{\prime}) - V^{\pi_{\theta}}(s) \Big] \\
+= Q^{\pi_{\theta}}(s,a) - V^{\pi_{\theta}}(s) \\
+= A^{\pi_{\theta}}(s,a)
+\end{aligned} %]]&gt;&lt;/script&gt;
+
+&lt;h2 id=&quot;trpo-from-1st-order-to-2nd-order&quot;&gt;TRPO: From 1st Order to 2nd Order&lt;/h2&gt;
+
+&lt;p&gt;We don’t have access to the objective function in analytic form. However, we can estimate the gradient as the expected return of our policy by sampling trajectories. The gradient ascent update is correct if we make an infinitesimally small change.&lt;/p&gt;
+
+&lt;p&gt;A local approximation is only accurate closeby:&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;/assets/trpo_local_approx.png&quot; width=&quot;65%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;
+    With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Trust-region methods penalize large steps. Let’s call our surrogate objective \(L_{\pi_{old}}(\pi)\).
+Let’s call our true objective \( \eta(\pi)\). We will add a penalty for moving \( \theta \) from \( \theta_{old} \) (KL Divergence between the old and new policy).&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \max\limits_s KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]&lt;/script&gt;
+
+&lt;p&gt;Monotonic improvement will be guaranteed.Since the max is not good for Monte Carlo estimation, a practical approximation is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]&lt;/script&gt;
+
+&lt;h3 id=&quot;second-order-optimization-method&quot;&gt;Second Order Optimization Method&lt;/h3&gt;
+
+&lt;p&gt;What if we used a 2nd order optimization method instead of our vanilla 1st order optimization method?
+We would compute the Hessian of the KL divergence, not of our objective&lt;/p&gt;
+
+&lt;p&gt;Hessian computation is extremely expensive…( 100,000 x 100,000 )&lt;/p&gt;
+
+&lt;h3 id=&quot;truncated-natural-gradient-policy-algorithm&quot;&gt;Truncated Natural Gradient Policy Algorithm&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;for iteration 1,2,..  do
+    &lt;ul&gt;
+      &lt;li&gt;Run policy for \(T\) timesteps or \(N\) trajectories&lt;/li&gt;
+      &lt;li&gt;Estimate advantage function at all timesteps&lt;/li&gt;
+      &lt;li&gt;Compute policy gradient \(g\)&lt;/li&gt;
+      &lt;li&gt;Use Conjugate Gradient (with Hessian-vector products) to compute \( H^{-1}g \)&lt;/li&gt;
+      &lt;li&gt;Update policy parameter \( \theta = \theta_{old} + \alpha H^{-1}g \)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;trust-region-policy-optimization-trpo&quot;&gt;Trust Region Policy Optimization (TRPO)&lt;/h3&gt;
+
+&lt;p&gt;The Truncated Natural Policy Gradient algorithm was an unconstrained problem:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]&lt;/script&gt;
+
+&lt;p&gt;TRPO is a constrained problem (otherwise, algorithm is identical):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{aligned}
+\mbox{max } &amp; L_{\pi_{old}}(\pi) \\
+\mbox{subject to } &amp; \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big] \leq \delta
+\end{aligned} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Easier to set hyper parameter \(\delta\) rather than \(C\). \(\delta\) can remain fixed over whole learning process… Simply rescale step by some scalar.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References:&lt;/h2&gt;
+
+&lt;p&gt;[1] Richard Sutton and Andrew Barto. Reinforcement Learning:
+An Introduction. Chapter 13. &lt;a href=&quot;http://incompleteideas.net/book/bookdraft2017nov5.pdf&quot;&gt;http://incompleteideas.net/book/bookdraft2017nov5.pdf&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[2] John Schulman. Deep Reinforcement Learning: Policy Gradients and Q-Learning.Bay Area Deep Learning School, September 24, 2016.&lt;/p&gt;
+
+&lt;p&gt;[3] Andrej Karpathy. Deep Reinforcement Learning: Pong from Pixels. May 31, 2016. &lt;a href=&quot;http://karpathy.github.io/2016/05/31/rl/&quot;&gt;http://karpathy.github.io/2016/05/31/rl/&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry><entry><title type="html">Gauss-Newton Optimization in 10 Minutes</title><link href="http://johnwlambert.github.io/gauss-newton/" rel="alternate" type="text/html" title="Gauss-Newton Optimization in 10 Minutes" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://johnwlambert.github.io/gaussnewton</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-newton/">&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
 
 &lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
 
@@ -1160,347 +1971,4 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
 	&lt;span class=&quot;c1&quot;&gt;% stopping condition ...&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry><entry><title type="html">Linear Algebra Without the Agonizing Pain</title><link href="http://localhost:4000/linear-algebra/" rel="alternate" type="text/html" title="Linear Algebra Without the Agonizing Pain" /><published>2018-03-30T07:00:00-04:00</published><updated>2018-03-30T07:00:00-04:00</updated><id>http://localhost:4000/linalg</id><content type="html" xml:base="http://localhost:4000/linear-algebra/">&lt;!-- 
-&lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
-	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
-	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
-	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;760&quot; y=&quot;30&quot; style=&quot;fill:rgb(77,175,75)&quot; /&gt;
-	&lt;rect width=&quot;10&quot; height=&quot;10&quot; x=&quot;400&quot; y=&quot;60&quot; style=&quot;fill:rgb(225,229,224)&quot; /&gt;
-&lt;/svg&gt;
- --&gt;
-&lt;h2 id=&quot;linear-algebra-definitions&quot;&gt;Linear Algebra Definitions&lt;/h2&gt;
-&lt;p&gt;Before we do anything interesting with machine learning or optimization, we’ll need to review some absolutely &lt;strong&gt;essential&lt;/strong&gt; linear algebra concepts.&lt;/p&gt;
-&lt;h3 id=&quot;matrix-rank&quot;&gt;Matrix Rank&lt;/h3&gt;
-
-&lt;h3 id=&quot;vector-space&quot;&gt;Vector Space&lt;/h3&gt;
-
-&lt;h3 id=&quot;null-space-of-a-matrix&quot;&gt;Null Space of a Matrix&lt;/h3&gt;
-
-&lt;p&gt;Given \(A \in \mathbb{R}^{m \times n}\), the &lt;strong&gt;null space&lt;/strong&gt; of \(A\) is the set of vectors which are sent to the zero vector:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(A) = \{ x \in \mathbb{R}^n \mid Ax = 0 \}&lt;/script&gt;
-
-&lt;p&gt;Multiplication by \(A\) can be seen as a function which sends a vector \(x \in \mathbb{R}^n\) to a vector \(Ax \in \mathbb{R}^m\).&lt;/p&gt;
-
-&lt;p&gt;Of course, \(\mathcal{N}(A)\) always contains the zero vector, i.e. \({0} \in \mathcal{N}(A)\). But the question is, does it contain any other vectors? If the columns of \(A\) are linearly independent, then we can always say \(\mathcal{N}(A) = {0} \).&lt;/p&gt;
-
-&lt;h3 id=&quot;column-space-range-of-a-matrix&quot;&gt;Column Space (Range) of a Matrix&lt;/h3&gt;
-
-&lt;p&gt;Given an \(m \times n\) matrix \(A\), we would like to know for which vectors \(b \in \mathbb{R}^m\) the system \(Ax = b\) has a solution. Let’s define the columns of \(A\) as:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-A = \begin{bmatrix} | &amp; | &amp; &amp; | \\ v_1 &amp; v_2 &amp; \cdots &amp; v_n \\ | &amp; | &amp; &amp; | \end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;The column space of \(A\) is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;C(A) = \mbox{span}(v_1, v_2, \dots, v_n)&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;C(A) = \{ Ax \mid x \in \mathbb{R}^n \}&lt;/script&gt;
-
-&lt;p&gt;The system \(Ax = b\) has a solution &lt;strong&gt;if and only if&lt;/strong&gt; \(b \in C(A)\), equivalent to stating \(b\) is in the range of \(A\): \(b \in R(A)\).&lt;/p&gt;
-
-&lt;h3 id=&quot;rank-nullity-theorem&quot;&gt;Rank-Nullity Theorem&lt;/h3&gt;
-&lt;p&gt;Let \(A\) be any matrix such that \(A \in \mathbb{R}^{m \times n}\).&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{rank}(A) + \mbox{nullity}(A) = n&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{dim}\bigg(C(A)\bigg) + \mbox{dim}\bigg(N(A)\bigg) = n&lt;/script&gt;
-
-&lt;h3 id=&quot;orthogonal-complement&quot;&gt;Orthogonal Complement&lt;/h3&gt;
-
-&lt;h3 id=&quot;matrix-calculus&quot;&gt;Matrix Calculus&lt;/h3&gt;
-
-&lt;p&gt;Two identities are essential: gradients of matrix-vector products and of quadratic forms.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;\( \nabla_x (Ax) = A^T\)&lt;/li&gt;
-  &lt;li&gt;\(\nabla_x (x^TAx) = Ax + A^Tx\)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;When \(A\) is symmetric, which is often the case, \(A = A^T\) and thus \(\nabla_x (x^TAx) = 2Ax \)&lt;/p&gt;
-
-&lt;p&gt;John Duchi explains exactly why identies are true in &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;[1]&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;projection&quot;&gt;Projection&lt;/h2&gt;
-
-&lt;h3 id=&quot;cosine-rule&quot;&gt;Cosine Rule&lt;/h3&gt;
-
-&lt;p&gt;Consider the following triangle, which can be divided into two right triangles by drawing a line that passes through point \(B\) and is perpendicular to side \(b\).&lt;/p&gt;
-
-&lt;p&gt;Consider the right subtriangle, which is a “right triangle” with edge length \(c\) as its hypotenuse. By the Pythagorean Theorem,&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/cosine_law_dot_product.png&quot; width=&quot;50%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-c^2 = (a \mbox{ sin } C)^2 + (b-a \mbox{ cos } C)^2 \\
- = a^2 \mbox{ sin }^2 C + b^2 - 2ab \mbox{ cos } C + a^2 \mbox{ cos }^2 C \\
-  = a^2 \Big( \mbox{ sin }^2 C + \mbox{ cos }^2 C\Big) + b^2 - 2ab \mbox{ cos } C \\
-   = a^2 \Big( 1 \Big) + b^2 - 2ab \mbox{ cos } C
-\end{aligned}&lt;/script&gt;
-
-&lt;h3 id=&quot;dot-product-as-a-cosine&quot;&gt;Dot Product as a Cosine&lt;/h3&gt;
-
-&lt;p&gt;Consider two arbitrary vectors \(A\) and \(B\). We can form a triangle with these two sides and a third side connecting the ends of \(A\) and \(B\). We let \(\theta\) be the angle between \(A\) and \(B\).&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/cosine_law_dot_product_im2.png&quot; width=&quot;50%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-B + C = A \\
-C = A - B \\
-C \cdot C = (A-B) \cdot (A-B) \\
-C \cdot C = (A-B)^T (A-B) \\
- = A^A - B^TA - A^TB + B^B \\
- = \|A\| - 2B^TA + \|B\| \\
-  = \|A\| + \|B\| - 2B^TA \\
-  = \|A\| + \|B\| - 2 A \cdot B
-\end{aligned}&lt;/script&gt;
-
-&lt;p&gt;We showed above via the Law of Cosines that
-&lt;script type=&quot;math/tex&quot;&gt;C \cdot C = \|A\| + \|B\| - 2 \|A\| \|B\| \mbox{ cos }(\theta)&lt;/script&gt;
-, thus&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A \cdot B = \|A\| \|B\| \mbox{ cos }(\theta)&lt;/script&gt;
-
-&lt;h3 id=&quot;inner-products&quot;&gt;Inner Products&lt;/h3&gt;
-
-&lt;p&gt;Consider two vectors \(x,y \in \mathbb{R}^n\). We write their “inner product” as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\langle x, y \rangle  = x^Ty = x_1y_1 + \dots + x_iy_i + \dots + x_ny_n&lt;/script&gt;
-
-&lt;p&gt;The “norm” of a vector \(x\), a measure of its length, is computed as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;||x|| = \sqrt{x_1^2 + \dots x_n^2} = \sqrt{\langle x,x \rangle}&lt;/script&gt;
-
-&lt;p&gt;By trigonometry, we see a triangle:&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/dot_product_im3.JPG&quot; width=&quot;25%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;p&gt;We know that the vector 
-&lt;script type=&quot;math/tex&quot;&gt;\vec{e}_y = \frac{y}{||y||}&lt;/script&gt;. The projection of \(x\) onto the vector \(y\), denoted as \(P_y(x)\), is
-equivalent to computing \( cos(\theta) = \frac{adj}{hyp} \), where the adjacent side of the triangle is the vector \(\vec{y}\) and the hypotenuse is the vector \(\vec{x}\). We can reformulate this equation as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{hyp} * \mbox{ cos }(\theta) = \mbox{adj}&lt;/script&gt;
-
-&lt;p&gt;In our case, this becomes&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\| \vec{x} \| \mbox{cos }(\theta) = \|X_y\|&lt;/script&gt;
-
-&lt;p&gt;We recognize this as part of the cosine rule for dot products. Plugging this expression into the cosine rule, we see:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x \cdot y = \|y\| \|x\| \mbox{cos } \theta&lt;/script&gt;
-
-&lt;p&gt;We can easily write out the projection at this point, as merely the computation of the vector \(X_y\). We have obtained a closed form expression above for its length, and multiplying it by the unit vector in the direction of \(\vec{y}\), we see:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;P_y(x) = X_y = ||X_y|| e_y = \Bigg(\frac{x^Ty}{||y||}\Bigg)\Bigg(\frac{y}{||y||}\Bigg) = \Bigg(\frac{x^Ty}{||y||^2}\Bigg)y&lt;/script&gt;
-
-&lt;p&gt;where 
-&lt;script type=&quot;math/tex&quot;&gt;\frac{x^Ty}{||y||^2}&lt;/script&gt;
-is just a scalar coefficient.&lt;/p&gt;
-&lt;h3 id=&quot;the-gram-schmidt-procedure&quot;&gt;The Gram Schmidt Procedure&lt;/h3&gt;
-
-&lt;p&gt;Suppose we have a set of \(k\) vectors
-&lt;script type=&quot;math/tex&quot;&gt;\{a_1, \dots, a_k\}&lt;/script&gt;
-such that \(a_i \in \mathbb{R}^n\) are all independent. The objective of the Gram Schmidt procedure is to produce an orthonormal set of vectors
-&lt;script type=&quot;math/tex&quot;&gt;\{ q_1, \dots, q_k \}&lt;/script&gt;
-such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the portion of the next vector \(a_{i+1}\) that projects onto \(a_i\). For example, to find a vector which is orthogonal to the first, we could compute&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/gram_schmidt_projection.JPG&quot; width=&quot;40%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;p&gt;To find many vectors, we can follow an iterative procedure:&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-\begin{aligned}
-\begin{array}{ll}
-\mbox{Step 1a:} &amp; \tilde{q_1} = a_1 \\
-\mbox{Step 1b:} &amp; q_1 = \frac{\tilde{q_1} }{\|\tilde{q_1}\|} \\
-\mbox{Step 2a:} &amp; \tilde{q_2} = a_2 - P_{q_1}(a_2) = a_2 - (a_2^Tq_1)q_1\\
-\mbox{Step 2b:} &amp; q_2 = \frac{\tilde{q_2} }{\|\tilde{q_2}\|}\\
-\mbox{Step 3a:} &amp; \tilde{q_3} = a_3 - P_{q_2}(a_3) - P_{q_1}(a_3)\\ 
- &amp;  = a_3 - (a_3^Tq_2)q_2 - (a_3^Tq_1)q_1 \\
-\mbox{Step 3b:} &amp; q_3 = \frac{\tilde{q_3} }{\|\tilde{q_3}\|} \\
-\end{array}
-\end{aligned} %]]&gt;&lt;/script&gt;&lt;/p&gt;
-&lt;h2 id=&quot;solving-systems-of-equations&quot;&gt;Solving Systems of Equations&lt;/h2&gt;
-
-&lt;h3 id=&quot;overdetermined-systems&quot;&gt;Overdetermined Systems&lt;/h3&gt;
-&lt;p&gt;Here, matrix \(A\) is a skinny, full-rank matrix. We cannot solve such a system, so instead we minimize a residual \(r\), i.e. we minimize \(\lVert r \rVert^2 = \lVert Ax-y \rVert^2\).  We find an approximate solution to \(Y=Ax\).&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/least_squares_solution.png&quot; width=&quot;50%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Formally, we minimize some objective function \(J\):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\begin{array}{ll}
-\mbox{minimize} &amp; J \\
-&amp; \lVert r \rVert^2 \\
- &amp;  \lVert Ax-y \rVert^2 \\
-&amp; (Ax-y)^T (Ax-y) \\
-&amp; (Ax)^T(Ax) - y^TAx - (Ax)^Ty + y^Ty \\
-&amp; x^TA^TAx - y^TAx - x^TA^Ty + y^Ty
-\end{array}
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;We can set its gradient to zero, and since the objective is the square of an affine function, it is convex, so we can find its true, global minimum:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_x J = 2(A^TA)x - 2A^Ty = 0&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;2(A^TA)x = 2A^Ty&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(A^TA)x = A^Ty&lt;/script&gt;
-
-&lt;p&gt;Multiply on the left by \((A^TA)^{-1}\), and we recover the least squares solution:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ls} = (A^TA)^{-1}A^Ty = A^{\dagger}y&lt;/script&gt;
-
-&lt;p&gt;We are projecting \(y\) onto the the range of \(A\):&lt;/p&gt;
-
-&lt;p&gt;We call \(A^{\dagger}\) a &lt;strong&gt;left-inverse&lt;/strong&gt; of \(A\) because \(A^{\dagger}A=I\).&lt;/p&gt;
-
-&lt;h3 id=&quot;underdetermined-systems&quot;&gt;Underdetermined Systems&lt;/h3&gt;
-&lt;p&gt;Here \(A\) is a fat, full-rank matrix. We can &lt;strong&gt;always&lt;/strong&gt; solve such a system, and there will be an infinite # of solutions.&lt;/p&gt;
-
-&lt;p&gt;We often choose to find the smallest solution, i.e. the one closest to the origin&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/least_norm_solution.png&quot; width=&quot;50%&quot; /&gt;
-&lt;/div&gt;
-&lt;p&gt;Source: [&lt;a href=&quot;https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf&quot;&gt;3&lt;/a&gt;]&lt;/p&gt;
-
-&lt;p&gt;We call this a least-norm (\(x_{ln}\) ) solution, because we minimize \(\lVert x \rVert\):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-\mbox{minimize} &amp; x^Tx \\
-\mbox{subject to} &amp; Ax = y
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;By introducing Lagrange multipliers, we find&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;L(x, \lambda) = x^Tx + \lambda^T(Ax-y)&lt;/script&gt;
-
-&lt;p&gt;We have two optimality conditions:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-\nabla_x L = 2x + A^T \lambda = 0 \\
-\nabla_{\lambda} L = Ax - y = 0
-\end{aligned}&lt;/script&gt;
-
-&lt;p&gt;From condition (1), we see that&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x = -\frac{A^T \lambda}{2}&lt;/script&gt;
-
-&lt;p&gt;Substituting this into condition (2), we observe:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;Ax - y = 0 \\
-A(-\frac{A^T \lambda}{2}) = y \\
-\lambda = -2(AA^T)^{-1}y&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{ln} = A^T(AA^T)^{-1}y = A^{\dagger}y&lt;/script&gt;
-
-&lt;p&gt;We call \(A^{\dagger}\) a right-inverse of \(A\) because \(AA^{\dagger}=I\).&lt;/p&gt;
-
-&lt;h2 id=&quot;singular-value-decomposition-svd&quot;&gt;Singular Value Decomposition (SVD)&lt;/h2&gt;
-
-&lt;h3 id=&quot;svd-definition&quot;&gt;SVD Definition&lt;/h3&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-A=U\Sigma V^T = \begin{bmatrix} u_1 &amp; \dots &amp; u_r \end{bmatrix} \begin{bmatrix} \sigma_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where \(U\), \(V\) are orthogonal matrices, meaning \(U^TU = I\), \(UU^T=I\).&lt;/p&gt;
-
-&lt;p&gt;We call \(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\) the right/input singular vectors, because this is the first matrix to interact with an input vector \(x\) when we compute \(y=Ax\).&lt;/p&gt;
-
-&lt;p&gt;We call \(U=\begin{bmatrix} u_1, \dots, u_r \end{bmatrix}\) the left/output singular vectors, because this is the last matrix that the intermediate results are multiplied before we obtain our result ( \(y=Ax\) ).&lt;/p&gt;
-
-&lt;h3 id=&quot;computation-of-the-svd&quot;&gt;Computation of the SVD&lt;/h3&gt;
-
-&lt;p&gt;To find this decomposition for a matrix \(A\), we’ll need to compute the \(V\)’s.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^TA = (V\Sigma U^T) (U \Sigma V^T)&lt;/script&gt;
-
-&lt;p&gt;This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(v_i\)’s are simply the eigenvectors of \(A^TA\).&lt;/p&gt;
-
-&lt;p&gt;Now, we’ll need to compute the \(U\)’s.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T&lt;/script&gt;
-
-&lt;p&gt;The \(u_i\)’s are the eigenvectors of \(AA^T\). Furthermore,  \(u_1, \dots u_r\) are an orthonormal basis for \(\mbox{range}(A)\).&lt;/p&gt;
-
-&lt;h3 id=&quot;how-can-we-interpret-the-svd-from-2&quot;&gt;How Can We Interpret the SVD? (From [&lt;a href=&quot;http://ee263.stanford.edu/lectures/svd-v2.pdf&quot;&gt;2&lt;/a&gt;])&lt;/h3&gt;
-
-&lt;p&gt;If \(A = U \Sigma V^T\), then we can decompose the the linear mapping \(y = Ax\) to a series of steps, e.g.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;I compute coefficients of \(x\) along input directions \(v_1, \dots , v_r\)&lt;/li&gt;
-  &lt;li&gt;I scale coefficients by \(\sigma_i\)&lt;/li&gt;
-  &lt;li&gt;I reconstitute along output directions \(u_1, \dots , u_r\)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/svd_interpretation_decomposition.png&quot; width=&quot;75%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;p&gt;How can we visualize this transformation? Consider the image of a unit ball under \(A\):&lt;/p&gt;
-
-&lt;div align=&quot;center&quot;&gt;
-&lt;img src=&quot;/assets/svd_interpretation_unit_ball_to_ellipsoid.png&quot; width=&quot;75%&quot; /&gt;
-&lt;/div&gt;
-
-&lt;p&gt;The unit ball is transformed into an ellipsoid. Specifically, 
-&lt;script type=&quot;math/tex&quot;&gt;\{ Ax \mid \|x\| \leq 1 \}&lt;/script&gt;
-is an ellipsoid with principal axes \(\sigma_iu_i.\)&lt;/p&gt;
-
-&lt;h3 id=&quot;svd-applications&quot;&gt;SVD Applications&lt;/h3&gt;
-
-&lt;p&gt;If \(A\) has SVD \(A = U \Sigma V^T\), we can use the SVD to compute the general pseudo-inverse of a matrix:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y=Ax&lt;/script&gt;
-
-&lt;p&gt;We substitute in the SVD decomposition of \(A\):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y= (U \Sigma V^T)x&lt;/script&gt;
-
-&lt;p&gt;We now wish to find&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(U \Sigma V^T)^{-1} y= x&lt;/script&gt;
-
-&lt;p&gt;Since \((AB)^{−1} = B^{−1}A^{−1}\), we can say&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(U \Sigma V^T)^{-1} =  (V^T)^{-1} \Sigma^{-1} U^{-1}&lt;/script&gt;
-
-&lt;p&gt;Since \(U,V\) are orthogonal matrices, we know \(U^{-1}=U^T\) and \(V^{-1}=V^T\), so&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(V^T)^{-1} \Sigma^{-1} U^{-1} = (V^T)^{T} \Sigma^{-1} U^{T} = V \Sigma^{-1} U^{T}&lt;/script&gt;
-
-&lt;p&gt;Thus, we have:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^{\dagger} = V \Sigma^{-1}U^T&lt;/script&gt;
-
-&lt;h2 id=&quot;extremal-trace-problems&quot;&gt;Extremal Trace Problems&lt;/h2&gt;
-
-&lt;h2 id=&quot;eigenvectors&quot;&gt;Eigenvectors&lt;/h2&gt;
-
-&lt;p&gt;These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford’s EE 263 course (Linear Dynamical Systems).&lt;/p&gt;
-
-&lt;p&gt;References:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;Duchi, John. &lt;a href=&quot;https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf&quot;&gt;Properties of the Trace and Matrix Derivatives&lt;/a&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Boyd, Stephen. &lt;a href=&quot;http://ee263.stanford.edu/lectures/svd-v2.pdf&quot;&gt;Linear Dynamical Systems, (EE263) Lecture Slides&lt;/a&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Boyd, Stephen. &lt;a href=&quot;https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf&quot;&gt;Linear Dynamical Systems, (EE263) Lecture 8: Least-norm solutions of undetermined equations&lt;/a&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;</content><author><name></name></author><summary type="html">Necessary Linear Algebra Overview</summary></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry></feed>
