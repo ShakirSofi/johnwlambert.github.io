@@ -1,0 +1,188 @@
+---
+layout: post
+comments: true
+permalink: /icp/
+title:  "Iterative Closest Point"
+excerpt: "Constrained Optimization, Lagrangians, Duality, and Interior Point Methods"
+date:   2018-11-29 11:00:00
+mathjax: true
+---
+
+
+## The 3D Registration Problem
+Given two shapes A and B which partially overlap
+
+Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B
+
+Assume A and B are positioned close to each other
+
+$$
+\min\limits_T \delta(A, T(B))
+$$
+
+
+## Degrees of Freedom: Transform estimation
+
+A rigid motion has 6 degrees of freedom (3 for translation and 3 for rotation). We typically estimate the motion using many more pairs of corresponding points, so the problem is overdetermined (which is good, given noise, outliers, etc – use least squares approaches).
+
+
+## Key Challenges of the Hard Optimization Problem
+
+- (1) We must estimate correspondences. This gives rise to combinatorial searches.
+
+- (2) We must estimate the aligning transform. Transforms may be non-linear.
+
+Fortunately, the low-dimensionality of some transforms helps.
+
+## Optimal Transformation for Point Clouds
+
+
+
+When given correspondences, the problem is formulated as:
+
+*Given two sets points:* $$ \{a_i \}_{i=1}^n, \{ b_i \}_{i=1}^n $$ *in*   . *Find the rigid transform* \\(\mathbf{R}, t\\) *that minimizes*
+
+$$
+\underset{\mathbf{R}, t}{\mbox{minimize }} \sum\limits_{i=1}^N \| \mathbf{R}x_i + t - y_i \|_2^2
+$$
+
+
+
+
+$$
+\sum\limits_{i=1}^n \|Ra_i − t − b_i \|_2^2
+$$
+
+$$
+\bar{a} = \frac{1}{|A|} \sum\limits_i a_i
+$$
+
+$$
+\bar{b} = \frac{1}{|B|} \sum\limits_i b_i
+$$
+
+$$
+a_i^{\prime} = a_i − \bar{a}
+$$
+
+$$
+b_i^{\prime} = b_i − \bar{b} 
+$$
+
+$$
+a_i = a_i^{\prime} + \bar{a},  b_i = b_i^{\prime} + \bar{b}
+$$
+
+$$
+= \sum\limits_{i=1}^n \|R(a_i^{\prime} + \bar{a}) − t − (b_i^{\prime} + \bar{b})\|_2^2
+$$
+
+$$
+= \sum\limits_{i=1}^n \|Ra_i^{\prime} − b_i^{\prime} + (R\bar{a} − \bar{b} − t)\|_2^2
+$$
+
+
+Let
+
+$$
+t = R\bar{a} − \bar{b}
+$$
+
+$$
+\sum\limits_{i=1}^n \|Ra_i − t − b_i \|_2^2 = \sum\limits_{i=1}^n \|Ra_i^{\prime} − b_i^{\prime}\|_2^2
+$$
+
+
+$$
+tr(RN)
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+def find_rigid_alignment(A, B):
+	"""
+	2-D or 3-D registration with known correspondences.
+	Registration occurs in the zero centered coordinate system, and then
+	must be transported back.
+
+		Args:
+		-	A: Numpy array of shape (N,D) -- Reference Point Cloud (target)
+		-	B: Numpy array of shape (N,D) -- Point Cloud to Align (source)
+
+		Returns:
+		-	R: optimal rotation
+		-	t: optimal translation
+	"""
+	num_pts = A.shape[0]
+	dim = A.shape[1]
+
+	a_mean = np.mean(A, axis=0)
+	b_mean = np.mean(B, axis=0)
+
+	# Zero-center the point clouds
+	A -= a_mean
+	B -= b_mean
+
+	N = np.zeros((dim, dim))
+	for i in range(num_pts):
+		N += A[i].reshape(dim,1).dot( B[i].reshape(1,dim) )
+	N = A.T.dot(B)
+
+	U, D, V_T = np.linalg.svd(N)
+	S = np.eye(dim)
+	det = np.linalg.det(U) * np.linalg.det(V_T.T)
+	
+	# Check for reflection case
+	if not np.isclose(det,1.):
+		S[dim-1,dim-1] = -1
+
+	R = U.dot(S).dot(V_T)
+	t = R.dot( b_mean.reshape(dim,1) ) - a_mean.reshape(dim,1)
+	return R, -t.squeeze()
+```
+
+Similar code named the *Umeyama Transform* after[4] ships with [Eigen](https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60) as [Umeyama](https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html). The Open3D library utilizes the Umeyama method also (source code [here](https://github.com/IntelVCL/Open3D/blob/master/src/Core/Registration/TransformationEstimation.cpp#L47)).
+
+## Local Methods
+
+### Iterated Closest Pair (ICP) [2]
+
+- Align the A points to their closest B neighbors, then repeat.
+
+- Converges, if starting positions are "close enough".
+
+
+## Variants
+
+### Exhaustive Search
+
+- Compare (ideally) all alignments
+- Sample the space of possible initial alignments.
+- Correspondence is determined by the alignment at which models are closest.
+- Provides optimal result
+- Can be unnecessarily slow
+- Does not generalize well to non-rigid deformations
+
+## References
+
+[1] Leonidas Guibas. Alignments and Correspondences, Geometric Features. CS 233: Geometric and Topological Data Analysis, 9 May 2018.
+
+[2] Besl, McKay 1992.
+
+[3] Shinji Umeyama. Least-squares estimation of transformation parameters between two point patterns", PAMI 1991. [http://web.stanford.edu/class/cs273/refs/umeyama.pdf](http://web.stanford.edu/class/cs273/refs/umeyama.pdf).
+
+[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. [https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf](https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf).
+
