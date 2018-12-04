@@ -1,5 +1,141 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-11-28T12:28:10-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Piazza Answers</title><link href="http://johnwlambert.github.io/2018/11/28/piazza-answers.html" rel="alternate" type="text/html" title="Piazza Answers" /><published>2018-11-28T00:00:00-05:00</published><updated>2018-11-28T00:00:00-05:00</updated><id>http://johnwlambert.github.io/2018/11/28/piazza-answers</id><content type="html" xml:base="http://johnwlambert.github.io/2018/11/28/piazza-answers.html">&lt;h2 id=&quot;visualizing-cnns-via-deconvolution&quot;&gt;Visualizing CNNs via deconvolution&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-03T22:58:57-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Iterative Closest Point</title><link href="http://localhost:4000/icp/" rel="alternate" type="text/html" title="Iterative Closest Point" /><published>2018-11-29T06:00:00-05:00</published><updated>2018-11-29T06:00:00-05:00</updated><id>http://localhost:4000/icp</id><content type="html" xml:base="http://localhost:4000/icp/">&lt;h2 id=&quot;the-3d-registration-problem&quot;&gt;The 3D Registration Problem&lt;/h2&gt;
+&lt;p&gt;Given two shapes A and B which partially overlap&lt;/p&gt;
+
+&lt;p&gt;Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B&lt;/p&gt;
+
+&lt;p&gt;Assume A and B are positioned close to each other&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min\limits_T \delta(A, T(B))&lt;/script&gt;
+
+&lt;h2 id=&quot;degrees-of-freedom-transform-estimation&quot;&gt;Degrees of Freedom: Transform estimation&lt;/h2&gt;
+
+&lt;p&gt;A rigid motion has 6 degrees of freedom (3 for translation and 3 for rotation). We typically estimate the motion using many more pairs of corresponding points, so the problem is overdetermined (which is good, given noise, outliers, etc – use least squares approaches).&lt;/p&gt;
+
+&lt;h2 id=&quot;key-challenges-of-the-hard-optimization-problem&quot;&gt;Key Challenges of the Hard Optimization Problem&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;(1) We must estimate correspondences. This gives rise to combinatorial searches.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;(2) We must estimate the aligning transform. Transforms may be non-linear.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Fortunately, the low-dimensionality of some transforms helps.&lt;/p&gt;
+
+&lt;h2 id=&quot;optimal-transformation-for-point-clouds&quot;&gt;Optimal Transformation for Point Clouds&lt;/h2&gt;
+
+&lt;p&gt;When given correspondences, the problem is formulated as:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Given two sets points:&lt;/em&gt; &lt;script type=&quot;math/tex&quot;&gt;\{a_i \}_{i=1}^n, \{ b_i \}_{i=1}^n&lt;/script&gt; &lt;em&gt;in&lt;/em&gt;   . &lt;em&gt;Find the rigid transform&lt;/em&gt; \(\mathbf{R}, t\) &lt;em&gt;that minimizes&lt;/em&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\underset{\mathbf{R}, t}{\mbox{minimize }} \sum\limits_{i=1}^N \| \mathbf{R}x_i + t - y_i \|_2^2&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n \|Ra_i − t − b_i \|_2^2&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{a} = \frac{1}{|A|} \sum\limits_i a_i&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{b} = \frac{1}{|B|} \sum\limits_i b_i&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;a_i^{\prime} = a_i − \bar{a}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;b_i^{\prime} = b_i − \bar{b}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;a_i = a_i^{\prime} + \bar{a},  b_i = b_i^{\prime} + \bar{b}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \sum\limits_{i=1}^n \|R(a_i^{\prime} + \bar{a}) − t − (b_i^{\prime} + \bar{b})\|_2^2&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \sum\limits_{i=1}^n \|Ra_i^{\prime} − b_i^{\prime} + (R\bar{a} − \bar{b} − t)\|_2^2&lt;/script&gt;
+
+&lt;p&gt;Let&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;t = R\bar{a} − \bar{b}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n \|Ra_i − t − b_i \|_2^2 = \sum\limits_{i=1}^n \|Ra_i^{\prime} − b_i^{\prime}\|_2^2&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;tr(RN)&lt;/script&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def find_rigid_alignment(A, B):
+	&quot;&quot;&quot;
+	2-D or 3-D registration with known correspondences.
+	Registration occurs in the zero centered coordinate system, and then
+	must be transported back.
+
+		Args:
+		-	A: Numpy array of shape (N,D) -- Reference Point Cloud (target)
+		-	B: Numpy array of shape (N,D) -- Point Cloud to Align (source)
+
+		Returns:
+		-	R: optimal rotation
+		-	t: optimal translation
+	&quot;&quot;&quot;
+	num_pts = A.shape[0]
+	dim = A.shape[1]
+
+	a_mean = np.mean(A, axis=0)
+	b_mean = np.mean(B, axis=0)
+
+	# Zero-center the point clouds
+	A -= a_mean
+	B -= b_mean
+
+	N = np.zeros((dim, dim))
+	for i in range(num_pts):
+		N += A[i].reshape(dim,1).dot( B[i].reshape(1,dim) )
+	N = A.T.dot(B)
+
+	U, D, V_T = np.linalg.svd(N)
+	S = np.eye(dim)
+	det = np.linalg.det(U) * np.linalg.det(V_T.T)
+	
+	# Check for reflection case
+	if not np.isclose(det,1.):
+		S[dim-1,dim-1] = -1
+
+	R = U.dot(S).dot(V_T)
+	t = R.dot( b_mean.reshape(dim,1) ) - a_mean.reshape(dim,1)
+	return R, -t.squeeze()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Similar code named the &lt;em&gt;Umeyama Transform&lt;/em&gt; after[4] ships with &lt;a href=&quot;https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60&quot;&gt;Eigen&lt;/a&gt; as &lt;a href=&quot;https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html&quot;&gt;Umeyama&lt;/a&gt;. The Open3D library utilizes the Umeyama method also (source code &lt;a href=&quot;https://github.com/IntelVCL/Open3D/blob/master/src/Core/Registration/TransformationEstimation.cpp#L47&quot;&gt;here&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h2 id=&quot;local-methods&quot;&gt;Local Methods&lt;/h2&gt;
+
+&lt;h3 id=&quot;iterated-closest-pair-icp-2&quot;&gt;Iterated Closest Pair (ICP) [2]&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Align the A points to their closest B neighbors, then repeat.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Converges, if starting positions are “close enough”.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;variants&quot;&gt;Variants&lt;/h2&gt;
+
+&lt;h3 id=&quot;exhaustive-search&quot;&gt;Exhaustive Search&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Compare (ideally) all alignments&lt;/li&gt;
+  &lt;li&gt;Sample the space of possible initial alignments.&lt;/li&gt;
+  &lt;li&gt;Correspondence is determined by the alignment at which models are closest.&lt;/li&gt;
+  &lt;li&gt;Provides optimal result&lt;/li&gt;
+  &lt;li&gt;Can be unnecessarily slow&lt;/li&gt;
+  &lt;li&gt;Does not generalize well to non-rigid deformations&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Leonidas Guibas. Alignments and Correspondences, Geometric Features. CS 233: Geometric and Topological Data Analysis, 9 May 2018.&lt;/p&gt;
+
+&lt;p&gt;[2] Besl, McKay 1992.&lt;/p&gt;
+
+&lt;p&gt;[3] Shinji Umeyama. Least-squares estimation of transformation parameters between two point patterns”, PAMI 1991. &lt;a href=&quot;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&quot;&gt;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. &lt;a href=&quot;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&quot;&gt;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Piazza Answers</title><link href="http://localhost:4000/2018/11/28/piazza-answers.html" rel="alternate" type="text/html" title="Piazza Answers" /><published>2018-11-28T00:00:00-05:00</published><updated>2018-11-28T00:00:00-05:00</updated><id>http://localhost:4000/2018/11/28/piazza-answers</id><content type="html" xml:base="http://localhost:4000/2018/11/28/piazza-answers.html">&lt;h2 id=&quot;visualizing-cnns-via-deconvolution&quot;&gt;Visualizing CNNs via deconvolution&lt;/h2&gt;
 
 &lt;p&gt;It concerns slide 4 in this presentation.
 http://places.csail.mit.edu/slide_iclr2015.pdf&lt;/p&gt;
@@ -532,7 +668,7 @@ Giving a cornerness function in the lecture slides:
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 &amp; g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] &amp; g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Epipolar Geometry</title><link href="http://johnwlambert.github.io/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://johnwlambert.github.io/epipolar-geometry</id><content type="html" xml:base="http://johnwlambert.github.io/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
+&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Epipolar Geometry</title><link href="http://localhost:4000/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://localhost:4000/epipolar-geometry</id><content type="html" xml:base="http://localhost:4000/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
 &lt;p&gt;Modern robotic computer vision tasks like Structure from Motion (SfM) and Simultaneous Localization and Mapping (SLAM) would not be possible without feature matching. Tools from Epipolar Geometry are an easy way to discard outliers in feature matching and are widely used.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-fundamental-matrix&quot;&gt;The Fundamental Matrix&lt;/h2&gt;
@@ -609,7 +745,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 
 &lt;p&gt;[1] H. Longuet Higgins. A computer algorithm for reconstructing a scene from two projections. &lt;em&gt;Nature&lt;/em&gt;, 293, 1981.&lt;/p&gt;
 
-&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://johnwlambert.github.io/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/mpi</id><content type="html" xml:base="http://johnwlambert.github.io/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
+&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://localhost:4000/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/mpi</id><content type="html" xml:base="http://localhost:4000/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
 
 &lt;p&gt;mpirun –np 2 nvprof –log-file profile.out.%p&lt;/p&gt;
 
@@ -624,7 +760,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 &lt;p&gt;MV2_USE_CUDA=1 mpirun -np 1 nvprof –kernels gpu_GEMM –analysis-metrics
 –output-profile GEMMmetrics.out.%p.nvprof ./main [args]&lt;/p&gt;
 
-&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://johnwlambert.github.io/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/fully-connected-network</id><content type="html" xml:base="http://johnwlambert.github.io/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
+&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://localhost:4000/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/fully-connected-network</id><content type="html" xml:base="http://localhost:4000/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
 
 &lt;p&gt;Suppose we wish to implement a fully-connected feedforward neural network with 1 input layer, 1 hidden layer, and 1 output layer. We call such a network to be a two-layer neural network (ignoring the input layer as it is trivially present).&lt;/p&gt;
 
@@ -978,7 +1114,7 @@ Similarly,
 
 &lt;p&gt;References:&lt;/p&gt;
 
-&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://johnwlambert.github.io/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://johnwlambert.github.io/kernel-trick</id><content type="html" xml:base="http://johnwlambert.github.io/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
+&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://localhost:4000/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/kernel-trick</id><content type="html" xml:base="http://localhost:4000/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
 &lt;p&gt;The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = (x^Tz)^2 = (\sum\limits_{i=1}^n x_iz_i)^2&lt;/script&gt;
@@ -1005,7 +1141,7 @@ Similarly,
 
 &lt;p&gt;Thus, we’ve shown that for \(n=3\),
 &lt;script type=&quot;math/tex&quot;&gt;K(x,z) = \phi(x)^T \phi(z)&lt;/script&gt;
-which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://johnwlambert.github.io/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/fast-nearest-neighbor</id><content type="html" xml:base="http://johnwlambert.github.io/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://localhost:4000/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://localhost:4000/fast-nearest-neighbor</id><content type="html" xml:base="http://localhost:4000/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#rank&quot;&gt;Brute Force&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#fastaffinitymatrices&quot;&gt;Fast Affinity Matrices&lt;/a&gt;&lt;/li&gt;
@@ -1115,7 +1251,7 @@ AB^T = \begin{bmatrix} - &amp; a_1 &amp; - \\ - &amp; a_2 &amp; - \\ - &amp; a_3
   &lt;span class=&quot;n&quot;&gt;unit_test_arr_arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://johnwlambert.github.io/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://johnwlambert.github.io/subgradient</id><content type="html" xml:base="http://johnwlambert.github.io/subgradient-methods/">&lt;!-- 
+&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://localhost:4000/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://localhost:4000/subgradient</id><content type="html" xml:base="http://localhost:4000/subgradient-methods/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -1269,7 +1405,7 @@ x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 
 &lt;p&gt;[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf&quot;&gt;Lecture 6&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://johnwlambert.github.io/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://johnwlambert.github.io/cvx</id><content type="html" xml:base="http://johnwlambert.github.io/convex-opt/">&lt;!-- 
+&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://localhost:4000/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://localhost:4000/cvx</id><content type="html" xml:base="http://localhost:4000/convex-opt/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -1562,7 +1698,7 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
   &lt;li&gt;
     &lt;p&gt;Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf&quot;&gt;Lecture 16&lt;/a&gt;.&lt;/p&gt;
   &lt;/li&gt;
-&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Understanding Policy Gradients</title><link href="http://johnwlambert.github.io/policy-gradients/" rel="alternate" type="text/html" title="Understanding Policy Gradients" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://johnwlambert.github.io/policy-gradients</id><content type="html" xml:base="http://johnwlambert.github.io/policy-gradients/">&lt;h2 id=&quot;policy-gradients&quot;&gt;Policy Gradients&lt;/h2&gt;
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Understanding Policy Gradients</title><link href="http://localhost:4000/policy-gradients/" rel="alternate" type="text/html" title="Understanding Policy Gradients" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://localhost:4000/policy-gradients</id><content type="html" xml:base="http://localhost:4000/policy-gradients/">&lt;h2 id=&quot;policy-gradients&quot;&gt;Policy Gradients&lt;/h2&gt;
 
 &lt;p&gt;As opposed to Deep Q-Learning, policy gradients is a method to directly output probabilities of actions. We scale gradients of actions by reward.&lt;/p&gt;
 
@@ -1840,135 +1976,4 @@ An Introduction. Chapter 13. &lt;a href=&quot;http://incompleteideas.net/book/bo
 
 &lt;p&gt;[2] John Schulman. Deep Reinforcement Learning: Policy Gradients and Q-Learning.Bay Area Deep Learning School, September 24, 2016.&lt;/p&gt;
 
-&lt;p&gt;[3] Andrej Karpathy. Deep Reinforcement Learning: Pong from Pixels. May 31, 2016. &lt;a href=&quot;http://karpathy.github.io/2016/05/31/rl/&quot;&gt;http://karpathy.github.io/2016/05/31/rl/&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry><entry><title type="html">Gauss-Newton Optimization in 10 Minutes</title><link href="http://johnwlambert.github.io/gauss-newton/" rel="alternate" type="text/html" title="Gauss-Newton Optimization in 10 Minutes" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://johnwlambert.github.io/gaussnewton</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-newton/">&lt;h2 id=&quot;unconstrained-optimization&quot;&gt;Unconstrained Optimization&lt;/h2&gt;
-
-&lt;h3 id=&quot;the-gauss-newton-method&quot;&gt;The Gauss-Newton Method&lt;/h3&gt;
-
-&lt;p&gt;Suppose our residual is no longer affine, but rather nonlinear. We want to minimize \(\lVert r(x) \rVert^2\). Generally speaking, we cannot solve this problem, but rather can use good heuristics to find local minima.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Start from initial guess for your solution&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Repeat:&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;(1) Linearize \(r(x)\) around current guess \(x^{(k)}\). This can be accomplished by using a Taylor Series and Calculus (Standard Gauss-Newton), or one can use a least-squares fit to the line.&lt;/li&gt;
-  &lt;li&gt;(2) Solve least squares for linearized objective, get \(x^{(k+1)}\).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The linearized residual \(r(x)\) will resemble:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx r(x^{(k)}) + Dr(x^{(k)}) (x-x^{(k)})&lt;/script&gt;
-
-&lt;p&gt;where \(Dr\) is the Jacobian, meaning \( (Dr)_{ij} = \frac{\partial r_i}{\partial x_j}\)&lt;/p&gt;
-
-&lt;p&gt;Distributing the rightmost product, we obtain&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx Dr(x^{(k)})x - \bigg(Dr(x^{(k)}) (x^{(k)}) - r(x^{(k)}) \bigg)&lt;/script&gt;
-
-&lt;p&gt;With a single variable \(x\), we can re-write the above equation as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(x) \approx A^{(k)}x - b^{(k)}&lt;/script&gt;
-
-&lt;h3 id=&quot;levenberg-marquardt-algorithm-trust-region-gauss-newton-method&quot;&gt;Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)&lt;/h3&gt;
-
-&lt;p&gt;In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (&lt;a href=&quot;https://arxiv.org/abs/1502.05477&quot;&gt;TRPO&lt;/a&gt; is named after the same concept). Thus, we wish 
-&lt;script type=&quot;math/tex&quot;&gt;|| \theta - \theta^{(k)} ||^2&lt;/script&gt;
- to be small. Our new objective is:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;||A^{(k)} \theta - b^{(k)}||^2 + \lambda^{(k)} || \theta − \theta^{(k)}||^2&lt;/script&gt;
-
-&lt;p&gt;This objective can be written inside a single \(\ell_2\)-norm, instead using two separate \(\ell_2\)-norms:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \end{bmatrix} ||^2&lt;/script&gt;
-
-&lt;h2 id=&quot;example&quot;&gt;Example&lt;/h2&gt;
-
-&lt;p&gt;Suppose we have some input data \(x\) and labels \(y\). Our prediction function could be&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{f} = x^T\theta_1 + \theta_2&lt;/script&gt;
-
-&lt;p&gt;Suppose at inference time we use \(f(x) = \mbox{sign }\bigg(\hat{f}(x)\bigg)\), where \(\mbox{sign }(a) = +1\) for \(a \geq 0\) and −1 for \(a &amp;lt; 0\). At training time, we use its smooth (and differentiable) approximation, the hyperbolic tangent, tanh:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\phi(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}&lt;/script&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The gradient of \(\mbox{tanh}\): \(\nabla_x \mbox{tanh } = 1-\mbox{tanh }(x)^2\). We call this \(\phi^{\prime}\) in code:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.^&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Suppose our objective function is the MSE loss, with a regularization term:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;J = \sum\limits_{i=1}^{N} \Bigg(y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)\Bigg)^2 + \mu ||\theta_1||^2&lt;/script&gt;
-
-&lt;p&gt;The residual for a single training example \(i\) is \(r_i\) is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_i - \phi\big(x_i^T\theta_1 + \theta_2\big)&lt;/script&gt;
-
-&lt;p&gt;For a vector of training examples \(\mathbf{X}\) and labels \(\mathbf{Y}\), our nonlinear residual function is:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To linearize the residual, we compute its Jacobian \(Dr(\theta_1,\theta_2)\) via matrix calculus:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial r_i}{\partial \theta_1} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)x_i^T&lt;/script&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'*theta(1:400)+theta(end))* X(:,i)'&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\frac{\partial r_i}{\partial \theta_2} = -\phi^{\prime}(x_i^T\theta_1 + \theta_2)&lt;/script&gt;&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;phiprime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(:,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;'*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;The the full Jacobian evaluated at a certain point \(X_i\) is just these stacked individual entries:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labels_train&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jacobian_0_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jacobian_1_entr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Let \(\theta= \begin{bmatrix} \theta_1^T &amp;amp; \theta_2 \end{bmatrix}^T \in \mathbb{R}^{401}\). The linearized residual follows the exact form outlined in the Gauss-Newton section above:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;r(\theta) \approx A^{(k)}\theta - b^{(k)}&lt;/script&gt;
-
-&lt;p&gt;where&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;b^{(k)} = A^{(k)} \theta^{(k)} - r\bigg(\theta^{(k)}\bigg)&lt;/script&gt;
-
-&lt;p&gt;In code, this term is computed as:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;% computed above&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;b_k_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Dr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;400&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;We solve a least-squares problem in every iteration, with a 3-part objective function (penalizing the residual, large step sizes, and also large \(\theta_1\)-norm weights):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-|| \begin{bmatrix} A^{(k)} \\ \sqrt{\lambda^{(k)}} I_{401} \\ \begin{bmatrix} \sqrt{\mu} I_{400 } &amp; 0\end{bmatrix} \end{bmatrix} \theta - \begin{bmatrix} b^{(k)} \\ \sqrt{\lambda^{(k)}} \theta^{(k)} \\ 0 \end{bmatrix} ||^2. %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;We represent the left term by&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A_k_temp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]];&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;and the right term by&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;b_k = [b_k_temp; sqrt(lambda(itr))*theta; zeros(length(theta)-1,1)];
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;We solve for the next iterate of \(\theta\) with the pseudo-inverse:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;theta_temp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;\&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b_k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The full algorithm might resemble:&lt;/p&gt;
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%regularization coefficient&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;lambda&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial lambda for Levenberg-Marquardt&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;theta&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;401&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%initial value for theta (last entry is theta_2)&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;
-	&lt;span class=&quot;c1&quot;&gt;%calculate Jacobian at the current iteration (see code above)&lt;/span&gt;
-
-	&lt;span class=&quot;c1&quot;&gt;%linearize the objective function (see code above)&lt;/span&gt;
-
-	&lt;span class=&quot;c1&quot;&gt;% stopping condition ...&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry></feed>
+&lt;p&gt;[3] Andrej Karpathy. Deep Reinforcement Learning: Pong from Pixels. May 31, 2016. &lt;a href=&quot;http://karpathy.github.io/2016/05/31/rl/&quot;&gt;http://karpathy.github.io/2016/05/31/rl/&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry></feed>
