@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Structure From Motion</title>
+  <meta name="description" content="Deriving bundle adjustment">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/sfm/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Structure From Motion</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
+  <li><a href="#costfunctions">Cost Functions</a></li>
+  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+</ul>
+
+<p><a name="sfmpipeline"></a></p>
+
+<h2 id="a-basic-structure-from-motion-sfm-pipeline">A Basic Structure-from-Motion (SFM) Pipeline</h2>
+
+<p>As described in [1], there are generally four steps to the algorithm:</p>
+<ul>
+  <li>(1) Find interest points in each image</li>
+  <li>(2) Find candidate correspondences (match descriptors for each interest point)</li>
+  <li>(3) Perform geometric verification of correspondences (RANSAC + fundamental matrix)</li>
+  <li>(4) Solve for 3D points and camera that minimize reprojection error.</li>
+</ul>
+
+<p><a name="costfunctions"></a></p>
+
+<h2 id="cost-functionserror-modelling">Cost Functions/Error Modelling</h2>
+
+<p>The choice of cost function quantifies the total prediction error of the model. It measures how well the model fits the observations and background knowledge.</p>
+
+<h3 id="reprojection-error-for-a-single-keypoint-in-two-images">Reprojection Error for a Single Keypoint in Two Images</h3>
+
+<p>Imagine we have matched two keypoints, <script type="math/tex">x_1,x_2</script> in two different images <script type="math/tex">I_1,I_2</script> via a SIFT-like feature matching pipeline. We are viewing the projection of the same 3D point <script type="math/tex">\mathbf{X}</script> in both images. We now wish to identify the coordinates describing the location of <script type="math/tex">\mathbf{X}</script>.</p>
+
+<p>If image <script type="math/tex">I_1</script> was captured with projection matrix <script type="math/tex">M_1</script>, and image <script type="math/tex">I_2</script> was captured with projection matrix <script type="math/tex">M_2</script>, we can enforce that the 3D point <script type="math/tex">\mathbf{X}</script> is projected into the image into the right location in both images. This is called <em>triangulation</em>.</p>
+
+<p>If the camera calibration determining <script type="math/tex">M_1,M_2</script> are <strong>known</strong>, then the optimization problem for a single matched keypoint in two images becomes:</p>
+
+<script type="math/tex; mode=display">\min_{\mathbf{X}} f(\mathbf{X}) = \| x_1 - Proj(\mathbf{X},M_1)\|^2 + \| x_2 - Proj(\mathbf{X},M_2)\|^2</script>
+
+<h3 id="reprojection-error-for-many-keypoints-in-many-cameras">Reprojection Error for Many Keypoints in Many Cameras</h3>
+
+<p>Imagine now that we have <script type="math/tex">m</script> different cameras, and each camera has a <strong>known</strong> projection matrix <script type="math/tex">\{M_i\}_{i=1}^m</script>. Suppose we match <script type="math/tex">n</script> different keypoints across the images, denoted <script type="math/tex">\{\mathbf{X}_j\}_{j=1}^n</script>.</p>
+
+<p>The optimization problem becomes:</p>
+
+<script type="math/tex; mode=display">\min_{\mathbf{X}_1,\mathbf{X}_2, \dots} \sum\limits_{i=1}^m \sum\limits_{j=1}^n \| x_{ij} - Proj(\mathbf{X_j},M_i)\|^2</script>
+
+<p>In this case <script type="math/tex">x_{ij}</script> is the observed location of the <script type="math/tex">j</script>‘th keypoint into the <script type="math/tex">i</script>‘th image, as discovered by a keypoint detector in the SIFT-like pipeline. We penalize solutions for <script type="math/tex">\mathbf{X}_1,\mathbf{X}_2,\dots</script> in which <script type="math/tex">x_{ij}</script> is not very close to <script type="math/tex">Proj(\mathbf{X_j},M_i)</script>.</p>
+
+<p><a name="bundleadjustment"></a></p>
+
+<h2 id="bundle-adjustment">Bundle Adjustment</h2>
+
+<p>Imagine now that we are working with arbitrary images for which we have no calibration information. Thus, the projection matrices <script type="math/tex">\{M_i\}_{i=1}^m</script> are <strong>unknown</strong>.</p>
+
+<p>Bundle adjustment is the process of minimizing reprojection error over (1) multiple 3D points and (2) multiple cameras. Triggs <em>et al.</em> define it as <em>“the problem of refining a visual reconstruction to produce jointly optimal structure and viewing parameter estimates”</em> [2]. The optimization problem changes only by adding new, additional variables for which we solve.</p>
+
+<script type="math/tex; mode=display">\min_{\mathbf{X}_1,\mathbf{X}_2, \dots, M_1,M_2,\dots} \sum\limits_{i=1}^m \sum\limits_{j=1}^n \| x_{ij} - Proj(\mathbf{X_j},M_i)\|^2</script>
+
+<p>According to [2], the name “Bundle Adjustment” refers to <em>bundles</em> of light rays leaving each 3D point and converging on each camera center, <em>“which are ‘adjusted’ optimally with respect to both feature and camera positions”</em>.</p>
+
+<h2 id="gauss-newton">Gauss-Newton</h2>
+
+<p>Gauss-Newton is generally preferred to Second Order methods like Newton’s Method for a simple reason: deriving and implementing calculations of the second derivatives of the projection model <script type="math/tex">Proj(X_j,M_i)</script> is difficult and error-prone [2].</p>
+
+<p>For example, the seminal work in SfM, “Building Rome in a Day” [3] uses Trust-Region Gauss-Newton optimization (Levenberg-Marquardt) that chooses between a truncated and an exact step Levenberg-Marquardt algorithm.</p>
+
+<!-- ## Network Graph  shows which features are seen in which images, -->
+
+<h2 id="exploiting-sparsity">Exploiting Sparsity</h2>
+
+<p>Those who use generic optimization routines to solve SfM problems will find the optimization slow. This would be unwise, however, since the problem sparsity can be exploited.</p>
+
+<h2 id="references">References</h2>
+<p>[1] Ramanan, Deva. <em>Structure from Motion.</em> <a href="http://16720.courses.cs.cmu.edu/lec/sfm.pdf">http://16720.courses.cs.cmu.edu/lec/sfm.pdf</a>.</p>
+
+<p>[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. <em>Bundle Adjustment — A Modern Synthesis</em>. <a href="https://hal.inria.fr/inria-00548290/document">https://hal.inria.fr/inria-00548290/document</a>.</p>
+
+<p>[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. <em>Building Rome in a Day</em>. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. <a href="https://grail.cs.washington.edu/rome/rome_paper.pdf">https://grail.cs.washington.edu/rome/rome_paper.pdf</a>.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

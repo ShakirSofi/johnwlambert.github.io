@@ -1,5 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-03T22:58:57-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Iterative Closest Point</title><link href="http://localhost:4000/icp/" rel="alternate" type="text/html" title="Iterative Closest Point" /><published>2018-11-29T06:00:00-05:00</published><updated>2018-11-29T06:00:00-05:00</updated><id>http://localhost:4000/icp</id><content type="html" xml:base="http://localhost:4000/icp/">&lt;h2 id=&quot;the-3d-registration-problem&quot;&gt;The 3D Registration Problem&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-27T17:10:17-08:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Structure From Motion</title><link href="http://localhost:4000/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/sfm</id><content type="html" xml:base="http://localhost:4000/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;a-basic-structure-from-motion-sfm-pipeline&quot;&gt;A Basic Structure-from-Motion (SFM) Pipeline&lt;/h2&gt;
+
+&lt;p&gt;As described in [1], there are generally four steps to the algorithm:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;(1) Find interest points in each image&lt;/li&gt;
+  &lt;li&gt;(2) Find candidate correspondences (match descriptors for each interest point)&lt;/li&gt;
+  &lt;li&gt;(3) Perform geometric verification of correspondences (RANSAC + fundamental matrix)&lt;/li&gt;
+  &lt;li&gt;(4) Solve for 3D points and camera that minimize reprojection error.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;costfunctions&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;cost-functionserror-modelling&quot;&gt;Cost Functions/Error Modelling&lt;/h2&gt;
+
+&lt;p&gt;The choice of cost function quantifies the total prediction error of the model. It measures how well the model fits the observations and background knowledge.&lt;/p&gt;
+
+&lt;h3 id=&quot;reprojection-error-for-a-single-keypoint-in-two-images&quot;&gt;Reprojection Error for a Single Keypoint in Two Images&lt;/h3&gt;
+
+&lt;p&gt;Imagine we have matched two keypoints, &lt;script type=&quot;math/tex&quot;&gt;x_1,x_2&lt;/script&gt; in two different images &lt;script type=&quot;math/tex&quot;&gt;I_1,I_2&lt;/script&gt; via a SIFT-like feature matching pipeline. We are viewing the projection of the same 3D point &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}&lt;/script&gt; in both images. We now wish to identify the coordinates describing the location of &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;If image &lt;script type=&quot;math/tex&quot;&gt;I_1&lt;/script&gt; was captured with projection matrix &lt;script type=&quot;math/tex&quot;&gt;M_1&lt;/script&gt;, and image &lt;script type=&quot;math/tex&quot;&gt;I_2&lt;/script&gt; was captured with projection matrix &lt;script type=&quot;math/tex&quot;&gt;M_2&lt;/script&gt;, we can enforce that the 3D point &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}&lt;/script&gt; is projected into the image into the right location in both images. This is called &lt;em&gt;triangulation&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;If the camera calibration determining &lt;script type=&quot;math/tex&quot;&gt;M_1,M_2&lt;/script&gt; are &lt;strong&gt;known&lt;/strong&gt;, then the optimization problem for a single matched keypoint in two images becomes:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min_{\mathbf{X}} f(\mathbf{X}) = \| x_1 - Proj(\mathbf{X},M_1)\|^2 + \| x_2 - Proj(\mathbf{X},M_2)\|^2&lt;/script&gt;
+
+&lt;h3 id=&quot;reprojection-error-for-many-keypoints-in-many-cameras&quot;&gt;Reprojection Error for Many Keypoints in Many Cameras&lt;/h3&gt;
+
+&lt;p&gt;Imagine now that we have &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt; different cameras, and each camera has a &lt;strong&gt;known&lt;/strong&gt; projection matrix &lt;script type=&quot;math/tex&quot;&gt;\{M_i\}_{i=1}^m&lt;/script&gt;. Suppose we match &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; different keypoints across the images, denoted &lt;script type=&quot;math/tex&quot;&gt;\{\mathbf{X}_j\}_{j=1}^n&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;The optimization problem becomes:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min_{\mathbf{X}_1,\mathbf{X}_2, \dots} \sum\limits_{i=1}^m \sum\limits_{j=1}^n \| x_{ij} - Proj(\mathbf{X_j},M_i)\|^2&lt;/script&gt;
+
+&lt;p&gt;In this case &lt;script type=&quot;math/tex&quot;&gt;x_{ij}&lt;/script&gt; is the observed location of the &lt;script type=&quot;math/tex&quot;&gt;j&lt;/script&gt;‘th keypoint into the &lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;‘th image, as discovered by a keypoint detector in the SIFT-like pipeline. We penalize solutions for &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}_1,\mathbf{X}_2,\dots&lt;/script&gt; in which &lt;script type=&quot;math/tex&quot;&gt;x_{ij}&lt;/script&gt; is not very close to &lt;script type=&quot;math/tex&quot;&gt;Proj(\mathbf{X_j},M_i)&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;bundleadjustment&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;bundle-adjustment&quot;&gt;Bundle Adjustment&lt;/h2&gt;
+
+&lt;p&gt;Imagine now that we are working with arbitrary images for which we have no calibration information. Thus, the projection matrices &lt;script type=&quot;math/tex&quot;&gt;\{M_i\}_{i=1}^m&lt;/script&gt; are &lt;strong&gt;unknown&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Bundle adjustment is the process of minimizing reprojection error over (1) multiple 3D points and (2) multiple cameras. Triggs &lt;em&gt;et al.&lt;/em&gt; define it as &lt;em&gt;“the problem of refining a visual reconstruction to produce jointly optimal structure and viewing parameter estimates”&lt;/em&gt; [2]. The optimization problem changes only by adding new, additional variables for which we solve.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min_{\mathbf{X}_1,\mathbf{X}_2, \dots, M_1,M_2,\dots} \sum\limits_{i=1}^m \sum\limits_{j=1}^n \| x_{ij} - Proj(\mathbf{X_j},M_i)\|^2&lt;/script&gt;
+
+&lt;p&gt;According to [2], the name “Bundle Adjustment” refers to &lt;em&gt;bundles&lt;/em&gt; of light rays leaving each 3D point and converging on each camera center, &lt;em&gt;“which are ‘adjusted’ optimally with respect to both feature and camera positions”&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;gauss-newton&quot;&gt;Gauss-Newton&lt;/h2&gt;
+
+&lt;p&gt;Gauss-Newton is generally preferred to Second Order methods like Newton’s Method for a simple reason: deriving and implementing calculations of the second derivatives of the projection model &lt;script type=&quot;math/tex&quot;&gt;Proj(X_j,M_i)&lt;/script&gt; is difficult and error-prone [2].&lt;/p&gt;
+
+&lt;p&gt;For example, the seminal work in SfM, “Building Rome in a Day” [3] uses Trust-Region Gauss-Newton optimization (Levenberg-Marquardt) that chooses between a truncated and an exact step Levenberg-Marquardt algorithm.&lt;/p&gt;
+
+&lt;!-- ## Network Graph  shows which features are seen in which images, --&gt;
+
+&lt;h2 id=&quot;exploiting-sparsity&quot;&gt;Exploiting Sparsity&lt;/h2&gt;
+
+&lt;p&gt;Those who use generic optimization routines to solve SfM problems will find the optimization slow. This would be unwise, however, since the problem sparsity can be exploited.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+&lt;p&gt;[1] Ramanan, Deva. &lt;em&gt;Structure from Motion.&lt;/em&gt; &lt;a href=&quot;http://16720.courses.cs.cmu.edu/lec/sfm.pdf&quot;&gt;http://16720.courses.cs.cmu.edu/lec/sfm.pdf&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. &lt;em&gt;Bundle Adjustment — A Modern Synthesis&lt;/em&gt;. &lt;a href=&quot;https://hal.inria.fr/inria-00548290/document&quot;&gt;https://hal.inria.fr/inria-00548290/document&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Iterative Closest Point</title><link href="http://localhost:4000/icp/" rel="alternate" type="text/html" title="Iterative Closest Point" /><published>2018-11-29T03:00:00-08:00</published><updated>2018-11-29T03:00:00-08:00</updated><id>http://localhost:4000/icp</id><content type="html" xml:base="http://localhost:4000/icp/">&lt;h2 id=&quot;the-3d-registration-problem&quot;&gt;The 3D Registration Problem&lt;/h2&gt;
 &lt;p&gt;Given two shapes A and B which partially overlap&lt;/p&gt;
 
 &lt;p&gt;Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B&lt;/p&gt;
@@ -135,7 +209,7 @@
 
 &lt;p&gt;[3] Shinji Umeyama. Least-squares estimation of transformation parameters between two point patterns”, PAMI 1991. &lt;a href=&quot;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&quot;&gt;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. &lt;a href=&quot;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&quot;&gt;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Piazza Answers</title><link href="http://localhost:4000/2018/11/28/piazza-answers.html" rel="alternate" type="text/html" title="Piazza Answers" /><published>2018-11-28T00:00:00-05:00</published><updated>2018-11-28T00:00:00-05:00</updated><id>http://localhost:4000/2018/11/28/piazza-answers</id><content type="html" xml:base="http://localhost:4000/2018/11/28/piazza-answers.html">&lt;h2 id=&quot;visualizing-cnns-via-deconvolution&quot;&gt;Visualizing CNNs via deconvolution&lt;/h2&gt;
+&lt;p&gt;[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. &lt;a href=&quot;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&quot;&gt;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Piazza Answers</title><link href="http://localhost:4000/2018/11/28/piazza-answers.html" rel="alternate" type="text/html" title="Piazza Answers" /><published>2018-11-28T00:00:00-08:00</published><updated>2018-11-28T00:00:00-08:00</updated><id>http://localhost:4000/2018/11/28/piazza-answers</id><content type="html" xml:base="http://localhost:4000/2018/11/28/piazza-answers.html">&lt;h2 id=&quot;visualizing-cnns-via-deconvolution&quot;&gt;Visualizing CNNs via deconvolution&lt;/h2&gt;
 
 &lt;p&gt;It concerns slide 4 in this presentation.
 http://places.csail.mit.edu/slide_iclr2015.pdf&lt;/p&gt;
@@ -668,7 +742,12 @@ Giving a cornerness function in the lecture slides:
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 &amp; g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] &amp; g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Epipolar Geometry</title><link href="http://localhost:4000/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T06:01:00-05:00</published><updated>2018-11-19T06:01:00-05:00</updated><id>http://localhost:4000/epipolar-geometry</id><content type="html" xml:base="http://localhost:4000/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
+&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;
+
+&lt;p&gt;Question:
+How is 1x1 convolution idential to a fully-connected layer&lt;/p&gt;
+
+&lt;p&gt;5x5 kernel, with 5x5 input. Elementwise multiply. Same as matrix multiplication because…&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Epipolar Geometry</title><link href="http://localhost:4000/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T03:01:00-08:00</published><updated>2018-11-19T03:01:00-08:00</updated><id>http://localhost:4000/epipolar-geometry</id><content type="html" xml:base="http://localhost:4000/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
 &lt;p&gt;Modern robotic computer vision tasks like Structure from Motion (SfM) and Simultaneous Localization and Mapping (SLAM) would not be possible without feature matching. Tools from Epipolar Geometry are an easy way to discard outliers in feature matching and are widely used.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-fundamental-matrix&quot;&gt;The Fundamental Matrix&lt;/h2&gt;
@@ -745,7 +824,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 
 &lt;p&gt;[1] H. Longuet Higgins. A computer algorithm for reconstructing a scene from two projections. &lt;em&gt;Nature&lt;/em&gt;, 293, 1981.&lt;/p&gt;
 
-&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://localhost:4000/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/mpi</id><content type="html" xml:base="http://localhost:4000/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
+&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://localhost:4000/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T04:01:00-07:00</published><updated>2018-10-02T04:01:00-07:00</updated><id>http://localhost:4000/mpi</id><content type="html" xml:base="http://localhost:4000/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
 
 &lt;p&gt;mpirun –np 2 nvprof –log-file profile.out.%p&lt;/p&gt;
 
@@ -760,7 +839,7 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 &lt;p&gt;MV2_USE_CUDA=1 mpirun -np 1 nvprof –kernels gpu_GEMM –analysis-metrics
 –output-profile GEMMmetrics.out.%p.nvprof ./main [args]&lt;/p&gt;
 
-&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://localhost:4000/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/fully-connected-network</id><content type="html" xml:base="http://localhost:4000/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
+&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Fully Connected Neural Networks From Scratch</title><link href="http://localhost:4000/fully-connected/" rel="alternate" type="text/html" title="Fully Connected Neural Networks From Scratch" /><published>2018-10-02T04:01:00-07:00</published><updated>2018-10-02T04:01:00-07:00</updated><id>http://localhost:4000/fully-connected-network</id><content type="html" xml:base="http://localhost:4000/fully-connected/">&lt;p&gt;Neural networks are often explained in the most complicated ways possible, but we’ll show just how simple they can be.&lt;/p&gt;
 
 &lt;p&gt;Suppose we wish to implement a fully-connected feedforward neural network with 1 input layer, 1 hidden layer, and 1 output layer. We call such a network to be a two-layer neural network (ignoring the input layer as it is trivially present).&lt;/p&gt;
 
@@ -1114,7 +1193,7 @@ Similarly,
 
 &lt;p&gt;References:&lt;/p&gt;
 
-&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://localhost:4000/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T07:01:00-04:00</published><updated>2018-10-02T07:01:00-04:00</updated><id>http://localhost:4000/kernel-trick</id><content type="html" xml:base="http://localhost:4000/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
+&lt;p&gt;(1) Eric Darve, Stanford University.&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry><entry><title type="html">Kernel Trick</title><link href="http://localhost:4000/kernel-trick/" rel="alternate" type="text/html" title="Kernel Trick" /><published>2018-10-02T04:01:00-07:00</published><updated>2018-10-02T04:01:00-07:00</updated><id>http://localhost:4000/kernel-trick</id><content type="html" xml:base="http://localhost:4000/kernel-trick/">&lt;h2 id=&quot;the-kernel-trick&quot;&gt;The Kernel Trick&lt;/h2&gt;
 &lt;p&gt;The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;K(x,z) = (x^Tz)^2 = (\sum\limits_{i=1}^n x_iz_i)^2&lt;/script&gt;
@@ -1141,7 +1220,7 @@ Similarly,
 
 &lt;p&gt;Thus, we’ve shown that for \(n=3\),
 &lt;script type=&quot;math/tex&quot;&gt;K(x,z) = \phi(x)^T \phi(z)&lt;/script&gt;
-which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://localhost:4000/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T07:00:00-04:00</published><updated>2018-10-02T07:00:00-04:00</updated><id>http://localhost:4000/fast-nearest-neighbor</id><content type="html" xml:base="http://localhost:4000/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+which contains all of the cross-product terms.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Kernel Trick is a poorly taught but beautiful piece of insight that makes SVMs work.</summary></entry><entry><title type="html">Fast Nearest Neighbors</title><link href="http://localhost:4000/fast-nearest-neighbor/" rel="alternate" type="text/html" title="Fast Nearest Neighbors" /><published>2018-10-02T04:00:00-07:00</published><updated>2018-10-02T04:00:00-07:00</updated><id>http://localhost:4000/fast-nearest-neighbor</id><content type="html" xml:base="http://localhost:4000/fast-nearest-neighbor/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#rank&quot;&gt;Brute Force&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#fastaffinitymatrices&quot;&gt;Fast Affinity Matrices&lt;/a&gt;&lt;/li&gt;
@@ -1251,7 +1330,7 @@ AB^T = \begin{bmatrix} - &amp; a_1 &amp; - \\ - &amp; a_2 &amp; - \\ - &amp; a_3
   &lt;span class=&quot;n&quot;&gt;unit_test_arr_arr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://localhost:4000/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T07:00:00-04:00</published><updated>2018-04-02T07:00:00-04:00</updated><id>http://localhost:4000/subgradient</id><content type="html" xml:base="http://localhost:4000/subgradient-methods/">&lt;!-- 
+&lt;p&gt;Now consider the speedup we’ve achieved:&lt;/p&gt;</content><author><name></name></author><summary type="html">Vectorizing nearest neighbors (with no for-loops!)</summary></entry><entry><title type="html">Subgradient Methods in 10 Minutes</title><link href="http://localhost:4000/subgradient-methods/" rel="alternate" type="text/html" title="Subgradient Methods in 10 Minutes" /><published>2018-04-02T04:00:00-07:00</published><updated>2018-04-02T04:00:00-07:00</updated><id>http://localhost:4000/subgradient</id><content type="html" xml:base="http://localhost:4000/subgradient-methods/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -1405,7 +1484,7 @@ x^{(k+1)} = x^{(k)} − \alpha_k \cdot g^{(k)}, &amp; k = 0, 1, 2, 3, \cdots
 
 &lt;p&gt;[1] Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/scribes/10725_Lecture6.pdf&quot;&gt;Lecture 6&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://localhost:4000/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T07:00:00-04:00</published><updated>2018-04-01T07:00:00-04:00</updated><id>http://localhost:4000/cvx</id><content type="html" xml:base="http://localhost:4000/convex-opt/">&lt;!-- 
+&lt;p&gt;[2] Boyd, Stephen. &lt;a href=&quot;https://stanford.edu/class/ee364b/lectures/subgrad_method_notes.pdf&quot;&gt;Subgradient Methods: Notes for EE 364B&lt;/a&gt;, January 2007.&lt;/p&gt;</content><author><name></name></author><summary type="html">Convex Optimization Part II</summary></entry><entry><title type="html">Convex Optimization Without the Agonizing Pain</title><link href="http://localhost:4000/convex-opt/" rel="alternate" type="text/html" title="Convex Optimization Without the Agonizing Pain" /><published>2018-04-01T04:00:00-07:00</published><updated>2018-04-01T04:00:00-07:00</updated><id>http://localhost:4000/cvx</id><content type="html" xml:base="http://localhost:4000/convex-opt/">&lt;!-- 
 &lt;svg width=&quot;800&quot; height=&quot;200&quot;&gt;
 	&lt;rect width=&quot;800&quot; height=&quot;200&quot; style=&quot;fill:rgb(98,51,20)&quot; /&gt;
 	&lt;rect width=&quot;20&quot; height=&quot;50&quot; x=&quot;20&quot; y=&quot;100&quot; style=&quot;fill:rgb(189,106,53)&quot; /&gt;
@@ -1698,282 +1777,4 @@ I_{-}(u) = \begin{cases} 0 &amp; u\leq 0 \\ \infty &amp; u &gt; 0 \end{cases} %]
   &lt;li&gt;
     &lt;p&gt;Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, &lt;a href=&quot;https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf&quot;&gt;Lecture 16&lt;/a&gt;.&lt;/p&gt;
   &lt;/li&gt;
-&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Understanding Policy Gradients</title><link href="http://localhost:4000/policy-gradients/" rel="alternate" type="text/html" title="Understanding Policy Gradients" /><published>2018-03-31T07:00:00-04:00</published><updated>2018-03-31T07:00:00-04:00</updated><id>http://localhost:4000/policy-gradients</id><content type="html" xml:base="http://localhost:4000/policy-gradients/">&lt;h2 id=&quot;policy-gradients&quot;&gt;Policy Gradients&lt;/h2&gt;
-
-&lt;p&gt;As opposed to Deep Q-Learning, policy gradients is a method to directly output probabilities of actions. We scale gradients of actions by reward.&lt;/p&gt;
-
-&lt;p&gt;Pros:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;A &lt;strong&gt;policy is often easier to approximate than value function&lt;/strong&gt;. For example, if playing Pong, it is hard to assign a specific score to moving your paddle up vs. down.&lt;/li&gt;
-  &lt;li&gt;Policy Gradients &lt;strong&gt;works well empirically&lt;/strong&gt; and was a key to AlphaGo’s success.&lt;/li&gt;
-  &lt;li&gt;Policy gradients &lt;strong&gt;learns stochastic optimal policies&lt;/strong&gt;, which is crucial for many applications. For example, in the game of &lt;em&gt;Rock, Paper, Scissors&lt;/em&gt;, a deterministic policy is easily exploited, but a uniform random policy is optimal.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Cons:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Training takes forever. The use of sampled data is not efficient. High variance confounds actions. Need tons of data for estimator to be good enough.&lt;/li&gt;
-  &lt;li&gt;Converge to local optima. Often there are many optima.&lt;/li&gt;
-  &lt;li&gt;Unlike human learning: humans can use rapid, abstract model building.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;background&quot;&gt;Background&lt;/h3&gt;
-
-&lt;h3 id=&quot;geometric-intuition&quot;&gt;Geometric Intuition&lt;/h3&gt;
-
-&lt;p&gt;Suppose we have a function \(f(x)\), such that \(f(x) \geq 0 \forall x\)
-For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its density.&lt;/p&gt;
-
-&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
-  &lt;img src=&quot;/assets/policy_gradients_geometric_intuition.png&quot; width=&quot;65%&quot; /&gt;
-  &lt;div class=&quot;figcaption&quot;&gt;
-    With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;math-background&quot;&gt;Math Background&lt;/h3&gt;
-&lt;p&gt;To understand the proofs, you’ll need to understand 3 simple tricks:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;The derivative of the natural logarithm: \( \nabla_{\theta} \mbox{log }z = \frac{1}{z} \nabla_{\theta} z \)&lt;/li&gt;
-  &lt;li&gt;The definition of expectation:&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
-\mathbb{E}_{x \sim p(x)}[f(x)] = \sum\limits_x p(x) f(x) \\
-\mathbb{E}_{x \sim p(x)}[f(x)] = \int_x p(x) f(x) \,dx
-\end{align}&lt;/script&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Multiplying a fraction’s numerator and denominator by some arbitrary, non-zero constant does not change the fraction’s value.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{a}{b} = \frac{a \cdot p(x)}{b \cdot p(x)}&lt;/script&gt;
-
-&lt;h2 id=&quot;policy-gradient-theorem&quot;&gt;Policy Gradient Theorem&lt;/h2&gt;
-
-&lt;p&gt;Let \(x\) be the action we will choose, \(s\) be the parameterization of our current state, \(\theta\) be the weights of our neural network. Then our neural network will directly output probabilities \(p(x \mid s; \theta)\) that depend upon the input (\(s\)) and the network weights (\( \theta \)).&lt;/p&gt;
-
-&lt;p&gt;We start with a desire to maximize our expected reward. Our reward function is \(r(x)\), which is dependent upon the action \(x\) that we take.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\nabla_{\theta} \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x)] &amp;= \nabla_{\theta} \sum_x p(x \mid s; \theta) r(x) &amp; \text{Defn. of expectation} \\
-&amp; = \sum_x r(x) \nabla_{\theta} p(x \mid s; \theta) &amp; \text{Push gradient inside sum} \\
-&amp; = \sum_x r(x) p(x \mid s; \theta) \frac{\nabla_{\theta} p(x \mid s; \theta)}{p(x \mid s; \theta)}  &amp; \text{Multiply and divide by } p(x \mid s; \theta) \\
-&amp; = \sum_x r(x) p(x \mid s; \theta) \nabla_{\theta} \log p(x \mid s; \theta) &amp; \text{Apply } \nabla_{\theta} \log(z) = \frac{1}{z} \nabla_{\theta} z \\
-&amp; = \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x) \nabla_{\theta} \log p(x \mid s; \theta) ] &amp; \text{Definition of expectation}
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;A similar derivation can be found in [1] or in [2].&lt;/p&gt;
-
-&lt;p&gt;What does this mean for us? It means that if you want to maximize your expected reward, you could do something like gradient ascent. It turns out that the gradient of the expected reward is simple to compute and analytical – it is simply &lt;strong&gt;the expectation of the reward times the log probabilities of actions&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;consider-trajectories&quot;&gt;Consider Trajectories&lt;/h2&gt;
-&lt;p&gt;Now, let’s consider trajectories, which are sequences of actions.&lt;/p&gt;
-
-&lt;p&gt;The &lt;em&gt;Markov Property&lt;/em&gt; states that Markov Property: the next state \(s^{\prime}\) depends on the current state \(s\) and the decision maker’s action \(a\). But given \(s\) and \(a\), it is conditionally independent of all previous states and actions.&lt;/p&gt;
-
-&lt;p&gt;The probability of a trajectory is defined as:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(\tau \mid \theta) = \underbrace{ \mu(s_0) }_{\text{initial state distribution}}  \cdot \prod\limits_{t=0}^{T-1} \Big[ \underbrace{\pi (a_t \mid s_t, \theta)}_{\text{policy}} \cdot \underbrace{p(s_{t+1},r_t \mid s_t, a_t)}_{\text{transition fn.}} \Big]&lt;/script&gt;
-
-&lt;p&gt;Before we had:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x)] = \mathbb{E}_{x \sim p( x \mid s; \theta)} [r(x) \nabla_{\theta} \log p(x \mid s; \theta) ]&lt;/script&gt;
-
-&lt;p&gt;Consider a stochastic generating process that gives us a trajectory of \((s,a,r)\) tuples:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_{T-1}, a_{T-1} r_{T-1}, s_T)&lt;/script&gt;
-
-&lt;p&gt;We want the expected reward over a trajectory…&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} [ \underbrace{\nabla_{\theta} \log p(\tau \mid \theta)}_{\text{What is this?}} \underbrace{R(\tau)}_{\text{Reward of a trajectory}}  ]&lt;/script&gt;
-
-&lt;p&gt;The reward over a trajectory is simple: \(R(\tau) = \sum\limits_{t=0}^{T-1}r_t\)&lt;/p&gt;
-
-&lt;h2 id=&quot;the-probability-of-a-trajectory-given-a-policy&quot;&gt;The Probability of a Trajectory, Given a Policy&lt;/h2&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-p(\tau \mid \theta) &amp;= \underbrace{ \mu(s_0) }_{\text{initial state distribution}}  \cdot \prod\limits_{t=0}^{T-1} \Big[ \underbrace{\pi (a_t \mid s_t, \theta)}_{\text{policy}} \cdot \underbrace{p(s_{t+1},r_t \mid s_t, a_t)}_{\text{transition fn.}} \Big] &amp; \text{Markov Property} \\
-\mbox{log } p(\tau \mid \theta) &amp;= \mbox{log } \mu(s_0) + \mbox{log } \prod\limits_{t=0}^{T-1} \Big[ \pi (a_t \mid s_t, \theta) \cdot p(s_{t+1},r_t \mid s_t, a_t) \Big] &amp; \text{Log of product = sum of logs} \\
- &amp;= \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \mbox{log }\Big[ \pi (a_t \mid s_t, \theta) \cdot p(s_{t+1},r_t \mid s_t, a_t) \Big] &amp; \text{Log of product = sum of logs} \\
- &amp;= \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \Big[ \mbox{log }\pi (a_t \mid s_t, \theta) + \mbox{log } p(s_{t+1},r_t \mid s_t, a_t) \Big] &amp; \text{Log of product = sum of logs} \\
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;h2 id=&quot;maximizing-expected-return-of-a-trajectory&quot;&gt;Maximizing Expected Return of a Trajectory&lt;/h2&gt;
-&lt;p&gt;As we discussed earlier, in order to perform gradient ascent, we’ll need to be able to compute:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} [ \underbrace{\nabla_{\theta} \log p(\tau \mid \theta)}_{\text{Derived Above}} \underbrace{R(\tau)}_{\text{Reward of a trajectory}}  ]&lt;/script&gt;
-
-&lt;p&gt;We have just shown that the inner term is simply:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\log p(\tau \mid \theta) = \mbox{log } \mu(s_0) +  \sum\limits_{t=0}^{T-1} \Big[ \mbox{log }\pi (a_t \mid s_t, \theta) + \mbox{log } p(s_{t+1},r_t \mid s_t, a_t) \Big]&lt;/script&gt;
-
-&lt;p&gt;We need its gradient. Only one term depends upon \(\theta\) above, so all other terms fall out in the gradient:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} \Big[ R(\tau) \nabla_{\theta} \sum\limits_{t=0}^{T-1} \mbox{log }\pi (a_t \mid s_t, \theta) \Big]&lt;/script&gt;
-
-&lt;p&gt;This concludes the derivation of the Policy Gradient Theorem for entire trajectories.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-reinforce-algorithm&quot;&gt;The REINFORCE Algorithm&lt;/h2&gt;
-
-&lt;p&gt;The REINFORCE algorithm is a Monte-Carlo Policy-Gradient Method. Below we describe the episodic version:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Input: a differentiable policy parameterization \(\pi(a \mid s, \theta)\)&lt;/li&gt;
-  &lt;li&gt;Initialize policy parameter \(\theta \in \mathbb{R}^d\)&lt;/li&gt;
-  &lt;li&gt;Repeat forever:
-    &lt;ul&gt;
-      &lt;li&gt;Generate an episode \(S_0\), \(A_0\), \(R_1\), … , \(S_{T−1}\), \(A_{T−1}\), \(R_T\) , following \( \pi(\cdot \mid \cdot, \theta) \)&lt;/li&gt;
-      &lt;li&gt;For each step of the episode \(t = 0, … , T-1\):
-        &lt;ul&gt;
-          &lt;li&gt;\(G \leftarrow\) return from step \(t\)&lt;/li&gt;
-          &lt;li&gt;\( \theta \leftarrow \theta + \alpha \gamma^t G \nabla_{\theta} \mbox{ ln }\pi(A_t \mid S_t, \theta) \)&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;See page 271 of [1] for more details. Andrej Karpathy has a &lt;a href=&quot;https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5&quot;&gt;very simple 130-line script here&lt;/a&gt; that illustrates this in Python.&lt;/p&gt;
-
-&lt;h2 id=&quot;reinforce-with-a-baseline&quot;&gt;REINFORCE With a Baseline&lt;/h2&gt;
-
-&lt;!--- TODO: FIX THIS PART --&gt;
-
-&lt;p&gt;In the section on geometric intuition, we discussed how:
-Suppose we have a function \(f(x)\), such that \(f(x) \geq 0 \forall x\)
-For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its density.&lt;/p&gt;
-
-&lt;p&gt;However, we really want to only push up on the density for better-than-average \(x_i\):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\nabla_{\theta} \mathbb{E}_x [f(x)] &amp;= \nabla_{\theta} \mathbb{E}_x [f(x) -b] \\
-&amp;= \mathbb{E}_x \Big[ \nabla_{\theta}  \mbox{log } p(x \mid \theta) (f(x) -b) \Big]
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;A near optimal choice of baseline \(b\) is always the mean return, \( \mathbb{E}[f(x)]\).&lt;/p&gt;
-
-&lt;h2 id=&quot;actor-critic&quot;&gt;Actor Critic&lt;/h2&gt;
-
-&lt;p&gt;Monte Carlo Policy Gradient has high variance. What if we used a critic to estimate the action-value function?&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;Q_w(s,a) \approx Q^{\pi_\theta}(s,a)&lt;/script&gt;
-
-&lt;p&gt;The Actor contains the policy and is the agent that makes decisions. The Critic makes no decisions or actions, but merely watches what the critic does and evaluates if it was good or bad.&lt;/p&gt;
-
-&lt;h2 id=&quot;actor-critic-with-approximate-policy-gradient&quot;&gt;Actor-Critic with Approximate Policy Gradient&lt;/h2&gt;
-
-&lt;p&gt;The critic says, “Hey, I think if you go in this direction, you can actually do better!”&lt;/p&gt;
-
-&lt;p&gt;In each step, move a little bit in the direction that the critic says is good or bad.&lt;/p&gt;
-
-&lt;h2 id=&quot;advantage-function&quot;&gt;Advantage Function&lt;/h2&gt;
-
-&lt;p&gt;We remember the state-value function \(V^{\pi}(s)\), which tells us the goodness of a state.
-We remember the state-action function \(Q(s,a)\).     &lt;br /&gt;
-We want an advantage function \(A^{\pi}(s,a)\)  to tell us how much better is action \(a\) than what the policy \(\pi\) would have done otherwise:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^{\pi}(s,a) = Q(s,a) - V^{\pi}(s)&lt;/script&gt;
-
-&lt;p&gt;Did things get better after one time step? Of course, a Critic could estimate both. But there’s a better way!&lt;/p&gt;
-
-&lt;h3 id=&quot;td-error-as-advantage-function&quot;&gt;TD Error as Advantage Function&lt;/h3&gt;
-
-&lt;p&gt;Make the good trajectories more probable, make the bad trajectories less probable (high variance)&lt;/p&gt;
-
-&lt;p&gt;Monte Carlo&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;unbiased but high variance&lt;/li&gt;
-  &lt;li&gt;conflates actions over whole trajectory&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;TD Learning&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;introduces bias (treating guess as truth) but estimate have lower variance&lt;/li&gt;
-  &lt;li&gt;incorporates 1 step&lt;/li&gt;
-  &lt;li&gt;usually more efficient&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;For the true value function \(V^{\pi_{\theta}}(s)\), the TD error \( \delta^{\pi_{\theta}}(s)\)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\delta^{\pi_{\theta}}(s) = r + \gamma V^{\pi_{\theta}}(s^{\prime}) - V^{\pi_{\theta}}(s)&lt;/script&gt;
-
-&lt;p&gt;is an unbiased estimate of the advantage function.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{aligned}
-\mathbb{E}_{\pi_{\theta}} \Big[\delta^{\pi_{\theta}}(s) \mid s,a \Big] &amp;= \mathbb{E}_{\pi_{\theta}} \Big[ r + \gamma V^{\pi_{\theta}}(s^{\prime}) - V^{\pi_{\theta}}(s) \Big] \\
-= Q^{\pi_{\theta}}(s,a) - V^{\pi_{\theta}}(s) \\
-= A^{\pi_{\theta}}(s,a)
-\end{aligned} %]]&gt;&lt;/script&gt;
-
-&lt;h2 id=&quot;trpo-from-1st-order-to-2nd-order&quot;&gt;TRPO: From 1st Order to 2nd Order&lt;/h2&gt;
-
-&lt;p&gt;We don’t have access to the objective function in analytic form. However, we can estimate the gradient as the expected return of our policy by sampling trajectories. The gradient ascent update is correct if we make an infinitesimally small change.&lt;/p&gt;
-
-&lt;p&gt;A local approximation is only accurate closeby:&lt;/p&gt;
-
-&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
-  &lt;img src=&quot;/assets/trpo_local_approx.png&quot; width=&quot;65%&quot; /&gt;
-  &lt;div class=&quot;figcaption&quot;&gt;
-    With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Trust-region methods penalize large steps. Let’s call our surrogate objective \(L_{\pi_{old}}(\pi)\).
-Let’s call our true objective \( \eta(\pi)\). We will add a penalty for moving \( \theta \) from \( \theta_{old} \) (KL Divergence between the old and new policy).&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \max\limits_s KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]&lt;/script&gt;
-
-&lt;p&gt;Monotonic improvement will be guaranteed.Since the max is not good for Monte Carlo estimation, a practical approximation is:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]&lt;/script&gt;
-
-&lt;h3 id=&quot;second-order-optimization-method&quot;&gt;Second Order Optimization Method&lt;/h3&gt;
-
-&lt;p&gt;What if we used a 2nd order optimization method instead of our vanilla 1st order optimization method?
-We would compute the Hessian of the KL divergence, not of our objective&lt;/p&gt;
-
-&lt;p&gt;Hessian computation is extremely expensive…( 100,000 x 100,000 )&lt;/p&gt;
-
-&lt;h3 id=&quot;truncated-natural-gradient-policy-algorithm&quot;&gt;Truncated Natural Gradient Policy Algorithm&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;for iteration 1,2,..  do
-    &lt;ul&gt;
-      &lt;li&gt;Run policy for \(T\) timesteps or \(N\) trajectories&lt;/li&gt;
-      &lt;li&gt;Estimate advantage function at all timesteps&lt;/li&gt;
-      &lt;li&gt;Compute policy gradient \(g\)&lt;/li&gt;
-      &lt;li&gt;Use Conjugate Gradient (with Hessian-vector products) to compute \( H^{-1}g \)&lt;/li&gt;
-      &lt;li&gt;Update policy parameter \( \theta = \theta_{old} + \alpha H^{-1}g \)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;trust-region-policy-optimization-trpo&quot;&gt;Trust Region Policy Optimization (TRPO)&lt;/h3&gt;
-
-&lt;p&gt;The Truncated Natural Policy Gradient algorithm was an unconstrained problem:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\eta(\pi) \geq L_{\pi_{old}}(\pi) - C \cdot \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big]&lt;/script&gt;
-
-&lt;p&gt;TRPO is a constrained problem (otherwise, algorithm is identical):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{aligned}
-\mbox{max } &amp; L_{\pi_{old}}(\pi) \\
-\mbox{subject to } &amp; \mathbb{E}_{s\sim p_{old}} KL \Big[ \pi_{old}(\cdot \mid s), \pi(\cdot \mid s) \Big] \leq \delta
-\end{aligned} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Easier to set hyper parameter \(\delta\) rather than \(C\). \(\delta\) can remain fixed over whole learning process… Simply rescale step by some scalar.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References:&lt;/h2&gt;
-
-&lt;p&gt;[1] Richard Sutton and Andrew Barto. Reinforcement Learning:
-An Introduction. Chapter 13. &lt;a href=&quot;http://incompleteideas.net/book/bookdraft2017nov5.pdf&quot;&gt;http://incompleteideas.net/book/bookdraft2017nov5.pdf&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[2] John Schulman. Deep Reinforcement Learning: Policy Gradients and Q-Learning.Bay Area Deep Learning School, September 24, 2016.&lt;/p&gt;
-
-&lt;p&gt;[3] Andrej Karpathy. Deep Reinforcement Learning: Pong from Pixels. May 31, 2016. &lt;a href=&quot;http://karpathy.github.io/2016/05/31/rl/&quot;&gt;http://karpathy.github.io/2016/05/31/rl/&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Including Trust-Region Variant (Levenberg-Marquardt)</summary></entry></feed>
+&lt;/ol&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry></feed>
