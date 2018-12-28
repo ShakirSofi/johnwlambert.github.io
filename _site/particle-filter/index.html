@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Particle Filter</title>
+  <meta name="description" content="multi-modal distributions, sigma point transform, matrix square roots ...">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/particle-filter/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Particle Filter</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
+  <li><a href="#costfunctions">Cost Functions</a></li>
+  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+</ul>
+
+<p><a name="sfmpipeline"></a></p>
+
+<h2 id="particle-filter">Particle Filter</h2>
+
+<p>The <strong>Particle Filter</strong> is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. It was developed between 1995 and 1996 at Oxford. It is often called the <strong>“Unscented Kalman Filter” (UKF)</strong> because its creator, Durant-White, thought “it didn’t stink” [ADD REFERENCE].</p>
+
+<h2 id="whats-wrong-with-the-ekf">What’s Wrong With the EKF?</h2>
+
+<p>The Particle Filter addresses a number of problems with the EKF:</p>
+
+<p><strong>Problem No. 1</strong> The initial conditions (I.C.s)!
+<em>If your initial guess is wrong, the Kalman filter will tell you exactly the wrong thing. The linearization can be vastly different at different parts of the state space</em>. For example, the EKF could diverge if the residual $| \mu_{0 \mid 0} - x |$ on the initial condition is large. In fact, if $ | \mu_{t \mid t} - x_t |$ large at any time, then the EKF could diverge. This has to do with severity of non-linearity. This is the most commonly found problem.</p>
+
+<p><strong>Problem No. 2: Covariance</strong>
+<em>In the EKF, the “covariance matrix” does not literally represent the covariance.</em> Unfortunately, the covariance matrix only literally captures the covariance in the Kalman Filter. In the EKF, it is just a matrix! We don’t know what it means! If we treat it as confidence, then it is reasonable enough. And commonly true, as long as $\mu$ is tracking $x$ pretty well. However, this estimate tends to be overconfident since we are not incorporating linearization errors! Instead, <script type="math/tex">\Sigma_{t \mid t}</script> incorporates only the noise errors <script type="math/tex">Q_t, R_t</script>. Thus, <script type="math/tex">\Sigma_{t \mid t}</script>  tends to be smaller than the true covariance matrix.</p>
+
+<p><strong>Problem No. 3: No Canary in the Goldmine</strong>
+An additional problem with the EKF is that we have no signal to know if we’re going awry.</p>
+
+<h2 id="a-different-parameterization-particles">A Different Parameterization: Particles</h2>
+
+<p>The UKF represents a different type of compromise than the EKF. In the Kalman Filter and its Extended variant, <script type="math/tex">\mu, \Sigma</script> are the parameters that define the distribution <script type="math/tex">\mathcal{N}(\mu, \Sigma)</script>.</p>
+
+<p>The UKF parameterizes the state distribution in a different way by using “Sigma points.” Consequently, the parameterization is called the (<script type="math/tex">\sigma</script>-points) parameterization. Thus, we move from <script type="math/tex">(\mu, \Sigma)</script> to a set of points with a weight associated with each, e.g. <script type="math/tex">\{ (x^0,w^0), \cdots, (x^{2n}, w^{2n}) \}</script>.</p>
+
+<p>The “Unscented Transform” is a curve-fitting exercise that converts individual points to a mean and covariance, i.e. <script type="math/tex">UT(\mu, \Sigma) = \{ (x^i, w^i) \}_i</script>. An advantage of the UKF is that it is very easy to propagate these individual points through nonlinearities like non-linear dynamics, whereas it is harder to push <script type="math/tex">\mu, \Sigma</script> through the nonlinearities.</p>
+
+<p>\item Properties that we want the unscented transform to have 
+\item UT($\cdot$):<br />
+$(\mu, \Sigma) = { (x^i, w^i) }<em>i$
+\item $UT^{-1}(\cdot)$ <br />
+$ { (x^i, w^i) }_i = (\mu, \Sigma)$
+\item We want the sample sigma points to share the same mean, covariance
+\begin{equation}
+\mu = \sum\limits</em>{i=0}^{2n} w^ix^i
+\end{equation}</p>
+
+<p>\begin{equation}
+\Sigma = \sum\limits_{i=0}^{2n} w^i (x^i - \mu)(x^i - \mu)^T
+\end{equation}
+They are redundant (an overparameterization of the Gaussian)
+\item We have redundancy for a smoothing effect, since won’t be for a perfect Gaussian
+\item Here is the transform $UT(\cdot)$:<br />
+$x^0 = \mu$ <br />
+$x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )<em>i, i = 1, \dots, n$<br />
+\item This is a matrix square root
+\item The index $i$ is the $i$’th column in the matrix square root
+\item We also have a mirror image set:<br />
+$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )</em>{i-n}, i =n+ 1, \dots, 2n$<br />
+\item Those were the points. The weights themselves:</p>
+
+<p>\begin{equation}
+w^0 = \frac{\lambda}{n+\lambda}
+\end{equation}</p>
+
+<p>\begin{equation}
+w^i = \frac{1}{2(n+\lambda)}, i \geq 1
+\end{equation}
+\item Each of these points plot points around the circle/ellipse
+\item Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.
+\item  $n \times n$ matrix is $\sqrt{(n+\lambda) \Sigma}$
+\end{itemize}
+\subsection{Verify Inverse Unscented Transform}
+\begin{itemize}
+\item  We verify $UT^{-1}(\cdot)$ as claimed</p>
+
+<p>\begin{equation}
+\sum\limits_{i=0}^{2n} w^ix^i = \frac{\lambda}{n+\lambda}(\mu) + \sum\limits_{i=1}^n  \frac{1}{2(n+\lambda)} \Bigg(\mu + ( \sqrt{(n+\lambda) \Sigma } )<em>i \Bigg) + \sum\limits</em>{i=n+1}^{2n} \frac{1}{2(n+\lambda)} \Bigg(\mu +  - ( \sqrt{(n+\lambda) \Sigma })_{i-n} \Bigg)
+\end{equation}</p>
+
+<p>\begin{equation}
+= \frac{\lambda}{n+\lambda}(\mu) +  \frac{n}{2(n+\lambda)} \Bigg(\mu  \Bigg) +  \frac{n}{2(n+\lambda)} \Bigg(\mu \Bigg) - \mu
+\end{equation}</p>
+
+<p>\item Everything also cancels in the $\Sigma$ calculation</p>
+
+<p>\begin{equation}
+\sum\limits_{i=1}^n \frac{ (\sqrt{n_\lambda})(\sqrt{n_\lambda})}{ (n+\lambda)} (\sqrt{\Sigma}_i) (\sqrt{\Sigma})_i^T = \Sigma
+\end{equation}</p>
+
+<p>We notice that if $AA^T = B$, then we can decompose $A$ as</p>
+
+<p>\begin{equation}
+A = \begin{bmatrix}
+| &amp; \cdots &amp; | <br />
+a_1 \cdots a_n <br />
+| &amp; \cdots &amp; | 
+\end{bmatrix}
+\end{equation}</p>
+
+<p>then $AA^T$ is</p>
+
+<p>\begin{equation}
+ = \begin{bmatrix}
+| &amp; \cdots &amp; | <br />
+a_1 &amp; \cdots  &amp; a_n <br />
+| &amp; \cdots &amp; | 
+\end{bmatrix}
+\begin{bmatrix}
+– &amp; a_1^T &amp; – <br />
+– &amp; \cdots &amp; – <br />
+– &amp; a_n^T &amp; – | 
+\end{bmatrix}
+\end{equation}
+\item Inverting the transform is just as simple
+\item We get $a_1 a_1^T + a_2 a_2^T + \cdots + a_n a_n^T$
+\item</p>
+
+<p>\begin{equation}
+\sum\limits_{i=1}^n a_i a_i^T = AA^T = B
+\end{equation}</p>
+
+<p>therefore</p>
+
+<p>\begin{equation}
+\sum\limits_{i=1}^n (\sqrt{\Sigma})_i (\sqrt{\Sigma})_i^T = (\sqrt{\Sigma}) (\sqrt{\Sigma})^T = \Sigma
+\end{equation}</p>
+
+<p>\item You might prefer the Cholesky Factorization for numerical versions
+\item Matrix Square Root! Can use SVD or Cholesky Factorization
+\item There are SVD matrix square roots:
+\item (i) $\sqrt{\Sigma} = U \Lambda^{1/2}$</p>
+
+<p>\begin{equation}
+\sqrt{\Sigma} (\sqrt{\Sigma})^T = U \Lambda^{1/2} (U \Lambda^{1/2})^T = \Sigma
+\end{equation}</p>
+
+<p>\item Columns of $U$ matrix are principal directions of ellipse. SVD gives you this geometric intution of the points around the semi axes, etc.
+\item 
+(ii)
+\begin{equation}
+\sqrt{\Sigma} = U \Lambda^{1/2} U^T = \Sigma
+\end{equation}
+\item SVD computation takes $O(4n^3)$ time</p>
+
+<p>\item \textbf{Cholesky Decomposition}:
+\item $M = LU$, where lower triangular times upper triangular
+\item When $M=M^T$, $L = U^T$
+\item Let $M=LL^T$
+\item (iii) $L = \sqrt{\Sigma}$
+\item People prefer cholesky in UKF because it has complexity $O( \frac{1}{6} n^3)$, just a constant savings.
+\item We choose $\sqrt{\Sigma} \sqrt{\Sigma}^T = LL^T = \Sigma$
+\item Zero out successive row elements of your vector, it is not along semi axes, but more along different axis-aligned directions as you zero  out rows</p>
+
+<p>\end{itemize}
+\subsection{UKF (Sigma Point Filter)}
+\begin{itemize}
+\item 
+\begin{equation}
+(\mu, \Sigma) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow predict \rightarrow (\bar{x}^i, \bar{w}^i) \rightarrow UT^{-1}(\cdot) \rightarrow  (\bar{\mu}, \bar{\Sigma}) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow update \rightarrow 
+\end{equation}
+\item \textbf{Predict Step}\</p>
+
+<p>$UT(\cdot)$
+\begin{equation}
+\begin{aligned}
+x_{t \mid t}^0 = \mu_{t \mid t} <br />
+x_{t \mid t}^i = \mu_{t \mid t} + (\sqrt{(n+\lambda) \Sigma_{t \mid t}})<em>i, i = 1, \dots, n <br />
+x</em>{t \mid t}^i = \mu_{t \mid t} - (\cdots), i = n+1, \dots, 2n <br />
+\bar{x}<em>{t +1 \mid t}^i = f(x</em>{t \mid t}^i, u_t)
+\end{aligned}
+\end{equation}
+We predict through nonlinear dynamics</p>
+
+<p>\item Now we run $UT^{-1}$
+\begin{equation}
+\begin{aligned}
+\mu_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \bar{x}<em>{t+1 \mid t}^i <br />
+\Sigma</em>{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i (\bar{x}<em>{t+1 \mid t}^i - \mu</em>{t+1 \mid t})(\bar{x}<em>{t+1 \mid t}^i - \mu</em>{t+1 \mid t})^T
+\end{aligned}
+\end{equation}</p>
+
+<p>\item We recall the Gaussian estimate!</p>
+
+<p>\begin{equation}
+\begin{aligned}
+\mu_{t \mid t} = \mu + \Sigma_{XY} \Sigma_{YY}^{-1} (y - \hat{y}) <br />
+\Sigma_{t \mid t} = \Sigma - \Sigma_{XY} \Sigma_{YY}^{-1} \Sigma_{YX}
+\end{aligned}
+\end{equation}</p>
+
+<p>\item Now the UPDATE step:<br />
+We run $UT(\cdot)$<br />
+$x_{t +1 \mid t}^0$<br />
+$x_{t+1 \mid t}^{2n}$\</p>
+
+<p>Let’s build $\hat{y}<em>{t+1 \mid t}$ and $\Sigma</em>{t+1 \mid t}^{XY}$, $\Sigma_{t+1 \mid t}^{YY}$
+\item Now</p>
+
+<p>\begin{equation}
+\hat{y}<em>{t+1 \mid t} = \sum\limits</em>{i=0}^{2n} w^i \hat{y}_{t+1 \mid t}^i
+\end{equation}
+which is the expected measurment
+Now,</p>
+
+<p>\begin{equation}
+\begin{aligned}
+\Sigma_{t+1 \mid t}^{YY} = \sum\limits_{i=0}^{2n} w^i (\hat{y}<em>{t+1 \mid t}^i - \hat{y}</em>{t+1 \mid t}) (\hat{y}<em>{t+1 \mid t}^i - \hat{y}</em>{t+1 \mid t})^T
+\end{aligned}
+\end{equation}</p>
+
+<p>Now</p>
+
+<p>\begin{equation}
+\begin{aligned}
+\Sigma_{t+1 \mid t}^{XY} = \sum\limits_{i=0}^{2n} w^i (x_{t+1 \mid t}^i - \mu_{t+1 \mid t}) (\hat{y}<em>{t+1 \mid t}^i - \hat{y}</em>{t+1 \mid t})^T
+\end{aligned}
+\end{equation}</p>
+
+<p>We are doing a fitting operation. That is why we have more sigma points than we need. Smooth out the anomalies due to any one point getting weird.</p>
+
+<p>\begin{equation}
+\Sigma_{t+1 \mid t+1} = \Sigma_{t+1 \mid t} - \Sigma_{t+1 \mid t}^{XY} \Sigma_{t+1 \mid t}^{YY}
+\end{equation}</p>
+
+<p>\begin{equation}
+\mu_{t+1 \mid t+1 } = \mu_{t+1 \mid t } + \Sigma_{t+1 \mid t}^{XY} (\Sigma_{t+1 \mid t}^{YY})^{-1} (y_{t+1} - \hat{y}<em>{t+1 \mid t})
+\end{equation}
+where $y</em>{t+1}$ is the actual measurement.</p>
+
+<p>\item What is $\lambda$? Problem specific.  Consider SVD square root, so that sigma points will be along principal axes.
+\item Suppose we have $x^0$ at the center of the ellipse, and $x^1, \dots, x^4$ lie at each corner of the principal semi-axes
+\item $\lambda$ is the ``confidence-value’’ of the error ellipse
+\item If $n+\lambda = 1$, then $x^i = \mu \pm \sqrt{\Sigma}_i$ and each column represents one standard deviation
+\item Standard deviation in each direction. Bigger $\lambda$ is, then the bigger is the ellipse (And vice versa: smaller $\lambda$ gives smaller ellipse)
+\item The size of the ellipse matters because this is what we take as the region about which we create our linearization
+\item UKF is a lineaerization, takes average slope over a neighborhood. But it is not from the Taylor Series Expansion
+\item 
+\item Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborhood about which we fit the Gaussian is determined by  $\lambda$
+\item The smaller $\lambda$ is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)
+\item Interesting value of $\lambda$: $\lambda=2$. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
+\item Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
+\end{itemize}
+\subsection{PRO version of UKF}
+\begin{itemize}
+\item Other Form of UKF:</p>
+
+<p>\begin{equation}
+\lambda = \alpha^2 ( n + k) - n
+\end{equation}
+this gives us two parameters to tune
+\begin{equation}
+x^i = \mu \pm \alpha ( \sqrt{(n+k) \Sigma})_i
+\end{equation}
+where the two parameters are $\alpha,k$
+\item We now have to redefine the weights to be</p>
+
+<p>\begin{equation}
+w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)
+\end{equation}
+where $\beta$ is another parameter                     <br />
+\item Hugh Durrant White, the original paper has this original form</p>
+
+<p>\item How does it work?
+\end{itemize}
+\section{May 10: Particle Filter}
+\begin{itemize}
+\item Algorithm is simple, but expensive to compute (with for loop)
+\item In UKF, samples deterministally extracted
+\item In Particle filter, no assumption about form of distribution, but need many form of them, and probabilistically extracted
+\item \textbf{Main Idea:} Represent a distribution $p(x)$ with a collection of samples from $p(x)$: $x^i \sim p(x), i=1,\dots, N$ i.i.d.
+\item What does it mean to ``represent’’ a distribution $p(x)$ with a bunch of particles ${ x_1, \dots, x_N }$?
+\item We know that empirical moments are related to true distribution by the law of large number
+\item Recall</p>
+
+<p>\begin{equation}
+\begin{array}{lll}
+\mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, &amp; x_i \sim p(x), &amp; i=1,\dots, N, i.i.d
+\end{array}
+\end{equation}
+Then 
+\begin{equation}
+\begin{array}{ll}
+\Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, &amp; x_i \sim p(x)
+\end{array}
+\end{equation}
+Also,
+\begin{equation}
+\mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)
+\end{equation}
+The Law of Large numbers states that
+\begin{equation}
+\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]
+\end{equation}
+as $N \rightarrow \infty$
+\item 
+Problem: Given a set of particles 
+\begin{equation}
+{ x_{t+1 \mid t}^1, \dots, x_{t+1  \mid t}^N } \sim p(x_{t+1} \mid y_{1:t} )
+\end{equation}
+drawn from the above distribution
+\item 
+We recall the update step
+\begin{equation}
+p(x_t \mid y_{1:t} ) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) dx_t }
+\end{equation}
+We have particles from the top right expression, $x_{t \mid t-1}^i \sim p( x_t \mid y_{1:t-1})$
+\item We want to use Bayes Rule so that we can transform our particles so that they approximate the posterior (this will be one step of the Bayesian Filter)
+\item We will use :</p>
+
+<p>\item $q(x)$ the proposal distribution, the particles are actually from here</p>
+
+<p>\item We want them to be from $p(x)$ the target distribution, we wish they were from here
+\item We use Particle Weights</p>
+
+<p>\begin{equation}
+\mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx 
+\end{equation}</p>
+
+<p>\begin{equation}
+\mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]
+\end{equation}</p>
+
+<p>\item Given ${x^1, \dots, x^N }$
+\item New set: ${ (x^1,w^1), \dots, (x^N,w^N) }$ where $w^i = w(x^i)$
+\item Now the expectation is</p>
+
+<p>\begin{equation}
+\mathbbm{E}<em>p[f(X)] \approx \frac{1}{N} \sum\limits</em>{i=1}^N f(x^i) w^i
+\end{equation}
+and $w(x) = \frac{p(x)}{q(x)}$
+\item If we knew $p,q$, then we would know the weights
+\item But in the filtering setup, we don’t know the posterior, the distribution we are trying to hit! But in fact, we don’t need the target distribution!
+\item 
+Proposal: What we have
+\begin{equation}
+q(x) = p(x_t \mid y_{1:t-1})
+\end{equation}
+\item 
+Target: What we want
+\begin{equation}
+p(x) = p(x_t \mid y_{1:t})
+\end{equation}
+\item 
+So we get weights:</p>
+
+<p>\begin{equation}
+w^i = w(x^i) = \frac{ p(x^i) }{ q(x^i) } = \frac{p(x_t^i \mid y_{1:t})^i}{p(x_t^i \mid y_{1:t-1}) }
+\end{equation}
+\item Now, by Bayes Rule, we can say that the PRIOR cancels out, which was the only thing we didn’t know???</p>
+
+<p>\begin{equation}
+ = \frac{     \frac{p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} \cdots dx_t }     }{ p(x_t \mid y_{1:t-1}) }
+\end{equation}</p>
+
+<p>When the prior cancels, we get</p>
+
+<p>\begin{equation}
+w(x_t^i) = \frac{p(y_t \mid x_t^i ) }{ \int_{x_t} \cdots dx_t } 
+\end{equation}</p>
+
+<p>We just care about the relative weights, so</p>
+
+<p>\begin{equation}
+\bar{w} (x_t^i) = p(y_t \mid x_t^i)
+\end{equation}
+(unnormalized)
+\item</p>
+
+<p>\item</p>
+
+<p>\begin{equation}
+w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }
+\end{equation}
+\item  Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$</p>
+
+<p>\begin{equation}
+y_t = g(x_t) + v_t
+\end{equation}
+Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find</p>
+
+<p>\begin{equation}
+{ (x_{t \mid t}^i, w_{t \mid t}^i }<em>i
+\end{equation}
+to represent $p(x_t \mid y</em>{1:t})$. The weights are</p>
+
+<p>\begin{equation}
+\bar{w}<em>{t \mid t}^i = p(y_t \mid x_t = x</em>{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)
+\end{equation}
+And now</p>
+
+<p>\begin{equation}
+\bar{w}<em>{t \mid t}^i = \eta \mbox{exp } { -\frac{1}{2} (y_t - g(x</em>{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) }
+\end{equation}</p>
+
+<p>Renormalize
+\begin{equation}
+w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }
+\end{equation}
+\item Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)
+\item Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the $x$ particles, which are the input</p>
+
+<p>\begin{equation}
+{ (x_t^i, w_{t \mid t-1}^i) }
+\end{equation}</p>
+
+<p>\item 
+\begin{equation}
+\bar{w}<em>{t \mid t}^i = p(y_t \mid x_t = x_t^i) w</em>{t \mid t-1}^i
+\end{equation}
+and
+\begin{equation}
+w_{t \mid t}^i  = \frac{ \bar{w}<em>{t \mid t}^i }{ \sum\limits</em>{i=1}^N \bar{w}_{t \mid t}^i  }
+\end{equation}
+\end{itemize}</p>
+
+<h2 id="predict-step">Predict Step</h2>
+
+<script type="math/tex; mode=display">p(x_{t+1} \mid y_{1:t}) = \int_x p(x_{t+1} \mid x_t) p(x_t \mid y_{1:t}) dx_t</script>
+
+<p>the left side is the transition distribution (which we have)</p>
+
+<p>the right side is ${ (x_t^i, w_{t \mid t}^i) }$</p>
+
+<p>Let’s just “simulate” <script type="math/tex">p(x_{t+1} \mid x_t)</script></p>
+
+<p>Draw <script type="math/tex">x_{t+1}^i \sim p(x_{t+1} \mid x_t = x_t^i )</script></p>
+
+<p>where <script type="math/tex">x_{t+1} = f(x_t, u_t) + w_t</script>, the process noise <script type="math/tex">w_t \sim \mathcal{N}(0, Q_t)</script></p>
+
+<p>We sample 
+<script type="math/tex">% <![CDATA[
+\begin{array}{ll}
+w_t \sim \mathcal{N}(0, Q_t), & \rightarrow x_{t+1}^i = f(x_{t}^i, u_t) + w_t 
+\end{array} %]]></script></p>
+
+<p>1000 particles per dimension <script type="math/tex">(1000^{D}</script> where <script type="math/tex">D</script>=dimension</p>
+
+<p>Exponential explosion of particles required to keep the same resolution</p>
+
+<p>Full Filter: Given</p>
+
+<script type="math/tex; mode=display">\{ (x_{t }^i, w_{t \mid t}^i \}_i</script>
+
+<p>Predict:</p>
+
+<script type="math/tex; mode=display">x_{t+1}^i \sim p(x_{t+1} \mid x_t = x_t^i )</script>
+
+<p>Update:</p>
+
+<script type="math/tex; mode=display">\bar{w}_{t+1 \mid t+1}^i = p(y_{t+1} \mid x_{t+1} = x_{t+1}^i) w_{t \mid t}^i</script>
+
+<script type="math/tex; mode=display">w_{t+1 \mid t+1 }^i  = \frac{ \bar{w}_{t+1 \mid t+1}^i }{ \sum\limits_{i=1}^N \bar{w}_{t+1 \mid t+1}^i  }</script>
+
+<h2 id="sample-degeneracy">Sample Degeneracy</h2>
+
+<p>Unfortunately, it is easy to end up with degenerate samples in the UKF, meaning the samples won’t do anything for you because they are all spread apart. TODO: Only one takes the weight, why?</p>
+
+<p>The <strong>solution</strong>: resample points in a very clever way, via importance (re-)sampling. In a <em>survival of the fittest</em>, those samples with high weight end up lots of children, and those with low weight disappear. I</p>
+
+<p>\item We sample a new set of particles at time $t$, get new $x_t^i$ s.t.
+\item This is sequential important re-sampling.</p>
+
+<script type="math/tex; mode=display">Pr( x_t^i = x_t^j) = w_t^j</script>
+
+<p>The noisy prediction will disperse them. The new weights are uniform, i.e. <script type="math/tex">w_t^i = \frac{1}{N}</script>
+\item Particle impoverishment; all particles clumped at one point because not enough noise to disperse them
+\item If the resampling happens too frequently, in comparison with the dispersal via noise, then we get sample impoverishment!</p>
+
+<p>We will get that all $x_t^i \approx x_t^j$, and $w_t^i \approx \frac{1}{N}, \forall i$</p>
+
+<p>So no diversity in the distribution anymore</p>
+
+<p>To fix it, resample less often</p>
+
+<p>Or you could just throw some random particles into your bag</p>
+
+<p>Check how different weights are at every time. If too different, trigger a resample (variance without subtracting mean is <script type="math/tex">\sum\limits_{i=1}^N (w_t^i)^2 \geq \mbox{thresh}</script></p>
+
+<p>If maximally different, then you would get <script type="math/tex">1</script> and <script type="math/tex">0</script>, maximally different</p>
+
+<p><strong>Low Variance Resampling:</strong> in previous formulation, you could have gotten all copies of the same particle
+One number line is <script type="math/tex">r \sim v[0, \frac{1}{N}]</script>
+Then map each of these to the right interval above in the weighted bins. Determinsitic resampling
+Make <script type="math/tex">n</script> copies of it in every uniform bin</p>
+
+<p><strong>Swept under Rug</strong>
+All filters have tried to compute the Bayesian posterior (either exactly or approximately)
+The particle filter does not do this (look at prediction step)
+PF tracks approximates the posterior of the trajectory instead</p>
+
+<script type="math/tex; mode=display">p(x_{0:t} \mid y_{1:t})</script>
+
+<p>Because of the prediction step, where we say draw sample</p>
+
+<script type="math/tex; mode=display">x_{t+1}^i \sim p(x_{t+1} \mid x_t  = x_t^i )</script>
+
+<p>What we really wanted was</p>
+
+<script type="math/tex; mode=display">x_{t+1}^i \sim p(x_{t+1} \mid y_{1:t} ) = \int_{x_t} p(x_{t+1} \mid x_t) p(x_t \mid y_{1:t}) dx_t</script>
+
+<p>\item Instead, the Particle Filter finds</p>
+
+<script type="math/tex; mode=display">x_{t+1}^i \sim p(x_{t+1}, x_t \mid y_{1:t}) = p(x_{t+1} \mid x_t = x_t^i) p(x_t = x_t^i \mid y_{1:t})</script>
+
+<p>Track distribution of the whole TRAJECTORY, given all of the measurements.
+Important for SLAM, because in SLAM we often want to estimate the history of the trajectory of the robot
+\end{itemize}</p>
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

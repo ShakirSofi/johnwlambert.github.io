@@ -98,6 +98,15 @@ Today, the computer vision community is learning how to use statistical learning
 
     <div class="module-header">Module 4: State Estimation </div>
 
+    <div class="materials-item">
+      <a href="bayes-filter/">
+        What is State Estimation? and the Bayes Filter
+      </a>
+      <div class="kw">
+          linear dynamical systems, bayes rule, bayesian estimation, and filtering
+      </div>
+    </div>
+
     <div class="module-header">Module 5: Geometry and Camera Calibration </div>
 
     <div class="materials-item">
