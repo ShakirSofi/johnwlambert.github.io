@@ -1,0 +1,41 @@
+---
+layout: post
+title:  "Simultaneous Localization and Mapping (SLAM)"
+permalink: /slam/
+excerpt: "GraphSLAM, loop closures"
+mathjax: true
+date:   2018-12-27 11:00:00
+mathjax: true
+
+---
+Table of Contents:
+- [A Basic SfM Pipeline](#sfmpipeline)
+- [Cost Functions](#costfunctions)
+- [Bundle Adjustment](#bundleadjustment)
+
+<a name='sfmpipeline'></a>
+
+## Localization
+
+
+SLAM methods [2, 10, 13, 14, 21, 30]
+
+M. Bosse, P. Newman, J. Leonard, M. Soika, W. Feiten, and S. Teller. Simultaneous localization and map building in large-scale cyclic envi- ronments using the atlas framework. IJRR, 23(12), 2004.
+
+
+T. Duckett, S. Marsland, and J. Shapiro. Learning globally consistent
+maps by relaxation. ICRA 2000.
+
+
+J. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.
+[14] U. Frese, P. Larsson, and T. Duckett. A multigrid algorithm for
+simultaneous localization and mapping. IEEE Transactions on Robotics,
+2005.
+
+
+K. Konolige. Large-scale map-making. AAAI, 2004.
+
+
+S. Thrun and M. Montemerlo. The GraphSLAM algorithm with
+applications to large-scale mapping of urban structures. IJRR, 25(5/6),
+2005.

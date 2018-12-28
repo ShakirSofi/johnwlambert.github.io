@@ -684,3 +684,13 @@ $$\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x 
 
 I should have explained that above -- $$\odot$$ is the Hadamard product (element wise multiplication).
 
+
+Question:
+How is 1x1 convolution idential to a fully-connected layer
+
+
+5x5 kernel, with 5x5 input. Elementwise multiply. Same as matrix multiplication because...
+
+
+
+

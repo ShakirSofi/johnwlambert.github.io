@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Robot Localization</title>
+  <meta name="description" content="ICP, grid histograms, ...">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/robot-localization/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Robot Localization</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
+  <li><a href="#costfunctions">Cost Functions</a></li>
+  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+</ul>
+
+<p><a name="sfmpipeline"></a></p>
+
+<h2 id="localization">Localization</h2>
+
+<p>Navigation in urban environments requires clever solutions because sensors like GPS can’t provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1].</p>
+
+<p>I’ll review some methods from 2007-2018.</p>
+
+<h2 id="points-planes-poles-gaussian-bars-over-2d-grids-feature-representation-method">Points Planes Poles Gaussian Bars over 2D Grids (Feature representation method)</h2>
+
+<p>particle filter method for correlating LIDAR measurements [1]</p>
+
+<h2 id="2d-grids">2D grids</h2>
+
+<h2 id="using-deep-learning">Using Deep Learning</h2>
+
+<p>[1] J. Levinson, M. Montemerlo, and S. Thrun. Map-based 929 precision vehicle localization in urban environments. In 930
+Robotics: Science and Systems, volume 4, page 1. Citeseer,</p>
+<ol>
+  <li>1, 2, 5 931</li>
+</ol>
+
+<p>[2] R. Kummerle, D. Hahnel, D. Dolgov, S. Thrun, and W. Bur- 925 gard. Autonomous driving in a multi-level parking structure. 926 In IEEE International Conference on Robotics and Automa- 927 tion (ICRA), pages 3395–3400, May 2009. 1</p>
+
+<p>[3] J. Levinson and S. Thrun. Robust vehicle localization in 932 urban environments using probabilistic maps. In IEEE In- 933 ternational Conference on Robotics and Automation (ICRA), 934 pages 4372–4378, May 2010. 1, 2, 5, 7</p>
+
+<p>[4] R. W. Wolcott and R. M. Eustice. Fast LIDAR localization using multiresolution gaussian mixture maps. In IEEE In- ternational Conference on Robotics and Automation (ICRA), pages 2814–2821, May 2015. 1, 2</p>
+
+<p>[5] R. W. Wolcott and R. M. Eustice. Robust LIDAR local- ization using multiresolution gaussian mixture maps for au- tonomous driving. The International Journal of Robotics Re- search, 36(3):292–319, 2017. 1, 2</p>
+
+<p>[6] H. Kim, B. Liu, C. Y. Goh, S. Lee, and H. Myung. Robust 920 vehicle localization using entropy-weighted particle filter- 921 based data fusion of vertical and road intensity information 922 for a large scale urban area. IEEE Robotics and Automation 923 Letters, 2(3):1518–1524, July 2017.</p>
+
+<p>[7] R. Dub, M. G. Gollub, H. Sommer, I. Gilitschenski, R. Sieg- wart, C. Cadena, and J. Nieto. Incremental-segment-based localization in 3-D point clouds. IEEE Robotics and Au- tomation Letters, 3(3):1832–1839, July 2018. 1</p>
+
+<p>[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes. In IEEE Inter- national Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

@@ -2,7 +2,7 @@
 layout: post
 title:  "Bayes Filter"
 permalink: /bayes-filter/
-excerpt: "ICP, grid histograms, ..."
+excerpt: "linear dynamical systems, bayes rule, bayesian filtering, estimation ..."
 mathjax: true
 date:   2018-12-27 11:00:00
 mathjax: true
@@ -121,7 +121,7 @@ In estimation, the state $$X$$ is static. In filtering, the state $$X$$ is dynam
     Suppose we have $$Y_1$$ (wet umbrellas), and $$Y_2$$ (wet-ground), which share common parent $$X$$ (it's raining). Get conditional independence
 
 Suppose we have sequence of measurements $$(Y_1,Y_2,\dots, Y_t)$$, revealed
-$$X$$ is a static state.
+$$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent given $$X$$.
   </div>
 </div>
 
@@ -204,7 +204,7 @@ $$
 p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t},   \mid x_{t-1}, y_{1:t-1})  p( x_{t-1}  \mid y_{1:t-1})   dx_{t-1}
 $$
 
-By Markovianity, we can simplify the expression above to:
+By Markovianity, we can simplify the expression above, giving us **the Predict Step**:
 
 $$
 p(x_{t} \mid y_{1:t-1}) = \int_{x_t-1} p(x_{t} \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1})dx_{t-1}
@@ -280,16 +280,4 @@ It turns out that we can write out these integrals analytically for a very speci
 
 [3] Mac Schwager. Lecture Presentations of AA 273: State Estimation, taught at Stanford University in April-June 2018. 
 
-## TRASH
 
-
-
-
-
-
-
-$$
-p(x \mid y_{1:t}) = f(y_t, p(x,y_{1:t-1})
-$$
-
-Assume $$Y_1,\dots, Y_t$$ are conditionally independent given $$X$$
