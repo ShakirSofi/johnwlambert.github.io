@@ -109,12 +109,21 @@ Today, the computer vision community is learning how to use statistical learning
       </div>
     </div>
 
-        <div class="materials-item">
+    <div class="materials-item">
       <a href="icp/">
         Iterative Closest Point
       </a>
       <div class="kw">
           simple derivations and code examples 
+      </div>
+    </div>
+
+    <div class="materials-item">
+      <a href="sfm/">
+        Structure From Motion
+      </a>
+      <div class="kw">
+          Deriving bundle adjustment
       </div>
     </div>
 
