@@ -377,58 +377,63 @@ w(x_t^i) = \frac{p(y_t \mid x_t^i ) }{ \int_{x_t} \cdots dx_t }
 
 We just care about the relative weights, so
 
-\begin{equation}
+$$
 \bar{w} (x_t^i) = p(y_t \mid x_t^i)
-\end{equation}
+$$
+
 (unnormalized)
-\item 
 
-\item 
-
-\begin{equation}
+$$
 w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }
-\end{equation}
-\item  Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$
+$$
 
-\begin{equation}
+Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$
+
+$$
 y_t = g(x_t) + v_t
-\end{equation}
+$$
+
 Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find
 
-\begin{equation}
+$$
 \{ (x_{t \mid t}^i, w_{t \mid t}^i \}_i
-\end{equation}
+$$
+
 to represent $p(x_t \mid y_{1:t})$. The weights are
 
-\begin{equation}
+$$
 \bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)
-\end{equation}
+$$
+
 And now
 
-\begin{equation}
+$$
 \bar{w}_{t \mid t}^i = \eta \mbox{exp } \{ -\frac{1}{2} (y_t - g(x_{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) \}
-\end{equation}
+$$
 
 Renormalize
-\begin{equation}
+
+$$
 w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }
-\end{equation}
-\item Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)
-\item Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the $x$ particles, which are the input
+$$
 
-\begin{equation}
+Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)
+
+Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the $$x$$ particles, which are the input
+
+$$
 \{ (x_t^i, w_{t \mid t-1}^i) \}
-\end{equation}
+$$
 
-\item 
-\begin{equation}
+$$
 \bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_t^i) w_{t \mid t-1}^i
-\end{equation}
+$$
+
 and
-\begin{equation}
+
+$$
 w_{t \mid t}^i  = \frac{ \bar{w}_{t \mid t}^i }{ \sum\limits_{i=1}^N \bar{w}_{t \mid t}^i  }
-\end{equation}
-\end{itemize}
+$$
 
 ## Predict Step
 

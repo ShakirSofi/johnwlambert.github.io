@@ -451,58 +451,43 @@ w(x_t^i) = \frac{p(y_t \mid x_t^i ) }{ \int_{x_t} \cdots dx_t }
 
 <p>We just care about the relative weights, so</p>
 
-<p>\begin{equation}
-\bar{w} (x_t^i) = p(y_t \mid x_t^i)
-\end{equation}
-(unnormalized)
-\item</p>
+<script type="math/tex; mode=display">\bar{w} (x_t^i) = p(y_t \mid x_t^i)</script>
 
-<p>\item</p>
+<p>(unnormalized)</p>
 
-<p>\begin{equation}
-w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }
-\end{equation}
-\item  Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$</p>
+<script type="math/tex; mode=display">w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }</script>
 
-<p>\begin{equation}
-y_t = g(x_t) + v_t
-\end{equation}
-Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find</p>
+<p>Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$</p>
 
-<p>\begin{equation}
-{ (x_{t \mid t}^i, w_{t \mid t}^i }<em>i
-\end{equation}
-to represent $p(x_t \mid y</em>{1:t})$. The weights are</p>
+<script type="math/tex; mode=display">y_t = g(x_t) + v_t</script>
 
-<p>\begin{equation}
-\bar{w}<em>{t \mid t}^i = p(y_t \mid x_t = x</em>{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)
-\end{equation}
-And now</p>
+<p>Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find</p>
 
-<p>\begin{equation}
-\bar{w}<em>{t \mid t}^i = \eta \mbox{exp } { -\frac{1}{2} (y_t - g(x</em>{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) }
-\end{equation}</p>
+<script type="math/tex; mode=display">\{ (x_{t \mid t}^i, w_{t \mid t}^i \}_i</script>
 
-<p>Renormalize
-\begin{equation}
-w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }
-\end{equation}
-\item Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)
-\item Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the $x$ particles, which are the input</p>
+<p>to represent $p(x_t \mid y_{1:t})$. The weights are</p>
 
-<p>\begin{equation}
-{ (x_t^i, w_{t \mid t-1}^i) }
-\end{equation}</p>
+<script type="math/tex; mode=display">\bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)</script>
 
-<p>\item 
-\begin{equation}
-\bar{w}<em>{t \mid t}^i = p(y_t \mid x_t = x_t^i) w</em>{t \mid t-1}^i
-\end{equation}
-and
-\begin{equation}
-w_{t \mid t}^i  = \frac{ \bar{w}<em>{t \mid t}^i }{ \sum\limits</em>{i=1}^N \bar{w}_{t \mid t}^i  }
-\end{equation}
-\end{itemize}</p>
+<p>And now</p>
+
+<script type="math/tex; mode=display">\bar{w}_{t \mid t}^i = \eta \mbox{exp } \{ -\frac{1}{2} (y_t - g(x_{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) \}</script>
+
+<p>Renormalize</p>
+
+<script type="math/tex; mode=display">w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }</script>
+
+<p>Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)</p>
+
+<p>Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the <script type="math/tex">x</script> particles, which are the input</p>
+
+<script type="math/tex; mode=display">\{ (x_t^i, w_{t \mid t-1}^i) \}</script>
+
+<script type="math/tex; mode=display">\bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_t^i) w_{t \mid t-1}^i</script>
+
+<p>and</p>
+
+<script type="math/tex; mode=display">w_{t \mid t}^i  = \frac{ \bar{w}_{t \mid t}^i }{ \sum\limits_{i=1}^N \bar{w}_{t \mid t}^i  }</script>
 
 <h2 id="predict-step">Predict Step</h2>
 
