@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-27T22:37:26-08:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-27T22:43:55-08:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
 </subtitle><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
@@ -460,58 +460,43 @@ w(x_t^i) = \frac{p(y_t \mid x_t^i ) }{ \int_{x_t} \cdots dx_t }
 
 &lt;p&gt;We just care about the relative weights, so&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\bar{w} (x_t^i) = p(y_t \mid x_t^i)
-\end{equation}
-(unnormalized)
-\item&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w} (x_t^i) = p(y_t \mid x_t^i)&lt;/script&gt;
 
-&lt;p&gt;\item&lt;/p&gt;
+&lt;p&gt;(unnormalized)&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }
-\end{equation}
-\item  Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
-y_t = g(x_t) + v_t
-\end{equation}
-Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find&lt;/p&gt;
+&lt;p&gt;Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-{ (x_{t \mid t}^i, w_{t \mid t}^i }&lt;em&gt;i
-\end{equation}
-to represent $p(x_t \mid y&lt;/em&gt;{1:t})$. The weights are&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_t = g(x_t) + v_t&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
-\bar{w}&lt;em&gt;{t \mid t}^i = p(y_t \mid x_t = x&lt;/em&gt;{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)
-\end{equation}
-And now&lt;/p&gt;
+&lt;p&gt;Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\bar{w}&lt;em&gt;{t \mid t}^i = \eta \mbox{exp } { -\frac{1}{2} (y_t - g(x&lt;/em&gt;{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) }
-\end{equation}&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ (x_{t \mid t}^i, w_{t \mid t}^i \}_i&lt;/script&gt;
 
-&lt;p&gt;Renormalize
-\begin{equation}
-w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }
-\end{equation}
-\item Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)
-\item Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the $x$ particles, which are the input&lt;/p&gt;
+&lt;p&gt;to represent $p(x_t \mid y_{1:t})$. The weights are&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-{ (x_t^i, w_{t \mid t-1}^i) }
-\end{equation}&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)&lt;/script&gt;
 
-&lt;p&gt;\item 
-\begin{equation}
-\bar{w}&lt;em&gt;{t \mid t}^i = p(y_t \mid x_t = x_t^i) w&lt;/em&gt;{t \mid t-1}^i
-\end{equation}
-and
-\begin{equation}
-w_{t \mid t}^i  = \frac{ \bar{w}&lt;em&gt;{t \mid t}^i }{ \sum\limits&lt;/em&gt;{i=1}^N \bar{w}_{t \mid t}^i  }
-\end{equation}
-\end{itemize}&lt;/p&gt;
+&lt;p&gt;And now&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t \mid t}^i = \eta \mbox{exp } \{ -\frac{1}{2} (y_t - g(x_{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) \}&lt;/script&gt;
+
+&lt;p&gt;Renormalize&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }&lt;/script&gt;
+
+&lt;p&gt;Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)&lt;/p&gt;
+
+&lt;p&gt;Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; particles, which are the input&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ (x_t^i, w_{t \mid t-1}^i) \}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_t^i) w_{t \mid t-1}^i&lt;/script&gt;
+
+&lt;p&gt;and&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_{t \mid t}^i  = \frac{ \bar{w}_{t \mid t}^i }{ \sum\limits_{i=1}^N \bar{w}_{t \mid t}^i  }&lt;/script&gt;
 
 &lt;h2 id=&quot;predict-step&quot;&gt;Predict Step&lt;/h2&gt;
 
