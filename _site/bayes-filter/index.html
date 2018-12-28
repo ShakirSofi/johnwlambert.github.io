@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Bayes Filter</title>
+  <meta name="description" content="ICP, grid histograms, ...">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/bayes-filter/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Bayes Filter</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#state-estimation">What is State Estimation?</a></li>
+  <li><a href="#dt-lds">Discrete-time Linear Dynamical Systems</a></li>
+  <li><a href="#probability-review">Probability Review: The Chain Rule, Marginalization, &amp; Bayes Rule</a></li>
+  <li><a href="#bayes-estimation">Recursive Bayesian Estimation + Conditional Independence</a></li>
+  <li><a href="#pgm-bayes-filter">Graphical Model: The Structure of Variables in the Bayes Filter</a></li>
+  <li><a href="#bayes-filter-deriv">Derivation of the Bayes Filter</a></li>
+</ul>
+
+<p><a name="state-estimation"></a></p>
+
+<h2 id="what-is-state-estimation">What is State Estimation?</h2>
+
+<p>State estimation is the study of reproducing the state of a robot (e.g. its orientation, location) from noisy measurements. Unfortunately, we can’t obtain the state <script type="math/tex">x</script> directly. Instead, we can obtain get a measurement that is all tangled up with noise.</p>
+
+<p>A more formal definition: Given a history of measurements <script type="math/tex">y_1, \dots, y_t)</script>, and system inputs <script type="math/tex">(u_1, \dots, u_t)</script>, find an estimate <script type="math/tex">\hat{x}_t</script> of the state <script type="math/tex">x</script> with small error <script type="math/tex">\|\hat{x}_t - x_t \|</script>.</p>
+
+<p>What do we have to work with?</p>
+<ul>
+  <li>(1) We are given the measurements <script type="math/tex">y_t</script>, whose distribution is modeled  as <script type="math/tex">p(y_t \mid x_t, u_t)</script>.</li>
+  <li>(2) We assume that we know the state transition distribution <script type="math/tex">p(x_{t+1} \mid x_t, u_t)</script>, i.e. the robot dynamics.</li>
+</ul>
+
+<p>The goal of state estimation is to find the posterior distribution of <script type="math/tex">x</script> given all of the prior measurements and inputs:</p>
+
+<script type="math/tex; mode=display">p(x_t \mid y_{1:t}, u_{1:t})</script>
+
+<h2 id="why-do-we-need-a-distribution-instead-of-a-single-state-estimate">Why do we need a distribution instead of a single state estimate?</h2>
+
+<p>The goal of state estimation is not to obtain a single <script type="math/tex">\hat{x}</script>. Rather, we desire a distribution over <script type="math/tex">x</script>’s. You might ask, <em>why?</em></p>
+
+<p>The mean of a distribution may not be representative of the distribution whatsoever. For example, consider a bimodal distribution with a mean around 0, but consisting of two camel humps. There is more information in the Bayesian estimate that we can use for control. In the case of a Kalman Filter, we will express the state distribution as a Gaussian, which is parameterized compactly by a mean and covariance.</p>
+
+<p><a name="dt-lds"></a></p>
+
+<h2 id="discrete-time-linear-dynamical-systems-dt-lds">Discrete-time Linear Dynamical Systems (DT LDS)</h2>
+
+<p>Filtering and estimation is much more easily described in discrete time than in continuous time. We use Linear Dynamical Systems as a key tool in state estimation.</p>
+
+<p>Suppose we have a system with state <script type="math/tex">x \in R^n</script>, which changes over timesteps <script type="math/tex">t</script> [1,2]. The matrix <script type="math/tex">A(t) \in R^{n \times n}</script> is called the dynamics matrix. Suppose we provide an input <script type="math/tex">u \in R^m</script> at time <script type="math/tex">t</script>.  <script type="math/tex">B(t)</script> is the <script type="math/tex">R^{n \times m}</script> input matrix. The vector <script type="math/tex">c(t) \in R^n</script> is called the offset. We can express the system as:</p>
+
+<script type="math/tex; mode=display">x(t + 1) = A(t)x(t) + B(t)u(t) + c(t)</script>
+
+<p>We will use the shorthand notation for simplicity:</p>
+
+<script type="math/tex; mode=display">x_{t + 1} = A_t x_t + B_t u_t + c_t</script>
+
+<p>As Boyd and Vandenberghe point out [2], the LDS is a “special case of a Markov system where the next state is a linear function of the current state.” Suppose we also have an output of the system <script type="math/tex">y(t) \in R^{p}</script>. <script type="math/tex">C(t) \in R^{p \times n}</script> is the output or sensor matrix. This equation can be modeled as:</p>
+
+<script type="math/tex; mode=display">y(t) = C(t)x(t) + D(t)u(t)</script>
+
+<p>or in shorthand, as</p>
+
+<script type="math/tex; mode=display">y_t = C_t x_t + D_t u_t</script>
+
+<p>where  <script type="math/tex">t \in Z = \{0, \pm 1, \pm 2, \dots \}</script> and vector signals <script type="math/tex">x,u,y</script> are sequences. It is not hard to see that the DT LDS is a first-order vector recursion [1].</p>
+
+<p><a name="probability-review"></a></p>
+
+<h2 id="probability-review-the-chain-rule-marginalization--bayes-rule">Probability Review: The Chain Rule, Marginalization, &amp; Bayes Rule</h2>
+
+<p>The <strong>Chain Rule</strong> states that if <script type="math/tex">y_1,...y_t</script> are events, and <script type="math/tex">p(y_i) > 0</script>, then:</p>
+
+<script type="math/tex; mode=display">p(y_1 \cap y_2 \cap \dots \cap y_t) = p(y_1) p(y_2 \mid y_1)···p(y_t \mid y_1 \cap \dots \cap y_{t-1})</script>
+
+<p><strong>Marginalization</strong> is a method of variable elimination. If <script type="math/tex">X_1,X_2</script> are independent:</p>
+
+<script type="math/tex; mode=display">\int\limits_{x_2} p(x_1,x_2) dx_2 = \int\limits_{x_2} p(x_1)p(x_2)dx = p(x_1) \int\limits_{x_2} p(x_2)dx_2 = p(x_1)</script>
+
+<p>We recall <strong>Bayes’ Rule</strong> states that if <script type="math/tex">x,y</script> are events, and <script type="math/tex">p(x) > 0</script> and <script type="math/tex">p(y) > 0</script>, then:</p>
+
+<script type="math/tex; mode=display">p(x \mid y) = \frac{p(y \mid x)p(x)}{p(y)} = \frac{p(y,x)}{p(y)}</script>
+
+<p>In the domain of state estimation, we can assign the following meaning to these distributions:</p>
+<ul>
+  <li><script type="math/tex">p(x)</script> is our prior.</li>
+  <li><script type="math/tex">p(y \mid x)</script> is our measurement likelihood.</li>
+  <li><script type="math/tex">p(y)</script> is the normalization term.</li>
+  <li><script type="math/tex">p(x \mid y)</script> is our posterior (what we can’t see, given what we can see).</li>
+</ul>
+
+<p>One problem is that we may not know <script type="math/tex">p(y)</script> directly. Fortunately, it turns out <em>we don’t need to</em>.
+By marginalization of <script type="math/tex">x</script> from the joint distribution <script type="math/tex">p(x,y)</script>, we can write the normalization constant <script type="math/tex">p(y)</script> in the denominator differently:</p>
+
+<script type="math/tex; mode=display">p(x \mid y)  = \frac{p(y \mid x) p(x)}{\int\limits_x p(y\mid x)p(x) dx}</script>
+
+<p><a name="bayes-estimation"></a></p>
+
+<h2 id="recursive-bayesian-estimation--conditional-independence">Recursive Bayesian Estimation + Conditional Independence</h2>
+
+<p>In estimation, the state <script type="math/tex">X</script> is static. In filtering, the state <script type="math/tex">X</script> is dynamic. We will address the <strong>Bayesian estimation</strong> case first, which can be modeled graphically as Naive Bayes, and <strong>later we’ll address the Bayesian filtering</strong> case.</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/naive_bayes.jpg" width="65%" />
+  <div class="figcaption">
+    Suppose we have $$Y_1$$ (wet umbrellas), and $$Y_2$$ (wet-ground), which share common parent $$X$$ (it's raining). Get conditional independence
+
+Suppose we have sequence of measurements $$(Y_1,Y_2,\dots, Y_t)$$, revealed
+$$X$$ is a static state.
+  </div>
+</div>
+
+<p>We’ll now derive the recursion, which iterates upon the previous timesteps. The key insight is that <strong>we can factor Bayes Rule via conditional independence.</strong></p>
+
+<p>Suppose we have observed a measurement <script type="math/tex">y</script> for <script type="math/tex">t-1</script> timesteps. In the <strong>previous time step</strong> we had posterior:</p>
+
+<script type="math/tex; mode=display">p(x \mid y_{1:t-1})  = \frac{p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx}</script>
+
+<p>We want to compute:
+<script type="math/tex">p(x \mid y_{1:t})  = \frac{p(y_{1:t} \mid x) p(x)}{\int\limits_x p(y_{1:t}\mid x)p(x) dx}</script></p>
+
+<p>By the Chain Rule:
+<script type="math/tex">p(x \mid y_{1:t})  = \frac{ p(y_t, x, y_{1:t-1}) }{\int\limits_x p(y_{1:t}, x) dx} =  \frac{ p(y_t \mid x, y_{1:t-1}) p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t}\mid x)p(x) dx}</script></p>
+
+<p>We assume that conditioned upon <script type="math/tex">x</script>, all <script type="math/tex">y_i</script> are conditionally independent. Thus, we can discard evidence: <script type="math/tex">p(y_t \mid x, y_{1:t-1}) = p(y_t \mid x)</script>. Simplifying, we see:</p>
+
+<script type="math/tex; mode=display">p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) p(y_{1:t-1} \mid x) p(x)}{\int\limits_x  p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}</script>
+
+<p>Rewrite it in terms of the posterior from the previous time step. We see the previous time step’s posterior also included <script type="math/tex">p(y_{1:t-1} \mid x) p(x)</script> (the unnormalized previous time step posterior)</p>
+
+<script type="math/tex; mode=display">p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) \frac{p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }{ \frac{\int\limits_x p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }</script>
+
+<p>Since constant w.r.t integral, can combine integrals, and see previous posterior in the denominator. Get:</p>
+
+<script type="math/tex; mode=display">p(x \mid y_{1:t}) = \frac{p(y_t \mid x) p(x \mid y_{1:t-1})}{ \int\limits_x p(y_t \mid x) p(x \mid y_{1:t-1})dx} = f\Bigg(y_t, p(x \mid y_{1:t-1}) \Bigg)</script>
+
+<p>In the recursive Bayes Filter, the prior is just the posterior from the previous time step. Thus, we have the following loop: <strong>Measure-&gt;Estimate-&gt;Measure-&gt;Estimate…</strong>. We only got this from conditional independence of measurements, given the state. The graphical model is Naive Bayes.</p>
+
+<p><a name="pgm-bayes-filter"></a></p>
+
+<h2 id="graphical-model-the-structure-of-variables-in-the-bayes-filter">Graphical Model: The Structure of Variables in the Bayes Filter</h2>
+
+<p>Now consider a dynamic state <script type="math/tex">X_t</script>, instead of a static <script type="math/tex">X</script>. This system can be modeled as a Hidden Markov Model.</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/bayesian_filter_hmm.jpg" width="65%" />
+  <div class="figcaption">
+    As we move forward in time, the state evolves from $$X_0 \rightarrow X_1 \rightarrow \dots \rightarrow X_t$$
+  </div>
+</div>
+
+<p>The HMM structure gives us two gifts: (1) the Markov Property, and (2) Conditional Independence.</p>
+
+<p><strong>The Markov Property (Markovianity)</strong>: discard information regarding the state</p>
+
+<script type="math/tex; mode=display">p(x_t \mid x_{1:t-1}, y_{1:t-1}) = p(x_t \mid x_{t-1})</script>
+
+<p><strong>Conditional Independence of Measurements</strong>: discard information regarding the measurement</p>
+
+<script type="math/tex; mode=display">p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t)</script>
+
+<p><a name="bayes-filter-deriv"></a></p>
+
+<h2 id="derivation-of-the-bayes-filter">Derivation of the Bayes Filter</h2>
+
+<p>Suppose we start with our posterior from the previous timestep, which incorporates all measurements <script type="math/tex">y_1,\dots, y_{t-1}</script>: Via marginalization, we can rewrite the expression as:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t}, x_{t-1}  \mid y_{1:t-1})dx_{t-1}</script>
+
+<p>By the chain rule, we can factor:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t},   \mid x_{t-1}, y_{1:t-1})  p( x_{t-1}  \mid y_{1:t-1})   dx_{t-1}</script>
+
+<p>By Markovianity, we can simplify the expression above to:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t-1}) = \int_{x_t-1} p(x_{t} \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1})dx_{t-1}</script>
+
+<p>In what we call the update step, we simply express the posterior using Bayes’ Rule:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{p(y_{1:t})} =  \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_{1:t} \mid x_{t}) p(x_{t}) dx_{t}}</script>
+
+<p>We can now factor the numerator with the chain rule:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t, y_{1:t-1}) p(y_{1:t-1} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_t \mid x_t, y_{1:t-1}) p(y_{1:t-1} \mid x_{t}) p(x_{t})dx_{t}}</script>
+
+<p>By the conditional independence of measurements <script type="math/tex">y</script>, we know <script type="math/tex">p(y_t \mid x_t, y_{1:t-1}) = p(y_t \mid x_t)</script>, so we can simplify:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(y_{1:t-1} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_t \mid x_t) p(y_{1:t-1} \mid x_{t}) p(x_{t})dx_{t}}</script>
+
+<p>Interestingly enough, we can see above in the right hand side two terms from Bayes’ Rule. We’ll be able to collapse them into a single term. Using these two terms, the left side of Bayes’ Rule would be:</p>
+
+<script type="math/tex; mode=display">p(x_t \mid y_{1:t-1}) = \frac{p(y_{1:t-1} \mid x_{t}) p(x_{t})}{ \int_{x_t}p(y_{1:t-1} \mid x_{t}) p(x_{t})  dx_t }</script>
+
+<p>Multiplying by the denominator, we obtain:</p>
+
+<script type="math/tex; mode=display">p(x_t \mid y_{1:t-1}) \int_{x_t}p(y_{1:t-1} \mid x_{t}) p(x_{t})  dx_t = p(y_{1:t-1} \mid x_{t}) p(x_{t})</script>
+
+<p>Since by marginalization <script type="math/tex">\int_{x_t}p(y_{1:t-1} \mid x_{t}) p(x_{t})  dx_t = p(y_{1:t-1})</script>, we can simplify the line above to:</p>
+
+<script type="math/tex; mode=display">p(x_t \mid y_{1:t-1}) p(y_{1:t-1}) = p(y_{1:t-1} \mid x_{t}) p(x_{t})</script>
+
+<p>We now plug this substitution into the numerator and in the denominator of the posterior:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1})   }{\int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1}) dx_{t}}</script>
+
+<p>Since <script type="math/tex">p(y_{1:t-1})</script> does not depend upon <script type="math/tex">x</script>, we can pull it out of the integral, and the term cancels in the top and bottom:</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1})   }{ p(y_{1:t-1})\int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}} = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}}</script>
+
+<p>This is the closed form expression for the <strong>Update Step</strong> of the Bayes’ Filter.</p>
+
+<script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{p(y_{t} \mid x_{t})p(x_{t} \mid y_{1:t-1})}{\int\limits_{x_{t}} p(y_{t} \mid x_{t}) p(x_{t} \mid y_{1:t-1}) dx_{t}}</script>
+
+<p>The algorithm consists of repeatedly applying two steps: (1) the <strong>predict step</strong>, where we move forward the time step, and (2) the <strong>update step</strong>, where we incorporate the measurement.  They appear in an arbitrary order and constitute a cycle, but you have to start somewhere. At the end of the update step, we have the best estimate.</p>
+
+<p>It turns out that we can write out these integrals analytically for a very special family of distributions: Gaussian distributed random variables. This will be the Kalman Filter, which is covered in the next blog post in the <em>State Estimation</em> module.</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Stephen Boyd and Reza Mahalati. <a href="http://ee263.stanford.edu/lectures/overview.pdf">http://ee263.stanford.edu/lectures/overview.pdf</a>.</p>
+
+<p>[2] Stephen Boyd and Lieven Vandenberghe. <em>Introduction to Applied Linear Algebra – Vectors, Matrices, and Least Squares</em>. Cambridge University Press, 2018. <a href="https://web.stanford.edu/~boyd/vmls/vmls.pdf">https://web.stanford.edu/~boyd/vmls/vmls.pdf</a></p>
+
+<p>[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation, taught at Stanford University in April-June 2018.</p>
+
+<h2 id="trash">TRASH</h2>
+
+<script type="math/tex; mode=display">p(x \mid y_{1:t}) = f(y_t, p(x,y_{1:t-1})</script>
+
+<p>Assume <script type="math/tex">Y_1,\dots, Y_t</script> are conditionally independent given <script type="math/tex">X</script></p>
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
