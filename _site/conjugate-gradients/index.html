@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>The Kalman Filter</title>
-  <meta name="description" content="Multivariate Gaussians, ...">
+  <title>Conjugate Gradients</title>
+  <meta name="description" content="Krylov subspaces ...">
    <link rel="stylesheet" href="/css/main.css">
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/kalman-filter/">
+  <link rel="canonical" href="http://localhost:4000/conjugate-gradients/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -86,7 +86,7 @@
         <div class="post">
 
   <header class="post-header">
-    <h1>The Kalman Filter</h1>
+    <h1>Conjugate Gradients</h1>
     <p class="meta">Dec 27, 2018</p>
   </header>
 
@@ -100,41 +100,7 @@
 
 <p><a name="sfmpipeline"></a></p>
 
-<h2 id="what-is-the-kalman-filter">What is the Kalman Filter?</h2>
-
-<p>The Kalman Filter is nothing more than the Bayes’ Filter for Gaussian distributed random variables. The Bayes’ Filter is described in a <a href="/bayes-filter/">previous post</a>.</p>
-
-<p>It is a very surprising result that we can write out the integrals analytically for the Bayes’ Filter when working with a special family of distributions: Gaussian distributed random variables (r.v.’s).  As we recall from the Bayes’ Filter, we have three quantities that we’ll need to be able to evaluate:</p>
-<ul>
-  <li>(1) <script type="math/tex">\int_{x_{t-1}} p(x_t \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1}) dx_{t-1}</script></li>
-  <li>(2) <script type="math/tex">p(x_t \mid x_{t-1})  = f(x_t, x_{t-1} )</script></li>
-  <li>(3) <script type="math/tex">p(y_t \mid x_t) = g(y_t, x_t)</script></li>
-</ul>
-
-<p>Expressions (2) and (3) must be finitely parameterizable. It will take a fair amount of work to derive the analytical formulas of the Bayes’ Filter for Gaussian r.v.’s (the Kalman Filter).  We’ll first review properties of multivariate Gaussians, then the Woodbury matrix inversion lemmas, intuition behind covariance matrices, and then derive the Kalman Filter.</p>
-
-<h2 id="woodbury-matrix-inversion-lemmas">Woodbury Matrix Inversion Lemmas</h2>
-
-<h2 id="kalman-filter-derivation">Kalman Filter Derivation</h2>
-
-<h2 id="gaussian-white-noise">Gaussian White Noise</h2>
-
-<p>In practice, noise is usually not Gaussian and is not white (usually colored).</p>
-
-<p>\item Fact: For a Linear-Gaussian dynamical system (one who’s dynamics are expressed with Gaussian White Noise
-\begin{equation}
-\begin{array}{ll}
-x_{t+1} = Ax_t + B u_t + w_t, &amp; w_t \sim \mathcal{N}(0,Q) <br />
-\end{array}
-\end{equation}</p>
-
-<p>\begin{equation}
-\begin{array}{ll}
-y_t = Cx_t + Du_t + v_t, &amp; v_t \sim \mathcal{N}(O, R)
-\end{array}
-\end{equation}
-where $w_t, v_t$ are zero-mean white noise</p>
-
+<h2 id="conjugate-gradients">Conjugate Gradients</h2>
 
   </article>
 

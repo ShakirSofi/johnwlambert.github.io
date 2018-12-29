@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Bayes Filter</title>
-  <meta name="description" content="linear dynamical systems, bayes rule, bayesian filtering, estimation ...">
+  <title>What is State Estimation? and the Bayes Filter</title>
+  <meta name="description" content="linear dynamical systems, bayes&#39; rule, bayesian filtering &amp; estimation ...">
    <link rel="stylesheet" href="/css/main.css">
 
 
@@ -86,7 +86,7 @@
         <div class="post">
 
   <header class="post-header">
-    <h1>Bayes Filter</h1>
+    <h1>What is State Estimation? and the Bayes Filter</h1>
     <p class="meta">Dec 27, 2018</p>
   </header>
 
@@ -98,7 +98,8 @@
   <li><a href="#probability-review">Probability Review: The Chain Rule, Marginalization, &amp; Bayes Rule</a></li>
   <li><a href="#bayes-estimation">Recursive Bayesian Estimation + Conditional Independence</a></li>
   <li><a href="#pgm-bayes-filter">Graphical Model: The Structure of Variables in the Bayes Filter</a></li>
-  <li><a href="#bayes-filter-deriv">Derivation of the Bayes Filter</a></li>
+  <li><a href="#bayes-filter-deriv-predict">Derivation of the Bayes Filter: Predict Step</a></li>
+  <li><a href="#bayes-filter-deriv-update">Derivation of the Bayes Filter: Update Step</a></li>
 </ul>
 
 <p><a name="state-estimation"></a></p>
@@ -185,12 +186,9 @@ By marginalization of <script type="math/tex">x</script> from the joint distribu
 <p>In estimation, the state <script type="math/tex">X</script> is static. In filtering, the state <script type="math/tex">X</script> is dynamic. We will address the <strong>Bayesian estimation</strong> case first, which can be modeled graphically as Naive Bayes, and <strong>later we’ll address the Bayesian filtering</strong> case.</p>
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/naive_bayes.jpg" width="65%" />
+  <img src="/assets/naive_bayes.png" width="45%" />
   <div class="figcaption">
-    Suppose we have $$Y_1$$ (wet umbrellas), and $$Y_2$$ (wet-ground), which share common parent $$X$$ (it's raining). Get conditional independence
-
-Suppose we have sequence of measurements $$(Y_1,Y_2,\dots, Y_t)$$, revealed
-$$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent given $$X$$.
+Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a static state. Assume Y_1,..., Y_t are conditionally independent given X. This is the Naive Bayes' structure of Bayesian estimation.
   </div>
 </div>
 
@@ -227,7 +225,7 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 <p>Now consider a dynamic state <script type="math/tex">X_t</script>, instead of a static <script type="math/tex">X</script>. This system can be modeled as a Hidden Markov Model.</p>
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/bayesian_filter_hmm.jpg" width="65%" />
+  <img src="/assets/bayesian_filter_hmm.png" width="65%" />
   <div class="figcaption">
     As we move forward in time, the state evolves from $$X_0 \rightarrow X_1 \rightarrow \dots \rightarrow X_t$$
   </div>
@@ -243,9 +241,9 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 
 <script type="math/tex; mode=display">p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t)</script>
 
-<p><a name="bayes-filter-deriv"></a></p>
+<p><a name="bayes-filter-deriv-predict"></a></p>
 
-<h2 id="derivation-of-the-bayes-filter">Derivation of the Bayes Filter</h2>
+<h2 id="derivation-of-the-bayes-filter-predict-step">Derivation of the Bayes Filter: Predict Step</h2>
 
 <p>Suppose we start with our posterior from the previous timestep, which incorporates all measurements <script type="math/tex">y_1,\dots, y_{t-1}</script>: Via marginalization, we can rewrite the expression as:</p>
 
@@ -258,6 +256,10 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 <p>By Markovianity, we can simplify the expression above, giving us <strong>the Predict Step</strong>:</p>
 
 <script type="math/tex; mode=display">p(x_{t} \mid y_{1:t-1}) = \int_{x_t-1} p(x_{t} \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1})dx_{t-1}</script>
+
+<p><a name="bayes-filter-deriv-update"></a></p>
+
+<h2 id="derivation-of-the-bayes-filter-update-step">Derivation of the Bayes Filter: Update Step</h2>
 
 <p>In what we call the update step, we simply express the posterior using Bayes’ Rule:</p>
 
@@ -301,11 +303,11 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 
 <h2 id="references">References</h2>
 
-<p>[1] Stephen Boyd and Reza Mahalati. <a href="http://ee263.stanford.edu/lectures/overview.pdf">http://ee263.stanford.edu/lectures/overview.pdf</a>.</p>
+<p>[1] Stephen Boyd and Reza Mahalati. Lecture 1,  Introduction to Linear Dynamical Systems (EE 263). <a href="http://ee263.stanford.edu/lectures/overview.pdf">http://ee263.stanford.edu/lectures/overview.pdf</a>.</p>
 
 <p>[2] Stephen Boyd and Lieven Vandenberghe. <em>Introduction to Applied Linear Algebra – Vectors, Matrices, and Least Squares</em>. Cambridge University Press, 2018. <a href="https://web.stanford.edu/~boyd/vmls/vmls.pdf">https://web.stanford.edu/~boyd/vmls/vmls.pdf</a></p>
 
-<p>[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation, taught at Stanford University in April-June 2018.</p>
+<p>[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.</p>
 
 
   </article>

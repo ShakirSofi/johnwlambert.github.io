@@ -17,7 +17,11 @@ Table of Contents:
 
 ## Particle Filter
 
-The **Particle Filter** is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. It was developed between 1995 and 1996 at Oxford. It is often called the **"Unscented Kalman Filter" (UKF)** because its creator, Durant-White, thought "it didn't stink" [ADD REFERENCE].
+The **Particle Filter** is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. This is because it contains no assumptions about the form of the state distribution. It was published in 1995 [2,3] by Simon Julier, Jeffrey Uhlmann, and Hugh Durrant-Whyte at Oxford. It is often called the **"Unscented Kalman Filter" (UKF)** because the inventors thought "it didn't stink" like the EKF.
+
+The main idea is to Represent a distribution $$p(x)$$ with a collection of samples (particles) from $$p(x)$$: $$x^i \sim p(x), i=1,\dots, N$$ i.i.d. We know that empirical moments are related to true distribution by the Law of Large Numbers. The algorithm is simple, but expensive to compute with a for loop.
+
+
 
 ## What's Wrong With the EKF?
 
@@ -41,74 +45,85 @@ The UKF parameterizes the state distribution in a different way by using "Sigma 
 The "Unscented Transform" is a curve-fitting exercise that converts individual points to a mean and covariance, i.e. $$UT(\mu, \Sigma) = \{ (x^i, w^i) \}_i$$. An advantage of the UKF is that it is very easy to propagate these individual points through nonlinearities like non-linear dynamics, whereas it is harder to push $$\mu, \Sigma$$ through the nonlinearities.
 
 
-\item Properties that we want the unscented transform to have 
-\item UT($\cdot$):\\
-$(\mu, \Sigma) = \{ (x^i, w^i) \}_i$
-\item $UT^{-1}(\cdot)$ \\
-$ \{ (x^i, w^i) \}_i = (\mu, \Sigma)$
-\item We want the sample sigma points to share the same mean, covariance
-\begin{equation}
+*Properties that we want the unscented transform to have*
+\item UT($$\cdot$$):\\
+$$(\mu, \Sigma) = \{ (x^i, w^i) \}_i$$
+
+$$UT^{-1}(\cdot)$$ \\
+$$ \{ (x^i, w^i) \}_i = (\mu, \Sigma)$$
+We want the sample sigma points to share the same mean, covariance
+
+$$
 \mu = \sum\limits_{i=0}^{2n} w^ix^i
-\end{equation}
+$$
 
-\begin{equation}
+$$
 \Sigma = \sum\limits_{i=0}^{2n} w^i (x^i - \mu)(x^i - \mu)^T
-\end{equation}
+$$
+
 They are redundant (an overparameterization of the Gaussian)
-\item We have redundancy for a smoothing effect, since won't be for a perfect Gaussian
-\item Here is the transform $UT(\cdot)$:\\
-$x^0 = \mu$ \\
-$x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )_i, i = 1, \dots, n$\\
-\item This is a matrix square root
-\item The index $i$ is the $i$'th column in the matrix square root
-\item We also have a mirror image set:\\
+
+We have redundancy for a smoothing effect, since won't be for a perfect Gaussian
+
+Here is the transform $$UT(\cdot)$$:\\
+$$x^0 = \mu$$ \\
+$$x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )_i, i = 1, \dots, n$$\\
+
+This is a matrix square root
+
+The index $i$ is the $$i$$'th column in the matrix square root
+
+We also have a mirror image set:\\
 $x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$\\
-\item Those were the points. The weights themselves:
 
-\begin{equation}
+Those were the points. The weights themselves:
+
+$$
 w^0 = \frac{\lambda}{n+\lambda}
-\end{equation}
+$$
 
-\begin{equation}
+$$
 w^i = \frac{1}{2(n+\lambda)}, i \geq 1
-\end{equation}
-\item Each of these points plot points around the circle/ellipse
-\item Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.
-\item  $n \times n$ matrix is $\sqrt{(n+\lambda) \Sigma}$
-\end{itemize}
-\subsection{Verify Inverse Unscented Transform}
-\begin{itemize}
-\item  We verify $UT^{-1}(\cdot)$ as claimed
+$$
 
-\begin{equation}
+Each of these points plot points around the circle/ellipse
+Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.
+
+$$n \times n$$ matrix is $$\sqrt{(n+\lambda) \Sigma}$$
+
+## Verify Inverse Unscented Transform**
+
+We verify $$UT^{-1}(\cdot)$$ as claimed
+
+$$
 \sum\limits_{i=0}^{2n} w^ix^i = \frac{\lambda}{n+\lambda}(\mu) + \sum\limits_{i=1}^n  \frac{1}{2(n+\lambda)} \Bigg(\mu + ( \sqrt{(n+\lambda) \Sigma } )_i \Bigg) + \sum\limits_{i=n+1}^{2n} \frac{1}{2(n+\lambda)} \Bigg(\mu +  - ( \sqrt{(n+\lambda) \Sigma })_{i-n} \Bigg)
-\end{equation}
+$$
 
-\begin{equation}
+$$
 = \frac{\lambda}{n+\lambda}(\mu) +  \frac{n}{2(n+\lambda)} \Bigg(\mu  \Bigg) +  \frac{n}{2(n+\lambda)} \Bigg(\mu \Bigg) - \mu
-\end{equation}
+$$
 
-\item Everything also cancels in the $\Sigma$ calculation
+Everything also cancels in the $\Sigma$ calculation
 
 
-\begin{equation}
+$$
 \sum\limits_{i=1}^n \frac{ (\sqrt{n_\lambda})(\sqrt{n_\lambda})}{ (n+\lambda)} (\sqrt{\Sigma}_i) (\sqrt{\Sigma})_i^T = \Sigma
-\end{equation}
+$$
 
 We notice that if $AA^T = B$, then we can decompose $A$ as
 
-\begin{equation}
+$$
 A = \begin{bmatrix}
 | & \cdots & | \\
 a_1 \cdots a_n \\
 | & \cdots & | 
 \end{bmatrix}
-\end{equation}
+$$
 
-then $AA^T$ is
+then $$AA^T$$ is
 
 
-\begin{equation}
+$$
  = \begin{bmatrix}
 | & \cdots & | \\
 a_1 & \cdots  & a_n \\
@@ -119,104 +134,118 @@ a_1 & \cdots  & a_n \\
 -- & \cdots & -- \\
 -- & a_n^T & -- | 
 \end{bmatrix}
-\end{equation}
-\item Inverting the transform is just as simple
-\item We get $a_1 a_1^T + a_2 a_2^T + \cdots + a_n a_n^T$
-\item 
+$$
 
-\begin{equation}
+Inverting the transform is just as simple
+We get $$a_1 a_1^T + a_2 a_2^T + \cdots + a_n a_n^T$$
+
+
+$$
 \sum\limits_{i=1}^n a_i a_i^T = AA^T = B
-\end{equation}
+$$
 
 therefore
 
-\begin{equation}
+$$
 \sum\limits_{i=1}^n (\sqrt{\Sigma})_i (\sqrt{\Sigma})_i^T = (\sqrt{\Sigma}) (\sqrt{\Sigma})^T = \Sigma
-\end{equation}
+$$
 
-\item You might prefer the Cholesky Factorization for numerical versions
-\item Matrix Square Root! Can use SVD or Cholesky Factorization
-\item There are SVD matrix square roots:
-\item (i) $\sqrt{\Sigma} = U \Lambda^{1/2}$
 
-\begin{equation}
+## Matrix Square Roots
+
+You might prefer the Cholesky Factorization for numerical versions
+Matrix Square Root! Can use SVD or Cholesky Factorization
+There are SVD matrix square roots:
+(i) $$\sqrt{\Sigma} = U \Lambda^{1/2}$$
+
+$$
 \sqrt{\Sigma} (\sqrt{\Sigma})^T = U \Lambda^{1/2} (U \Lambda^{1/2})^T = \Sigma
-\end{equation}
+$$
 
-\item Columns of $U$ matrix are principal directions of ellipse. SVD gives you this geometric intution of the points around the semi axes, etc.
-\item 
+Columns of $U$ matrix are principal directions of ellipse. SVD gives you this geometric intution of the points around the semi axes, etc.
+
 (ii)
-\begin{equation}
+
+$$
 \sqrt{\Sigma} = U \Lambda^{1/2} U^T = \Sigma
-\end{equation}
-\item SVD computation takes $O(4n^3)$ time
+$$
 
-\item \textbf{Cholesky Decomposition}:
-\item $M = LU$, where lower triangular times upper triangular
-\item When $M=M^T$, $L = U^T$
-\item Let $M=LL^T$
-\item (iii) $L = \sqrt{\Sigma}$
-\item People prefer cholesky in UKF because it has complexity $O( \frac{1}{6} n^3)$, just a constant savings.
-\item We choose $\sqrt{\Sigma} \sqrt{\Sigma}^T = LL^T = \Sigma$
-\item Zero out successive row elements of your vector, it is not along semi axes, but more along different axis-aligned directions as you zero  out rows
+SVD computation takes $O(4n^3)$ time
 
-\end{itemize}
-\subsection{UKF (Sigma Point Filter)}
-\begin{itemize}
-\item 
-\begin{equation}
+**Cholesky Decomposition**
+$$M = LU$$, where lower triangular times upper triangular
+When $$M=M^T$$, $$L = U^T$$
+Let $$M=LL^T$$
+(iii) $$L = \sqrt{\Sigma}$$
+People prefer cholesky in UKF because it has complexity $$O( \frac{1}{6} n^3)$$, just a constant savings.
+
+We choose $$\sqrt{\Sigma} \sqrt{\Sigma}^T = LL^T = \Sigma$$
+
+Zero out successive row elements of your vector, it is not along semi axes, but more along different axis-aligned directions as you zero  out rows
+
+
+## UKF (Sigma Point Filter)
+
+
+$$
 (\mu, \Sigma) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow predict \rightarrow (\bar{x}^i, \bar{w}^i) \rightarrow UT^{-1}(\cdot) \rightarrow  (\bar{\mu}, \bar{\Sigma}) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow update \rightarrow 
-\end{equation}
-\item \textbf{Predict Step}\\
+$$
 
-$UT(\cdot)$
-\begin{equation}
+**Predict Step**
+
+$$ UT(\cdot) $$
+
+$$
 \begin{aligned}
 x_{t \mid t}^0 = \mu_{t \mid t} \\
 x_{t \mid t}^i = \mu_{t \mid t} + (\sqrt{(n+\lambda) \Sigma_{t \mid t}})_i, i = 1, \dots, n \\
 x_{t \mid t}^i = \mu_{t \mid t} - (\cdots), i = n+1, \dots, 2n \\
 \bar{x}_{t +1 \mid t}^i = f(x_{t \mid t}^i, u_t)
 \end{aligned}
-\end{equation}
+$$
+
 We predict through nonlinear dynamics
 
-\item Now we run $UT^{-1}$
-\begin{equation}
+Now we run $$UT^{-1}$$
+
+$$
 \begin{aligned}
 \mu_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \bar{x}_{t+1 \mid t}^i \\
 \Sigma_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i (\bar{x}_{t+1 \mid t}^i - \mu_{t+1 \mid t})(\bar{x}_{t+1 \mid t}^i - \mu_{t+1 \mid t})^T
 \end{aligned}
-\end{equation}
+$$
 
-\item We recall the Gaussian estimate!
+We recall the Gaussian estimate!
 
-\begin{equation}
+$$
 \begin{aligned}
 \mu_{t \mid t} = \mu + \Sigma_{XY} \Sigma_{YY}^{-1} (y - \hat{y}) \\
 \Sigma_{t \mid t} = \Sigma - \Sigma_{XY} \Sigma_{YY}^{-1} \Sigma_{YX}
 \end{aligned}
-\end{equation}
+$$
 
 
 \item Now the UPDATE step:\\
-We run $UT(\cdot)$\\
-$x_{t +1 \mid t}^0$\\
-$x_{t+1 \mid t}^{2n}$\\
+We run $$UT(\cdot)$$\\
+$$x_{t +1 \mid t}^0$$\\
+$$x_{t+1 \mid t}^{2n}$$\\
 
 Let's build $\hat{y}_{t+1 \mid t}$ and $\Sigma_{t+1 \mid t}^{XY}$, $\Sigma_{t+1 \mid t}^{YY}$
 \item Now
 
-\begin{equation}
+$$
 \hat{y}_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \hat{y}_{t+1 \mid t}^i
-\end{equation}
+$$
+
 which is the expected measurment
 Now,
 
-\begin{equation}
+
+$$
 \begin{aligned}
 \Sigma_{t+1 \mid t}^{YY} = \sum\limits_{i=0}^{2n} w^i (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t}) (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t})^T
 \end{aligned}
-\end{equation}
+$$
 
 Now
 
@@ -241,19 +270,27 @@ We are doing a fitting operation. That is why we have more sigma points than we 
 \end{equation}
 where $y_{t+1}$ is the actual measurement.
 
+## Choosing Lambda
 
+ What is $$\lambda$$? Problem specific.  Consider SVD square root, so that sigma points will be along principal axes.
 
-\item What is $\lambda$? Problem specific.  Consider SVD square root, so that sigma points will be along principal axes.
-\item Suppose we have $x^0$ at the center of the ellipse, and $x^1, \dots, x^4$ lie at each corner of the principal semi-axes
-\item $\lambda$ is the ``confidence-value'' of the error ellipse
-\item If $n+\lambda = 1$, then $x^i = \mu \pm \sqrt{\Sigma}_i$ and each column represents one standard deviation
-\item Standard deviation in each direction. Bigger $\lambda$ is, then the bigger is the ellipse (And vice versa: smaller $\lambda$ gives smaller ellipse)
-\item The size of the ellipse matters because this is what we take as the region about which we create our linearization
-\item UKF is a lineaerization, takes average slope over a neighborhood. But it is not from the Taylor Series Expansion
-\item 
-\item Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborhood about which we fit the Gaussian is determined by  $\lambda$
-\item The smaller $\lambda$ is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)
-\item Interesting value of $\lambda$: $\lambda=2$. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
+Suppose we have $$x^0$$ at the center of the ellipse, and $$x^1, \dots, x^4$$ lie at each corner of the principal semi-axes
+
+$$\lambda$ is the "confidence-value" of the error ellipse
+
+If $$n+\lambda = 1$$, then $$x^i = \mu \pm \sqrt{\Sigma}_i$$ and each column represents one standard deviation
+
+Standard deviation in each direction. Bigger $$\lambda$$ is, then the bigger is the ellipse (And vice versa: smaller $$\lambda$$ gives smaller ellipse)
+
+The size of the ellipse matters because this is what we take as the region about which we create our linearization
+
+UKF is a linearization, takes average slope over a neighborhood. But it is not from the Taylor Series Expansion
+
+Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborhood about which we fit the Gaussian is determined by  $$\lambda$$
+
+The smaller $$\lambda$$ is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)
+
+Interesting value of $$\lambda$$: $$\lambda=2$$. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
 \item Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
 \end{itemize}
 \subsection{PRO version of UKF}
@@ -264,110 +301,140 @@ where $y_{t+1}$ is the actual measurement.
 \lambda = \alpha^2 ( n + k) - n
 \end{equation}
 this gives us two parameters to tune
-\begin{equation}
+
+$$
 x^i = \mu \pm \alpha ( \sqrt{(n+k) \Sigma})_i
-\end{equation}
-where the two parameters are $\alpha,k$
-\item We now have to redefine the weights to be
+$$
 
-\begin{equation}
+where the two parameters are $$\alpha,k$$
+
+We now have to redefine the weights to be
+
+$$
 w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)
-\end{equation}
+$$
+
 where $\beta$ is another parameter                       
-\item Hugh Durrant White, the original paper has this original form
 
-\item How does it work?
-\end{itemize}
-\section{May 10: Particle Filter}
-\begin{itemize}
-\item Algorithm is simple, but expensive to compute (with for loop)
-\item In UKF, samples deterministally extracted
-\item In Particle filter, no assumption about form of distribution, but need many form of them, and probabilistically extracted
-\item \textbf{Main Idea:} Represent a distribution $p(x)$ with a collection of samples from $p(x)$: $x^i \sim p(x), i=1,\dots, N$ i.i.d.
-\item What does it mean to ``represent'' a distribution $p(x)$ with a bunch of particles $\{ x_1, \dots, x_N \}$?
-\item We know that empirical moments are related to true distribution by the law of large number
-\item Recall
+Hugh Durrant White, the original paper has this original form
 
-\begin{equation}
+How does it work?
+
+
+ Algorithm is simple, but expensive to compute (with for loop)
+
+In UKF, samples deterministally extracted
+
+In Particle filter, no assumption about form of distribution, but need many form of them, and probabilistically extracted
+
+**Main Idea:** Represent a distribution $p(x)$ with a collection of samples from $$p(x)$$: $$x^i \sim p(x), i=1,\dots, N$$ i.i.d.
+
+What does it mean to ``represent'' a distribution $$p(x)$$ with a bunch of particles $$\{ x_1, \dots, x_N \}$$?
+
+We know that empirical moments are related to true distribution by the law of large number
+
+Recall
+
+$$
 \begin{array}{lll}
 \mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, & x_i \sim p(x), & i=1,\dots, N, i.i.d
 \end{array}
-\end{equation}
+$$
+
 Then 
-\begin{equation}
+
+$$
 \begin{array}{ll}
 \Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, & x_i \sim p(x)
 \end{array}
-\end{equation}
+$$
+
 Also,
-\begin{equation}
+
+$$
 \mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)
-\end{equation}
+$$
+
 The Law of Large numbers states that
-\begin{equation}
+
+$$
 \frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]
-\end{equation}
-as $N \rightarrow \infty$
-\item 
+$$
+
+as $$N \rightarrow \infty$$
+
 Problem: Given a set of particles 
-\begin{equation}
+
+$$
 \{ x_{t+1 \mid t}^1, \dots, x_{t+1  \mid t}^N \} \sim p(x_{t+1} \mid y_{1:t} )
-\end{equation}
+$$
+
 drawn from the above distribution
-\item 
+
 We recall the update step
-\begin{equation}
+
+$$
 p(x_t \mid y_{1:t} ) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) dx_t }
-\end{equation}
-We have particles from the top right expression, $x_{t \mid t-1}^i \sim p( x_t \mid y_{1:t-1})$
-\item We want to use Bayes Rule so that we can transform our particles so that they approximate the posterior (this will be one step of the Bayesian Filter)
-\item We will use :
+$$
 
-\item $q(x)$ the proposal distribution, the particles are actually from here
+We have particles from the top right expression, $$x_{t \mid t-1}^i \sim p( x_t \mid y_{1:t-1})$$
 
-\item We want them to be from $p(x)$ the target distribution, we wish they were from here
-\item We use Particle Weights
+We want to use Bayes Rule so that we can transform our particles so that they approximate the posterior (this will be one step of the Bayesian Filter)
 
-\begin{equation}
+We will use :
+
+
+$$q(x)$$ the proposal distribution, the particles are actually from here
+
+We want them to be from $p(x)$ the target distribution, we wish they were from here
+
+We use Particle Weights
+
+$$
 \mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx 
-\end{equation}
+$$
 
 
-\begin{equation}
+$$
 \mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]
-\end{equation}
+$$
 
-\item Given $\{x^1, \dots, x^N \}$
-\item New set: $\{ (x^1,w^1), \dots, (x^N,w^N) \}$ where $w^i = w(x^i)$
-\item Now the expectation is
+Given $\{x^1, \dots, x^N \}$
+New set: $\{ (x^1,w^1), \dots, (x^N,w^N) \}$ where $w^i = w(x^i)$
+Now the expectation is
 
-\begin{equation}
+$$
 \mathbbm{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i
-\end{equation}
-and $w(x) = \frac{p(x)}{q(x)}$
-\item If we knew $p,q$, then we would know the weights
-\item But in the filtering setup, we don't know the posterior, the distribution we are trying to hit! But in fact, we don't need the target distribution!
-\item 
+$$
+
+and $$w(x) = \frac{p(x)}{q(x)}$$
+
+If we knew $$p,q$$, then we would know the weights
+But in the filtering setup, we don't know the posterior, the distribution we are trying to hit! But in fact, we don't need the target distribution!
+
 Proposal: What we have
-\begin{equation}
+
+$$
 q(x) = p(x_t \mid y_{1:t-1})
-\end{equation}
-\item 
+$$
+
 Target: What we want
-\begin{equation}
+
+$$
 p(x) = p(x_t \mid y_{1:t})
-\end{equation}
-\item 
+$$
+
 So we get weights:
 
-\begin{equation}
+$$
 w^i = w(x^i) = \frac{ p(x^i) }{ q(x^i) } = \frac{p(x_t^i \mid y_{1:t})^i}{p(x_t^i \mid y_{1:t-1}) }
-\end{equation}
-\item Now, by Bayes Rule, we can say that the PRIOR cancels out, which was the only thing we didn't know???
+$$
 
-\begin{equation}
+Now, by Bayes Rule, we can say that the PRIOR cancels out, which was the only thing we didn't know???
+
+$$
  = \frac{     \frac{p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} \cdots dx_t }     }{ p(x_t \mid y_{1:t-1}) }
-\end{equation}
+$$
 
 When the prior cancels, we get
 
@@ -552,3 +619,18 @@ $$
 Track distribution of the whole TRAJECTORY, given all of the measurements.
 Important for SLAM, because in SLAM we often want to estimate the history of the trajectory of the robot
 \end{itemize}
+
+
+## References
+
+[1] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018. 
+
+[2] SJ Julier, JK Uhlmann, HF Durrant-Whyte. *A new approach for filtering nonlinear systems*. Proceedings of the American Control Conference, June 1995, Volume 3, pages 1628-1632.
+
+[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. *A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators*. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.
+
+
+
+
+
+
