@@ -26,13 +26,8 @@ It is a very surprising result that we can write out the integrals analytically 
 
 Expressions (2) and (3) must be finitely parameterizable. It will take a fair amount of work to derive the analytical formulas of the Bayes' Filter for Gaussian r.v.'s (the Kalman Filter).  We'll first review properties of multivariate Gaussians, then the Woodbury matrix inversion lemmas, intuition behind covariance matrices, and then derive the Kalman Filter.
 
-## Properties of Multivariate Gaussians
 
 ## Woodbury Matrix Inversion Lemmas
-
-## How can we understand a covariance matrix?
-
-Larger covariance means more uncertainty. Isocontours/error ellipses
 
 ## Kalman Filter Derivation
 

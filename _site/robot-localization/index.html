@@ -104,35 +104,74 @@
 
 <p>Navigation in urban environments requires clever solutions because sensors like GPS can’t provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1].</p>
 
+<p>In order for an autonomous robot to stay in a specific lane, it needs to know where the lane is. For an autonomous robot to stay in a lane, the localization requirements are in the order of decimeters [1].</p>
+
 <p>I’ll review some methods from 2007-2018.</p>
+
+<h2 id="building-a-map">Building a Map</h2>
+
+<p>The dominant method is to learn a detailed map of the environment, and then to use a vehicle’s LIDAR sensor to localize relative to this map [1]. In [1], a “map” was a 2-D overhead view of the road surface, taken in the infrared spectrum with 5-cm resolution. This 2-D grid assigns to each x-y location in the environment an infrared reflectivity value. Thus, their ground map is a orthographic infrared photograph of the ground. To acquire such a map, multiple laser range finders are mounted on a vehicle, pointing downwards at the road surface. Obtain range + infrared reflectivity. GraphSLAM is employed to map roads.</p>
+
+<p>To make a map, one has to differentiate between static and dynamic objects. There are two good ways to do this, as described in [1]</p>
+<ul>
+  <li>track or remove objects that move at the time of mapping.</li>
+  <li>reducing the map to features are very likely to be static.</li>
+</ul>
+
+<p>A 2D-world assumption is often not enough. In [2], localization is desired within a multi-level parking garage. They utilize multi-level surface maps to compactly represent such buildings, with a graph-based optimization procedure to establish the consistency of the map. Store surface height and variance <script type="math/tex">\sigma_{ij}^{l}</script> to represent the uncertainty in the height of the surface.</p>
+
+<p>build an accurate map of the environment offline through aligning multiple
+sensor passes over the same area. [9]</p>
+
+<h2 id="online-localization-feature-matching-in-the-map">Online Localization: Feature Matching in the Map</h2>
+
+<p>In the online stage, sensory input must be matched against the HD-map.</p>
+
+<p>In [1], the authors correlate via the Pearson product-moment correlation the measured infrared reflectivity with the map. The importance weight of each particle is a function of the correlation</p>
+
+<script type="math/tex; mode=display">w_t^{[k]} = \mbox{exp}\{ -\frac{1}{2} (x_t^{[k]} − y_t)^T \Gamma_t^{−1} (x_t^{[k]} − y_t)\} \cdot \Bigg( \mbox{corr} \Bigg[ \begin{pmatrix} h_1(m,x_t^{[k]}) \\ \vdots \\ h_{180}(m,x_t^{[k]}) \end{pmatrix}, \begin{pmatrix} z_t^1 \\ \vdots \\ z_t^{180} \end{pmatrix} \Bigg] + 1 \Bigg)</script>
+
+<p>In [2], online localization is performed via the iterative closest points (ICP) algorithm to obtain a maximum likelihood estimate of the robot motion between subsequent observations. Instead of performing ICP on raw 3D point clouds, the ICP is performed on local MLS-maps.</p>
 
 <h2 id="points-planes-poles-gaussian-bars-over-2d-grids-feature-representation-method">Points Planes Poles Gaussian Bars over 2D Grids (Feature representation method)</h2>
 
-<p>particle filter method for correlating LIDAR measurements [1]</p>
+<p>point-to-plane ICP between the raw 3D LiDAR points against the 3D pre-scanned localization prior at 10Hz
+particle filter method for correlating LIDAR measurements [1]</p>
 
 <h2 id="2d-grids">2D grids</h2>
 
 <h2 id="using-deep-learning">Using Deep Learning</h2>
 
-<p>[1] J. Levinson, M. Montemerlo, and S. Thrun. Map-based 929 precision vehicle localization in urban environments. In 930
-Robotics: Science and Systems, volume 4, page 1. Citeseer,</p>
-<ol>
-  <li>1, 2, 5 931</li>
-</ol>
+<p>Barsan <em>et al.</em> are the first to use CNNs on LiDAR orthographic (bird’s-eye-view) images of the ground for the online localization, feature matching step [9].  embeds both LiDAR intensity maps
+and online LiDAR sweeps in a common space where calibration is not required. In this scenario, online localization can be performed by searching exhaustively over 3-DoF poses – 2D position on the map manifold plus rotation. The authors score the quality of pose matches by the cross-correlation between the embeddings.</p>
 
-<p>[2] R. Kummerle, D. Hahnel, D. Dolgov, S. Thrun, and W. Bur- 925 gard. Autonomous driving in a multi-level parking structure. 926 In IEEE International Conference on Robotics and Automa- 927 tion (ICRA), pages 3395–3400, May 2009. 1</p>
+<p>They use a histogram filter, the discretized Bayes’ filter, to perform the search over 3D space. The three grid dimensions are <script type="math/tex">x,y,\theta</script>, and they compute the belief likelihood for every cell in the search space.</p>
 
-<p>[3] J. Levinson and S. Thrun. Robust vehicle localization in 932 urban environments using probabilistic maps. In IEEE In- 933 ternational Conference on Robotics and Automation (ICRA), 934 pages 4372–4378, May 2010. 1, 2, 5, 7</p>
+<p>Barsan <em>et al.</em> generate ground-truth poses 
+Our ground-truth poses are acquired through an expensive high
+precision offline matching procedure with up to several centimeter uncertainty. We rasterize the
+aggregated LiDAR points to create a LiDAR intensity image. Both the online intensity image and
+the intensity map are discretized at a spatial resolution of 5cm covering a 30m×24m region.</p>
 
-<p>[4] R. W. Wolcott and R. M. Eustice. Fast LIDAR localization using multiresolution gaussian mixture maps. In IEEE In- ternational Conference on Robotics and Automation (ICRA), pages 2814–2821, May 2015. 1, 2</p>
+<h2 id="references">References</h2>
 
-<p>[5] R. W. Wolcott and R. M. Eustice. Robust LIDAR local- ization using multiresolution gaussian mixture maps for au- tonomous driving. The International Journal of Robotics Re- search, 36(3):292–319, 2017. 1, 2</p>
+<p>[1] J. Levinson, M. Montemerlo, and S. Thrun. <em>Map-based precision vehicle localization in urban environments</em>. In Robotics: Science and Systems, volume 4, page 1. Citeseer, 2007.</p>
 
-<p>[6] H. Kim, B. Liu, C. Y. Goh, S. Lee, and H. Myung. Robust 920 vehicle localization using entropy-weighted particle filter- 921 based data fusion of vertical and road intensity information 922 for a large scale urban area. IEEE Robotics and Automation 923 Letters, 2(3):1518–1524, July 2017.</p>
+<p>[2] R. Kummerle, D. Hahnel, D. Dolgov, S. Thrun, and W. Burgard. <em>Autonomous driving in a multi-level parking structure</em>. In IEEE International Conference on Robotics and Automation (ICRA), pages 3395–3400, May 2009.</p>
 
-<p>[7] R. Dub, M. G. Gollub, H. Sommer, I. Gilitschenski, R. Sieg- wart, C. Cadena, and J. Nieto. Incremental-segment-based localization in 3-D point clouds. IEEE Robotics and Au- tomation Letters, 3(3):1832–1839, July 2018. 1</p>
+<p>[3] J. Levinson and S. Thrun. <em>Robust vehicle localization in urban environments using probabilistic maps</em>. In IEEE International Conference on Robotics and Automation (ICRA), 934 pages 4372–4378, May 2010.</p>
 
-<p>[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes. In IEEE Inter- national Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.</p>
+<p>[4] R. W. Wolcott and R. M. Eustice. <em>Fast LIDAR localization using multiresolution gaussian mixture maps</em>. In IEEE International Conference on Robotics and Automation (ICRA), pages 2814–2821, May 2015.</p>
+
+<p>[5] R. W. Wolcott and R. M. Eustice. <em>Robust LIDAR localization using multiresolution gaussian mixture maps for autonomous driving</em>. The International Journal of Robotics Research, 36(3):292–319, 2017.</p>
+
+<p>[6] H. Kim, B. Liu, C. Y. Goh, S. Lee, and H. Myung. <em>Robust vehicle localization using entropy-weighted particle filter-based data fusion of vertical and road intensity information for a large scale urban area</em>. IEEE Robotics and Automation 923 Letters, 2(3):1518–1524, July 2017.</p>
+
+<p>[7] R. Dub, M. G. Gollub, H. Sommer, I. Gilitschenski, R. Siegwart, C. Cadena, and J. Nieto. <em>Incremental-segment-based localization in 3-D point clouds</em>. IEEE Robotics and Automation Letters, 3(3):1832–1839, July 2018. 1</p>
+
+<p>[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. <em>Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes</em>. In IEEE International Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.</p>
+
+<p>[9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. <em>Learning to Localize Using a LiDAR Intensity Map</em>. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.</p>
 
 
   </article>

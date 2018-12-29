@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Bayes Filter"
+title:  "What is State Estimation? and the Bayes Filter"
 permalink: /bayes-filter/
-excerpt: "linear dynamical systems, bayes rule, bayesian filtering, estimation ..."
+excerpt: "linear dynamical systems, bayes' rule, bayesian filtering & estimation ..."
 mathjax: true
 date:   2018-12-27 11:00:00
 mathjax: true
@@ -14,8 +14,8 @@ Table of Contents:
 - [Probability Review: The Chain Rule, Marginalization, & Bayes Rule](#probability-review)
 - [Recursive Bayesian Estimation + Conditional Independence](#bayes-estimation)
 - [Graphical Model: The Structure of Variables in the Bayes Filter](#pgm-bayes-filter)
-- [Derivation of the Bayes Filter](#bayes-filter-deriv)
-
+- [Derivation of the Bayes Filter: Predict Step](#bayes-filter-deriv-predict)
+- [Derivation of the Bayes Filter: Update Step](#bayes-filter-deriv-update)
 
 <a name='state-estimation'></a>
 
@@ -116,12 +116,9 @@ $$
 In estimation, the state $$X$$ is static. In filtering, the state $$X$$ is dynamic. We will address the **Bayesian estimation** case first, which can be modeled graphically as Naive Bayes, and **later we'll address the Bayesian filtering** case.
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/naive_bayes.jpg" width="65%">
+  <img src="/assets/naive_bayes.png" width="45%">
   <div class="figcaption">
-    Suppose we have $$Y_1$$ (wet umbrellas), and $$Y_2$$ (wet-ground), which share common parent $$X$$ (it's raining). Get conditional independence
-
-Suppose we have sequence of measurements $$(Y_1,Y_2,\dots, Y_t)$$, revealed
-$$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent given $$X$$.
+Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a static state. Assume Y_1,..., Y_t are conditionally independent given X. This is the Naive Bayes' structure of Bayesian estimation.
   </div>
 </div>
 
@@ -171,7 +168,7 @@ In the recursive Bayes Filter, the prior is just the posterior from the previous
 Now consider a dynamic state $$X_t$$, instead of a static $$X$$. This system can be modeled as a Hidden Markov Model. 
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/bayesian_filter_hmm.jpg" width="65%">
+  <img src="/assets/bayesian_filter_hmm.png" width="65%">
   <div class="figcaption">
     As we move forward in time, the state evolves from $$X_0 \rightarrow X_1 \rightarrow \dots \rightarrow X_t$$
   </div>
@@ -188,9 +185,9 @@ $$ p(x_t \mid x_{1:t-1}, y_{1:t-1}) = p(x_t \mid x_{t-1}) $$
 $$ p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t) $$
 
 
-<a name='bayes-filter-deriv'></a>
+<a name='bayes-filter-deriv-predict'></a>
 
-## Derivation of the Bayes Filter
+## Derivation of the Bayes Filter: Predict Step
 
 Suppose we start with our posterior from the previous timestep, which incorporates all measurements $$y_1,\dots, y_{t-1}$$: Via marginalization, we can rewrite the expression as:
 
@@ -210,6 +207,9 @@ $$
 p(x_{t} \mid y_{1:t-1}) = \int_{x_t-1} p(x_{t} \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1})dx_{t-1}
 $$
 
+<a name='bayes-filter-deriv-update'></a>
+
+## Derivation of the Bayes Filter: Update Step
 
 In what we call the update step, we simply express the posterior using Bayes' Rule:
 
@@ -274,10 +274,10 @@ It turns out that we can write out these integrals analytically for a very speci
 
 ## References
 
-[1] Stephen Boyd and Reza Mahalati. [http://ee263.stanford.edu/lectures/overview.pdf](http://ee263.stanford.edu/lectures/overview.pdf).
+[1] Stephen Boyd and Reza Mahalati. Lecture 1,  Introduction to Linear Dynamical Systems (EE 263). [http://ee263.stanford.edu/lectures/overview.pdf](http://ee263.stanford.edu/lectures/overview.pdf).
 
 [2] Stephen Boyd and Lieven Vandenberghe. *Introduction to Applied Linear Algebra – Vectors, Matrices, and Least Squares*. Cambridge University Press, 2018. [https://web.stanford.edu/~boyd/vmls/vmls.pdf](https://web.stanford.edu/~boyd/vmls/vmls.pdf)
 
-[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation, taught at Stanford University in April-June 2018. 
+[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018. 
 
 

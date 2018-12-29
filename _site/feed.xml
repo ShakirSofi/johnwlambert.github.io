@@ -1,5 +1,298 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-27T22:43:55-08:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-29T02:18:59-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Lie Groups&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#son&quot;&gt;SO(N)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#so2&quot;&gt;SO(2)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#so3&quot;&gt;SO(3)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#se2&quot;&gt;SE(2)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#se3&quot;&gt;SE(3)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#conjugation&quot;&gt;Conjugation in Group Theory&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#lie-algebra&quot;&gt;The Lie Algebra&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;whyliegroups&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;why-do-we-need-lie-groups&quot;&gt;Why do we need Lie Groups?&lt;/h2&gt;
+
+&lt;p&gt;Rigid bodies have a state which consists of position and orientation. When sensors are placed on a rigid body (e.g. a robot), they provide measurements in the body frame. Suppose we wish to take a measurement &lt;script type=&quot;math/tex&quot;&gt;y_b&lt;/script&gt; from the body frame and move it to the world frame, &lt;script type=&quot;math/tex&quot;&gt;y_w&lt;/script&gt;. We can do this via left multiplication with a transformation matrix &lt;script type=&quot;math/tex&quot;&gt;{}^{w}T_{b}&lt;/script&gt;, a member of the matrix Lie groups, that transports the point from one space to another space:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_w = {}^{w}T_{b} y_b&lt;/script&gt;
+
+&lt;p&gt;&lt;a name=&quot;liegroups&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;lie-groups&quot;&gt;Lie Groups&lt;/h2&gt;
+
+&lt;p&gt;When we are working with pure rotations, we work with Special Orthogonal groups, &lt;script type=&quot;math/tex&quot;&gt;SO(\cdot)&lt;/script&gt;. When we are working with a rotation and a translation together, we work with Special Euclidean groups &lt;script type=&quot;math/tex&quot;&gt;SE(\cdot)&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;Lie Groups are unique because they are &lt;strong&gt;both a group and a manifold&lt;/strong&gt;. They are continuous manifolds in high-dimensional spaces, and have a group structure. I’ll describe them in more detail below.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;son&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;son&quot;&gt;SO(N)&lt;/h3&gt;
+
+&lt;p&gt;Membership in the Special Orthogonal Group &lt;script type=&quot;math/tex&quot;&gt;SO(N)&lt;/script&gt; requires two matrix properties:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;script type=&quot;math/tex; mode=display&quot;&gt;R^TR = I&lt;/script&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{det}(R) = +1&lt;/script&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This gives us a very helpful property: &lt;script type=&quot;math/tex&quot;&gt;R^{-1} = R^T&lt;/script&gt;, so the matrix inverse is as simple as taking the transpose.  We will generally work with &lt;script type=&quot;math/tex&quot;&gt;SO(N)&lt;/script&gt;, where &lt;script type=&quot;math/tex&quot;&gt;N=2,3&lt;/script&gt;, meaning the matrices are rotation matrices &lt;script type=&quot;math/tex&quot;&gt;R \in \mathbf{R}^{2 \times 2}&lt;/script&gt; or &lt;script type=&quot;math/tex&quot;&gt;R \in \mathbf{R}^{3 \times 3}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;These rotation matrices &lt;script type=&quot;math/tex&quot;&gt;R&lt;/script&gt; are not commutative.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;so2&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;so2&quot;&gt;SO(2)&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;SO(2)&lt;/script&gt; is a 1D manifold living in a 2D Euclidean space, e.g. moving around a circle.  We will be stuck with singularities if we use 2 numbers to parameterize it, which would mean kinematics break down at certain orientations.&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;SO(2)&lt;/script&gt; is the space of orthogonal matrices that corresponds to rotations in the plane.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;A simple example&lt;/strong&gt;:
+Let’s move from the body frame &lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt; to a target frame &lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P_t = {}^tR_b(\theta) P_o&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{bmatrix}
+5 \mbox{ cos} (\theta) \\
+5 \mbox{ sin} (\theta)
+\end{bmatrix} = \begin{bmatrix} cos(\theta) &amp; -sin(\theta) \\ sin(\theta) &amp; cos(\theta) \end{bmatrix} * \begin{bmatrix} 5 \\ 0 \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;As described in [3], another way to think of this is to consider that a robot can be rotated counterclockwise by some angle &lt;script type=&quot;math/tex&quot;&gt;\theta \in [0,2 \pi)&lt;/script&gt; by mapping every &lt;script type=&quot;math/tex&quot;&gt;(x,y)&lt;/script&gt; as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(x, y) \rightarrow (x \mbox{ cos } \theta − y \mbox{ sin } \theta, x \mbox{ sin } \theta + y \mbox{ cos } \theta).&lt;/script&gt;
+
+&lt;p&gt;&lt;a name=&quot;so3&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;so3&quot;&gt;SO(3)&lt;/h3&gt;
+
+&lt;p&gt;There are several well-known parameterizations of &lt;script type=&quot;math/tex&quot;&gt;R \in SO(3)&lt;/script&gt;:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;(1.) &lt;script type=&quot;math/tex&quot;&gt;R \in \mathbf{R}^{3 \times 3}&lt;/script&gt; full rotation matrix, 9 parameters – there must be 6 constraints&lt;/li&gt;
+  &lt;li&gt;(2.) Euler angles, e.g. &lt;script type=&quot;math/tex&quot;&gt;(\phi, \theta, \psi)&lt;/script&gt;, so 3 parameters&lt;/li&gt;
+  &lt;li&gt;(3.) Angle-Axis parameters &lt;script type=&quot;math/tex&quot;&gt;(\vec{a}, \phi)&lt;/script&gt;, which is 4 parameters and 1 constraint (unit length)&lt;/li&gt;
+  &lt;li&gt;(4.) Quaternions (&lt;script type=&quot;math/tex&quot;&gt;q_0,q_1,q_2,q_3)&lt;/script&gt;, 4 parameters and 1 constraint (unit length)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are only 3 degrees of freedom in describing a rotation. But this object doesn’t live in 3D space. It is a 3D manifold, embedded in a 4-D Euclidean space.&lt;/p&gt;
+
+&lt;p&gt;Parameterizations 1,3,4 are overconstrained, meaning they employ more parameters than we strictly need. With overparameterized representations, we have to do extra work to make sure we satisfy the constraints of the representation.&lt;/p&gt;
+
+&lt;p&gt;As it turns out &lt;script type=&quot;math/tex&quot;&gt;SO(3)&lt;/script&gt; cannot be parameterized by only 3 parameters in a non-singular way.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Euler Angles&lt;/strong&gt;
+One parameterization of &lt;script type=&quot;math/tex&quot;&gt;SO(3)&lt;/script&gt; is to imagine three successive rotations around different axes. The Euler angles encapsulate yaw-pitch-roll: first, a rotation about the z-axis (yaw, &lt;script type=&quot;math/tex&quot;&gt;\psi&lt;/script&gt;). Then, a rotation about the pitch axis by &lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt; (via right-hand rule), and finally we perform a roll by &lt;script type=&quot;math/tex&quot;&gt;\phi&lt;/script&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;/assets/euler_angles.jpg&quot; width=&quot;65%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;
+    The Euler angles.
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The sequence of successive rotations is encapsulated in &lt;script type=&quot;math/tex&quot;&gt;{}^{w}R_b&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;{}^{w}R_b = R_R(\phi) R_P(\theta) R_Y (\psi)&lt;/script&gt;
+
+&lt;p&gt;As outlined in [3], these successive rotations by &lt;script type=&quot;math/tex&quot;&gt;(\phi, \theta, \psi)&lt;/script&gt; are defined by:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+R_{yaw} = R_y (\psi) = \begin{bmatrix}
+\mbox{cos} \psi &amp; -\mbox{sin} \psi  &amp; 0 \\
+\mbox{sin} \psi &amp; \mbox{cos} \psi &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+R_{pitch} = R_p (\theta) = \begin{bmatrix}
+\mbox{cos} \theta &amp; 0 &amp; \mbox{sin} \theta \\
+ 0 &amp; 1 &amp; 0 \\
+ -\mbox{sin} \theta &amp; 0 &amp; \mbox{cos} \theta \\
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+R_{roll} = R_R (\phi) = \begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; \mbox{cos} \phi &amp; -\mbox{sin} \phi \\
+0 &amp; \mbox{sin} \phi &amp;  \mbox{cos} \phi \\
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;You have probably noticed that each rotation matrix &lt;script type=&quot;math/tex&quot;&gt;\in \mathbf{R}^{3 \times 3}&lt;/script&gt; above is a simple extension of the 2D rotation matrix from &lt;script type=&quot;math/tex&quot;&gt;SO(2)&lt;/script&gt;. For example, the yaw matrix &lt;script type=&quot;math/tex&quot;&gt;R_{yaw}&lt;/script&gt; performs a 2D rotation with respect to the &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt; coordinates while leaving the &lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt; coordinate unchanged [3].&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;se2&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;se2&quot;&gt;SE(2)&lt;/h3&gt;
+
+&lt;p&gt;The real space &lt;script type=&quot;math/tex&quot;&gt;SE(2)&lt;/script&gt; are &lt;script type=&quot;math/tex&quot;&gt;3 \times 3&lt;/script&gt; matrices, moving a point in homogenous coordinates to a new frame. It is important to remember that this represents a rotation followed by a translation (not the other way around).&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+T = \begin{bmatrix} x_w \\ y_w \\ 1 \end{bmatrix} = \begin{bmatrix}
+ R_{2 \times 2}&amp; &amp; t_{2 \times 1}  \\
+&amp; \ddots &amp; \vdots  \\
+0 &amp; 0 &amp; 1
+\end{bmatrix} * \begin{bmatrix} x_b \\ y_b \\ 1 \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;By adding an extra dimension to the input points and transformation matrix &lt;script type=&quot;math/tex&quot;&gt;T&lt;/script&gt; the translational part of the transformation is absorbed [3].&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;se3&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;se3&quot;&gt;SE(3)&lt;/h3&gt;
+
+&lt;p&gt;The real space &lt;script type=&quot;math/tex&quot;&gt;SE(3)&lt;/script&gt; are &lt;script type=&quot;math/tex&quot;&gt;4 \times 4&lt;/script&gt; matrices, the real space resembles:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{bmatrix}
+&amp; &amp; &amp; \\
+&amp; R_{3 \times 3} &amp; &amp;  t_{3 \times 1} \\
+&amp; &amp; &amp; \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;&lt;a name=&quot;conjugation&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;conjugation-in-group-theory&quot;&gt;Conjugation in Group Theory&lt;/h2&gt;
+
+&lt;p&gt;Surprisingly, movement in &lt;script type=&quot;math/tex&quot;&gt;SE(2)&lt;/script&gt; can always be achieved by moving somewhere, making a rotation there, and then moving back.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;SE(2) = (\cdot) SO(2) (\cdot)&lt;/script&gt;
+
+&lt;p&gt;If we move to a point by vector movement &lt;script type=&quot;math/tex&quot;&gt;p&lt;/script&gt;, essentially we perform: &lt;script type=&quot;math/tex&quot;&gt;B-p&lt;/script&gt;, then go back with &lt;script type=&quot;math/tex&quot;&gt;p + \dots&lt;/script&gt;.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+B^{\prime} = \begin{bmatrix}
+R &amp; t \\
+0 &amp; 1
+\end{bmatrix}_B = \begin{bmatrix}
+I &amp; p \\
+0 &amp; 1
+\end{bmatrix} \begin{bmatrix}
+R &amp; 0 \\
+0 &amp; 1
+\end{bmatrix} \begin{bmatrix}
+I &amp; -p \\
+0 &amp; 1
+\end{bmatrix}_B %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;&lt;a name=&quot;lie-algebra&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;connecting-spatial-coordinates-and-spatial-velocities-the-lie-algebra&quot;&gt;Connecting Spatial Coordinates and Spatial Velocities: The Lie Algebra&lt;/h2&gt;
+
+&lt;p&gt;The Lie Algebra maps spatial coordinates to spatial velocity.&lt;/p&gt;
+
+&lt;p&gt;In the case of &lt;script type=&quot;math/tex&quot;&gt;SO(3)&lt;/script&gt;, the Lie Algebra is the space of skew-symmetric matrices&lt;/p&gt;
+
+&lt;p&gt;Rigid Body Kinematics: we want a differential equation (ODE) that links &lt;script type=&quot;math/tex&quot;&gt;\vec{\omega}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;{}^{^w}R_b&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;in particular,
+&lt;script type=&quot;math/tex&quot;&gt;{}^{^w} \dot{R}_r = f({}^{^w}R_b, \vec{\omega})&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+\frac{ \partial }{\partial t}(R^R = I)
+ \\
+\dot{R}^TR + R^T \dot{R} = 0 \\
+\dot{R}^TR = -R^T \dot{R} 
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;we define &lt;script type=&quot;math/tex&quot;&gt;\Omega = R^T \dot{R}&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Omega^T = (R^T \dot{R} )^T = \dot{R}^TR  = -R^T \dot{R}  = -\Omega&lt;/script&gt;
+
+&lt;p&gt;Skew-symmetric! $\Omega^T = -\Omega$&lt;/p&gt;
+
+&lt;p&gt;In fact,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\Omega = \begin{bmatrix}
+0 &amp; -\omega_z &amp; \omega_y \\
+\omega_z &amp; 0 &amp; -\omega_x \\
+-\omega_y &amp; \omega_x &amp; 0
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;\vec{\omega} = \begin{bmatrix} \omega_x \\ \omega_y \\ \omega_z \end{bmatrix}&lt;/script&gt; is the angular velocity&lt;/p&gt;
+
+&lt;p&gt;Notation! the “hat” map&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{\omega}^{\hat{}} =\Omega&lt;/script&gt;
+
+&lt;p&gt;the “v” map&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Omega^{v} = \bar{\omega}&lt;/script&gt;
+
+&lt;p&gt;So we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+\dot{R} = R \Omega \\
+\Omega = \bar{\omega}^{\hat{}}
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;\item In terms of frames, we have Poisson’s kinematic equation&lt;/p&gt;
+
+&lt;p&gt;\item The intrinsic equation is (where &lt;script type=&quot;math/tex&quot;&gt;\vec{\omega}_b&lt;/script&gt; in the body frame is $\Omega_b$):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;{}^{^w}\dot{R}_b =  {}^{^w}R_b \Omega_b&lt;/script&gt;
+
+&lt;p&gt;The “strap-down” equation (extrinsic)&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;{}^{^b}\dot{R}_w =  - \Omega_b {}^{^b}R_w&lt;/script&gt;
+
+&lt;p&gt;Take vector on aircraft, put it into the coordinate frame of the world&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+{}_{^w}R_b = \begin{bmatrix} | &amp; | &amp; | \\ {}^{^w} \hat{x}_b &amp; {}^{^w}\hat{y}_b &amp; {}^{^w} \hat{z}_b \\ | &amp; | &amp; |  \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Omega \vec{v}_b = \omega \times \vec{v}_b&lt;/script&gt;
+
+&lt;p&gt;Can we use this for filtering? Can we use &lt;script type=&quot;math/tex&quot;&gt;\dot{R} = R \Omega&lt;/script&gt; directly in an EKF, UKF
+We’d have to turn it into discrete-time 
+Naively, you might do the first order Euler approximation:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{ R_{t + \delta_t} -R_t}{\delta t} \approx R_t \Omega_t&lt;/script&gt;
+
+&lt;p&gt;This does not work!&lt;/p&gt;
+
+&lt;p&gt;You won’t maintain orthogonality! The defining property of &lt;script type=&quot;math/tex&quot;&gt;SO(3)&lt;/script&gt; was orthogonality, so&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;R_{t + \delta t} \not\in SO(3)&lt;/script&gt;
+
+&lt;p&gt;and pretty soon&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+R_{t + \delta t}^T R_{t + \delta t} \neq I \\
+\mbox{det }(R_{t+\delta t}) \neq +1
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;The 3x3 matrix will not be recognizable of a rotation&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Frank Dellaert. Lecture Presentations of MM 8803: Mobile Manipulation, taught at the Georgia Institute of Technology, Fall 2018.&lt;/p&gt;
+
+&lt;p&gt;[2] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.&lt;/p&gt;
+
+&lt;p&gt;[3] Steven M. LaValle. &lt;em&gt;Planning Algorithms&lt;/em&gt;. Cambridge University Press, 2006, New York, NY, USA.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Rigid Body Kinematics and Filtering&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Kinematics with Euler Angles&lt;/p&gt;
+
+&lt;p&gt;\begin{equation}
+\dot{R} = f(R, \vec{w}), (\dot{\phi}, \dot{\theta}, \dot{\psi}) = f(\phi, \theta, \psi, \vec{\omega})
+\end{equation}&lt;/p&gt;
+
+&lt;p&gt;\item&lt;/p&gt;
+
+&lt;p&gt;\begin{equation}
+\vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
+\end{equation}&lt;/p&gt;
+
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -8,7 +301,330 @@
 
 &lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;localization&quot;&gt;Localization&lt;/h2&gt;
+&lt;h2 id=&quot;what-is-a-multivariate-gaussian-random-variable&quot;&gt;What is a multivariate Gaussian random variable?&lt;/h2&gt;
+
+&lt;p&gt;Gaussian R.V.s are parameterized by two quantities:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;X \sim p(x)  = \mathcal{N}(\mu_x, \Sigma_x)&lt;/script&gt;
+
+&lt;p&gt;Preceded by a term for normalization&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(\mu_x, \Sigma_x) = 
+\frac{1}{\sqrt{(2\pi)^n|\Sigma_x|}}\mbox{exp}
+\Bigg\{ -\frac{1}{2} (x - \mu_x)^T \Sigma_x^{-1} (x - \mu_x) \Bigg\}&lt;/script&gt;
+
+&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; is the dimension, i.e. &lt;script type=&quot;math/tex&quot;&gt;X \in \mathbbm{R}^n&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;And of course in the scalar case, we see&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(\mu_x, \sigma_x) =&lt;/script&gt;
+
+&lt;p&gt;Level sets trace out ellipses that are centered at &lt;script type=&quot;math/tex&quot;&gt;\mu_x&lt;/script&gt;, have minor and major axes (in 2D), and ellipsoids in higher dimensions&lt;/p&gt;
+
+&lt;p&gt;Mean:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;E[X] = \int_x x p(x) dx&lt;/script&gt;
+
+&lt;p&gt;need to show&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mu_x = \int_x x \mathcal{N}(\mu_x,\Sigma_x) dx&lt;/script&gt;
+
+&lt;p&gt;Covariance&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;E[(X- \mu_x)(X - \mu_x)^T] = \int_x (x-\mu_x)(x-\mu_x)^T p(x) dx&lt;/script&gt;
+
+&lt;p&gt;need to show&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Sigma_x = \int_x (x- \mu_x) (x-\mu_x)^T \mathcal{N}(\mu_x, \Sigma_x) dx&lt;/script&gt;
+
+&lt;p&gt;Gaussian distribution is a second-order distribution, which does not mean that the higher order moments are zero (not true in general)
+Convert between a standard normal, and any multivariate Gaussian&lt;/p&gt;
+
+&lt;h2 id=&quot;the-standard-normal-distribution&quot;&gt;The Standard Normal Distribution&lt;/h2&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;X_s \sim \mathcal{N}(0, I)&lt;/script&gt;
+
+&lt;p&gt;unit (identity) covariance, so each axis decouples, compute integral over each axis separately&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;How to generate any Gaussian R.V. from standard normal&lt;/strong&gt; $$X_s$?$&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;X = \Sigma_x^{1/2}X_s + \mu_x&lt;/script&gt;
+
+&lt;p&gt;Can obtain by scaling by covariance matrix, and by translating by mean
+Very good for simulating
+With MATLAB, can generate scalar, unit variance, 0 mean Gaussian R.V. with \texttt{randn}
+Call \texttt{randn} $n$ times to populate $X_s$, and them multiply, then add
+And we can compute via Cholesky Decomposition (unique if positive definite)&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Sigma = \Sigma_x^{1/2}(\Sigma_x^{1/2})^T&lt;/script&gt;
+
+&lt;h2 id=&quot;matrix-square-roots&quot;&gt;Matrix Square Roots&lt;/h2&gt;
+
+&lt;p&gt;\item There are other possible matrix square roots
+\item \textbf{How to transform any Gaussian R.V. to the standard normal} $X_s$?
+\item Do so via rearrangement:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+X_s = \Sigma_x^{-1/2}(X - \mu_x), &amp; X \sim \mathcal{N}(\mu_x, \Sigma_x)
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Much easier to integrate over the form on the RHS, not LHS
+Comes from method of derived distributions
+Derived Distributions: Given &lt;script type=&quot;math/tex&quot;&gt;X \sim p(x)&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;Y=f(X)&lt;/script&gt;, find &lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt;
+Here &lt;script type=&quot;math/tex&quot;&gt;X = X_s&lt;/script&gt;, and function &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; is the linear distribution &lt;script type=&quot;math/tex&quot;&gt;AX + b&lt;/script&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;properties-of-multivariate-gaussians&quot;&gt;Properties of Multivariate Gaussians&lt;/h2&gt;
+
+&lt;h2 id=&quot;how-can-we-understand-a-covariance-matrix&quot;&gt;How can we understand a covariance matrix?&lt;/h2&gt;
+
+&lt;p&gt;Larger covariance means more uncertainty. Isocontours/error ellipses&lt;/p&gt;
+
+&lt;p&gt;We set &lt;script type=&quot;math/tex&quot;&gt;P=0.95&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\varepsilon = \frac{1-P}{2 \pi |\Sigma|^{1/2}} = \frac{1-0.95}{2 \pi |\Sigma|^{1/2}} = \frac{0.05}{2 \pi |\Sigma|^{1/2}}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{B}(\varepsilon) = \Big\{ x \mid p(x) \geq \varepsilon \Big\}&lt;/script&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+import numpy as np
+import pdb
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+import scipy
+
+sns.set_style({'font.family': 'Times New Roman'})
+
+def plot_gauss_ellipse(mu, cov, color='g', rad=2, ):
+	&quot;&quot;&quot;
+	Adapted from Piotr Dollar's https://github.com/pdollar/toolbox/
+	Plots a 2D ellipse derived from a 2D Gaussian specified by mu &amp;amp; cov.
+	
+	USAGE:
+		hs = plotGaussEllipses( mus, Cs, [rad] )
+	
+	Args:
+	-	mus: Numpy array of shape (2,), representing mean
+	-	Cs: Numpy array of shape (2,2), representing covariance matrix
+	-	color: string representing Matplotlib color
+	-	rad: [2] Number of std to create the ellipse to
+	
+	Returns:
+	-	None
+	
+	color choices: ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+	&quot;&quot;&quot;
+	cRow, ccol, ra, rb, phi = gauss2ellipse( mu, cov, rad)
+	plotEllipse( cRow, ccol, ra, rb, phi, color)
+
+
+
+def gauss2ellipse(mu, C, rad=2):
+	&quot;&quot;&quot;
+	Adapted from Piotr Dollar's https://github.com/pdollar/toolbox/
+	Creates an ellipse representing the 2D Gaussian distribution.
+	
+	Creates an ellipse representing the 2D Gaussian distribution with mean mu
+	and covariance matrix C.  Returns 5 parameters that specify the ellipse.
+	
+	USAGE
+	 [cRow, cCol, ra, rb, phi] = gauss2ellipse( mu, C, [rad] )
+	
+	Args:
+	-	mu: 1x2 vector representing the center of the ellipse
+	-	C: 2x2 cov matrix
+	-	rad: [2] Number of std to create the ellipse to
+	
+	OUTPUTS
+	-	cRow: the row location of the center of the ellipse
+	-	cCol: the column location of the center of the ellipse
+	-	ra: semi-major axis length (in pixels) of the ellipse
+	-	rb: semi-minor axis length (in pixels) of the ellipse
+	-	phi: rotation angle (radians) of semimajor axis from x-axis
+	
+	EXAMPLE
+	#  [cRow, cCol, ra, rb, phi] = gauss2ellipse( [5 5], [1 0; .5 2] )
+	#  plotEllipse( cRow, cCol, ra, rb, phi );
+	&quot;&quot;&quot;
+	# error check
+	if mu.size != 2 or C.shape != (2,2):
+		print('Works only for 2D Gaussians')
+		quit()
+
+	# decompose using SVD
+	_,D,Rh = np.linalg.svd(C)
+	R = Rh.T
+	normstd = np.sqrt(D)
+
+	# get angle of rotation (in row/column format)
+	phi = np.arccos(R[0,0])
+
+	if R[1,0] &amp;lt; 0:
+		phi = 2*np.pi - phi
+	phi = np.pi/2 - phi
+
+	# get ellipse radii
+	ra = rad * normstd[0]
+	rb = rad * normstd[1]
+
+	# center of ellipse
+	cRow = mu[0]
+	cCol = mu[1]
+
+	return cRow, cCol, ra, rb, phi
+
+
+
+def plotEllipse(cRow,cCol,ra,rb,phi,color='b',nPnts=100,lw=1,ls='-'):
+	&quot;&quot;&quot;
+	Adapted from Piotr Dollar's https://github.com/pdollar/toolbox/
+	Adds an ellipse to the current plot.
+	
+	USAGE:
+	-	h,hc,hl = plotEllipse(cRow,cCol,ra,rb,phi,[color],[nPnts],[lw],[ls])
+	
+	Args:
+	-	cRow: the row location of the center of the ellipse
+	-	cCol: the column location of the center of the ellipse
+	-	ra: semi-major axis radius length (in pixels) of the ellipse
+	-	rb: semi-minor axis radius length (in pixels) of the ellipse
+	-	phi: rotation angle (radians) of semimajor axis from x-axis
+	-	color: ['b'] color for ellipse
+	-	nPnts: [100] number of points used to draw each ellipse
+	-	lw: [1] line width
+	-	ls: ['-'] line style
+
+	Returns:
+	-	h : handle to ellipse
+	-	hc: handle to ellipse center
+	-	hl: handle to ellipse orient
+
+	EXAMPLE:
+		plotEllipse( 3, 2, 1, 5, pi/6, 'g');
+	&quot;&quot;&quot;
+	# plot ellipse (rotate a scaled circle):
+	ts = np.linspace(-np.pi, np.pi, nPnts+1)
+	cts = np.cos(ts)
+	sts = np.sin(ts)
+
+	x = ra * cts * np.cos(-phi) + rb * sts * np.sin(-phi) + cCol
+	y = rb * sts * np.cos(-phi) - ra * cts * np.sin(-phi) + cRow
+	h = plt.plot(x,y, color=color, linewidth=lw, linestyle=ls)
+
+	# plot center point and line indicating orientation
+	hc = plt.plot(cCol, cRow, 'k+', color=color, linewidth=lw, linestyle=ls)
+
+	x = [cCol, cCol+np.cos(-phi)*ra]
+	y = [cRow, cRow-np.sin(-phi)*ra]
+	hl = plt.plot(x, y, color=color, linewidth=lw, linestyle=ls)
+
+	return h,hc,hl
+
+
+def gen_from_distribution():
+
+
+
+	Sigma_sqrt = scipy.linalg.sqrtm(Sigma)
+	Sigma_inv = np.linalg.inv(Sigma)
+	tiled_mu = np.tile(mu,(1000,1)).T
+	samples = np.matmul( Sigma_sqrt, np.random.randn(2,1000) ) + tiled_mu
+	exterior_samples = np.zeros((1,2))
+	interior_samples = np.zeros((1,2))
+
+	for i in range(samples.shape[1]):
+			X = samples[:,i]
+			f_val = 0.5 * np.matmul( np.matmul( (X - mu).T, Sigma_inv), X - mu )
+			if f_val &amp;lt; -np.log(0.05):
+				interior_samples = np.vstack([interior_samples, np.reshape(X,(1,2)) ])
+			else:
+				exterior_samples = np.vstack([exterior_samples, np.reshape(X,(1,2)) ])
+
+	plt.scatter(interior_samples[:,0], interior_samples[:,1], c= 'b')
+	plt.scatter(exterior_samples[:,0], exterior_samples[:,1], c= 'b')
+
+def plot_gauss_ellipse_v2():
+	&quot;&quot;&quot;
+	&quot;&quot;&quot;
+	d = 2 # dimension of samples
+	p = 0.95 # probability
+	num_samples = 1000
+
+	mu = np.array(0,0) # dimension (2,)
+
+	# define covar matrices of dim (2,2)
+	cov_mats[0] = np.array([[1,0],
+							[0,1]])
+	cov_mats[1] = np.array([[2,0],
+							[0,2]])
+	cov_mats[2] = np.array([[0.25, 0.3]
+							[0.3, 1]])
+	cov_mats[3] = np.array([[10., 5]
+							[5., 5]])
+
+	for covar_mat in cov_mats:
+
+
+		# generate and plot 1000 samples
+		generate_gaussian_samples()
+		plt.plot()
+
+		# plot the error ellipse
+		r = np.sqrt(ellipse_const)
+		n_pts = int((2*np.pi) / 0.01)+1
+		theta = np.linspace(0,2*np.pi,n_pts)
+		w1 = r * np.cos(theta)
+		w2 = r * np.sin(theta)
+		w = np.array([w1,w2]).reshape(2,1)
+
+		# transferred back to x coordinates
+		x = scipy.linalg.sqrtm(sigma).dot(w) + mu
+		plt.plot()
+
+
+def unit_test1():
+	&quot;&quot;&quot;
+	&quot;&quot;&quot;
+
+	# plot_gauss_ellipse(mu=np.array([10., 10.]), cov=np.eye(2))
+	# plot_gauss_ellipse(mu=np.array([10., 10.]), cov=np.eye(2)*2.)
+	# plt.show()
+
+	fig()
+
+	plot_gauss_ellipse(mu=np.array([10., 10.]), cov=np.array([[5,0],[0,3]]) )
+	plt.show()
+
+
+
+
+if __name__ == '__main__':
+	unit_test1()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://localhost:4000/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/conjugate-gradients</id><content type="html" xml:base="http://localhost:4000/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/h2&gt;</content><author><name></name></author><summary type="html">Krylov subspaces ...</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;slam&quot;&gt;SLAM&lt;/h2&gt;
+
+&lt;h2 id=&quot;orbslam&quot;&gt;ORBSlam&lt;/h2&gt;
+
+&lt;h2 id=&quot;graphslam&quot;&gt;GraphSLAM&lt;/h2&gt;
 
 &lt;p&gt;SLAM methods [2, 10, 13, 14, 21, 30]&lt;/p&gt;
 
@@ -26,7 +642,9 @@ simultaneous localization and mapping. IEEE Transactions on Robotics,
 
 &lt;p&gt;S. Thrun and M. Montemerlo. The GraphSLAM algorithm with
 applications to large-scale mapping of urban structures. IJRR, 25(5/6),
-2005.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://localhost:4000/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/sfm</id><content type="html" xml:base="http://localhost:4000/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+2005.&lt;/p&gt;
+
+&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://localhost:4000/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/sfm</id><content type="html" xml:base="http://localhost:4000/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -100,7 +718,7 @@ applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 
 &lt;p&gt;[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. &lt;em&gt;Bundle Adjustment — A Modern Synthesis&lt;/em&gt;. &lt;a href=&quot;https://hal.inria.fr/inria-00548290/document&quot;&gt;https://hal.inria.fr/inria-00548290/document&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://localhost:4000/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/particle-filter</id><content type="html" xml:base="http://localhost:4000/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://localhost:4000/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/particle-filter</id><content type="html" xml:base="http://localhost:4000/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -111,7 +729,9 @@ applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 
 &lt;h2 id=&quot;particle-filter&quot;&gt;Particle Filter&lt;/h2&gt;
 
-&lt;p&gt;The &lt;strong&gt;Particle Filter&lt;/strong&gt; is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. It was developed between 1995 and 1996 at Oxford. It is often called the &lt;strong&gt;“Unscented Kalman Filter” (UKF)&lt;/strong&gt; because its creator, Durant-White, thought “it didn’t stink” [ADD REFERENCE].&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;Particle Filter&lt;/strong&gt; is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. This is because it contains no assumptions about the form of the state distribution. It was published in 1995 [2,3] by Simon Julier, Jeffrey Uhlmann, and Hugh Durrant-Whyte at Oxford. It is often called the &lt;strong&gt;“Unscented Kalman Filter” (UKF)&lt;/strong&gt; because the inventors thought “it didn’t stink” like the EKF.&lt;/p&gt;
+
+&lt;p&gt;The main idea is to Represent a distribution &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt; with a collection of samples (particles) from &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt;: &lt;script type=&quot;math/tex&quot;&gt;x^i \sim p(x), i=1,\dots, N&lt;/script&gt; i.i.d. We know that empirical moments are related to true distribution by the Law of Large Numbers. The algorithm is simple, but expensive to compute with a for loop.&lt;/p&gt;
 
 &lt;h2 id=&quot;whats-wrong-with-the-ekf&quot;&gt;What’s Wrong With the EKF?&lt;/h2&gt;
 
@@ -134,179 +754,163 @@ An additional problem with the EKF is that we have no signal to know if we’re 
 
 &lt;p&gt;The “Unscented Transform” is a curve-fitting exercise that converts individual points to a mean and covariance, i.e. &lt;script type=&quot;math/tex&quot;&gt;UT(\mu, \Sigma) = \{ (x^i, w^i) \}_i&lt;/script&gt;. An advantage of the UKF is that it is very easy to propagate these individual points through nonlinearities like non-linear dynamics, whereas it is harder to push &lt;script type=&quot;math/tex&quot;&gt;\mu, \Sigma&lt;/script&gt; through the nonlinearities.&lt;/p&gt;
 
-&lt;p&gt;\item Properties that we want the unscented transform to have 
-\item UT($\cdot$):&lt;br /&gt;
-$(\mu, \Sigma) = { (x^i, w^i) }&lt;em&gt;i$
-\item $UT^{-1}(\cdot)$ &lt;br /&gt;
-$ { (x^i, w^i) }_i = (\mu, \Sigma)$
-\item We want the sample sigma points to share the same mean, covariance
-\begin{equation}
-\mu = \sum\limits&lt;/em&gt;{i=0}^{2n} w^ix^i
-\end{equation}&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Properties that we want the unscented transform to have&lt;/em&gt;
+\item UT(&lt;script type=&quot;math/tex&quot;&gt;\cdot&lt;/script&gt;):&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;(\mu, \Sigma) = \{ (x^i, w^i) \}_i&lt;/script&gt;&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\Sigma = \sum\limits_{i=0}^{2n} w^i (x^i - \mu)(x^i - \mu)^T
-\end{equation}
-They are redundant (an overparameterization of the Gaussian)
-\item We have redundancy for a smoothing effect, since won’t be for a perfect Gaussian
-\item Here is the transform $UT(\cdot)$:&lt;br /&gt;
-$x^0 = \mu$ &lt;br /&gt;
-$x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )&lt;em&gt;i, i = 1, \dots, n$&lt;br /&gt;
-\item This is a matrix square root
-\item The index $i$ is the $i$’th column in the matrix square root
-\item We also have a mirror image set:&lt;br /&gt;
-$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )&lt;/em&gt;{i-n}, i =n+ 1, \dots, 2n$&lt;br /&gt;
-\item Those were the points. The weights themselves:&lt;/p&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;UT^{-1}(\cdot)&lt;/script&gt; &lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;\{ (x^i, w^i) \}_i = (\mu, \Sigma)&lt;/script&gt;
+We want the sample sigma points to share the same mean, covariance&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-w^0 = \frac{\lambda}{n+\lambda}
-\end{equation}&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mu = \sum\limits_{i=0}^{2n} w^ix^i&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
-w^i = \frac{1}{2(n+\lambda)}, i \geq 1
-\end{equation}
-\item Each of these points plot points around the circle/ellipse
-\item Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.
-\item  $n \times n$ matrix is $\sqrt{(n+\lambda) \Sigma}$
-\end{itemize}
-\subsection{Verify Inverse Unscented Transform}
-\begin{itemize}
-\item  We verify $UT^{-1}(\cdot)$ as claimed&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Sigma = \sum\limits_{i=0}^{2n} w^i (x^i - \mu)(x^i - \mu)^T&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
-\sum\limits_{i=0}^{2n} w^ix^i = \frac{\lambda}{n+\lambda}(\mu) + \sum\limits_{i=1}^n  \frac{1}{2(n+\lambda)} \Bigg(\mu + ( \sqrt{(n+\lambda) \Sigma } )&lt;em&gt;i \Bigg) + \sum\limits&lt;/em&gt;{i=n+1}^{2n} \frac{1}{2(n+\lambda)} \Bigg(\mu +  - ( \sqrt{(n+\lambda) \Sigma })_{i-n} \Bigg)
-\end{equation}&lt;/p&gt;
+&lt;p&gt;They are redundant (an overparameterization of the Gaussian)&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-= \frac{\lambda}{n+\lambda}(\mu) +  \frac{n}{2(n+\lambda)} \Bigg(\mu  \Bigg) +  \frac{n}{2(n+\lambda)} \Bigg(\mu \Bigg) - \mu
-\end{equation}&lt;/p&gt;
+&lt;p&gt;We have redundancy for a smoothing effect, since won’t be for a perfect Gaussian&lt;/p&gt;
 
-&lt;p&gt;\item Everything also cancels in the $\Sigma$ calculation&lt;/p&gt;
+&lt;p&gt;Here is the transform &lt;script type=&quot;math/tex&quot;&gt;UT(\cdot)&lt;/script&gt;:&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;x^0 = \mu&lt;/script&gt; &lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )_i, i = 1, \dots, n&lt;/script&gt;\&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\sum\limits_{i=1}^n \frac{ (\sqrt{n_\lambda})(\sqrt{n_\lambda})}{ (n+\lambda)} (\sqrt{\Sigma}_i) (\sqrt{\Sigma})_i^T = \Sigma
-\end{equation}&lt;/p&gt;
+&lt;p&gt;This is a matrix square root&lt;/p&gt;
+
+&lt;p&gt;The index $i$ is the &lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;‘th column in the matrix square root&lt;/p&gt;
+
+&lt;p&gt;We also have a mirror image set:&lt;br /&gt;
+$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$\&lt;/p&gt;
+
+&lt;p&gt;Those were the points. The weights themselves:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w^0 = \frac{\lambda}{n+\lambda}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w^i = \frac{1}{2(n+\lambda)}, i \geq 1&lt;/script&gt;
+
+&lt;p&gt;Each of these points plot points around the circle/ellipse
+Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;n \times n&lt;/script&gt; matrix is &lt;script type=&quot;math/tex&quot;&gt;\sqrt{(n+\lambda) \Sigma}&lt;/script&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;verify-inverse-unscented-transform&quot;&gt;Verify Inverse Unscented Transform**&lt;/h2&gt;
+
+&lt;p&gt;We verify &lt;script type=&quot;math/tex&quot;&gt;UT^{-1}(\cdot)&lt;/script&gt; as claimed&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=0}^{2n} w^ix^i = \frac{\lambda}{n+\lambda}(\mu) + \sum\limits_{i=1}^n  \frac{1}{2(n+\lambda)} \Bigg(\mu + ( \sqrt{(n+\lambda) \Sigma } )_i \Bigg) + \sum\limits_{i=n+1}^{2n} \frac{1}{2(n+\lambda)} \Bigg(\mu +  - ( \sqrt{(n+\lambda) \Sigma })_{i-n} \Bigg)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \frac{\lambda}{n+\lambda}(\mu) +  \frac{n}{2(n+\lambda)} \Bigg(\mu  \Bigg) +  \frac{n}{2(n+\lambda)} \Bigg(\mu \Bigg) - \mu&lt;/script&gt;
+
+&lt;p&gt;Everything also cancels in the $\Sigma$ calculation&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n \frac{ (\sqrt{n_\lambda})(\sqrt{n_\lambda})}{ (n+\lambda)} (\sqrt{\Sigma}_i) (\sqrt{\Sigma})_i^T = \Sigma&lt;/script&gt;
 
 &lt;p&gt;We notice that if $AA^T = B$, then we can decompose $A$ as&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 A = \begin{bmatrix}
-| &amp;amp; \cdots &amp;amp; | &lt;br /&gt;
-a_1 \cdots a_n &lt;br /&gt;
-| &amp;amp; \cdots &amp;amp; | 
-\end{bmatrix}
-\end{equation}&lt;/p&gt;
+| &amp; \cdots &amp; | \\
+a_1 \cdots a_n \\
+| &amp; \cdots &amp; | 
+\end{bmatrix} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;then $AA^T$ is&lt;/p&gt;
+&lt;p&gt;then &lt;script type=&quot;math/tex&quot;&gt;AA^T&lt;/script&gt; is&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
- = \begin{bmatrix}
-| &amp;amp; \cdots &amp;amp; | &lt;br /&gt;
-a_1 &amp;amp; \cdots  &amp;amp; a_n &lt;br /&gt;
-| &amp;amp; \cdots &amp;amp; | 
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+= \begin{bmatrix}
+| &amp; \cdots &amp; | \\
+a_1 &amp; \cdots  &amp; a_n \\
+| &amp; \cdots &amp; | 
 \end{bmatrix}
 \begin{bmatrix}
-– &amp;amp; a_1^T &amp;amp; – &lt;br /&gt;
-– &amp;amp; \cdots &amp;amp; – &lt;br /&gt;
-– &amp;amp; a_n^T &amp;amp; – | 
-\end{bmatrix}
-\end{equation}
-\item Inverting the transform is just as simple
-\item We get $a_1 a_1^T + a_2 a_2^T + \cdots + a_n a_n^T$
-\item&lt;/p&gt;
+-- &amp; a_1^T &amp; -- \\
+-- &amp; \cdots &amp; -- \\
+-- &amp; a_n^T &amp; -- | 
+\end{bmatrix} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
-\sum\limits_{i=1}^n a_i a_i^T = AA^T = B
-\end{equation}&lt;/p&gt;
+&lt;p&gt;Inverting the transform is just as simple
+We get &lt;script type=&quot;math/tex&quot;&gt;a_1 a_1^T + a_2 a_2^T + \cdots + a_n a_n^T&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n a_i a_i^T = AA^T = B&lt;/script&gt;
 
 &lt;p&gt;therefore&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\sum\limits_{i=1}^n (\sqrt{\Sigma})_i (\sqrt{\Sigma})_i^T = (\sqrt{\Sigma}) (\sqrt{\Sigma})^T = \Sigma
-\end{equation}&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n (\sqrt{\Sigma})_i (\sqrt{\Sigma})_i^T = (\sqrt{\Sigma}) (\sqrt{\Sigma})^T = \Sigma&lt;/script&gt;
 
-&lt;p&gt;\item You might prefer the Cholesky Factorization for numerical versions
-\item Matrix Square Root! Can use SVD or Cholesky Factorization
-\item There are SVD matrix square roots:
-\item (i) $\sqrt{\Sigma} = U \Lambda^{1/2}$&lt;/p&gt;
+&lt;h2 id=&quot;matrix-square-roots&quot;&gt;Matrix Square Roots&lt;/h2&gt;
 
-&lt;p&gt;\begin{equation}
-\sqrt{\Sigma} (\sqrt{\Sigma})^T = U \Lambda^{1/2} (U \Lambda^{1/2})^T = \Sigma
-\end{equation}&lt;/p&gt;
+&lt;p&gt;You might prefer the Cholesky Factorization for numerical versions
+Matrix Square Root! Can use SVD or Cholesky Factorization
+There are SVD matrix square roots:
+(i) &lt;script type=&quot;math/tex&quot;&gt;\sqrt{\Sigma} = U \Lambda^{1/2}&lt;/script&gt;&lt;/p&gt;
 
-&lt;p&gt;\item Columns of $U$ matrix are principal directions of ellipse. SVD gives you this geometric intution of the points around the semi axes, etc.
-\item 
-(ii)
-\begin{equation}
-\sqrt{\Sigma} = U \Lambda^{1/2} U^T = \Sigma
-\end{equation}
-\item SVD computation takes $O(4n^3)$ time&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sqrt{\Sigma} (\sqrt{\Sigma})^T = U \Lambda^{1/2} (U \Lambda^{1/2})^T = \Sigma&lt;/script&gt;
 
-&lt;p&gt;\item \textbf{Cholesky Decomposition}:
-\item $M = LU$, where lower triangular times upper triangular
-\item When $M=M^T$, $L = U^T$
-\item Let $M=LL^T$
-\item (iii) $L = \sqrt{\Sigma}$
-\item People prefer cholesky in UKF because it has complexity $O( \frac{1}{6} n^3)$, just a constant savings.
-\item We choose $\sqrt{\Sigma} \sqrt{\Sigma}^T = LL^T = \Sigma$
-\item Zero out successive row elements of your vector, it is not along semi axes, but more along different axis-aligned directions as you zero  out rows&lt;/p&gt;
+&lt;p&gt;Columns of $U$ matrix are principal directions of ellipse. SVD gives you this geometric intution of the points around the semi axes, etc.&lt;/p&gt;
 
-&lt;p&gt;\end{itemize}
-\subsection{UKF (Sigma Point Filter)}
-\begin{itemize}
-\item 
-\begin{equation}
-(\mu, \Sigma) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow predict \rightarrow (\bar{x}^i, \bar{w}^i) \rightarrow UT^{-1}(\cdot) \rightarrow  (\bar{\mu}, \bar{\Sigma}) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow update \rightarrow 
-\end{equation}
-\item \textbf{Predict Step}\&lt;/p&gt;
+&lt;p&gt;(ii)&lt;/p&gt;
 
-&lt;p&gt;$UT(\cdot)$
-\begin{equation}
-\begin{aligned}
-x_{t \mid t}^0 = \mu_{t \mid t} &lt;br /&gt;
-x_{t \mid t}^i = \mu_{t \mid t} + (\sqrt{(n+\lambda) \Sigma_{t \mid t}})&lt;em&gt;i, i = 1, \dots, n &lt;br /&gt;
-x&lt;/em&gt;{t \mid t}^i = \mu_{t \mid t} - (\cdots), i = n+1, \dots, 2n &lt;br /&gt;
-\bar{x}&lt;em&gt;{t +1 \mid t}^i = f(x&lt;/em&gt;{t \mid t}^i, u_t)
-\end{aligned}
-\end{equation}
-We predict through nonlinear dynamics&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sqrt{\Sigma} = U \Lambda^{1/2} U^T = \Sigma&lt;/script&gt;
 
-&lt;p&gt;\item Now we run $UT^{-1}$
-\begin{equation}
-\begin{aligned}
-\mu_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \bar{x}&lt;em&gt;{t+1 \mid t}^i &lt;br /&gt;
-\Sigma&lt;/em&gt;{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i (\bar{x}&lt;em&gt;{t+1 \mid t}^i - \mu&lt;/em&gt;{t+1 \mid t})(\bar{x}&lt;em&gt;{t+1 \mid t}^i - \mu&lt;/em&gt;{t+1 \mid t})^T
-\end{aligned}
-\end{equation}&lt;/p&gt;
+&lt;p&gt;SVD computation takes $O(4n^3)$ time&lt;/p&gt;
 
-&lt;p&gt;\item We recall the Gaussian estimate!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cholesky Decomposition&lt;/strong&gt;
+&lt;script type=&quot;math/tex&quot;&gt;M = LU&lt;/script&gt;, where lower triangular times upper triangular
+When &lt;script type=&quot;math/tex&quot;&gt;M=M^T&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;L = U^T&lt;/script&gt;
+Let &lt;script type=&quot;math/tex&quot;&gt;M=LL^T&lt;/script&gt;
+(iii) &lt;script type=&quot;math/tex&quot;&gt;L = \sqrt{\Sigma}&lt;/script&gt;
+People prefer cholesky in UKF because it has complexity &lt;script type=&quot;math/tex&quot;&gt;O( \frac{1}{6} n^3)&lt;/script&gt;, just a constant savings.&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\begin{aligned}
-\mu_{t \mid t} = \mu + \Sigma_{XY} \Sigma_{YY}^{-1} (y - \hat{y}) &lt;br /&gt;
+&lt;p&gt;We choose &lt;script type=&quot;math/tex&quot;&gt;\sqrt{\Sigma} \sqrt{\Sigma}^T = LL^T = \Sigma&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Zero out successive row elements of your vector, it is not along semi axes, but more along different axis-aligned directions as you zero  out rows&lt;/p&gt;
+
+&lt;h2 id=&quot;ukf-sigma-point-filter&quot;&gt;UKF (Sigma Point Filter)&lt;/h2&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(\mu, \Sigma) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow predict \rightarrow (\bar{x}^i, \bar{w}^i) \rightarrow UT^{-1}(\cdot) \rightarrow  (\bar{\mu}, \bar{\Sigma}) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow update \rightarrow&lt;/script&gt;
+
+&lt;p&gt;&lt;strong&gt;Predict Step&lt;/strong&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;UT(\cdot)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+x_{t \mid t}^0 = \mu_{t \mid t} \\
+x_{t \mid t}^i = \mu_{t \mid t} + (\sqrt{(n+\lambda) \Sigma_{t \mid t}})_i, i = 1, \dots, n \\
+x_{t \mid t}^i = \mu_{t \mid t} - (\cdots), i = n+1, \dots, 2n \\
+\bar{x}_{t +1 \mid t}^i = f(x_{t \mid t}^i, u_t)
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;We predict through nonlinear dynamics&lt;/p&gt;
+
+&lt;p&gt;Now we run &lt;script type=&quot;math/tex&quot;&gt;UT^{-1}&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+\mu_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \bar{x}_{t+1 \mid t}^i \\
+\Sigma_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i (\bar{x}_{t+1 \mid t}^i - \mu_{t+1 \mid t})(\bar{x}_{t+1 \mid t}^i - \mu_{t+1 \mid t})^T
+\end{aligned}&lt;/script&gt;
+
+&lt;p&gt;We recall the Gaussian estimate!&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+\mu_{t \mid t} = \mu + \Sigma_{XY} \Sigma_{YY}^{-1} (y - \hat{y}) \\
 \Sigma_{t \mid t} = \Sigma - \Sigma_{XY} \Sigma_{YY}^{-1} \Sigma_{YX}
-\end{aligned}
-\end{equation}&lt;/p&gt;
+\end{aligned}&lt;/script&gt;
 
 &lt;p&gt;\item Now the UPDATE step:&lt;br /&gt;
-We run $UT(\cdot)$&lt;br /&gt;
-$x_{t +1 \mid t}^0$&lt;br /&gt;
-$x_{t+1 \mid t}^{2n}$\&lt;/p&gt;
+We run &lt;script type=&quot;math/tex&quot;&gt;UT(\cdot)&lt;/script&gt;&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;x_{t +1 \mid t}^0&lt;/script&gt;&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;x_{t+1 \mid t}^{2n}&lt;/script&gt;\&lt;/p&gt;
 
 &lt;p&gt;Let’s build $\hat{y}&lt;em&gt;{t+1 \mid t}$ and $\Sigma&lt;/em&gt;{t+1 \mid t}^{XY}$, $\Sigma_{t+1 \mid t}^{YY}$
 \item Now&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\hat{y}&lt;em&gt;{t+1 \mid t} = \sum\limits&lt;/em&gt;{i=0}^{2n} w^i \hat{y}_{t+1 \mid t}^i
-\end{equation}
-which is the expected measurment
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{y}_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \hat{y}_{t+1 \mid t}^i&lt;/script&gt;
+
+&lt;p&gt;which is the expected measurment
 Now,&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\begin{aligned}
-\Sigma_{t+1 \mid t}^{YY} = \sum\limits_{i=0}^{2n} w^i (\hat{y}&lt;em&gt;{t+1 \mid t}^i - \hat{y}&lt;/em&gt;{t+1 \mid t}) (\hat{y}&lt;em&gt;{t+1 \mid t}^i - \hat{y}&lt;/em&gt;{t+1 \mid t})^T
-\end{aligned}
-\end{equation}&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
+\Sigma_{t+1 \mid t}^{YY} = \sum\limits_{i=0}^{2n} w^i (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t}) (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t})^T
+\end{aligned}&lt;/script&gt;
 
 &lt;p&gt;Now&lt;/p&gt;
 
@@ -327,17 +931,27 @@ Now,&lt;/p&gt;
 \end{equation}
 where $y&lt;/em&gt;{t+1}$ is the actual measurement.&lt;/p&gt;
 
-&lt;p&gt;\item What is $\lambda$? Problem specific.  Consider SVD square root, so that sigma points will be along principal axes.
-\item Suppose we have $x^0$ at the center of the ellipse, and $x^1, \dots, x^4$ lie at each corner of the principal semi-axes
-\item $\lambda$ is the ``confidence-value’’ of the error ellipse
-\item If $n+\lambda = 1$, then $x^i = \mu \pm \sqrt{\Sigma}_i$ and each column represents one standard deviation
-\item Standard deviation in each direction. Bigger $\lambda$ is, then the bigger is the ellipse (And vice versa: smaller $\lambda$ gives smaller ellipse)
-\item The size of the ellipse matters because this is what we take as the region about which we create our linearization
-\item UKF is a lineaerization, takes average slope over a neighborhood. But it is not from the Taylor Series Expansion
-\item 
-\item Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborhood about which we fit the Gaussian is determined by  $\lambda$
-\item The smaller $\lambda$ is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)
-\item Interesting value of $\lambda$: $\lambda=2$. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
+&lt;h2 id=&quot;choosing-lambda&quot;&gt;Choosing Lambda&lt;/h2&gt;
+
+&lt;p&gt;What is &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;? Problem specific.  Consider SVD square root, so that sigma points will be along principal axes.&lt;/p&gt;
+
+&lt;p&gt;Suppose we have &lt;script type=&quot;math/tex&quot;&gt;x^0&lt;/script&gt; at the center of the ellipse, and &lt;script type=&quot;math/tex&quot;&gt;x^1, \dots, x^4&lt;/script&gt; lie at each corner of the principal semi-axes&lt;/p&gt;
+
+&lt;p&gt;$$\lambda$ is the “confidence-value” of the error ellipse&lt;/p&gt;
+
+&lt;p&gt;If &lt;script type=&quot;math/tex&quot;&gt;n+\lambda = 1&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;x^i = \mu \pm \sqrt{\Sigma}_i&lt;/script&gt; and each column represents one standard deviation&lt;/p&gt;
+
+&lt;p&gt;Standard deviation in each direction. Bigger &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; is, then the bigger is the ellipse (And vice versa: smaller &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; gives smaller ellipse)&lt;/p&gt;
+
+&lt;p&gt;The size of the ellipse matters because this is what we take as the region about which we create our linearization&lt;/p&gt;
+
+&lt;p&gt;UKF is a linearization, takes average slope over a neighborhood. But it is not from the Taylor Series Expansion&lt;/p&gt;
+
+&lt;p&gt;Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborhood about which we fit the Gaussian is determined by  &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;The smaller &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)&lt;/p&gt;
+
+&lt;p&gt;Interesting value of &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;: &lt;script type=&quot;math/tex&quot;&gt;\lambda=2&lt;/script&gt;. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
 \item Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
 \end{itemize}
 \subsection{PRO version of UKF}
@@ -347,110 +961,110 @@ where $y&lt;/em&gt;{t+1}$ is the actual measurement.&lt;/p&gt;
 &lt;p&gt;\begin{equation}
 \lambda = \alpha^2 ( n + k) - n
 \end{equation}
-this gives us two parameters to tune
-\begin{equation}
-x^i = \mu \pm \alpha ( \sqrt{(n+k) \Sigma})_i
-\end{equation}
-where the two parameters are $\alpha,k$
-\item We now have to redefine the weights to be&lt;/p&gt;
+this gives us two parameters to tune&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)
-\end{equation}
-where $\beta$ is another parameter                     &lt;br /&gt;
-\item Hugh Durrant White, the original paper has this original form&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x^i = \mu \pm \alpha ( \sqrt{(n+k) \Sigma})_i&lt;/script&gt;
 
-&lt;p&gt;\item How does it work?
-\end{itemize}
-\section{May 10: Particle Filter}
-\begin{itemize}
-\item Algorithm is simple, but expensive to compute (with for loop)
-\item In UKF, samples deterministally extracted
-\item In Particle filter, no assumption about form of distribution, but need many form of them, and probabilistically extracted
-\item \textbf{Main Idea:} Represent a distribution $p(x)$ with a collection of samples from $p(x)$: $x^i \sim p(x), i=1,\dots, N$ i.i.d.
-\item What does it mean to ``represent’’ a distribution $p(x)$ with a bunch of particles ${ x_1, \dots, x_N }$?
-\item We know that empirical moments are related to true distribution by the law of large number
-\item Recall&lt;/p&gt;
+&lt;p&gt;where the two parameters are &lt;script type=&quot;math/tex&quot;&gt;\alpha,k&lt;/script&gt;&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
+&lt;p&gt;We now have to redefine the weights to be&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)&lt;/script&gt;
+
+&lt;p&gt;where $\beta$ is another parameter&lt;/p&gt;
+
+&lt;p&gt;Hugh Durrant White, the original paper has this original form&lt;/p&gt;
+
+&lt;p&gt;How does it work?&lt;/p&gt;
+
+&lt;p&gt;Algorithm is simple, but expensive to compute (with for loop)&lt;/p&gt;
+
+&lt;p&gt;In UKF, samples deterministally extracted&lt;/p&gt;
+
+&lt;p&gt;In Particle filter, no assumption about form of distribution, but need many form of them, and probabilistically extracted&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Main Idea:&lt;/strong&gt; Represent a distribution $p(x)$ with a collection of samples from &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt;: &lt;script type=&quot;math/tex&quot;&gt;x^i \sim p(x), i=1,\dots, N&lt;/script&gt; i.i.d.&lt;/p&gt;
+
+&lt;p&gt;What does it mean to ``represent’’ a distribution &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt; with a bunch of particles &lt;script type=&quot;math/tex&quot;&gt;\{ x_1, \dots, x_N \}&lt;/script&gt;?&lt;/p&gt;
+
+&lt;p&gt;We know that empirical moments are related to true distribution by the law of large number&lt;/p&gt;
+
+&lt;p&gt;Recall&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{array}{lll}
-\mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, &amp;amp; x_i \sim p(x), &amp;amp; i=1,\dots, N, i.i.d
-\end{array}
-\end{equation}
-Then 
-\begin{equation}
+\mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, &amp; x_i \sim p(x), &amp; i=1,\dots, N, i.i.d
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Then&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{array}{ll}
-\Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, &amp;amp; x_i \sim p(x)
-\end{array}
-\end{equation}
-Also,
-\begin{equation}
-\mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)
-\end{equation}
-The Law of Large numbers states that
-\begin{equation}
-\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]
-\end{equation}
-as $N \rightarrow \infty$
-\item 
-Problem: Given a set of particles 
-\begin{equation}
-{ x_{t+1 \mid t}^1, \dots, x_{t+1  \mid t}^N } \sim p(x_{t+1} \mid y_{1:t} )
-\end{equation}
-drawn from the above distribution
-\item 
-We recall the update step
-\begin{equation}
-p(x_t \mid y_{1:t} ) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) dx_t }
-\end{equation}
-We have particles from the top right expression, $x_{t \mid t-1}^i \sim p( x_t \mid y_{1:t-1})$
-\item We want to use Bayes Rule so that we can transform our particles so that they approximate the posterior (this will be one step of the Bayesian Filter)
-\item We will use :&lt;/p&gt;
+\Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, &amp; x_i \sim p(x)
+\end{array} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;\item $q(x)$ the proposal distribution, the particles are actually from here&lt;/p&gt;
+&lt;p&gt;Also,&lt;/p&gt;
 
-&lt;p&gt;\item We want them to be from $p(x)$ the target distribution, we wish they were from here
-\item We use Particle Weights&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
-\mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx 
-\end{equation}&lt;/p&gt;
+&lt;p&gt;The Law of Large numbers states that&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]
-\end{equation}&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]&lt;/script&gt;
 
-&lt;p&gt;\item Given ${x^1, \dots, x^N }$
-\item New set: ${ (x^1,w^1), \dots, (x^N,w^N) }$ where $w^i = w(x^i)$
-\item Now the expectation is&lt;/p&gt;
+&lt;p&gt;as &lt;script type=&quot;math/tex&quot;&gt;N \rightarrow \infty&lt;/script&gt;&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-\mathbbm{E}&lt;em&gt;p[f(X)] \approx \frac{1}{N} \sum\limits&lt;/em&gt;{i=1}^N f(x^i) w^i
-\end{equation}
-and $w(x) = \frac{p(x)}{q(x)}$
-\item If we knew $p,q$, then we would know the weights
-\item But in the filtering setup, we don’t know the posterior, the distribution we are trying to hit! But in fact, we don’t need the target distribution!
-\item 
-Proposal: What we have
-\begin{equation}
-q(x) = p(x_t \mid y_{1:t-1})
-\end{equation}
-\item 
-Target: What we want
-\begin{equation}
-p(x) = p(x_t \mid y_{1:t})
-\end{equation}
-\item 
-So we get weights:&lt;/p&gt;
+&lt;p&gt;Problem: Given a set of particles&lt;/p&gt;
 
-&lt;p&gt;\begin{equation}
-w^i = w(x^i) = \frac{ p(x^i) }{ q(x^i) } = \frac{p(x_t^i \mid y_{1:t})^i}{p(x_t^i \mid y_{1:t-1}) }
-\end{equation}
-\item Now, by Bayes Rule, we can say that the PRIOR cancels out, which was the only thing we didn’t know???&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ x_{t+1 \mid t}^1, \dots, x_{t+1  \mid t}^N \} \sim p(x_{t+1} \mid y_{1:t} )&lt;/script&gt;
 
-&lt;p&gt;\begin{equation}
- = \frac{     \frac{p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} \cdots dx_t }     }{ p(x_t \mid y_{1:t-1}) }
-\end{equation}&lt;/p&gt;
+&lt;p&gt;drawn from the above distribution&lt;/p&gt;
+
+&lt;p&gt;We recall the update step&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid y_{1:t} ) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) dx_t }&lt;/script&gt;
+
+&lt;p&gt;We have particles from the top right expression, &lt;script type=&quot;math/tex&quot;&gt;x_{t \mid t-1}^i \sim p( x_t \mid y_{1:t-1})&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;We want to use Bayes Rule so that we can transform our particles so that they approximate the posterior (this will be one step of the Bayesian Filter)&lt;/p&gt;
+
+&lt;p&gt;We will use :&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;q(x)&lt;/script&gt; the proposal distribution, the particles are actually from here&lt;/p&gt;
+
+&lt;p&gt;We want them to be from $p(x)$ the target distribution, we wish they were from here&lt;/p&gt;
+
+&lt;p&gt;We use Particle Weights&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]&lt;/script&gt;
+
+&lt;p&gt;Given ${x^1, \dots, x^N }$
+New set: ${ (x^1,w^1), \dots, (x^N,w^N) }$ where $w^i = w(x^i)$
+Now the expectation is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i&lt;/script&gt;
+
+&lt;p&gt;and &lt;script type=&quot;math/tex&quot;&gt;w(x) = \frac{p(x)}{q(x)}&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;If we knew &lt;script type=&quot;math/tex&quot;&gt;p,q&lt;/script&gt;, then we would know the weights
+But in the filtering setup, we don’t know the posterior, the distribution we are trying to hit! But in fact, we don’t need the target distribution!&lt;/p&gt;
+
+&lt;p&gt;Proposal: What we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;q(x) = p(x_t \mid y_{1:t-1})&lt;/script&gt;
+
+&lt;p&gt;Target: What we want&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x) = p(x_t \mid y_{1:t})&lt;/script&gt;
+
+&lt;p&gt;So we get weights:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w^i = w(x^i) = \frac{ p(x^i) }{ q(x^i) } = \frac{p(x_t^i \mid y_{1:t})^i}{p(x_t^i \mid y_{1:t-1}) }&lt;/script&gt;
+
+&lt;p&gt;Now, by Bayes Rule, we can say that the PRIOR cancels out, which was the only thing we didn’t know???&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \frac{     \frac{p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} \cdots dx_t }     }{ p(x_t \mid y_{1:t-1}) }&lt;/script&gt;
 
 &lt;p&gt;When the prior cancels, we get&lt;/p&gt;
 
@@ -589,7 +1203,15 @@ PF tracks approximates the posterior of the trajectory instead&lt;/p&gt;
 
 &lt;p&gt;Track distribution of the whole TRAJECTORY, given all of the measurements.
 Important for SLAM, because in SLAM we often want to estimate the history of the trajectory of the robot
-\end{itemize}&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry><entry><title type="html">Robot Localization</title><link href="http://localhost:4000/robot-localization/" rel="alternate" type="text/html" title="Robot Localization" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/localization</id><content type="html" xml:base="http://localhost:4000/robot-localization/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+\end{itemize}&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.&lt;/p&gt;
+
+&lt;p&gt;[2] SJ Julier, JK Uhlmann, HF Durrant-Whyte. &lt;em&gt;A new approach for filtering nonlinear systems&lt;/em&gt;. Proceedings of the American Control Conference, June 1995, Volume 3, pages 1628-1632.&lt;/p&gt;
+
+&lt;p&gt;[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. &lt;em&gt;A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators&lt;/em&gt;. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry><entry><title type="html">Robot Localization</title><link href="http://localhost:4000/robot-localization/" rel="alternate" type="text/html" title="Robot Localization" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/localization</id><content type="html" xml:base="http://localhost:4000/robot-localization/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -602,35 +1224,74 @@ Important for SLAM, because in SLAM we often want to estimate the history of the
 
 &lt;p&gt;Navigation in urban environments requires clever solutions because sensors like GPS can’t provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1].&lt;/p&gt;
 
+&lt;p&gt;In order for an autonomous robot to stay in a specific lane, it needs to know where the lane is. For an autonomous robot to stay in a lane, the localization requirements are in the order of decimeters [1].&lt;/p&gt;
+
 &lt;p&gt;I’ll review some methods from 2007-2018.&lt;/p&gt;
+
+&lt;h2 id=&quot;building-a-map&quot;&gt;Building a Map&lt;/h2&gt;
+
+&lt;p&gt;The dominant method is to learn a detailed map of the environment, and then to use a vehicle’s LIDAR sensor to localize relative to this map [1]. In [1], a “map” was a 2-D overhead view of the road surface, taken in the infrared spectrum with 5-cm resolution. This 2-D grid assigns to each x-y location in the environment an infrared reflectivity value. Thus, their ground map is a orthographic infrared photograph of the ground. To acquire such a map, multiple laser range finders are mounted on a vehicle, pointing downwards at the road surface. Obtain range + infrared reflectivity. GraphSLAM is employed to map roads.&lt;/p&gt;
+
+&lt;p&gt;To make a map, one has to differentiate between static and dynamic objects. There are two good ways to do this, as described in [1]&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;track or remove objects that move at the time of mapping.&lt;/li&gt;
+  &lt;li&gt;reducing the map to features are very likely to be static.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A 2D-world assumption is often not enough. In [2], localization is desired within a multi-level parking garage. They utilize multi-level surface maps to compactly represent such buildings, with a graph-based optimization procedure to establish the consistency of the map. Store surface height and variance &lt;script type=&quot;math/tex&quot;&gt;\sigma_{ij}^{l}&lt;/script&gt; to represent the uncertainty in the height of the surface.&lt;/p&gt;
+
+&lt;p&gt;build an accurate map of the environment offline through aligning multiple
+sensor passes over the same area. [9]&lt;/p&gt;
+
+&lt;h2 id=&quot;online-localization-feature-matching-in-the-map&quot;&gt;Online Localization: Feature Matching in the Map&lt;/h2&gt;
+
+&lt;p&gt;In the online stage, sensory input must be matched against the HD-map.&lt;/p&gt;
+
+&lt;p&gt;In [1], the authors correlate via the Pearson product-moment correlation the measured infrared reflectivity with the map. The importance weight of each particle is a function of the correlation&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_t^{[k]} = \mbox{exp}\{ -\frac{1}{2} (x_t^{[k]} − y_t)^T \Gamma_t^{−1} (x_t^{[k]} − y_t)\} \cdot \Bigg( \mbox{corr} \Bigg[ \begin{pmatrix} h_1(m,x_t^{[k]}) \\ \vdots \\ h_{180}(m,x_t^{[k]}) \end{pmatrix}, \begin{pmatrix} z_t^1 \\ \vdots \\ z_t^{180} \end{pmatrix} \Bigg] + 1 \Bigg)&lt;/script&gt;
+
+&lt;p&gt;In [2], online localization is performed via the iterative closest points (ICP) algorithm to obtain a maximum likelihood estimate of the robot motion between subsequent observations. Instead of performing ICP on raw 3D point clouds, the ICP is performed on local MLS-maps.&lt;/p&gt;
 
 &lt;h2 id=&quot;points-planes-poles-gaussian-bars-over-2d-grids-feature-representation-method&quot;&gt;Points Planes Poles Gaussian Bars over 2D Grids (Feature representation method)&lt;/h2&gt;
 
-&lt;p&gt;particle filter method for correlating LIDAR measurements [1]&lt;/p&gt;
+&lt;p&gt;point-to-plane ICP between the raw 3D LiDAR points against the 3D pre-scanned localization prior at 10Hz
+particle filter method for correlating LIDAR measurements [1]&lt;/p&gt;
 
 &lt;h2 id=&quot;2d-grids&quot;&gt;2D grids&lt;/h2&gt;
 
 &lt;h2 id=&quot;using-deep-learning&quot;&gt;Using Deep Learning&lt;/h2&gt;
 
-&lt;p&gt;[1] J. Levinson, M. Montemerlo, and S. Thrun. Map-based 929 precision vehicle localization in urban environments. In 930
-Robotics: Science and Systems, volume 4, page 1. Citeseer,&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;1, 2, 5 931&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;Barsan &lt;em&gt;et al.&lt;/em&gt; are the first to use CNNs on LiDAR orthographic (bird’s-eye-view) images of the ground for the online localization, feature matching step [9].  embeds both LiDAR intensity maps
+and online LiDAR sweeps in a common space where calibration is not required. In this scenario, online localization can be performed by searching exhaustively over 3-DoF poses – 2D position on the map manifold plus rotation. The authors score the quality of pose matches by the cross-correlation between the embeddings.&lt;/p&gt;
 
-&lt;p&gt;[2] R. Kummerle, D. Hahnel, D. Dolgov, S. Thrun, and W. Bur- 925 gard. Autonomous driving in a multi-level parking structure. 926 In IEEE International Conference on Robotics and Automa- 927 tion (ICRA), pages 3395–3400, May 2009. 1&lt;/p&gt;
+&lt;p&gt;They use a histogram filter, the discretized Bayes’ filter, to perform the search over 3D space. The three grid dimensions are &lt;script type=&quot;math/tex&quot;&gt;x,y,\theta&lt;/script&gt;, and they compute the belief likelihood for every cell in the search space.&lt;/p&gt;
 
-&lt;p&gt;[3] J. Levinson and S. Thrun. Robust vehicle localization in 932 urban environments using probabilistic maps. In IEEE In- 933 ternational Conference on Robotics and Automation (ICRA), 934 pages 4372–4378, May 2010. 1, 2, 5, 7&lt;/p&gt;
+&lt;p&gt;Barsan &lt;em&gt;et al.&lt;/em&gt; generate ground-truth poses 
+Our ground-truth poses are acquired through an expensive high
+precision offline matching procedure with up to several centimeter uncertainty. We rasterize the
+aggregated LiDAR points to create a LiDAR intensity image. Both the online intensity image and
+the intensity map are discretized at a spatial resolution of 5cm covering a 30m×24m region.&lt;/p&gt;
 
-&lt;p&gt;[4] R. W. Wolcott and R. M. Eustice. Fast LIDAR localization using multiresolution gaussian mixture maps. In IEEE In- ternational Conference on Robotics and Automation (ICRA), pages 2814–2821, May 2015. 1, 2&lt;/p&gt;
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[5] R. W. Wolcott and R. M. Eustice. Robust LIDAR local- ization using multiresolution gaussian mixture maps for au- tonomous driving. The International Journal of Robotics Re- search, 36(3):292–319, 2017. 1, 2&lt;/p&gt;
+&lt;p&gt;[1] J. Levinson, M. Montemerlo, and S. Thrun. &lt;em&gt;Map-based precision vehicle localization in urban environments&lt;/em&gt;. In Robotics: Science and Systems, volume 4, page 1. Citeseer, 2007.&lt;/p&gt;
 
-&lt;p&gt;[6] H. Kim, B. Liu, C. Y. Goh, S. Lee, and H. Myung. Robust 920 vehicle localization using entropy-weighted particle filter- 921 based data fusion of vertical and road intensity information 922 for a large scale urban area. IEEE Robotics and Automation 923 Letters, 2(3):1518–1524, July 2017.&lt;/p&gt;
+&lt;p&gt;[2] R. Kummerle, D. Hahnel, D. Dolgov, S. Thrun, and W. Burgard. &lt;em&gt;Autonomous driving in a multi-level parking structure&lt;/em&gt;. In IEEE International Conference on Robotics and Automation (ICRA), pages 3395–3400, May 2009.&lt;/p&gt;
 
-&lt;p&gt;[7] R. Dub, M. G. Gollub, H. Sommer, I. Gilitschenski, R. Sieg- wart, C. Cadena, and J. Nieto. Incremental-segment-based localization in 3-D point clouds. IEEE Robotics and Au- tomation Letters, 3(3):1832–1839, July 2018. 1&lt;/p&gt;
+&lt;p&gt;[3] J. Levinson and S. Thrun. &lt;em&gt;Robust vehicle localization in urban environments using probabilistic maps&lt;/em&gt;. In IEEE International Conference on Robotics and Automation (ICRA), 934 pages 4372–4378, May 2010.&lt;/p&gt;
 
-&lt;p&gt;[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes. In IEEE Inter- national Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">ICP, grid histograms, ...</summary></entry><entry><title type="html">The Kalman Filter</title><link href="http://localhost:4000/kalman-filter/" rel="alternate" type="text/html" title="The Kalman Filter" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/kalman-filter</id><content type="html" xml:base="http://localhost:4000/kalman-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[4] R. W. Wolcott and R. M. Eustice. &lt;em&gt;Fast LIDAR localization using multiresolution gaussian mixture maps&lt;/em&gt;. In IEEE International Conference on Robotics and Automation (ICRA), pages 2814–2821, May 2015.&lt;/p&gt;
+
+&lt;p&gt;[5] R. W. Wolcott and R. M. Eustice. &lt;em&gt;Robust LIDAR localization using multiresolution gaussian mixture maps for autonomous driving&lt;/em&gt;. The International Journal of Robotics Research, 36(3):292–319, 2017.&lt;/p&gt;
+
+&lt;p&gt;[6] H. Kim, B. Liu, C. Y. Goh, S. Lee, and H. Myung. &lt;em&gt;Robust vehicle localization using entropy-weighted particle filter-based data fusion of vertical and road intensity information for a large scale urban area&lt;/em&gt;. IEEE Robotics and Automation 923 Letters, 2(3):1518–1524, July 2017.&lt;/p&gt;
+
+&lt;p&gt;[7] R. Dub, M. G. Gollub, H. Sommer, I. Gilitschenski, R. Siegwart, C. Cadena, and J. Nieto. &lt;em&gt;Incremental-segment-based localization in 3-D point clouds&lt;/em&gt;. IEEE Robotics and Automation Letters, 3(3):1832–1839, July 2018. 1&lt;/p&gt;
+
+&lt;p&gt;[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. &lt;em&gt;Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes&lt;/em&gt;. In IEEE International Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.&lt;/p&gt;
+
+&lt;p&gt;[9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. &lt;em&gt;Learning to Localize Using a LiDAR Intensity Map&lt;/em&gt;. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">ICP, grid histograms, ...</summary></entry><entry><title type="html">The Kalman Filter</title><link href="http://localhost:4000/kalman-filter/" rel="alternate" type="text/html" title="The Kalman Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/kalman-filter</id><content type="html" xml:base="http://localhost:4000/kalman-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -652,13 +1313,7 @@ Robotics: Science and Systems, volume 4, page 1. Citeseer,&lt;/p&gt;
 
 &lt;p&gt;Expressions (2) and (3) must be finitely parameterizable. It will take a fair amount of work to derive the analytical formulas of the Bayes’ Filter for Gaussian r.v.’s (the Kalman Filter).  We’ll first review properties of multivariate Gaussians, then the Woodbury matrix inversion lemmas, intuition behind covariance matrices, and then derive the Kalman Filter.&lt;/p&gt;
 
-&lt;h2 id=&quot;properties-of-multivariate-gaussians&quot;&gt;Properties of Multivariate Gaussians&lt;/h2&gt;
-
 &lt;h2 id=&quot;woodbury-matrix-inversion-lemmas&quot;&gt;Woodbury Matrix Inversion Lemmas&lt;/h2&gt;
-
-&lt;h2 id=&quot;how-can-we-understand-a-covariance-matrix&quot;&gt;How can we understand a covariance matrix?&lt;/h2&gt;
-
-&lt;p&gt;Larger covariance means more uncertainty. Isocontours/error ellipses&lt;/p&gt;
 
 &lt;h2 id=&quot;kalman-filter-derivation&quot;&gt;Kalman Filter Derivation&lt;/h2&gt;
 
@@ -678,14 +1333,15 @@ x_{t+1} = Ax_t + B u_t + w_t, &amp;amp; w_t \sim \mathcal{N}(0,Q) &lt;br /&gt;
 y_t = Cx_t + Du_t + v_t, &amp;amp; v_t \sim \mathcal{N}(O, R)
 \end{array}
 \end{equation}
-where $w_t, v_t$ are zero-mean white noise&lt;/p&gt;</content><author><name></name></author><summary type="html">Multivariate Gaussians, ...</summary></entry><entry><title type="html">Bayes Filter</title><link href="http://localhost:4000/bayes-filter/" rel="alternate" type="text/html" title="Bayes Filter" /><published>2018-12-27T03:00:00-08:00</published><updated>2018-12-27T03:00:00-08:00</updated><id>http://localhost:4000/bayes-filter</id><content type="html" xml:base="http://localhost:4000/bayes-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+where $w_t, v_t$ are zero-mean white noise&lt;/p&gt;</content><author><name></name></author><summary type="html">Multivariate Gaussians, ...</summary></entry><entry><title type="html">What is State Estimation? and the Bayes Filter</title><link href="http://localhost:4000/bayes-filter/" rel="alternate" type="text/html" title="What is State Estimation? and the Bayes Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/bayes-filter</id><content type="html" xml:base="http://localhost:4000/bayes-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#state-estimation&quot;&gt;What is State Estimation?&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#dt-lds&quot;&gt;Discrete-time Linear Dynamical Systems&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#probability-review&quot;&gt;Probability Review: The Chain Rule, Marginalization, &amp;amp; Bayes Rule&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#bayes-estimation&quot;&gt;Recursive Bayesian Estimation + Conditional Independence&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pgm-bayes-filter&quot;&gt;Graphical Model: The Structure of Variables in the Bayes Filter&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bayes-filter-deriv&quot;&gt;Derivation of the Bayes Filter&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bayes-filter-deriv-predict&quot;&gt;Derivation of the Bayes Filter: Predict Step&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bayes-filter-deriv-update&quot;&gt;Derivation of the Bayes Filter: Update Step&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;a name=&quot;state-estimation&quot;&gt;&lt;/a&gt;&lt;/p&gt;
@@ -772,12 +1428,9 @@ By marginalization of &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; f
 &lt;p&gt;In estimation, the state &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; is static. In filtering, the state &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; is dynamic. We will address the &lt;strong&gt;Bayesian estimation&lt;/strong&gt; case first, which can be modeled graphically as Naive Bayes, and &lt;strong&gt;later we’ll address the Bayesian filtering&lt;/strong&gt; case.&lt;/p&gt;
 
 &lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
-  &lt;img src=&quot;/assets/naive_bayes.jpg&quot; width=&quot;65%&quot; /&gt;
+  &lt;img src=&quot;/assets/naive_bayes.png&quot; width=&quot;45%&quot; /&gt;
   &lt;div class=&quot;figcaption&quot;&gt;
-    Suppose we have $$Y_1$$ (wet umbrellas), and $$Y_2$$ (wet-ground), which share common parent $$X$$ (it's raining). Get conditional independence
-
-Suppose we have sequence of measurements $$(Y_1,Y_2,\dots, Y_t)$$, revealed
-$$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent given $$X$$.
+Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a static state. Assume Y_1,..., Y_t are conditionally independent given X. This is the Naive Bayes' structure of Bayesian estimation.
   &lt;/div&gt;
 &lt;/div&gt;
 
@@ -814,7 +1467,7 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 &lt;p&gt;Now consider a dynamic state &lt;script type=&quot;math/tex&quot;&gt;X_t&lt;/script&gt;, instead of a static &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt;. This system can be modeled as a Hidden Markov Model.&lt;/p&gt;
 
 &lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
-  &lt;img src=&quot;/assets/bayesian_filter_hmm.jpg&quot; width=&quot;65%&quot; /&gt;
+  &lt;img src=&quot;/assets/bayesian_filter_hmm.png&quot; width=&quot;65%&quot; /&gt;
   &lt;div class=&quot;figcaption&quot;&gt;
     As we move forward in time, the state evolves from $$X_0 \rightarrow X_1 \rightarrow \dots \rightarrow X_t$$
   &lt;/div&gt;
@@ -830,9 +1483,9 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t)&lt;/script&gt;
 
-&lt;p&gt;&lt;a name=&quot;bayes-filter-deriv&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a name=&quot;bayes-filter-deriv-predict&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;derivation-of-the-bayes-filter&quot;&gt;Derivation of the Bayes Filter&lt;/h2&gt;
+&lt;h2 id=&quot;derivation-of-the-bayes-filter-predict-step&quot;&gt;Derivation of the Bayes Filter: Predict Step&lt;/h2&gt;
 
 &lt;p&gt;Suppose we start with our posterior from the previous timestep, which incorporates all measurements &lt;script type=&quot;math/tex&quot;&gt;y_1,\dots, y_{t-1}&lt;/script&gt;: Via marginalization, we can rewrite the expression as:&lt;/p&gt;
 
@@ -845,6 +1498,10 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 &lt;p&gt;By Markovianity, we can simplify the expression above, giving us &lt;strong&gt;the Predict Step&lt;/strong&gt;:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t-1}) = \int_{x_t-1} p(x_{t} \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1})dx_{t-1}&lt;/script&gt;
+
+&lt;p&gt;&lt;a name=&quot;bayes-filter-deriv-update&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;derivation-of-the-bayes-filter-update-step&quot;&gt;Derivation of the Bayes Filter: Update Step&lt;/h2&gt;
 
 &lt;p&gt;In what we call the update step, we simply express the posterior using Bayes’ Rule:&lt;/p&gt;
 
@@ -888,11 +1545,11 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Stephen Boyd and Reza Mahalati. &lt;a href=&quot;http://ee263.stanford.edu/lectures/overview.pdf&quot;&gt;http://ee263.stanford.edu/lectures/overview.pdf&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;[1] Stephen Boyd and Reza Mahalati. Lecture 1,  Introduction to Linear Dynamical Systems (EE 263). &lt;a href=&quot;http://ee263.stanford.edu/lectures/overview.pdf&quot;&gt;http://ee263.stanford.edu/lectures/overview.pdf&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;[2] Stephen Boyd and Lieven Vandenberghe. &lt;em&gt;Introduction to Applied Linear Algebra – Vectors, Matrices, and Least Squares&lt;/em&gt;. Cambridge University Press, 2018. &lt;a href=&quot;https://web.stanford.edu/~boyd/vmls/vmls.pdf&quot;&gt;https://web.stanford.edu/~boyd/vmls/vmls.pdf&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation, taught at Stanford University in April-June 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">linear dynamical systems, bayes rule, bayesian filtering, estimation ...</summary></entry><entry><title type="html">Iterative Closest Point</title><link href="http://localhost:4000/icp/" rel="alternate" type="text/html" title="Iterative Closest Point" /><published>2018-11-29T03:00:00-08:00</published><updated>2018-11-29T03:00:00-08:00</updated><id>http://localhost:4000/icp</id><content type="html" xml:base="http://localhost:4000/icp/">&lt;h2 id=&quot;the-3d-registration-problem&quot;&gt;The 3D Registration Problem&lt;/h2&gt;
+&lt;p&gt;[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">linear dynamical systems, bayes' rule, bayesian filtering &amp; estimation ...</summary></entry><entry><title type="html">Iterative Closest Point</title><link href="http://localhost:4000/icp/" rel="alternate" type="text/html" title="Iterative Closest Point" /><published>2018-11-29T06:00:00-05:00</published><updated>2018-11-29T06:00:00-05:00</updated><id>http://localhost:4000/icp</id><content type="html" xml:base="http://localhost:4000/icp/">&lt;h2 id=&quot;the-3d-registration-problem&quot;&gt;The 3D Registration Problem&lt;/h2&gt;
 &lt;p&gt;Given two shapes A and B which partially overlap&lt;/p&gt;
 
 &lt;p&gt;Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B&lt;/p&gt;
@@ -1028,634 +1685,4 @@ $$X$$ is a static state. Assume $$Y_1,\dots, Y_t$$ are conditionally independent
 
 &lt;p&gt;[3] Shinji Umeyama. Least-squares estimation of transformation parameters between two point patterns”, PAMI 1991. &lt;a href=&quot;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&quot;&gt;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. &lt;a href=&quot;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&quot;&gt;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry><entry><title type="html">Piazza Answers</title><link href="http://localhost:4000/2018/11/28/piazza-answers.html" rel="alternate" type="text/html" title="Piazza Answers" /><published>2018-11-28T00:00:00-08:00</published><updated>2018-11-28T00:00:00-08:00</updated><id>http://localhost:4000/2018/11/28/piazza-answers</id><content type="html" xml:base="http://localhost:4000/2018/11/28/piazza-answers.html">&lt;h2 id=&quot;visualizing-cnns-via-deconvolution&quot;&gt;Visualizing CNNs via deconvolution&lt;/h2&gt;
-
-&lt;p&gt;It concerns slide 4 in this presentation.
-http://places.csail.mit.edu/slide_iclr2015.pdf&lt;/p&gt;
-
-&lt;p&gt;I’m having a hard time understanding the deconvolution part of the slide.&lt;/p&gt;
-
-&lt;p&gt;Great question. You can see a presentation from Matt Zeiler on the method here: https://www.youtube.com/watch?v=ghEmQSxT6tw. He summarizes his method from about minutes 8:40-20:00 in the presentation.&lt;/p&gt;
-
-&lt;p&gt;Suppose there is some layer you want to visualize. Zeiler feeds in 50,000 ImageNet images through a learned convnet, and gets the activation at that layer for all of the images. Then they feed in the highest activations into their deconvolutional network.&lt;/p&gt;
-
-&lt;p&gt;Their inverse network needs to make max pooling and convolution reversible. So they use unpooling and deconvolution to go backwards. This is how they can visualize individual layers.&lt;/p&gt;
-
-&lt;h2 id=&quot;backprop-per-layer-equations&quot;&gt;Backprop per-layer equations&lt;/h2&gt;
-
-&lt;p&gt;I would expect the quiz to include content from the lecture slides and what was discussed in lecture. Professor Hays didn’t go into detail how to perform backprop through every single layer, so I wouldn’t expect a detailed derivation for each layer. You can find the slides on backprop here.&lt;/p&gt;
-
-&lt;p&gt;https://www.cc.gatech.edu/~hays/compvision/lectures/20.pdf&lt;/p&gt;
-
-&lt;p&gt;If you’re interested in digging deeper into the equations, some basic intuition for derivatives can be found &lt;a href=&quot;http://cs231n.github.io/optimization-2/&quot;&gt;here&lt;/a&gt; and &lt;a href=&quot;http://cs231n.stanford.edu/slides/2018/cs231n_2018_lecture04.pdf&quot;&gt;here&lt;/a&gt;. The chain rules binds together the derivatives of each layer. For two simple examples, the (sub)gradient of a max of two arguments is 1 for the larger argument, 0 for the smaller argument. The derivative for the addition of two arguments is 1 with respect to each argument.&lt;/p&gt;
-
-&lt;h2 id=&quot;fc-vs-conv2d-maxpool-linear&quot;&gt;FC vs. CONV2D MAXPOOL LINEAR&lt;/h2&gt;
-
-&lt;p&gt;what are the reasons for not using fully connected layers and using conv2d+maxpool+linear layer combinations ? Is it only because the number in fully connected layers are very large for image processing to prohibits from learning the weights fast enough ? #vvm&lt;/p&gt;
-
-&lt;p&gt;John Lambert
- John Lambert 18 hours ago We use convolutions and hierarchies of processing steps since we showed earlier in the course that this is the most effective way to work with image (gridded data).&lt;/p&gt;
-
-&lt;p&gt;We don’t use fully-connected layers at every step because there would be way to many learnable parameters to learn without overfitting, and the memory size would be enormous. The fully-connected layers act as the classifier on top of the automatically-learned features.&lt;/p&gt;
-
-&lt;p&gt;From CS 231N at Stanford:
-http://cs231n.github.io/convolutional-networks/&lt;/p&gt;
-
-&lt;p&gt;Regular Neural Nets. …Neural Networks receive an input (a single vector), and transform it through a series of hidden layers. Each hidden layer is made up of a set of neurons, where each neuron is fully connected to all neurons in the previous layer, and where neurons in a single layer function completely independently and do not share any connections. The last fully-connected layer is called the “output layer” and in classification settings it represents the class scores.&lt;/p&gt;
-
-&lt;p&gt;Regular Neural Nets don’t scale well to full images. In CIFAR-10, images are only of size 32x32x3 (32 wide, 32 high, 3 color channels), so a single fully-connected neuron in a first hidden layer of a regular Neural Network would have 32&lt;em&gt;32&lt;/em&gt;3 = 3072 weights. This amount still seems manageable, but clearly this fully-connected structure does not scale to larger images. For example, an image of more respectable size, e.g. 200x200x3, would lead to neurons that have 200&lt;em&gt;200&lt;/em&gt;3 = 120,000 weights. Moreover, we would almost certainly want to have several such neurons, so the parameters would add up quickly! Clearly, this full connectivity is wasteful and the huge number of parameters would quickly lead to overfitting.&lt;/p&gt;
-
-&lt;p&gt;3D volumes of neurons. Convolutional Neural Networks take advantage of the fact that the input consists of images and they constrain the architecture in a more sensible way. In particular, unlike a regular Neural Network, the layers of a ConvNet have neurons arranged in 3 dimensions: width, height, depth. (Note that the word depthhere refers to the third dimension of an activation volume, not to the depth of a full Neural Network, which can refer to the total number of layers in a network.) For example, the input images in CIFAR-10 are an input volume of activations, and the volume has dimensions 32x32x3 (width, height, depth respectively). As we will soon see, the neurons in a layer will only be connected to a small region of the layer before it, instead of all of the neurons in a fully-connected manner. Moreover, the final output layer would for CIFAR-10 have dimensions 1x1x10, because by the end of the ConvNet architecture we will reduce the full image into a single vector of class scores, arranged along the depth dimension.&lt;/p&gt;
-
-&lt;h2 id=&quot;why-does-batch-norm-help&quot;&gt;Why does Batch Norm help?&lt;/h2&gt;
-&lt;p&gt;John: (adding this) I wouldn’t expect batch norm to help by 15% on the simple network. Maybe by about 4% on the SimpleNet. Are you confounding the influence of normalization, more layers, data augmentation, and dropout with the influence of batch norm?&lt;/p&gt;
-
-&lt;p&gt;If you train your network to learn a mapping from X-&amp;gt;Y, and then the distribution of X changes, then you might need to retrain your network so that it can understand the changed distribution of X. (Suppose you go learned to classify black cats, and then suddenly you need to classify colored cats, example here).
-https://www.youtube.com/watch?v=nUUqwaxLnWs&lt;/p&gt;
-
-&lt;p&gt;Batch Norm speeds up learning. This is because it reduces the amount that the distribution of hidden values moves around. This is often called “reducing internal covariate shift”.  Since all the layers are linked, if the first layer changes, then every other layer was dependent on those values being similar to before (not suddenly huge or small).&lt;/p&gt;
-
-&lt;p&gt;General ideas why Batch Norm helps:&lt;/p&gt;
-
-&lt;p&gt;Improves gradient flow through the network (want variance=1 in your layers, avoid exponentially vanishing or exploding dynamics in both the forward and the backward pass)
-Allows higher learning rates
-Reduces the strong dependence on initialization
-Acts as a form of regularization because it adds a bit of noise to training (uses statistics from random mini-batches to normalize) and it slightly reduces the need for dropout&lt;/p&gt;
-
-&lt;p&gt;https://arxiv.org/pdf/1805.11604.pdf
-Others say that BatchNorm makes the optimization landscape significantly smoother. They theorize that it reduces the Lipschitz constant of the loss function, meaning the loss changes at a smaller rate and the magnitudes of the gradients are smaller too.
-https://en.wikipedia.org/wiki/Lipschitz_continuity&lt;/p&gt;
-
-&lt;p&gt;https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf
-In the AlexNet paper, the authors mentioned that local response normalization aids generalization, meaning that the network can accurately understand new examples.&lt;/p&gt;
-
-&lt;h2 id=&quot;where-to-add-dropout&quot;&gt;Where to add Dropout?&lt;/h2&gt;
-&lt;p&gt;Dropout was used in older convolutional network architectures like AlexNet and VGG. Dropout should go in between the fully connected layers (also known as 1x1 convolutions). Dropout doesn’t seem to help in the other convolutional layers.  It’s not exactly clear why.&lt;/p&gt;
-
-&lt;p&gt;One hypothesis is that you only need to avoid overfitting in the layers with huge amounts of parameters (generally fully-connected layers), and convolutional layers usually have fewer parameters (just a few shared kernels) so there’s less need to avoid overfitting there. Of course, you could have the same number of parameters in both if you had very deep filter banks of kernels, but usually the max filter depth in VGG is only 512 and 384 in AlexNet.&lt;/p&gt;
-
-&lt;p&gt;ResNet, a more modern convnet architecture, does not use dropout but rather uses BatchNorm.&lt;/p&gt;
-
-&lt;h2 id=&quot;convolutions&quot;&gt;Convolutions&lt;/h2&gt;
-
-&lt;p&gt;Could somebody post answers for Lecture-4 slides 12,13 and Lecture-5 slides 6?&lt;/p&gt;
-
-&lt;p&gt;Lecture 4 Slide 12:&lt;/p&gt;
-
-&lt;p&gt;(2) this is forward difference derivative approximation.
-https://en.wikipedia.org/wiki/Finite_difference#Forward,_backward,_and_central_differences&lt;/p&gt;
-
-&lt;p&gt;Lecture 4 Slide 13&lt;/p&gt;
-
-&lt;p&gt;a) y-derivatives of image with Sobel operator&lt;/p&gt;
-
-&lt;p&gt;b) derivative of Gaussian computed with Sobel operator&lt;/p&gt;
-
-&lt;p&gt;c) image shifted with translated identity filter&lt;/p&gt;
-
-&lt;p&gt;For explanations of Lecture 5 Slide 6,FOURIER MAGNITUDE IMAGES
- believe the answers are the following:&lt;/p&gt;
-
-&lt;p&gt;1 and 3 are distinctive because they are not natural images.&lt;/p&gt;
-
-&lt;p&gt;1D – Gaussian stays as a circle in the Fourier space.&lt;/p&gt;
-
-&lt;p&gt;3A – Sobel has two separated ellipses.&lt;/p&gt;
-
-&lt;p&gt;2,4,5 are all similar because natural images have fairly similar Fourier magnitude images&lt;/p&gt;
-
-&lt;p&gt;2B – flower image has an even distribution of frequencies, so we see an even circular distribution in all directions in Fourier space.&lt;/p&gt;
-
-&lt;p&gt;4E – because we have only lines along the x-axis, so we see a line only on the y-axis in the Fourier amplitude image.&lt;/p&gt;
-
-&lt;p&gt;5C – because strong x,y-axis-aligned lines in the natural image related to x,y-axis-aligned lines in the Fourier magnitude images
-For Lecture 4 Slide 12, I have:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;0 -1  0&lt;/p&gt;
-
-&lt;p&gt;-1  4 -1&lt;/p&gt;
-
-&lt;p&gt;0 -1  0&lt;/p&gt;
-
-&lt;p&gt;2.&lt;/p&gt;
-
-&lt;p&gt;0 -1 1&lt;/p&gt;
-
-&lt;p&gt;For Lecture 4 Slide 13, I have:&lt;/p&gt;
-
-&lt;p&gt;a) G = D * B&lt;/p&gt;
-
-&lt;p&gt;b) A = B * C&lt;/p&gt;
-
-&lt;p&gt;c) F = D * E&lt;/p&gt;
-
-&lt;p&gt;d) I = D * D&lt;/p&gt;
-
-&lt;p&gt;For Lecture 5 Slide 6, I have:&lt;/p&gt;
-
-&lt;p&gt;1 - D&lt;/p&gt;
-
-&lt;p&gt;2 - B&lt;/p&gt;
-
-&lt;p&gt;3 - A&lt;/p&gt;
-
-&lt;p&gt;4 - E&lt;/p&gt;
-
-&lt;p&gt;5 - C&lt;/p&gt;
-
-&lt;p&gt;I’m not sure if I can explain why all of those are the way they are, but I hope this helps!&lt;/p&gt;
-
-&lt;h2 id=&quot;factor-graphs&quot;&gt;Factor Graphs&lt;/h2&gt;
-
-&lt;p&gt;I’m trying to understand the few slides on factor graph variable elimination, does anyone have an intuitive explanation or good resources to explain what’s going on?&lt;/p&gt;
-
-&lt;p&gt;A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).&lt;/p&gt;
-
-&lt;p&gt;Bayesian Networks are directed graphs where edges in the graph are associated with conditional probability distributions (CPDs), assigning the probability of children in the graph taking on certain values based on the values of the parents.&lt;/p&gt;
-
-&lt;p&gt;In undirected models like MRFs and Factor Graphs, instead of specifying CPDs, we specify (non-negative) potential functions (or factors) over sets of variables associated with cliques (complete subgraphs) C of the graph.  Like Conditional Prob. Distributions, a factor/potential can be represented as a table, but it is not normalized (does not sum to one).&lt;/p&gt;
-
-&lt;p&gt;A factor graph is a bipartite undirected graph with variable nodes (circles) and factor nodes (squares). Edges are only between the variable nodes and the factor nodes.&lt;/p&gt;
-
-&lt;p&gt;The variable nodes can take on certain values, and the likelihood of that event for a set of variables is expressed in the potential (factor node) attached to those variables.  Each factor node is associated with a single potential, whose scope is the set of variables that are neighbors in the factor graph.&lt;/p&gt;
-
-&lt;p&gt;A small example might make this clearer. Suppose we have a group of four people: Alex, Bob, Catherine, David A=Alex’s hair color (red, green, blue)&lt;/p&gt;
-
-&lt;p&gt;B=Bob’s hair color&lt;/p&gt;
-
-&lt;p&gt;C=Catherine’s hair color&lt;/p&gt;
-
-&lt;p&gt;D=David’s hair color&lt;/p&gt;
-
-&lt;p&gt;Alex and Bob are friends, Bob and Catherine are friends, Catherine and David are friends, David and Alex are friends&lt;/p&gt;
-
-&lt;p&gt;Friends never have the same hair color!&lt;/p&gt;
-
-&lt;p&gt;It turns out that this distribution p cannot be represented (perfectly) by any Bayesian network. But it is succinctly represented by a Factor Graph or MRF.
-https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmsma7unw07s/Screen_Shot_20181002_at_11.48.05_PM.png&lt;/p&gt;
-
-&lt;p&gt;The Factor Graph distribution is same as the MRF – this is just a different graph data structure&lt;/p&gt;
-
-&lt;p&gt;If you’re wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.&lt;/p&gt;
-
-&lt;p&gt;In the table Prof. Dellaert showed, we have variables as the columns and factors as the rows. He combines factors progressively to involve more and more variables.&lt;/p&gt;
-
-&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7d71g2p/Screen_Shot_20181003_at_2.05.56_PM.png&lt;/p&gt;
-
-&lt;p&gt;$$ Normalizing SIFT&lt;/p&gt;
-
-&lt;p&gt;You’re welcome to experiment with the choice of norm.  However, normally when we say that we’ll normalize every feature vector on its own, we mean normalizing descriptor &lt;script type=&quot;math/tex&quot;&gt;D&lt;/script&gt; such that &lt;script type=&quot;math/tex&quot;&gt;D_{normalized} = \frac{D}{\|D\|_2}&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;We do this because feature descriptors are points in high-dimensional space, so we want them all to have the same length. That way the distance between them is based only upon the different angles the vectors point in, rather than considering their different length.&lt;/p&gt;
-
-&lt;h2 id=&quot;more-efficient-calculation-of-sift-descriptor&quot;&gt;More efficient calculation of sift descriptor&lt;/h2&gt;
-
-&lt;p&gt;I’m finding it slightly hard to implement an efficient algorithm for calculating the sift descriptor. The way I’m doing it now is basically like this;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Calculate all the gradients and their angle&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Loop over all interest points&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Loop over the rows of the 4x4 cell&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Loop over the columns of the 4x4 cell&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;For each cell index, compute the histogram and save it in that cell&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;I’m feeling like there might be a nice numpy-way to get around my two inner loops (the ones over the cell). Is this possible? Any ideas or tips?&lt;/p&gt;
-
-&lt;p&gt;For reference: it can compute the descriptor for around 1000 interest points in one second, don’t know if that’s sufficiently fast?&lt;/p&gt;
-
-&lt;p&gt;One good way to reduce your 3 for-loops into 2 for-loops would be to do the following:&lt;/p&gt;
-
-&lt;p&gt;Instead of:&lt;/p&gt;
-
-&lt;p&gt;for interest point&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  for row
-
-        for col
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You could do:&lt;/p&gt;
-
-&lt;p&gt;for interest point&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   for 4x4 patch in 16x16 window
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Creating those patches can be done by reshaping and swapping the axes. For example, if you had an array x like&lt;/p&gt;
-
-&lt;p&gt;x = np.reshape(np.array(range(16)),(4,4))
-It would look like&lt;/p&gt;
-
-&lt;p&gt;array([[ 0,  1,  2,  3],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [ 4,  5,  6,  7],
-
-   [ 8,  9, 10, 11],
-
-   [12, 13, 14, 15]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You could break it into 2 parts along dimension 0:&lt;/p&gt;
-
-&lt;p&gt;x.reshape(2,-1)
-You’d get&lt;/p&gt;
-
-&lt;p&gt;array([[ 0,  1,  2,  3,  4,  5,  6,  7],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [ 8,  9, 10, 11, 12, 13, 14, 15]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If you kept breaking the innermost array into 2 arrays you’d get&lt;/p&gt;
-
-&lt;p&gt;x.reshape(2,2,-1)
-array([[[ 0,  1,  2,  3],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    [ 4,  5,  6,  7]],
-
-
-
-   [[ 8,  9, 10, 11],
-
-    [12, 13, 14, 15]]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;and then finally you would get&lt;/p&gt;
-
-&lt;p&gt;x.reshape(2,2,2,2)
-array([[[[ 0,  1],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     [ 2,  3]],
-
-    [[ 4,  5],
-
-     [ 6,  7]]],
-
-
-
-   [[[ 8,  9],
-
-     [10, 11]],
-
-    [[12, 13],
-
-     [14, 15]]]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;At this point you have 2 cubes that are 2x2x2. There are 3 ways you could look at this cube: there are 2 planes along the x-direction, or 2 planes along the y-direction, or 2 planes along the z-direction. If you swap the direction from which you look at the cube (swapaxes), you could now have&lt;/p&gt;
-
-&lt;p&gt;array([[[[ 0,  1],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;     [ 4,  5]],
-
-    [[ 2,  3],
-
-     [ 6,  7]]],
-
-
-
-   [[[ 8,  9],
-
-     [12, 13]],
-
-    [[10, 11],
-
-     [14, 15]]]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;which you’ll notice is effectively all of the original 2x2 patches with stride 2 from the original 4x4 matrix.&lt;/p&gt;
-
-&lt;p&gt;Sad to say it, but the speedup will probably be completely unnoticeable since the for loop is only over 4 iterations, as opposed to something over 40,000 iterations&lt;/p&gt;
-
-&lt;h2 id=&quot;visualizing-sift&quot;&gt;Visualizing SIFT&lt;/h2&gt;
-
-&lt;p&gt;Your get_features() function should return a NumPy array of shape (k, feat_dim) representing k stacked feature vectors (row-vectors), where “feat_dim” is the feature_dimensionality (e.g. 128 for standard SIFT).&lt;/p&gt;
-
-&lt;p&gt;Since this is a 2D matrix, we can treat it as a grayscale image. Each row in the image would correspond to the feature vector for one interest point. We would hope that each feature vector would unique, so the image shouldn’t be completely uniform in color (all identical features) or completely black (all zero values). That would be a clue that your features are degenerate.&lt;/p&gt;
-
-&lt;p&gt;For example, you might see something like this if you were to call:&lt;/p&gt;
-
-&lt;p&gt;import matplotlib.pyplot as plt; plt.imshow(image1_features); plt.show()&lt;/p&gt;
-
-&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm4fywn2xohb/features.png&lt;/p&gt;
-
-&lt;h2 id=&quot;trilinear-interpolation&quot;&gt;Trilinear Interpolation&lt;/h2&gt;
-
-&lt;p&gt;http://paulbourke.net/miscellaneous/interpolation/&lt;/p&gt;
-
-&lt;p&gt;On slide 30 of Lecture 7, Professor Hays was discussing trilinear interpolation. Trilinear interpolation is the name given to the process of linearly interpolating points within a box (3D) given values at the vertices of the box. We can think of our histogram as a 3D spatial histogram with &lt;script type=&quot;math/tex&quot;&gt;N_{\theta} \times N_x \times N_y&lt;/script&gt;, bins usually &lt;script type=&quot;math/tex&quot;&gt;8 \times 4 \times 4&lt;/script&gt;.
-https://www.cc.gatech.edu/~hays/compvision/lectures/07.pdf&lt;/p&gt;
-
-&lt;p&gt;You aren’t required to implement the trilinear interpolation for this project, but you may if you wish. I would recommend getting a baseline working first where the x and y derivatives at each pixel &lt;script type=&quot;math/tex&quot;&gt;I_x, I_y&lt;/script&gt; form 1 orientation, and that orientation goes into a single bin.&lt;/p&gt;
-
-&lt;p&gt;Then you could try the trilinear interpolation afterwards once that is working (without trilinear interpolation, you can still get »80% accuracy on Notre Dame).&lt;/p&gt;
-
-&lt;h2 id=&quot;sobel-vs-gaussian&quot;&gt;Sobel vs. Gaussian&lt;/h2&gt;
-
-&lt;p&gt;Hi, I’m trying to decide which is a better way to compute the gradient for the Harris corner detection, before I compute my cornerness function. I’m confused about the difference between both.&lt;/p&gt;
-
-&lt;p&gt;If I run just Sobel on my image, that means I’m getting the derivative, and smoothing with Gaussian in one go, right? And if I want to use Gaussian, I find the derivatives of the pixels, and apply Gaussian separately on the image? Not sure if one way is better than the other, and why.&lt;/p&gt;
-
-&lt;p&gt;You can also do both with one filter.&lt;/p&gt;
-
-&lt;p&gt;Suppose we have the image  &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt;:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-&lt;br/&gt;&lt;br/&gt;I = \begin{bmatrix}&lt;br/&gt;&lt;br/&gt;a &amp; b &amp; c \\&lt;br/&gt;&lt;br/&gt;d &amp; e &amp; f \\&lt;br/&gt;&lt;br/&gt;g &amp; h &amp; i&lt;br/&gt;&lt;br/&gt;\end{bmatrix}&lt;br/&gt;&lt;br/&gt;&lt;br/&gt; %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;One way to think about the Sobel x-derivative filter is that rather than looking at only &lt;script type=&quot;math/tex&quot;&gt;\frac{rise}{run}=\frac{f-d}{2}&lt;/script&gt; (centered at pixel e), we also use the x-derivatives above it and below it, e.g. &lt;script type=&quot;math/tex&quot;&gt;\frac{c-a}{2}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\frac{i-g}{2}&lt;/script&gt;. But we weight the x-derivative in the center the most (this is a form of smoothing) so we use an approximation like&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{ 2 \cdot (f-d) + (i-g)+ (c-a) }{8}&lt;/script&gt;
-
-&lt;p&gt;meaning our kernel resembles&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\frac{1}{8}&lt;br/&gt;&lt;br/&gt;\begin{bmatrix}&lt;br/&gt;&lt;br/&gt;1 &amp; 0 &amp; -1 \\&lt;br/&gt;&lt;br/&gt;2 &amp; 0 &amp; -2 \\&lt;br/&gt;&lt;br/&gt;1 &amp; 0 &amp; -1&lt;br/&gt;&lt;br/&gt;\end{bmatrix}&lt;br/&gt;&lt;br/&gt;&lt;br/&gt; %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;It is actually derived with directional derivatives.
-https://www.researchgate.net/publication/239398674_An_Isotropic_3_3_Image_Gradient_Operator&lt;/p&gt;
-
-&lt;p&gt;This is not identical to first blurring the image with a Gaussian filter, and then computing derivatives. We blur the image first because it makes the gradients less noisy.&lt;/p&gt;
-
-&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1ficspl6jw/smoothing_gradients.png&lt;/p&gt;
-
-&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1fiqeigs2g/derivative_theorem.png&lt;/p&gt;
-
-&lt;p&gt;And an elegant fact that can save a step in smoothed gradient computation is to simply blur with the x and y derivatives of a Gaussian filter, by the following property:&lt;/p&gt;
-
-&lt;p&gt;http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf
-Slides&lt;/p&gt;
-
-&lt;h2 id=&quot;nearest-neighbor-distance-ratio-algorithm-418&quot;&gt;nearest neighbor distance ratio algorithm 4.18&lt;/h2&gt;
-&lt;p&gt;1) in the formula 4.18, what is meant by target descriptor, here it is Da ?&lt;/p&gt;
-
-&lt;p&gt;2) In the formula 4.18 what is meant by Db and Dc as being descriptors?&lt;/p&gt;
-
-&lt;p&gt;3)  What makes Da to be target descriptor and Db and Dc nearest neighbors ?&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;4) In formular 4.18&lt;/td&gt;
-      &lt;td&gt; &lt;/td&gt;
-      &lt;td&gt;Da - Db&lt;/td&gt;
-      &lt;td&gt; &lt;/td&gt;
-      &lt;td&gt;is norm? or euclidean distance ?&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;5) how is value of the descriptor such as Da related to the euclidean distance to Db?&lt;/p&gt;
-
-&lt;p&gt;6) Is there such a thing as x and y coordinates of the center for a specific descriptor that helps to calculate the distances between the&lt;/p&gt;
-
-&lt;p&gt;descriptors ? if so how to calculate the center of each descriptor ?&lt;/p&gt;
-
-&lt;p&gt;1) in the formula 4.18, what is meant by target descriptor, here it is Da ?&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; is a high-dimensional point. In the case of SIFT descriptors, &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; would be the SIFT feature vector in &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;2) In the formula 4.18 what is meant by Db and Dc as being descriptors?&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;D_B, D_C&lt;/script&gt; are high-dimensional points. These are the closest points, as measured by the &lt;script type=&quot;math/tex&quot;&gt;\ell_2&lt;/script&gt; norm, from &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; in this high dimensional space.&lt;/p&gt;
-
-&lt;p&gt;3)  What makes Da to be target descriptor and Db and Dc nearest neighbors ?&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; is the feature vector corresponding to an (x,y) location, for which we are trying to find matches in another image. &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; could be from Image1, and &lt;script type=&quot;math/tex&quot;&gt;D_B, D_C&lt;/script&gt; might be feature vectors corresponding to points in Image2&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;4) In formula 4.18&lt;/td&gt;
-      &lt;td&gt; &lt;/td&gt;
-      &lt;td&gt;Da - Db&lt;/td&gt;
-      &lt;td&gt; &lt;/td&gt;
-      &lt;td&gt;is norm? or euclidean distance ?&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\|D_A-D_B\|&lt;/script&gt; is the &lt;script type=&quot;math/tex&quot;&gt;\ell_2&lt;/script&gt; norm, which we often call the Euclidean norm.&lt;/p&gt;
-
-&lt;p&gt;5) how is value of the descriptor such as Da related to the euclidean distance to Db?&lt;/p&gt;
-
-&lt;p&gt;Euclidean distance from &lt;script type=&quot;math/tex&quot;&gt;D_B&lt;/script&gt; to &lt;script type=&quot;math/tex&quot;&gt;D_A&lt;/script&gt; depends upon knowing the location of &lt;script type=&quot;math/tex&quot;&gt;D_B,D_A&lt;/script&gt; in &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;6) Is there such a thing as x and y coordinates of the center for a specific descriptor that helps to calculate the distances between the&lt;/p&gt;
-
-&lt;p&gt;descriptors ? if so how to calculate the center of each descriptor ?&lt;/p&gt;
-
-&lt;p&gt;Each SIFT descriptor corresponds to an (x,y) point. We form the SIFT descriptor by looking at a 16x16 patch, centered at that (x,y) location. This could be considered a “center” of the descriptor, although I think using that terminology could be confusing since the (x,y)  “center” location in &lt;script type=&quot;math/tex&quot;&gt;R^2&lt;/script&gt; is not necessarily related at all to center of the &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt; space.  It may be possible to use the spatial information in &lt;script type=&quot;math/tex&quot;&gt;R^2&lt;/script&gt; to verify the matching of points in &lt;script type=&quot;math/tex&quot;&gt;R^{128}&lt;/script&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;arctan-vs-arctan2&quot;&gt;Arctan vs. Arctan2&lt;/h2&gt;
-
-&lt;p&gt;I would use arctan2 instead of arctan. Because of the sign ambiguity, a function cannot determine with certainty in which quadrant the angle falls only by its tangent value. 
-https://stackoverflow.com/questions/283406/what-is-the-difference-between-atan-and-atan2-in-c&lt;/p&gt;
-
-&lt;p&gt;Numpy arctan2 returns an “Array of angles in radians, in the range [-pi, pi].” (see here).
-https://docs.scipy.org/doc/numpy/reference/generated/numpy.arctan2.html&lt;/p&gt;
-
-&lt;p&gt;As long as you bin all of the gradient orientations consistently, it turns out it doesn’t matter if the histograms are created from 8 uniform intervals from [0,360] or 8 uniform intervals from [-180,180]. Histograms are empirical samples of a distribution, and translating the range won’t affect that distribution.&lt;/p&gt;
-
-&lt;p&gt;More on arctan2 from StackOverflow:&lt;/p&gt;
-
-&lt;p&gt;From school mathematics we know that the tangent has the definition&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;&lt;code&gt;tan(α) = sin(α) / cos(α)&lt;/code&gt;&lt;/em&gt;
-and we differentiate between four quadrants based on the angle that we supply to the functions. The sign of the sin, cos and tan have the following relationship (where we neglect the exact multiples of π/2):&lt;/p&gt;
-
-&lt;h2 id=&quot;--quadrant----angle--------------sin---cos---tan&quot;&gt;&lt;em&gt;&lt;code&gt;  Quadrant    Angle              sin   cos   tan&lt;/code&gt;&lt;/em&gt;&lt;/h2&gt;
-&lt;p&gt;I           0    &amp;lt; α &amp;lt; π/2      +     +     +
-  II          π/2  &amp;lt; α &amp;lt; π        +     -     -
-  III         π    &amp;lt; α &amp;lt; 3π/2     -     -     +
-  IV          3π/2 &amp;lt; α &amp;lt; 2π       -     +     -&amp;lt;/code&amp;gt;&amp;lt;/em&amp;gt;
-Given that the value of tan(α) is positive, we cannot distinguish, whether the angle was from the first or third quadrant and if it is negative, it could come from the second or fourth quadrant. So by convention, atan() returns an angle from the first or fourth quadrant (i.e. -π/2 &amp;lt;= atan() &amp;lt;= π/2), regardless of the original input to the tangent.&lt;/p&gt;
-
-&lt;p&gt;In order to get back the full information, we must not use the result of the division sin(α) / cos(α) but we have to look at the values of the sine and cosine separately. And this is what atan2() does. It takes both, the sin(α) and cos(α) and resolves all four quadrants by adding π to the result of atan() whenever the cosine is negative.&lt;/p&gt;
-
-&lt;h2 id=&quot;autocorrelation-matrix&quot;&gt;Autocorrelation Matrix&lt;/h2&gt;
-
-&lt;p&gt;Nicolas, that &lt;script type=&quot;math/tex&quot;&gt;*&lt;/script&gt; in the equation you’ve written is not multiplication – it is convolution. Szeliski states that he has “replaced the weighted summations with discrete convolutions with the weighting kernel &lt;script type=&quot;math/tex&quot;&gt;w&lt;/script&gt;”.&lt;/p&gt;
-
-&lt;p&gt;So before we had values &lt;script type=&quot;math/tex&quot;&gt;w(x,y)&lt;/script&gt; that could have been values from a Gaussian probability density function. Let &lt;script type=&quot;math/tex&quot;&gt;z = \begin{bmatrix} x \\ y \end{bmatrix}&lt;/script&gt; be the stacked 2D coordinate locations.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(z) = \frac{1}{(2 \pi)^{n/2} |\Sigma|^{1/2}} \mbox{exp} \Bigg( - \frac{1}{2} (z − \mu)^T \Sigma^{-1} (z − \mu) \Bigg)&lt;/script&gt;
-
-&lt;p&gt;For example, where &lt;script type=&quot;math/tex&quot;&gt;\mu&lt;/script&gt; is the center pixel location and &lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt; is the location of each pixel in the local neighborhood. These were used as weights in summations over a local neighborhood,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-M = \sum\limits_{x,y} w(x,y) \begin{bmatrix}I_x^2 &amp; I_xI_y \\I_xI_y &amp; I_y^2\end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;But the elegant convolution approach is used here because it is equivalent to summing a bunch of elementwise multiplications –  each point in a local neighborhood with its weight value (as we saw in Proj 1, and here filtering is equivalent to convolution since Gaussian filter is symmetric).&lt;/p&gt;
-
-&lt;h2 id=&quot;image-derivatives&quot;&gt;Image Derivatives&lt;/h2&gt;
-
-&lt;p&gt;Great question – there are a number of ways to do it, and they will all give different results.&lt;/p&gt;
-
-&lt;p&gt;Prof. Hays discussed in lecture how convolving (not cross-correlation filtering) with the Sobel filter is a good way to approximate image derivatives (here we could treat a Gaussian filter as the image to find its derivatives).&lt;/p&gt;
-
-&lt;p&gt;We’ve recommended a number of potentially useful OpenCV and SciPy functions that can do so in the project page. These will be very helpful!&lt;/p&gt;
-
-&lt;p&gt;Another simple way to approximate the derivative is to calculate the 1st discrete difference along the given axis. For example, in order to compute horizontal discrete differences, shift the image by 1 pixel to the left and subtract the two&lt;/p&gt;
-
-&lt;p&gt;For example, suppose you have a matrix b&lt;/p&gt;
-
-&lt;p&gt;b = np.array([[  0,   1,   1,   2],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [  3,   5,   8,  13],
-
-   [ 21,  34,  55,  89],
-
-   [144, 233, 377, 610]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;b[:,1:] - b[:,:-1]
-We would get:&lt;/p&gt;
-
-&lt;p&gt;array([[  1,   0,   1],&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [  2,   3,   5],
-
-   [ 13,  21,  34],
-
-   [ 89, 144, 233]])
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Then we could the pad the matrix with zeros on the right column to bring it back to the original size.&lt;/p&gt;
-
-&lt;h2 id=&quot;harris&quot;&gt;Harris&lt;/h2&gt;
-
-&lt;p&gt;A gaussian filter is expressed as &lt;script type=&quot;math/tex&quot;&gt;g(\sigma_1)&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;The second moment matrix at each pixel is convolved as follows:
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-\mu(\sigma_1,\sigma_D) = g(\sigma_1) * \begin{bmatrix} I_x^2 (\sigma_D) &amp; I_xI_y (\sigma_D) \\ I_xI_y (\sigma_D) &amp; I_{y}^2 (\sigma_D) \end{bmatrix} %]]&gt;&lt;/script&gt;
-Giving a cornerness function in the lecture slides:
-&lt;script type=&quot;math/tex&quot;&gt;har = \mbox{ det }[\mu(\sigma_1,\sigma_D)] - \alpha[\mbox{trace }\Big(\mu(\sigma_1,\sigma_D)\Big)]&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;or, when evaluated,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;har = g(I_x^2)g(I_y^2) - [g(I_xI_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2&lt;/script&gt;
-
-&lt;p&gt;So in the lecture slides notation, we can write &lt;script type=&quot;math/tex&quot;&gt;\mu(\sigma_1,\sigma_D)&lt;/script&gt; more simply by bringing in the filtering (identical to convolution here) operation:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * I_x^2 (\sigma_D) &amp; g(\sigma_1) * I_xI_y (\sigma_D) \\ g(\sigma_1) * I_xI_y (\sigma_D) &amp; g(\sigma_1) * I_{y}^2 (\sigma_D) \end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;It may be easier to understand if we write the equation in the following syntax:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 &amp; g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] &amp; g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;
-
-&lt;p&gt;Question:
-How is 1x1 convolution idential to a fully-connected layer&lt;/p&gt;
-
-&lt;p&gt;5x5 kernel, with 5x5 input. Elementwise multiply. Same as matrix multiplication because…&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Epipolar Geometry</title><link href="http://localhost:4000/epipolar-geometry/" rel="alternate" type="text/html" title="Epipolar Geometry" /><published>2018-11-19T03:01:00-08:00</published><updated>2018-11-19T03:01:00-08:00</updated><id>http://localhost:4000/epipolar-geometry</id><content type="html" xml:base="http://localhost:4000/epipolar-geometry/">&lt;h2 id=&quot;why-know-epipolar-geometry&quot;&gt;Why know Epipolar Geometry?&lt;/h2&gt;
-&lt;p&gt;Modern robotic computer vision tasks like Structure from Motion (SfM) and Simultaneous Localization and Mapping (SLAM) would not be possible without feature matching. Tools from Epipolar Geometry are an easy way to discard outliers in feature matching and are widely used.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-fundamental-matrix&quot;&gt;The Fundamental Matrix&lt;/h2&gt;
-
-&lt;p&gt;The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x,x^{\prime}\) are 2D corresponding points in separate images. In other words,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{bmatrix} u^{\prime} &amp; v^{\prime} &amp; 1 \end{bmatrix} \begin{bmatrix} f_{11} &amp; f_{12} &amp; f_{13} \\ f_{21} &amp; f_{22} &amp; f_{23} \\ f_{31} &amp; f_{32} &amp; f_{33} \end{bmatrix} \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = 0 %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Longuet-Higgins’ 8-Point Algorithm [1] provides the solution for estimating \(F\) if at least 8 point correspondences are provided. A system of linear equations is formed as follows:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-Af = \begin{bmatrix} u_1 u_1^{\prime} &amp; u_1v_1^{\prime} &amp; u_1 &amp; v_1 u_1^{\prime} &amp; v_1 v_1^{\prime} &amp; v_1 &amp; u_1^{\prime} &amp; v_1^{\prime} &amp; 1 \\ \vdots &amp; \vdots  &amp; \vdots  &amp; \vdots  &amp; \vdots  &amp; \vdots  &amp; \vdots  &amp; \vdots &amp; \vdots  \\   u_n u_n^{\prime} &amp; u_n v_n^{\prime} &amp; u_n &amp; v_n u_n^{\prime} &amp; v_n v_n^{\prime} &amp; v_n &amp; u_n^{\prime} &amp; v_n^{\prime} &amp; 1 \end{bmatrix} \begin{bmatrix} f_{11} \\ f_{12} \\ f_{13} \\ f_{21} \\ \vdots \\ f_{33} \end{bmatrix} = \begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;The matrix-vector product above can be driven to zero by minimizing the norm, and avoiding the degenerate solution that \(x=0\) with a constraint that the solution lies upon the unit ball, e.g.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-  \underset{\|x\|=1}{\mbox{minimize}} &amp; \|A x \|_2^2 = x^TA^TAx = x^TBx
-  \end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;By the Courant-Fisher characterization, it is well known that if \(B\) is a \(n \times n\) symmetric matrix with eigenvalues \(\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_n \) and corresponding eigenvectors \(v_1, \dots, v_n\), then&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;v_n = \mbox{arg } \underset{\|x\|=1}{\mbox{min }} x^TBx&lt;/script&gt;
-
-&lt;p&gt;meaning the eigenvector associated with the smallest eigenvalue \(\lambda_n\) of \(B\) is the solution \(x^{\star}\). The vector \(x^{\star}\) contains the 9 entries of the Fundamental matrix \(F^{\star}\).&lt;/p&gt;
-
-&lt;p&gt;This is a specific instance of the extremal trace \([2]\) (or trace minimization on a unit sphere) problem, with \(k=1\), i.e.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{aligned}
-    \begin{array}{ll}
-    \mbox{minimize} &amp; \mathbf{\mbox{Tr}}(X^TBX) \\
-    \mbox{subject to} &amp; X^TX=I_k
-    \end{array}
-\end{aligned} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where \(I_k\) denotes the \(k \times k\) identity matrix. The unit ball constraint avoids the trivial solution when all eigenvalues \(\lambda_i\) are zero instead of a single zero eigenvalue.&lt;/p&gt;
-
-&lt;p&gt;In our case, since \(U,V\) are orthogonal matrices (with orthonormal columns), then \(U^TU=I\). Thus, the SVD of \(B\) yields 
-\begin{equation}
-A^TA = (U\Sigma V^T)^T (U\Sigma V^T) = V\Sigma U^TU \Sigma V^T = V \Sigma^2 V^T.
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;Since \(B=A^TA\), \(B\) is symmetric, and thus the columns of \(V=\begin{bmatrix}v_1 \dots v_n \end{bmatrix}\) are eigenvectors of \(B\). \(V\) can equivalently be computed with the SVD of \(A\) or \(B\), since \(V\) appears in both decompositions: \(A=U \Sigma V^T\) and \(B=V\Sigma^2V^T\).&lt;/p&gt;
-
-&lt;h2 id=&quot;proof-the-svd-provides-the-solution&quot;&gt;Proof: the SVD provides the solution&lt;/h2&gt;
-&lt;p&gt;The proof is almost always taken for granted, but we will provide it here for completeness. Because \(B\) is symmetric, there exists a set of \(n\) orthonormal eigenvectors, yielding an eigendecomposition \(B=V^T \Lambda V\). Thus,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{llll}
-    \mbox{arg } \underset{\|x\|=1}{\mbox{min }} &amp; x^TBx = \mbox{arg } \underset{\|x\|=1}{\mbox{min }} &amp; x^TV^T \Lambda Vx = \mbox{arg } \underset{\|x\|=1}{\mbox{min }} &amp; (Vx)^T \Lambda (Vx)
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Since \(V\) is orthogonal, \(|Vx| = |x|\), thus minimizing \((Vx)^T \Lambda (Vx)\) is equivalent to minimizing \(x^T \Lambda x\). Since \(\Lambda\) is diagonal, \(x^TBx = \sum\limits_{i=1}^{n} \lambda_i x_i^2\) where \({\lambda_i}_{i=1}^n\) are the eigenvalues of \(B\). Let \(q_i=x_i^2\), meaning \(q_i\geq 0\) since it represents a squared quantity. Since \(|x|=1\), then \(\sqrt{\sum\limits_i x_i^2}=1\), \(\sum\limits_i x_i^2=1 \), \(\sum\limits_i q_i = 1\). Thus,&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
- \underset{|x|=1}{\mbox{min }}  x^TBx= \underset{|x|=1}{\mbox{min }} \sum\limits_{i=1}^{n} \lambda_i x_i^2= \underset{q_i}{\mbox{min }} \sum\limits_i \lambda_i q_i = \underset{q_i}{\mbox{min }} \lambda_n \sum\limits_i q_i = \lambda_n
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;where \(\lambda_n\) is the smallest eigenvalue of \(B\). The last line follows since \(q_i \geq 0\) and \(\sum\limits_i q_i = 1\), therefore we have a convex combination of a set of numbers \( {\lambda_i}_{i=1}^n \) on the real line. By properties of a convex combination, the result must lie in between the smallest and largest number. Now that we know the minimum is \(\lambda_n\), we can obtain the argmin by the following observation:&lt;/p&gt;
-
-&lt;p&gt;If \(v\) is an eigenvector of \(B\), then 
-\begin{equation}
-    Bv = \lambda_n v
-\end{equation}
-Left multiplication with \(v^T\) simplifies the right side because \(v^Tv=1\), by our constraint that \(|x|=1\). We find:
-\begin{equation}
-    v^T(Bv) = v^T (\lambda_n v) = v^Tv \lambda_n = \lambda_n
-\end{equation}
-Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{\star}\). \( \square\)&lt;/p&gt;
-
-&lt;p&gt;References:&lt;/p&gt;
-
-&lt;p&gt;[1] H. Longuet Higgins. A computer algorithm for reconstructing a scene from two projections. &lt;em&gt;Nature&lt;/em&gt;, 293, 1981.&lt;/p&gt;
-
-&lt;p&gt;[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL &lt;a href=&quot;http://ee263.stanford.edu/notes/low_rank_approx.pdf&quot;&gt;http://ee263.stanford.edu/notes/low_rank_approx.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">The Fundamental matrix, solution via SVD.</summary></entry><entry><title type="html">Parallel Computing with MPI</title><link href="http://localhost:4000/mpi/" rel="alternate" type="text/html" title="Parallel Computing with MPI" /><published>2018-10-02T04:01:00-07:00</published><updated>2018-10-02T04:01:00-07:00</updated><id>http://localhost:4000/mpi</id><content type="html" xml:base="http://localhost:4000/mpi/">&lt;p&gt;mpiexec -x -np 2 xterm -e cuda-gdb ./myapp&lt;/p&gt;
-
-&lt;p&gt;mpirun –np 2 nvprof –log-file profile.out.%p&lt;/p&gt;
-
-&lt;p&gt;nvprof ./addMatrices -n 4000&lt;/p&gt;
-
-&lt;p&gt;cuda-memcheck ./memcheck_demo&lt;/p&gt;
-
-&lt;p&gt;MV2_USE_CUDA=1 mpirun -np 4 nvprof –output-profile profile.%p.nvprof ./main [args]&lt;/p&gt;
-
-&lt;p&gt;MV2_USE_CUDA=1 makes MVAPICH2 CUDA aware.&lt;/p&gt;
-
-&lt;p&gt;MV2_USE_CUDA=1 mpirun -np 1 nvprof –kernels gpu_GEMM –analysis-metrics
-–output-profile GEMMmetrics.out.%p.nvprof ./main [args]&lt;/p&gt;
-
-&lt;p&gt;nvvp &amp;amp;&lt;/p&gt;</content><author><name></name></author><summary type="html">Demystify backprop.</summary></entry></feed>
+&lt;p&gt;[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. &lt;a href=&quot;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&quot;&gt;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry></feed>

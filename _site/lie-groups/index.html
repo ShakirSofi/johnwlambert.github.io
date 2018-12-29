@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Lie Groups and Rigid Body Kinematics</title>
+  <meta name="description" content="SO(2), SO(3), SE(2), SE(3), Lie algebras">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/lie-groups/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Lie Groups and Rigid Body Kinematics</h1>
+    <p class="meta">Dec 28, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#whyliegroups">Why do we need Lie Groups?</a></li>
+  <li><a href="#liegroups">Lie Groups</a></li>
+  <li><a href="#son">SO(N)</a></li>
+  <li><a href="#so2">SO(2)</a></li>
+  <li><a href="#so3">SO(3)</a></li>
+  <li><a href="#se2">SE(2)</a></li>
+  <li><a href="#se3">SE(3)</a></li>
+  <li><a href="#conjugation">Conjugation in Group Theory</a></li>
+  <li><a href="#lie-algebra">The Lie Algebra</a></li>
+</ul>
+
+<p><a name="whyliegroups"></a></p>
+
+<h2 id="why-do-we-need-lie-groups">Why do we need Lie Groups?</h2>
+
+<p>Rigid bodies have a state which consists of position and orientation. When sensors are placed on a rigid body (e.g. a robot), they provide measurements in the body frame. Suppose we wish to take a measurement <script type="math/tex">y_b</script> from the body frame and move it to the world frame, <script type="math/tex">y_w</script>. We can do this via left multiplication with a transformation matrix <script type="math/tex">{}^{w}T_{b}</script>, a member of the matrix Lie groups, that transports the point from one space to another space:</p>
+
+<script type="math/tex; mode=display">y_w = {}^{w}T_{b} y_b</script>
+
+<p><a name="liegroups"></a></p>
+
+<h2 id="lie-groups">Lie Groups</h2>
+
+<p>When we are working with pure rotations, we work with Special Orthogonal groups, <script type="math/tex">SO(\cdot)</script>. When we are working with a rotation and a translation together, we work with Special Euclidean groups <script type="math/tex">SE(\cdot)</script>.</p>
+
+<p>Lie Groups are unique because they are <strong>both a group and a manifold</strong>. They are continuous manifolds in high-dimensional spaces, and have a group structure. I’ll describe them in more detail below.</p>
+
+<p><a name="son"></a></p>
+
+<h3 id="son">SO(N)</h3>
+
+<p>Membership in the Special Orthogonal Group <script type="math/tex">SO(N)</script> requires two matrix properties:</p>
+<ul>
+  <li>
+    <script type="math/tex; mode=display">R^TR = I</script>
+  </li>
+  <li>
+    <script type="math/tex; mode=display">\mbox{det}(R) = +1</script>
+  </li>
+</ul>
+
+<p>This gives us a very helpful property: <script type="math/tex">R^{-1} = R^T</script>, so the matrix inverse is as simple as taking the transpose.  We will generally work with <script type="math/tex">SO(N)</script>, where <script type="math/tex">N=2,3</script>, meaning the matrices are rotation matrices <script type="math/tex">R \in \mathbf{R}^{2 \times 2}</script> or <script type="math/tex">R \in \mathbf{R}^{3 \times 3}</script>.</p>
+
+<p>These rotation matrices <script type="math/tex">R</script> are not commutative.</p>
+
+<p><a name="so2"></a></p>
+
+<h3 id="so2">SO(2)</h3>
+
+<p><script type="math/tex">SO(2)</script> is a 1D manifold living in a 2D Euclidean space, e.g. moving around a circle.  We will be stuck with singularities if we use 2 numbers to parameterize it, which would mean kinematics break down at certain orientations.</p>
+
+<p><script type="math/tex">SO(2)</script> is the space of orthogonal matrices that corresponds to rotations in the plane.</p>
+
+<p><strong>A simple example</strong>:
+Let’s move from the body frame <script type="math/tex">b</script> to a target frame <script type="math/tex">t</script>:</p>
+
+<script type="math/tex; mode=display">P_t = {}^tR_b(\theta) P_o</script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix}
+5 \mbox{ cos} (\theta) \\
+5 \mbox{ sin} (\theta)
+\end{bmatrix} = \begin{bmatrix} cos(\theta) & -sin(\theta) \\ sin(\theta) & cos(\theta) \end{bmatrix} * \begin{bmatrix} 5 \\ 0 \end{bmatrix} %]]></script>
+
+<p>As described in [3], another way to think of this is to consider that a robot can be rotated counterclockwise by some angle <script type="math/tex">\theta \in [0,2 \pi)</script> by mapping every <script type="math/tex">(x,y)</script> as:</p>
+
+<script type="math/tex; mode=display">(x, y) \rightarrow (x \mbox{ cos } \theta − y \mbox{ sin } \theta, x \mbox{ sin } \theta + y \mbox{ cos } \theta).</script>
+
+<p><a name="so3"></a></p>
+
+<h3 id="so3">SO(3)</h3>
+
+<p>There are several well-known parameterizations of <script type="math/tex">R \in SO(3)</script>:</p>
+<ul>
+  <li>(1.) <script type="math/tex">R \in \mathbf{R}^{3 \times 3}</script> full rotation matrix, 9 parameters – there must be 6 constraints</li>
+  <li>(2.) Euler angles, e.g. <script type="math/tex">(\phi, \theta, \psi)</script>, so 3 parameters</li>
+  <li>(3.) Angle-Axis parameters <script type="math/tex">(\vec{a}, \phi)</script>, which is 4 parameters and 1 constraint (unit length)</li>
+  <li>(4.) Quaternions (<script type="math/tex">q_0,q_1,q_2,q_3)</script>, 4 parameters and 1 constraint (unit length)</li>
+</ul>
+
+<p>There are only 3 degrees of freedom in describing a rotation. But this object doesn’t live in 3D space. It is a 3D manifold, embedded in a 4-D Euclidean space.</p>
+
+<p>Parameterizations 1,3,4 are overconstrained, meaning they employ more parameters than we strictly need. With overparameterized representations, we have to do extra work to make sure we satisfy the constraints of the representation.</p>
+
+<p>As it turns out <script type="math/tex">SO(3)</script> cannot be parameterized by only 3 parameters in a non-singular way.</p>
+
+<p><strong>Euler Angles</strong>
+One parameterization of <script type="math/tex">SO(3)</script> is to imagine three successive rotations around different axes. The Euler angles encapsulate yaw-pitch-roll: first, a rotation about the z-axis (yaw, <script type="math/tex">\psi</script>). Then, a rotation about the pitch axis by <script type="math/tex">\theta</script> (via right-hand rule), and finally we perform a roll by <script type="math/tex">\phi</script>.</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/euler_angles.jpg" width="65%" />
+  <div class="figcaption">
+    The Euler angles.
+  </div>
+</div>
+
+<p>The sequence of successive rotations is encapsulated in <script type="math/tex">{}^{w}R_b</script>:</p>
+
+<script type="math/tex; mode=display">{}^{w}R_b = R_R(\phi) R_P(\theta) R_Y (\psi)</script>
+
+<p>As outlined in [3], these successive rotations by <script type="math/tex">(\phi, \theta, \psi)</script> are defined by:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+R_{yaw} = R_y (\psi) = \begin{bmatrix}
+\mbox{cos} \psi & -\mbox{sin} \psi  & 0 \\
+\mbox{sin} \psi & \mbox{cos} \psi & 0 \\
+0 & 0 & 1
+\end{bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+R_{pitch} = R_p (\theta) = \begin{bmatrix}
+\mbox{cos} \theta & 0 & \mbox{sin} \theta \\
+ 0 & 1 & 0 \\
+ -\mbox{sin} \theta & 0 & \mbox{cos} \theta \\
+\end{bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+R_{roll} = R_R (\phi) = \begin{bmatrix}
+1 & 0 & 0 \\
+0 & \mbox{cos} \phi & -\mbox{sin} \phi \\
+0 & \mbox{sin} \phi &  \mbox{cos} \phi \\
+\end{bmatrix} %]]></script>
+
+<p>You have probably noticed that each rotation matrix <script type="math/tex">\in \mathbf{R}^{3 \times 3}</script> above is a simple extension of the 2D rotation matrix from <script type="math/tex">SO(2)</script>. For example, the yaw matrix <script type="math/tex">R_{yaw}</script> performs a 2D rotation with respect to the <script type="math/tex">x</script> and <script type="math/tex">y</script> coordinates while leaving the <script type="math/tex">z</script> coordinate unchanged [3].</p>
+
+<p><a name="se2"></a></p>
+
+<h3 id="se2">SE(2)</h3>
+
+<p>The real space <script type="math/tex">SE(2)</script> are <script type="math/tex">3 \times 3</script> matrices, moving a point in homogenous coordinates to a new frame. It is important to remember that this represents a rotation followed by a translation (not the other way around).</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+T = \begin{bmatrix} x_w \\ y_w \\ 1 \end{bmatrix} = \begin{bmatrix}
+ R_{2 \times 2}& & t_{2 \times 1}  \\
+& \ddots & \vdots  \\
+0 & 0 & 1
+\end{bmatrix} * \begin{bmatrix} x_b \\ y_b \\ 1 \end{bmatrix} %]]></script>
+
+<p>By adding an extra dimension to the input points and transformation matrix <script type="math/tex">T</script> the translational part of the transformation is absorbed [3].</p>
+
+<p><a name="se3"></a></p>
+
+<h3 id="se3">SE(3)</h3>
+
+<p>The real space <script type="math/tex">SE(3)</script> are <script type="math/tex">4 \times 4</script> matrices, the real space resembles:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix}
+& & & \\
+& R_{3 \times 3} & &  t_{3 \times 1} \\
+& & & \\
+0 & 0 & 0 & 1
+\end{bmatrix} %]]></script>
+
+<p><a name="conjugation"></a></p>
+
+<h2 id="conjugation-in-group-theory">Conjugation in Group Theory</h2>
+
+<p>Surprisingly, movement in <script type="math/tex">SE(2)</script> can always be achieved by moving somewhere, making a rotation there, and then moving back.</p>
+
+<script type="math/tex; mode=display">SE(2) = (\cdot) SO(2) (\cdot)</script>
+
+<p>If we move to a point by vector movement <script type="math/tex">p</script>, essentially we perform: <script type="math/tex">B-p</script>, then go back with <script type="math/tex">p + \dots</script>.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+B^{\prime} = \begin{bmatrix}
+R & t \\
+0 & 1
+\end{bmatrix}_B = \begin{bmatrix}
+I & p \\
+0 & 1
+\end{bmatrix} \begin{bmatrix}
+R & 0 \\
+0 & 1
+\end{bmatrix} \begin{bmatrix}
+I & -p \\
+0 & 1
+\end{bmatrix}_B %]]></script>
+
+<p><a name="lie-algebra"></a></p>
+
+<h2 id="connecting-spatial-coordinates-and-spatial-velocities-the-lie-algebra">Connecting Spatial Coordinates and Spatial Velocities: The Lie Algebra</h2>
+
+<p>The Lie Algebra maps spatial coordinates to spatial velocity.</p>
+
+<p>In the case of <script type="math/tex">SO(3)</script>, the Lie Algebra is the space of skew-symmetric matrices</p>
+
+<p>Rigid Body Kinematics: we want a differential equation (ODE) that links <script type="math/tex">\vec{\omega}</script> and <script type="math/tex">{}^{^w}R_b</script></p>
+
+<p>in particular,
+<script type="math/tex">{}^{^w} \dot{R}_r = f({}^{^w}R_b, \vec{\omega})</script></p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+\frac{ \partial }{\partial t}(R^R = I)
+ \\
+\dot{R}^TR + R^T \dot{R} = 0 \\
+\dot{R}^TR = -R^T \dot{R} 
+\end{aligned}</script>
+
+<p>we define <script type="math/tex">\Omega = R^T \dot{R}</script></p>
+
+<script type="math/tex; mode=display">\Omega^T = (R^T \dot{R} )^T = \dot{R}^TR  = -R^T \dot{R}  = -\Omega</script>
+
+<p>Skew-symmetric! $\Omega^T = -\Omega$</p>
+
+<p>In fact,</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\Omega = \begin{bmatrix}
+0 & -\omega_z & \omega_y \\
+\omega_z & 0 & -\omega_x \\
+-\omega_y & \omega_x & 0
+\end{bmatrix} %]]></script>
+
+<p>where <script type="math/tex">\vec{\omega} = \begin{bmatrix} \omega_x \\ \omega_y \\ \omega_z \end{bmatrix}</script> is the angular velocity</p>
+
+<p>Notation! the “hat” map</p>
+
+<script type="math/tex; mode=display">\bar{\omega}^{\hat{}} =\Omega</script>
+
+<p>the “v” map</p>
+
+<script type="math/tex; mode=display">\Omega^{v} = \bar{\omega}</script>
+
+<p>So we have</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+\dot{R} = R \Omega \\
+\Omega = \bar{\omega}^{\hat{}}
+\end{aligned}</script>
+
+<p>\item In terms of frames, we have Poisson’s kinematic equation</p>
+
+<p>\item The intrinsic equation is (where <script type="math/tex">\vec{\omega}_b</script> in the body frame is $\Omega_b$):</p>
+
+<script type="math/tex; mode=display">{}^{^w}\dot{R}_b =  {}^{^w}R_b \Omega_b</script>
+
+<p>The “strap-down” equation (extrinsic)</p>
+
+<script type="math/tex; mode=display">{}^{^b}\dot{R}_w =  - \Omega_b {}^{^b}R_w</script>
+
+<p>Take vector on aircraft, put it into the coordinate frame of the world</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+{}_{^w}R_b = \begin{bmatrix} | & | & | \\ {}^{^w} \hat{x}_b & {}^{^w}\hat{y}_b & {}^{^w} \hat{z}_b \\ | & | & |  \end{bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">\Omega \vec{v}_b = \omega \times \vec{v}_b</script>
+
+<p>Can we use this for filtering? Can we use <script type="math/tex">\dot{R} = R \Omega</script> directly in an EKF, UKF
+We’d have to turn it into discrete-time 
+Naively, you might do the first order Euler approximation:</p>
+
+<script type="math/tex; mode=display">\frac{ R_{t + \delta_t} -R_t}{\delta t} \approx R_t \Omega_t</script>
+
+<p>This does not work!</p>
+
+<p>You won’t maintain orthogonality! The defining property of <script type="math/tex">SO(3)</script> was orthogonality, so</p>
+
+<script type="math/tex; mode=display">R_{t + \delta t} \not\in SO(3)</script>
+
+<p>and pretty soon</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+R_{t + \delta t}^T R_{t + \delta t} \neq I \\
+\mbox{det }(R_{t+\delta t}) \neq +1
+\end{aligned}</script>
+
+<p>The 3x3 matrix will not be recognizable of a rotation</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Frank Dellaert. Lecture Presentations of MM 8803: Mobile Manipulation, taught at the Georgia Institute of Technology, Fall 2018.</p>
+
+<p>[2] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.</p>
+
+<p>[3] Steven M. LaValle. <em>Planning Algorithms</em>. Cambridge University Press, 2006, New York, NY, USA.</p>
+
+<p><strong>Rigid Body Kinematics and Filtering</strong></p>
+
+<p>Kinematics with Euler Angles</p>
+
+<p>\begin{equation}
+\dot{R} = f(R, \vec{w}), (\dot{\phi}, \dot{\theta}, \dot{\psi}) = f(\phi, \theta, \psi, \vec{\omega})
+\end{equation}</p>
+
+<p>\item</p>
+
+<p>\begin{equation}
+\vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp; 0 &amp; -\mbox{sin} \theta \ 0 &amp; \mbox{cos} \phi &amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp; -\mbox{sin} \phi &amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
+\end{equation}</p>
+
+<p>\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$</p>
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
