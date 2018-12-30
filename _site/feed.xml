@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-12-29T02:23:51-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-12-29T22:21:24-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
 </subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://johnwlambert.github.io/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/lie-groups</id><content type="html" xml:base="http://johnwlambert.github.io/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
@@ -57,7 +57,7 @@
 &lt;p&gt;&lt;strong&gt;A simple example&lt;/strong&gt;:
 Let’s move from the body frame &lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt; to a target frame &lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;:&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;P_t = {}^tR_b(\theta) P_o&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;P_t = {}^tR_b(\theta) P_b&lt;/script&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{bmatrix}

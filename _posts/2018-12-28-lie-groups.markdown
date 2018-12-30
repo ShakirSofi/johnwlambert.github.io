@@ -61,7 +61,7 @@ $$SO(2)$$ is the space of orthogonal matrices that corresponds to rotations in t
 Let's move from the body frame $$b$$ to a target frame $$t$$:
 
 $$
-P_t = {}^tR_b(\theta) P_o
+P_t = {}^tR_b(\theta) P_b
 $$
 
 $$
