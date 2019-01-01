@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Dimensionality Reduction</title>
-  <meta name="description" content="PCA, ISOMAP, LLE, SNE, t-SNE">
+  <meta name="description" content="PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE">
    <link rel="stylesheet" href="/css/main.css">
 
 
@@ -93,26 +93,168 @@
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
-  <li><a href="#costfunctions">Cost Functions</a></li>
-  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+  <li><a href="#need-for-dr">Need for Dimensionality Reduction</a></li>
+  <li><a href="#pca">PCA</a></li>
+  <li><a href="#nonlinear-dr-methods">Nonlinear Dimensionality Reduction Methods</a></li>
+  <li><a href="#isomap">ISOMAP</a></li>
+  <li><a href="#lle">LLE</a></li>
+  <li><a href="#sne">SNE</a></li>
+  <li><a href="#t-sne">t-SNE</a></li>
 </ul>
 
-<p><a name="sfmpipeline"></a></p>
+<p><a name="need-for-dr"></a></p>
 
-<h2 id="linear-methods">Linear Methods</h2>
+<h2 id="the-need-for-dimensionality-reduction">The Need for Dimensionality Reduction</h2>
 
-<h3 id="pca">PCA</h3>
+<p><a name="pca"></a></p>
+
+<h3 id="linear-methods--pca">Linear Methods &amp; PCA</h3>
+
+<p>PCA is a surprisingly confusing algorithm for linear dimensionality reduction.</p>
+
+<p>https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf</p>
+
+<p>http://theory.stanford.edu/~tim/s17/l/l8.pdf</p>
+
+<p>\subsection{Data as Points in a Euclidean Space}
+\begin{itemize}
+\item Many scalar <code class="highlighter-rouge">attributes''
+\item Could  be very high dim space, where real space of data is low-dim
+\item But data just lives in high-dim subspace
+\item Find lower-dim subspace, where close to living inside the high-dim space (lower-d structure corresponds to linear subspaces in high-dim space)
+\item Pearson (1901) -- find a single lower dimensional subspace that captures most of the variation in the data
+\item What should be the dimensionality of the lower-dim space? How many dimensions do we need to explain most of the variability in the data
+\item Acts as a proxy for the real space
+\item Minimize errors introudced by projecting the data into this subspace
+\item Assumption: data has zero mean,</code>centered data’’
+\item Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system
+\item As a consequence, variance becomes just the 2nd moment
+\item Data points in 2D -&gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
+\item Bring it back onto the best fit line (multiply by vector)
+\begin{equation}
+x_{||} = vv^Tx
+\end{equation}
+\item Minimize an error function: error equivalent to maximizing the variance of the projected data
+\begin{equation}
+E = \frac{1}{M} \sum\limits_I \sum\limits_M … = &lt; |x^{\prime \mu} - x_{||}^{\prime \mu}|^2 &gt;<em>{\mu}
+\end{equation}
+$I$ dimensions
+\item WHY IS THIS?
+\item Trying to find the directions of maximum variance
+\item Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)
+\item If the covariance matrix is diagonal, then finding the direction of maximum variance is easy
+\item Rotate your coordinate system so that the covariance matrix becomes diagonal.
+\item This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?
+\item Solve all top-k possible subspaces
+\item Valid for all of them
+\item Check the error depending on many dimensions we used. A tradeoff
+\item $\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
+\item Projection $x</em>{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$
+\item Projection operator = $\mathbf{V}\mathbf{V}^T$
+\item But in general $P$ is of low rank and loses info
+\item Variance and reconstruction error
+\begin{equation}
+&lt;x^Tx&gt; - &lt;y_{||}^T y_{||}&gt;
+\end{equation}
+\item Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)
+\item Spectral analysis of the covariance matrix:
+if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors
+\item The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative
+\item Have diagonalized the covariance matrix, aligned, which was what we set out to do
+\item This is an extremal trace problem?
+\item 
+\begin{equation}
+\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2
+\end{equation}
+\item $ = \mbox{tr }(V^{\prime T} \Lambda V^{\prime})$
+\item To maximize the variance, need to put as mucch weight as possible on the large eigenvalues
+\item The reconstruction error is 
+\begin{equation}
+\sum\limits_{i=P+1}^I \lambda_i
+\end{equation}
+\item Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace
+\item \textbf{Main Lesson from PCA}: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix
+\item The eigenvectors give us the frame that we need – align with it
+\end{itemize}
+\subsection{PCA Examples}
+\begin{itemize}
+\item First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)
+\item This is simply what the analysis gives.
+\item The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)
+\item Geography of where an individual came from is reflected in their genetic material
+\item Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix
+\item PCA works very well here
+\item View matrices as points in high-dimensional space
+\item Recover grid structure for deformed sphere
+\item Get circular pattern of galloping horse from points
+\end{itemize}
+\subsection{Trick}
+\begin{itemize}
+\item What if we have fewer data points than dimensions $M&lt;I$? Think of images…
+\item By SVD, transpose your data
+\item Think of your data as rows, not columns
+\item Data becomes first pixel across 1000 images
+\item Covariance matrix $C_2$ of transposed problem
+\item Rows of transformed X (PCA’d X) are just eigenvectors of $C_1$
+\item Corresponding eigenvalues are just those of $C_2$, scaled by $I/M$</p>
+
+<p>ntroduced by Pearson (1901)
+and Hotelling (1933) to
+describe the variation in a set
+of multivariate data in terms of
+a set of uncorrelated variables.
+PCA looks for a single lower
+dimensional subspace that
+captures most of the variation
+in the data.
+Specifically, we aim to
+minimize the error introduced
+by projecting the data into this
+linear subspace.</p>
+
+<p>Use spectral analysis of the covariance matrix C of the
+data
+For any integer p, the error-minimizing p-dimensional
+subspace is the one spanned by the first p eigenvectors
+of the covariance matrix</p>
+
+<p>Eigenfaces (PCA on face images)</p>
+
+<p>M. Turk and A. Pentland, Face Recognition using Eigenfaces, CVPR 1991</p>
+
+<h2 id="multi-dimensional-scaling-mds">Multi-Dimensional Scaling (MDS)</h2>
+
+<p><a name="nonlinear-dr-methods"></a></p>
 
 <h2 id="non-linear-methods">Non-Linear Methods</h2>
+
+<p>Many data sets contain essential nonlinear structures and unfortunately these structures are invisible to linear methods like PCA [1].</p>
+
+<p>For example, Euclidean distance between points cannot disentangle or capture the structure of manifolds like the “swiss roll.” Instead, we need geodesic distance: distance directly on the manifold.</p>
+
+<p>Furthermore, PCA cares about large distances. The goal is to maximize variance, and variance comes from things that are far apart. If you care about small distances, PCA is the wrong tool to use.</p>
 
 <h2 id="creating-graphs-from-geometric-point-data">Creating Graphs from Geometric Point Data</h2>
 
 <p>Rely upon neighborhood relations. A graph can be constructed via (1) k-nearest neighbors or (2) <script type="math/tex">\epsilon</script>-balls.</p>
 
-<h3 id="isomap">Isomap</h3>
+<p><a name="isomap"></a></p>
 
-<h3 id="eigenmap">EigenMap</h3>
+<h3 id="isometric-feature-mapping-isomap">Isometric Feature Mapping (ISOMAP)</h3>
+
+<p>In the case of the swiss roll, Isometric Feature Mapping (ISOMAP) produces an unrolled, planar version of data that respects distances [5]. This is “isometric” unrolling.</p>
+
+<p>The ISOMAP algorithm involves three main steps, as outlined by Guibas [1]:</p>
+
+<ul>
+  <li>(1.) Form a nearest-neighbor graph <script type="math/tex">\mathcal{G}</script> on the original data points, weighing the edges by their original distances <script type="math/tex">d_x(i,j)</script>. One can build the NN-graph either (A) with a fixed radius/threshold <script type="math/tex">\epsilon</script>, or by using a (B) fixed # of neighbors.</li>
+  <li>(2.) Estimate the geodesic distances <script type="math/tex">d_{\mathcal{G}}(i,j)</script> between all pairs of points on the sampled manifold by computing their shortest path distances in the graph <script type="math/tex">\mathcal{G}</script>. This can be done with classic graph algorithms for all-pairs shortest-path algorithm (APSP)s: Floyd/Warshall’s algorithm or Dijkstra’s algorithm. Initially, all pairs given distance <script type="math/tex">\infty</script>, except for neighbors, which are connected.</li>
+  <li>(3.) Construct an embedding of the data in <script type="math/tex">d</script>-dimensional Euclidean space that best preserves the inter-point distances <script type="math/tex">d_{\mathcal{G}}(i,j)</script>. This is performed via Multi-Dimensional Scaling (MDS).</li>
+</ul>
+
+<p>ISOMAP actually comes with recovery guarantees that discovered structure equal to actual structure of the manifold, especially as the graph point density increases. MDS and ISOMAP both converge, but ISOMAP gets there more quickly.</p>
+
+<p><a name="lle"></a></p>
 
 <h3 id="locally-linear-embedding-lle">Locally Linear Embedding (LLE)</h3>
 
@@ -153,6 +295,8 @@ The optimization problem becomes:</li>
 local neighborhoods – collectively analyzed – can provide information about global
 geometry</em>”” [4].</p>
 
+<p><a name="sne"></a></p>
+
 <h3 id="stochastic-neighbor-embedding-sne">Stochastic Neighbor Embedding (SNE)</h3>
 
 <p>The Stochastic Neighbor Embedding (SNE) converts high-dimensional points to low-dimensional points by preserving distances. The method takes a probabilistic point of view: high-dimensional Euclidean point distances are converted into conditional probabilities that represent similarities [2,3].</p>
@@ -161,7 +305,7 @@ geometry</em>”” [4].</p>
 
 <script type="math/tex; mode=display">p_{j \mid i} = \frac{\mbox{exp }\big( - \frac{\|x_i - x_j\|^2}{2 \sigma_i^2}\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \frac{\|x_i - x_k\|^2}{2 \sigma_i^2} \big)}</script>
 
-<p>Similarity of datapoints in <strong>the low dimension</strong></p>
+<p>Similarity of datapoints in <strong>the low dimension</strong>:</p>
 
 <script type="math/tex; mode=display">q_{j \mid i} = \frac{\mbox{exp }\big( - \|y_i - y_j\|^2\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \|y_i - y_k\|^2 \big)}</script>
 
@@ -176,6 +320,8 @@ geometry</em>”” [4].</p>
 <script type="math/tex; mode=display">\frac{\partial C}{\partial y_i} = 2 \sum\limits_j (p_{j \mid i} - q_{j \mid i} - p_{i \mid j} - q_{i \mid j} )(y_i - y_j)</script>
 
 <p>However, the Kullback-Leibler divergence is not symmetric, so a formulation with a joint distribution can be made.</p>
+
+<p><a name="t-sne"></a></p>
 
 <h3 id="t-sne">t-SNE</h3>
 
@@ -196,6 +342,15 @@ geometry</em>”” [4].</p>
 <p>[3] L.J.P. van der Maaten and G.E. Hinton. <em>Visualizing High-Dimensional Data Using t-SNE</em>. Journal of Machine Learning Research 9 (Nov):2579-2605, 2008.</p>
 
 <p>[4] Sam T. Roweis and Lawrence K. Saul. <em>Nonlinear Dimensionality Reduction by Locally Linear Embedding</em>. Science Magazine, Vol. 290,  22 Dec. 2000.</p>
+
+<p>[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. <em>A Global Geometric Framework for Nonlinear Dimensionality Reduction</em>. Science 290 (5500): 2319-2323, 22 December 2000.</p>
+
+<p>[6] Laurenz Wiskott. <em>Principal Component Analysis</em>. 11 March 2004. <a href="https://pdfs.semanticscholar.org/d657/68e1dad46bbdb5cfb17eb19eb07cc0f5947c.pdf">Online PDF</a>.</p>
+
+<p>[7] Karl Pearson. <em>On Lines and Planes of Closest Fit to Systems of Points in Space</em>. 1901. Philosophical Magazine. 2 (11): 559–572.</p>
+
+<p>[8] H Hotelling. <em>Analysis of a complex of statistical variables into principal components</em>. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
+Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.</p>
 
 
   </article>
