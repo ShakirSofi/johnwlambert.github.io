@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/dimensionality-reduction/">
+  <link rel="canonical" href="http://johnwlambert.github.io/dimensionality-reduction/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -106,97 +106,138 @@
 
 <h2 id="the-need-for-dimensionality-reduction">The Need for Dimensionality Reduction</h2>
 
+<p>When the dimensionality of data points is high, interpretation or visualization of the data can be quite challenging.</p>
+
 <p><a name="pca"></a></p>
 
-<h3 id="linear-methods--pca">Linear Methods &amp; PCA</h3>
+<h3 id="linear-methods">Linear Methods</h3>
 
-<p>PCA is a surprisingly confusing algorithm for linear dimensionality reduction.</p>
+<h2 id="principal-components-analysis-pca">Principal Components Analysis (PCA)</h2>
 
-<p>https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf</p>
+<p>PCA is an algorithm for linear dimensionality reduction that can be surprisingly confusing. There are many different ways to explain the algorithm, and it is not new – Karl Pearson (University College, London) introduced the ideas in 1901 and Harold Hostelling (Columbia) developed the terminology and more of the math about principal components in 1933.</p>
 
-<p>http://theory.stanford.edu/~tim/s17/l/l8.pdf</p>
+<p>To understand PCA, we must first consider data as points in a Euclidean space.  Suppose the lies in a high-dimensional subspace, but the real space of the data could be low-dimensional. We would like to identify the real, lower-dim subspace where lower-dim structure corresponds to linear subspaces in the high-dim space.</p>
 
-<p>\subsection{Data as Points in a Euclidean Space}
-\begin{itemize}
-\item Many scalar <code class="highlighter-rouge">attributes''
-\item Could  be very high dim space, where real space of data is low-dim
-\item But data just lives in high-dim subspace
-\item Find lower-dim subspace, where close to living inside the high-dim space (lower-d structure corresponds to linear subspaces in high-dim space)
-\item Pearson (1901) -- find a single lower dimensional subspace that captures most of the variation in the data
-\item What should be the dimensionality of the lower-dim space? How many dimensions do we need to explain most of the variability in the data
-\item Acts as a proxy for the real space
-\item Minimize errors introudced by projecting the data into this subspace
-\item Assumption: data has zero mean,</code>centered data’’
-\item Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system
-\item As a consequence, variance becomes just the 2nd moment
-\item Data points in 2D -&gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
-\item Bring it back onto the best fit line (multiply by vector)
-\begin{equation}
-x_{||} = vv^Tx
-\end{equation}
-\item Minimize an error function: error equivalent to maximizing the variance of the projected data
-\begin{equation}
-E = \frac{1}{M} \sum\limits_I \sum\limits_M … = &lt; |x^{\prime \mu} - x_{||}^{\prime \mu}|^2 &gt;<em>{\mu}
-\end{equation}
-$I$ dimensions
-\item WHY IS THIS?
-\item Trying to find the directions of maximum variance
-\item Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)
-\item If the covariance matrix is diagonal, then finding the direction of maximum variance is easy
-\item Rotate your coordinate system so that the covariance matrix becomes diagonal.
-\item This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?
-\item Solve all top-k possible subspaces
-\item Valid for all of them
-\item Check the error depending on many dimensions we used. A tradeoff
-\item $\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
-\item Projection $x</em>{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$
-\item Projection operator = $\mathbf{V}\mathbf{V}^T$
-\item But in general $P$ is of low rank and loses info
-\item Variance and reconstruction error
-\begin{equation}
-&lt;x^Tx&gt; - &lt;y_{||}^T y_{||}&gt;
-\end{equation}
-\item Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)
-\item Spectral analysis of the covariance matrix:
-if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors
-\item The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative
-\item Have diagonalized the covariance matrix, aligned, which was what we set out to do
-\item This is an extremal trace problem?
-\item 
-\begin{equation}
-\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2
-\end{equation}
-\item $ = \mbox{tr }(V^{\prime T} \Lambda V^{\prime})$
-\item To maximize the variance, need to put as mucch weight as possible on the large eigenvalues
-\item The reconstruction error is 
-\begin{equation}
-\sum\limits_{i=P+1}^I \lambda_i
-\end{equation}
-\item Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace
-\item \textbf{Main Lesson from PCA}: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix
-\item The eigenvectors give us the frame that we need – align with it
-\end{itemize}
-\subsection{PCA Examples}
-\begin{itemize}
-\item First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)
-\item This is simply what the analysis gives.
-\item The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)
-\item Geography of where an individual came from is reflected in their genetic material
-\item Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix
-\item PCA works very well here
-\item View matrices as points in high-dimensional space
-\item Recover grid structure for deformed sphere
-\item Get circular pattern of galloping horse from points
-\end{itemize}
-\subsection{Trick}
-\begin{itemize}
-\item What if we have fewer data points than dimensions $M&lt;I$? Think of images…
-\item By SVD, transpose your data
-\item Think of your data as rows, not columns
-\item Data becomes first pixel across 1000 images
-\item Covariance matrix $C_2$ of transposed problem
-\item Rows of transformed X (PCA’d X) are just eigenvectors of $C_1$
-\item Corresponding eigenvalues are just those of $C_2$, scaled by $I/M$</p>
+<p><strong>PCA has one key hyperparameter: the dimensionality of the lower-dim space.</strong> How many dimensions do we need to explain most of the variability in the data?</p>
+
+<p>The key idea is that we will project the points from high-D to low-D, and then when we project them back into high-D, the “reconstruction error” should be minimized.</p>
+
+<p>\item Pearson (1901) – find a single lower dimensional subspace that captures most of the variation in the data
+\item What should be the dimensionality of the lower-dim space?</p>
+
+<p>Acts as a proxy for the real space</p>
+
+<p>Minimize errors introudced by projecting the data into this subspace</p>
+
+<p>Assumption: data has zero mean, ``centered data’’</p>
+
+<p>Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system</p>
+
+<p>As a consequence, variance becomes just the 2nd moment</p>
+
+<p>Data points in 2D -&gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
+Bring it back onto the best fit line (multiply by vector)</p>
+
+<script type="math/tex; mode=display">x_{||} = vv^Tx</script>
+
+<p>Minimize an error function: error equivalent to maximizing the variance of the projected data</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+E = \frac{1}{M} \sum\limits_I \sum\limits_M ... = < \|x^{\prime \mu} - x_{||}^{\prime \mu}\|^2 >_{\mu} %]]></script>
+
+<p>$I$ dimensions
+WHY IS THIS?
+Trying to find the directions of maximum variance
+Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)</p>
+
+<p>If the covariance matrix is diagonal, then finding the direction of maximum variance is easy</p>
+
+<p>Rotate your coordinate system so that the covariance matrix becomes diagonal.</p>
+
+<p>This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?</p>
+
+<p>Solve all top-k possible subspaces</p>
+
+<p>Valid for all of them</p>
+
+<p>Check the error depending on many dimensions we used. A tradeoff
+$\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
+Projection $x_{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$</p>
+
+<p>Projection operator = $\mathbf{V}\mathbf{V}^T$</p>
+
+<p>But in general $P$ is of low rank and loses info</p>
+
+<p>Variance and reconstruction error</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+<x^Tx> - <y_{||}^T y_{||}> %]]></script>
+
+<p>Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)</p>
+
+<p>Spectral analysis of the covariance matrix:
+if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors</p>
+
+<p>The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative</p>
+
+<p>Have diagonalized the covariance matrix, aligned, which was what we set out to do</p>
+
+<p>This is an extremal trace problem?</p>
+
+<script type="math/tex; mode=display">\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2</script>
+
+<script type="math/tex; mode=display">= \mbox{tr }(V^{\prime T} \Lambda V^{\prime})</script>
+
+<p>To maximize the variance, need to put as mucch weight as possible on the large eigenvalues</p>
+
+<p>The reconstruction error is</p>
+
+<script type="math/tex; mode=display">\sum\limits_{i=P+1}^I \lambda_i</script>
+
+<p>Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace</p>
+
+<h3 id="eigenvectors-solve-pca">Eigenvectors Solve PCA</h3>
+
+<p><strong>Main Lesson from PCA</strong>: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix</p>
+
+<p>The eigenvectors give us the frame that we need – align with it</p>
+
+<h3 id="pca-examples">PCA Examples</h3>
+
+<p>First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)</p>
+
+<p>This is simply what the analysis gives.</p>
+
+<p>The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)</p>
+
+<p>Geography of where an individual came from is reflected in their genetic material</p>
+
+<p>Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix</p>
+
+<p>PCA works very well here</p>
+
+<p>View matrices as points in high-dimensional space</p>
+
+<p>Recover grid structure for deformed sphere</p>
+
+<p>Get circular pattern of galloping horse from points</p>
+
+<h3 id="svd-trick">SVD Trick</h3>
+
+<p>What if we have fewer data points than dimensions <script type="math/tex">% <![CDATA[
+M<I %]]></script>? Think of images…</p>
+
+<p>By SVD, transpose your data</p>
+
+<p>Think of your data as rows, not columns</p>
+
+<p>Data becomes first pixel across 1000 images</p>
+
+<p>Covariance matrix <script type="math/tex">C_2</script> of transposed problem</p>
+
+<p>Rows of transformed X (PCA’d X) are just eigenvectors of <script type="math/tex">C_1</script></p>
+
+<p>Corresponding eigenvalues are just those of <script type="math/tex">C_2</script>, scaled by <script type="math/tex">I/M</script></p>
 
 <p>ntroduced by Pearson (1901)
 and Hotelling (1933) to
@@ -221,6 +262,10 @@ of the covariance matrix</p>
 <p>Eigenfaces (PCA on face images)</p>
 
 <p>M. Turk and A. Pentland, Face Recognition using Eigenfaces, CVPR 1991</p>
+
+<p>https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf</p>
+
+<p>http://theory.stanford.edu/~tim/s17/l/l8.pdf</p>
 
 <h2 id="multi-dimensional-scaling-mds">Multi-Dimensional Scaling (MDS)</h2>
 

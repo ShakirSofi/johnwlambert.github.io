@@ -9,10 +9,18 @@ mathjax: true
 
 ---
 
+Table of Contents:
+- [Policy Gradients](#policy-gradients)
+- [Geometric Intuition](#geometric-intuition)
+- [Math Background](#math-background)
+- [Policy Gradient Theorem](#pg-theorem)
+- [The Probability of a Trajectory, Given a Policy](#prob-trajectory)
+- [The REINFORCE Algorithm](#reinforce)
+- [TD Error as Advantage Function](#td-error-advantage-fn)
+- [Trust Region Policy Optimization (TRPO)](#trpo)
+- [Truncated Natural Gradient Policy Algorithm](#trunc-natural-grad)
 
-
-
-
+<a name='policy-gradients'></a>
 
 ## Policy Gradients
 
@@ -28,9 +36,7 @@ Cons:
 - Converge to local optima. Often there are many optima.
 - Unlike human learning: humans can use rapid, abstract model building.
 
-
-### Background 
-
+<a name='geometric-intuition'></a>
 
 ### Geometric Intuition
 
@@ -44,6 +50,8 @@ For every \\(x_i\\), the gradient estimator \\( \hat{g}_i\\) tries to push up on
     With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
   </div>
 </div>
+
+<a name='math-background'></a>
 
 ### Math Background
 To understand the proofs, you'll need to understand 3 simple tricks:
@@ -64,8 +72,9 @@ $$
 \frac{a}{b} = \frac{a \cdot p(x)}{b \cdot p(x)}
 $$
 
-## Policy Gradient Theorem
+<a name='pg-theorem'></a>
 
+## Policy Gradient Theorem
 
 Let \\(x\\) be the action we will choose, \\(s\\) be the parameterization of our current state, \\(\theta\\) be the weights of our neural network. Then our neural network will directly output probabilities \\(p(x \mid s; \theta)\\) that depend upon the input (\\(s\\)) and the network weights (\\( \theta \\)).
 
@@ -116,6 +125,8 @@ $$
 
 The reward over a trajectory is simple: \\(R(\tau) = \sum\limits_{t=0}^{T-1}r_t\\)
 
+<a name='prob-trajectory'></a>
+
 ## The Probability of a Trajectory, Given a Policy
 
 $$
@@ -148,6 +159,7 @@ $$
 
 This concludes the derivation of the Policy Gradient Theorem for entire trajectories.
 
+<a name='reinforce'></a>
 
 ## The REINFORCE Algorithm
 
@@ -214,6 +226,8 @@ $$
 
 Did things get better after one time step? Of course, a Critic could estimate both. But there’s a better way!
 
+<a name='td-error-advantage-fn'></a>
+
 ### TD Error as Advantage Function
 
 Make the good trajectories more probable, make the bad trajectories less probable (high variance)
@@ -242,6 +256,8 @@ $$
 = A^{\pi_{\theta}}(s,a)
 \end{aligned}
 $$
+
+<a name='trpo'></a>
 
 ## TRPO: From 1st Order to 2nd Order
 
@@ -276,6 +292,8 @@ What if we used a 2nd order optimization method instead of our vanilla 1st order
 We would compute the Hessian of the KL divergence, not of our objective 
 
 Hessian computation is extremely expensive...( 100,000 x 100,000 )
+
+<a name='trunc-natural-grad'></a>
 
 ### Truncated Natural Gradient Policy Algorithm
 
