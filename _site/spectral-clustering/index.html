@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Spectral Clustering</title>
+  <meta name="description" content="">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/spectral-clustering/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Spectral Clustering</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#need-for-dr">Need for Dimensionality Reduction</a></li>
+  <li><a href="#pca">PCA</a></li>
+</ul>
+
+<p><a name="need-for-dr"></a></p>
+
+<h2 id="spectral-clustering">Spectral Clustering</h2>
+
+<p>\subsection{Graph Partitioning}
+\begin{itemize}
+\item Graph-cut problem: partition graph such that (1) edges between groups have a very low weight, and (2) edges within a group have high weight
+\item Could use \textbf{Ratio Cut} (by size of the component) or the \textbf{Normalized Cut} (or by volume of the component, aka the sum of degrees)
+\item Penalize using very small components, or very large components
+\item These are NP-hard combinatorial problems. But Spectral clustering offers a way to solve the relaxation version of these problems
+\item NCut -&gt; use random-walk laplacian
+\item RatioCut -&gt; use unnormalized laplacian
+\item 2-partition: assign by vector values of Fiedler vectors $\in \mathbbm{R}$, which ones $\in \mathbbm{R}<em>+$, or in $\mathbbm{R}</em>-$
+\item Can apply k-means or standard clustering algorithm on the embedded points (transform graph clustering into a point clustering problem!). Take you into point cloud setting
+\item K-means minimizes the distortion measure/energy
+\begin{equation}
+J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
+\end{equation}
+\item Centroid already minimizes the sum of squared distances
+\item Can only reduce energy in every step (locally converge to minimum)
+\item Can discover number of clusters that you need – look at gap between eigenvalues, where is there a large gap $|\lambda_k - \lambda_{k-1}|$. 
+\item Eigenvalues drop fast, then stabilize
+\item Spectral clustering can cluster spirals of points, where k-nearest neighbors in this space would epicly fail
+\item Look at data at a very different way… Even though data comes from a Euclidean space, easier to understand in the spectral space
+\item edge weight $\mbox{exp} (-diff(pixel_{i}, pixel_j)/t^2 )$
+\item Get reasonable, but not perfect, results for 3d segmentation
+\item Fast and efficient with decent results
+\end{itemize}</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Leonidas Guibas. <em>Graph Laplacians, Laplacian Embeddings, and Spectral Clustering</em>. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

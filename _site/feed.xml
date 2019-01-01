@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-31T22:56:16-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-01-01T01:09:35-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
 </subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
@@ -292,7 +292,44 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 \vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://localhost:4000/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/spectral-clustering</id><content type="html" xml:base="http://localhost:4000/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;need-for-dr&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;spectral-clustering&quot;&gt;Spectral Clustering&lt;/h2&gt;
+
+&lt;p&gt;\subsection{Graph Partitioning}
+\begin{itemize}
+\item Graph-cut problem: partition graph such that (1) edges between groups have a very low weight, and (2) edges within a group have high weight
+\item Could use \textbf{Ratio Cut} (by size of the component) or the \textbf{Normalized Cut} (or by volume of the component, aka the sum of degrees)
+\item Penalize using very small components, or very large components
+\item These are NP-hard combinatorial problems. But Spectral clustering offers a way to solve the relaxation version of these problems
+\item NCut -&amp;gt; use random-walk laplacian
+\item RatioCut -&amp;gt; use unnormalized laplacian
+\item 2-partition: assign by vector values of Fiedler vectors $\in \mathbbm{R}$, which ones $\in \mathbbm{R}&lt;em&gt;+$, or in $\mathbbm{R}&lt;/em&gt;-$
+\item Can apply k-means or standard clustering algorithm on the embedded points (transform graph clustering into a point clustering problem!). Take you into point cloud setting
+\item K-means minimizes the distortion measure/energy
+\begin{equation}
+J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
+\end{equation}
+\item Centroid already minimizes the sum of squared distances
+\item Can only reduce energy in every step (locally converge to minimum)
+\item Can discover number of clusters that you need – look at gap between eigenvalues, where is there a large gap $|\lambda_k - \lambda_{k-1}|$. 
+\item Eigenvalues drop fast, then stabilize
+\item Spectral clustering can cluster spirals of points, where k-nearest neighbors in this space would epicly fail
+\item Look at data at a very different way… Even though data comes from a Euclidean space, easier to understand in the spectral space
+\item edge weight $\mbox{exp} (-diff(pixel_{i}, pixel_j)/t^2 )$
+\item Get reasonable, but not perfect, results for 3d segmentation
+\item Fast and efficient with decent results
+\end{itemize}&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -309,26 +346,168 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://localhost:4000/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/dimensionality-reduction</id><content type="html" xml:base="http://localhost:4000/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#nonlinear-dr-methods&quot;&gt;Nonlinear Dimensionality Reduction Methods&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#isomap&quot;&gt;ISOMAP&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#lle&quot;&gt;LLE&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#sne&quot;&gt;SNE&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#t-sne&quot;&gt;t-SNE&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a name=&quot;need-for-dr&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;linear-methods&quot;&gt;Linear Methods&lt;/h2&gt;
+&lt;h2 id=&quot;the-need-for-dimensionality-reduction&quot;&gt;The Need for Dimensionality Reduction&lt;/h2&gt;
 
-&lt;h3 id=&quot;pca&quot;&gt;PCA&lt;/h3&gt;
+&lt;p&gt;&lt;a name=&quot;pca&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;linear-methods--pca&quot;&gt;Linear Methods &amp;amp; PCA&lt;/h3&gt;
+
+&lt;p&gt;PCA is a surprisingly confusing algorithm for linear dimensionality reduction.&lt;/p&gt;
+
+&lt;p&gt;https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf&lt;/p&gt;
+
+&lt;p&gt;http://theory.stanford.edu/~tim/s17/l/l8.pdf&lt;/p&gt;
+
+&lt;p&gt;\subsection{Data as Points in a Euclidean Space}
+\begin{itemize}
+\item Many scalar &lt;code class=&quot;highlighter-rouge&quot;&gt;attributes''
+\item Could  be very high dim space, where real space of data is low-dim
+\item But data just lives in high-dim subspace
+\item Find lower-dim subspace, where close to living inside the high-dim space (lower-d structure corresponds to linear subspaces in high-dim space)
+\item Pearson (1901) -- find a single lower dimensional subspace that captures most of the variation in the data
+\item What should be the dimensionality of the lower-dim space? How many dimensions do we need to explain most of the variability in the data
+\item Acts as a proxy for the real space
+\item Minimize errors introudced by projecting the data into this subspace
+\item Assumption: data has zero mean,&lt;/code&gt;centered data’’
+\item Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system
+\item As a consequence, variance becomes just the 2nd moment
+\item Data points in 2D -&amp;gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
+\item Bring it back onto the best fit line (multiply by vector)
+\begin{equation}
+x_{||} = vv^Tx
+\end{equation}
+\item Minimize an error function: error equivalent to maximizing the variance of the projected data
+\begin{equation}
+E = \frac{1}{M} \sum\limits_I \sum\limits_M … = &amp;lt; |x^{\prime \mu} - x_{||}^{\prime \mu}|^2 &amp;gt;&lt;em&gt;{\mu}
+\end{equation}
+$I$ dimensions
+\item WHY IS THIS?
+\item Trying to find the directions of maximum variance
+\item Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)
+\item If the covariance matrix is diagonal, then finding the direction of maximum variance is easy
+\item Rotate your coordinate system so that the covariance matrix becomes diagonal.
+\item This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?
+\item Solve all top-k possible subspaces
+\item Valid for all of them
+\item Check the error depending on many dimensions we used. A tradeoff
+\item $\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
+\item Projection $x&lt;/em&gt;{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$
+\item Projection operator = $\mathbf{V}\mathbf{V}^T$
+\item But in general $P$ is of low rank and loses info
+\item Variance and reconstruction error
+\begin{equation}
+&amp;lt;x^Tx&amp;gt; - &amp;lt;y_{||}^T y_{||}&amp;gt;
+\end{equation}
+\item Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)
+\item Spectral analysis of the covariance matrix:
+if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors
+\item The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative
+\item Have diagonalized the covariance matrix, aligned, which was what we set out to do
+\item This is an extremal trace problem?
+\item 
+\begin{equation}
+\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2
+\end{equation}
+\item $ = \mbox{tr }(V^{\prime T} \Lambda V^{\prime})$
+\item To maximize the variance, need to put as mucch weight as possible on the large eigenvalues
+\item The reconstruction error is 
+\begin{equation}
+\sum\limits_{i=P+1}^I \lambda_i
+\end{equation}
+\item Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace
+\item \textbf{Main Lesson from PCA}: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix
+\item The eigenvectors give us the frame that we need – align with it
+\end{itemize}
+\subsection{PCA Examples}
+\begin{itemize}
+\item First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)
+\item This is simply what the analysis gives.
+\item The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)
+\item Geography of where an individual came from is reflected in their genetic material
+\item Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix
+\item PCA works very well here
+\item View matrices as points in high-dimensional space
+\item Recover grid structure for deformed sphere
+\item Get circular pattern of galloping horse from points
+\end{itemize}
+\subsection{Trick}
+\begin{itemize}
+\item What if we have fewer data points than dimensions $M&amp;lt;I$? Think of images…
+\item By SVD, transpose your data
+\item Think of your data as rows, not columns
+\item Data becomes first pixel across 1000 images
+\item Covariance matrix $C_2$ of transposed problem
+\item Rows of transformed X (PCA’d X) are just eigenvectors of $C_1$
+\item Corresponding eigenvalues are just those of $C_2$, scaled by $I/M$&lt;/p&gt;
+
+&lt;p&gt;ntroduced by Pearson (1901)
+and Hotelling (1933) to
+describe the variation in a set
+of multivariate data in terms of
+a set of uncorrelated variables.
+PCA looks for a single lower
+dimensional subspace that
+captures most of the variation
+in the data.
+Specifically, we aim to
+minimize the error introduced
+by projecting the data into this
+linear subspace.&lt;/p&gt;
+
+&lt;p&gt;Use spectral analysis of the covariance matrix C of the
+data
+For any integer p, the error-minimizing p-dimensional
+subspace is the one spanned by the first p eigenvectors
+of the covariance matrix&lt;/p&gt;
+
+&lt;p&gt;Eigenfaces (PCA on face images)&lt;/p&gt;
+
+&lt;p&gt;M. Turk and A. Pentland, Face Recognition using Eigenfaces, CVPR 1991&lt;/p&gt;
+
+&lt;h2 id=&quot;multi-dimensional-scaling-mds&quot;&gt;Multi-Dimensional Scaling (MDS)&lt;/h2&gt;
+
+&lt;p&gt;&lt;a name=&quot;nonlinear-dr-methods&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;non-linear-methods&quot;&gt;Non-Linear Methods&lt;/h2&gt;
+
+&lt;p&gt;Many data sets contain essential nonlinear structures and unfortunately these structures are invisible to linear methods like PCA [1].&lt;/p&gt;
+
+&lt;p&gt;For example, Euclidean distance between points cannot disentangle or capture the structure of manifolds like the “swiss roll.” Instead, we need geodesic distance: distance directly on the manifold.&lt;/p&gt;
+
+&lt;p&gt;Furthermore, PCA cares about large distances. The goal is to maximize variance, and variance comes from things that are far apart. If you care about small distances, PCA is the wrong tool to use.&lt;/p&gt;
 
 &lt;h2 id=&quot;creating-graphs-from-geometric-point-data&quot;&gt;Creating Graphs from Geometric Point Data&lt;/h2&gt;
 
 &lt;p&gt;Rely upon neighborhood relations. A graph can be constructed via (1) k-nearest neighbors or (2) &lt;script type=&quot;math/tex&quot;&gt;\epsilon&lt;/script&gt;-balls.&lt;/p&gt;
 
-&lt;h3 id=&quot;isomap&quot;&gt;Isomap&lt;/h3&gt;
+&lt;p&gt;&lt;a name=&quot;isomap&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;eigenmap&quot;&gt;EigenMap&lt;/h3&gt;
+&lt;h3 id=&quot;isometric-feature-mapping-isomap&quot;&gt;Isometric Feature Mapping (ISOMAP)&lt;/h3&gt;
+
+&lt;p&gt;In the case of the swiss roll, Isometric Feature Mapping (ISOMAP) produces an unrolled, planar version of data that respects distances [5]. This is “isometric” unrolling.&lt;/p&gt;
+
+&lt;p&gt;The ISOMAP algorithm involves three main steps, as outlined by Guibas [1]:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;(1.) Form a nearest-neighbor graph &lt;script type=&quot;math/tex&quot;&gt;\mathcal{G}&lt;/script&gt; on the original data points, weighing the edges by their original distances &lt;script type=&quot;math/tex&quot;&gt;d_x(i,j)&lt;/script&gt;. One can build the NN-graph either (A) with a fixed radius/threshold &lt;script type=&quot;math/tex&quot;&gt;\epsilon&lt;/script&gt;, or by using a (B) fixed # of neighbors.&lt;/li&gt;
+  &lt;li&gt;(2.) Estimate the geodesic distances &lt;script type=&quot;math/tex&quot;&gt;d_{\mathcal{G}}(i,j)&lt;/script&gt; between all pairs of points on the sampled manifold by computing their shortest path distances in the graph &lt;script type=&quot;math/tex&quot;&gt;\mathcal{G}&lt;/script&gt;. This can be done with classic graph algorithms for all-pairs shortest-path algorithm (APSP)s: Floyd/Warshall’s algorithm or Dijkstra’s algorithm. Initially, all pairs given distance &lt;script type=&quot;math/tex&quot;&gt;\infty&lt;/script&gt;, except for neighbors, which are connected.&lt;/li&gt;
+  &lt;li&gt;(3.) Construct an embedding of the data in &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;-dimensional Euclidean space that best preserves the inter-point distances &lt;script type=&quot;math/tex&quot;&gt;d_{\mathcal{G}}(i,j)&lt;/script&gt;. This is performed via Multi-Dimensional Scaling (MDS).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ISOMAP actually comes with recovery guarantees that discovered structure equal to actual structure of the manifold, especially as the graph point density increases. MDS and ISOMAP both converge, but ISOMAP gets there more quickly.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;lle&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;locally-linear-embedding-lle&quot;&gt;Locally Linear Embedding (LLE)&lt;/h3&gt;
 
@@ -369,6 +548,8 @@ The optimization problem becomes:&lt;/li&gt;
 local neighborhoods – collectively analyzed – can provide information about global
 geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 
+&lt;p&gt;&lt;a name=&quot;sne&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
 &lt;h3 id=&quot;stochastic-neighbor-embedding-sne&quot;&gt;Stochastic Neighbor Embedding (SNE)&lt;/h3&gt;
 
 &lt;p&gt;The Stochastic Neighbor Embedding (SNE) converts high-dimensional points to low-dimensional points by preserving distances. The method takes a probabilistic point of view: high-dimensional Euclidean point distances are converted into conditional probabilities that represent similarities [2,3].&lt;/p&gt;
@@ -377,7 +558,7 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;p_{j \mid i} = \frac{\mbox{exp }\big( - \frac{\|x_i - x_j\|^2}{2 \sigma_i^2}\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \frac{\|x_i - x_k\|^2}{2 \sigma_i^2} \big)}&lt;/script&gt;
 
-&lt;p&gt;Similarity of datapoints in &lt;strong&gt;the low dimension&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Similarity of datapoints in &lt;strong&gt;the low dimension&lt;/strong&gt;:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;q_{j \mid i} = \frac{\mbox{exp }\big( - \|y_i - y_j\|^2\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \|y_i - y_k\|^2 \big)}&lt;/script&gt;
 
@@ -392,6 +573,8 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial C}{\partial y_i} = 2 \sum\limits_j (p_{j \mid i} - q_{j \mid i} - p_{i \mid j} - q_{i \mid j} )(y_i - y_j)&lt;/script&gt;
 
 &lt;p&gt;However, the Kullback-Leibler divergence is not symmetric, so a formulation with a joint distribution can be made.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;t-sne&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;t-sne&quot;&gt;t-SNE&lt;/h3&gt;
 
@@ -411,7 +594,16 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 
 &lt;p&gt;[3] L.J.P. van der Maaten and G.E. Hinton. &lt;em&gt;Visualizing High-Dimensional Data Using t-SNE&lt;/em&gt;. Journal of Machine Learning Research 9 (Nov):2579-2605, 2008.&lt;/p&gt;
 
-&lt;p&gt;[4] Sam T. Roweis and Lawrence K. Saul. &lt;em&gt;Nonlinear Dimensionality Reduction by Locally Linear Embedding&lt;/em&gt;. Science Magazine, Vol. 290,  22 Dec. 2000.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[4] Sam T. Roweis and Lawrence K. Saul. &lt;em&gt;Nonlinear Dimensionality Reduction by Locally Linear Embedding&lt;/em&gt;. Science Magazine, Vol. 290,  22 Dec. 2000.&lt;/p&gt;
+
+&lt;p&gt;[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. &lt;em&gt;A Global Geometric Framework for Nonlinear Dimensionality Reduction&lt;/em&gt;. Science 290 (5500): 2319-2323, 22 December 2000.&lt;/p&gt;
+
+&lt;p&gt;[6] Laurenz Wiskott. &lt;em&gt;Principal Component Analysis&lt;/em&gt;. 11 March 2004. &lt;a href=&quot;https://pdfs.semanticscholar.org/d657/68e1dad46bbdb5cfb17eb19eb07cc0f5947c.pdf&quot;&gt;Online PDF&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[7] Karl Pearson. &lt;em&gt;On Lines and Planes of Closest Fit to Systems of Points in Space&lt;/em&gt;. 1901. Philosophical Magazine. 2 (11): 559–572.&lt;/p&gt;
+
+&lt;p&gt;[8] H Hotelling. &lt;em&gt;Analysis of a complex of statistical variables into principal components&lt;/em&gt;. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
+Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1410,46 +1602,4 @@ the intensity map are discretized at a spatial resolution of 5cm covering a 30m�
 
 &lt;p&gt;[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. &lt;em&gt;Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes&lt;/em&gt;. In IEEE International Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.&lt;/p&gt;
 
-&lt;p&gt;[9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. &lt;em&gt;Learning to Localize Using a LiDAR Intensity Map&lt;/em&gt;. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">ICP, grid histograms, ...</summary></entry><entry><title type="html">The Kalman Filter</title><link href="http://localhost:4000/kalman-filter/" rel="alternate" type="text/html" title="The Kalman Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/kalman-filter</id><content type="html" xml:base="http://localhost:4000/kalman-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;what-is-the-kalman-filter&quot;&gt;What is the Kalman Filter?&lt;/h2&gt;
-
-&lt;p&gt;The Kalman Filter is nothing more than the Bayes’ Filter for Gaussian distributed random variables. The Bayes’ Filter is described in a &lt;a href=&quot;/bayes-filter/&quot;&gt;previous post&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;It is a very surprising result that we can write out the integrals analytically for the Bayes’ Filter when working with a special family of distributions: Gaussian distributed random variables (r.v.’s).  As we recall from the Bayes’ Filter, we have three quantities that we’ll need to be able to evaluate:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;(1) &lt;script type=&quot;math/tex&quot;&gt;\int_{x_{t-1}} p(x_t \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1}) dx_{t-1}&lt;/script&gt;&lt;/li&gt;
-  &lt;li&gt;(2) &lt;script type=&quot;math/tex&quot;&gt;p(x_t \mid x_{t-1})  = f(x_t, x_{t-1} )&lt;/script&gt;&lt;/li&gt;
-  &lt;li&gt;(3) &lt;script type=&quot;math/tex&quot;&gt;p(y_t \mid x_t) = g(y_t, x_t)&lt;/script&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Expressions (2) and (3) must be finitely parameterizable. It will take a fair amount of work to derive the analytical formulas of the Bayes’ Filter for Gaussian r.v.’s (the Kalman Filter).  We’ll first review properties of multivariate Gaussians, then the Woodbury matrix inversion lemmas, intuition behind covariance matrices, and then derive the Kalman Filter.&lt;/p&gt;
-
-&lt;h2 id=&quot;woodbury-matrix-inversion-lemmas&quot;&gt;Woodbury Matrix Inversion Lemmas&lt;/h2&gt;
-
-&lt;h2 id=&quot;kalman-filter-derivation&quot;&gt;Kalman Filter Derivation&lt;/h2&gt;
-
-&lt;h2 id=&quot;gaussian-white-noise&quot;&gt;Gaussian White Noise&lt;/h2&gt;
-
-&lt;p&gt;In practice, noise is usually not Gaussian and is not white (usually colored).&lt;/p&gt;
-
-&lt;p&gt;\item Fact: For a Linear-Gaussian dynamical system (one who’s dynamics are expressed with Gaussian White Noise
-\begin{equation}
-\begin{array}{ll}
-x_{t+1} = Ax_t + B u_t + w_t, &amp;amp; w_t \sim \mathcal{N}(0,Q) &lt;br /&gt;
-\end{array}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\begin{array}{ll}
-y_t = Cx_t + Du_t + v_t, &amp;amp; v_t \sim \mathcal{N}(O, R)
-\end{array}
-\end{equation}
-where $w_t, v_t$ are zero-mean white noise&lt;/p&gt;</content><author><name></name></author><summary type="html">Multivariate Gaussians, ...</summary></entry></feed>
+&lt;p&gt;[9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. &lt;em&gt;Learning to Localize Using a LiDAR Intensity Map&lt;/em&gt;. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">ICP, grid histograms, ...</summary></entry></feed>
