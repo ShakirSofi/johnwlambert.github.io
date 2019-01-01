@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/policy-gradients/">
+  <link rel="canonical" href="http://johnwlambert.github.io/policy-gradients/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -91,7 +91,22 @@
   </header>
 
   <article class="post-content">
-  <h2 id="policy-gradients">Policy Gradients</h2>
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#policy-gradients">Policy Gradients</a></li>
+  <li><a href="#geometric-intuition">Geometric Intuition</a></li>
+  <li><a href="#math-background">Math Background</a></li>
+  <li><a href="#pg-theorem">Policy Gradient Theorem</a></li>
+  <li><a href="#prob-trajectory">The Probability of a Trajectory, Given a Policy</a></li>
+  <li><a href="#reinforce">The REINFORCE Algorithm</a></li>
+  <li><a href="#td-error-advantage-fn">TD Error as Advantage Function</a></li>
+  <li><a href="#trpo">Trust Region Policy Optimization (TRPO)</a></li>
+  <li><a href="#trunc-natural-grad">Truncated Natural Gradient Policy Algorithm</a></li>
+</ul>
+
+<p><a name="policy-gradients"></a></p>
+
+<h2 id="policy-gradients">Policy Gradients</h2>
 
 <p>As opposed to Deep Q-Learning, policy gradients is a method to directly output probabilities of actions. We scale gradients of actions by reward.</p>
 
@@ -109,7 +124,7 @@
   <li>Unlike human learning: humans can use rapid, abstract model building.</li>
 </ul>
 
-<h3 id="background">Background</h3>
+<p><a name="geometric-intuition"></a></p>
 
 <h3 id="geometric-intuition">Geometric Intuition</h3>
 
@@ -122,6 +137,8 @@ For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its
     With higher function values f(x) to the right, the probability density p(x) will be pushed up by vectors with higher magnitude on the right.  Image source: John Schulman [2].
   </div>
 </div>
+
+<p><a name="math-background"></a></p>
 
 <h3 id="math-background">Math Background</h3>
 <p>To understand the proofs, you’ll need to understand 3 simple tricks:</p>
@@ -141,6 +158,8 @@ For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its
 </ul>
 
 <script type="math/tex; mode=display">\frac{a}{b} = \frac{a \cdot p(x)}{b \cdot p(x)}</script>
+
+<p><a name="pg-theorem"></a></p>
 
 <h2 id="policy-gradient-theorem">Policy Gradient Theorem</h2>
 
@@ -184,6 +203,8 @@ For every \(x_i\), the gradient estimator \( \hat{g}_i\) tries to push up on its
 
 <p>The reward over a trajectory is simple: \(R(\tau) = \sum\limits_{t=0}^{T-1}r_t\)</p>
 
+<p><a name="prob-trajectory"></a></p>
+
 <h2 id="the-probability-of-a-trajectory-given-a-policy">The Probability of a Trajectory, Given a Policy</h2>
 
 <script type="math/tex; mode=display">% <![CDATA[
@@ -208,6 +229,8 @@ p(\tau \mid \theta) &= \underbrace{ \mu(s_0) }_{\text{initial state distribution
 <script type="math/tex; mode=display">\nabla_{\theta} \mathbb{E}_{\tau} [R(\tau)] = \mathbb{E}_{\tau} \Big[ R(\tau) \nabla_{\theta} \sum\limits_{t=0}^{T-1} \mbox{log }\pi (a_t \mid s_t, \theta) \Big]</script>
 
 <p>This concludes the derivation of the Policy Gradient Theorem for entire trajectories.</p>
+
+<p><a name="reinforce"></a></p>
 
 <h2 id="the-reinforce-algorithm">The REINFORCE Algorithm</h2>
 
@@ -273,6 +296,8 @@ We want an advantage function \(A^{\pi}(s,a)\)  to tell us how much better is ac
 
 <p>Did things get better after one time step? Of course, a Critic could estimate both. But there’s a better way!</p>
 
+<p><a name="td-error-advantage-fn"></a></p>
+
 <h3 id="td-error-as-advantage-function">TD Error as Advantage Function</h3>
 
 <p>Make the good trajectories more probable, make the bad trajectories less probable (high variance)</p>
@@ -303,6 +328,8 @@ We want an advantage function \(A^{\pi}(s,a)\)  to tell us how much better is ac
 = A^{\pi_{\theta}}(s,a)
 \end{aligned} %]]></script>
 
+<p><a name="trpo"></a></p>
+
 <h2 id="trpo-from-1st-order-to-2nd-order">TRPO: From 1st Order to 2nd Order</h2>
 
 <p>We don’t have access to the objective function in analytic form. However, we can estimate the gradient as the expected return of our policy by sampling trajectories. The gradient ascent update is correct if we make an infinitesimally small change.</p>
@@ -331,6 +358,8 @@ Let’s call our true objective \( \eta(\pi)\). We will add a penalty for moving
 We would compute the Hessian of the KL divergence, not of our objective</p>
 
 <p>Hessian computation is extremely expensive…( 100,000 x 100,000 )</p>
+
+<p><a name="trunc-natural-grad"></a></p>
 
 <h3 id="truncated-natural-gradient-policy-algorithm">Truncated Natural Gradient Policy Algorithm</h3>
 

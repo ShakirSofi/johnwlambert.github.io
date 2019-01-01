@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-01-01T01:09:35-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-01T16:11:36-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://johnwlambert.github.io/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/lie-groups</id><content type="html" xml:base="http://johnwlambert.github.io/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Lie Groups&lt;/a&gt;&lt;/li&gt;
@@ -292,7 +292,7 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 \vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://localhost:4000/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/spectral-clustering</id><content type="html" xml:base="http://localhost:4000/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://johnwlambert.github.io/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/spectral-clustering</id><content type="html" xml:base="http://johnwlambert.github.io/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -329,7 +329,7 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/learning-point-cloud-features</id><content type="html" xml:base="http://johnwlambert.github.io/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -344,7 +344,7 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;p&gt;SPGN…&lt;/p&gt;
 
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://localhost:4000/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/dimensionality-reduction</id><content type="html" xml:base="http://localhost:4000/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://johnwlambert.github.io/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/dimensionality-reduction</id><content type="html" xml:base="http://johnwlambert.github.io/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -359,97 +359,138 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;h2 id=&quot;the-need-for-dimensionality-reduction&quot;&gt;The Need for Dimensionality Reduction&lt;/h2&gt;
 
+&lt;p&gt;When the dimensionality of data points is high, interpretation or visualization of the data can be quite challenging.&lt;/p&gt;
+
 &lt;p&gt;&lt;a name=&quot;pca&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;linear-methods--pca&quot;&gt;Linear Methods &amp;amp; PCA&lt;/h3&gt;
+&lt;h3 id=&quot;linear-methods&quot;&gt;Linear Methods&lt;/h3&gt;
 
-&lt;p&gt;PCA is a surprisingly confusing algorithm for linear dimensionality reduction.&lt;/p&gt;
+&lt;h2 id=&quot;principal-components-analysis-pca&quot;&gt;Principal Components Analysis (PCA)&lt;/h2&gt;
 
-&lt;p&gt;https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf&lt;/p&gt;
+&lt;p&gt;PCA is an algorithm for linear dimensionality reduction that can be surprisingly confusing. There are many different ways to explain the algorithm, and it is not new – Karl Pearson (University College, London) introduced the ideas in 1901 and Harold Hostelling (Columbia) developed the terminology and more of the math about principal components in 1933.&lt;/p&gt;
 
-&lt;p&gt;http://theory.stanford.edu/~tim/s17/l/l8.pdf&lt;/p&gt;
+&lt;p&gt;To understand PCA, we must first consider data as points in a Euclidean space.  Suppose the lies in a high-dimensional subspace, but the real space of the data could be low-dimensional. We would like to identify the real, lower-dim subspace where lower-dim structure corresponds to linear subspaces in the high-dim space.&lt;/p&gt;
 
-&lt;p&gt;\subsection{Data as Points in a Euclidean Space}
-\begin{itemize}
-\item Many scalar &lt;code class=&quot;highlighter-rouge&quot;&gt;attributes''
-\item Could  be very high dim space, where real space of data is low-dim
-\item But data just lives in high-dim subspace
-\item Find lower-dim subspace, where close to living inside the high-dim space (lower-d structure corresponds to linear subspaces in high-dim space)
-\item Pearson (1901) -- find a single lower dimensional subspace that captures most of the variation in the data
-\item What should be the dimensionality of the lower-dim space? How many dimensions do we need to explain most of the variability in the data
-\item Acts as a proxy for the real space
-\item Minimize errors introudced by projecting the data into this subspace
-\item Assumption: data has zero mean,&lt;/code&gt;centered data’’
-\item Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system
-\item As a consequence, variance becomes just the 2nd moment
-\item Data points in 2D -&amp;gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
-\item Bring it back onto the best fit line (multiply by vector)
-\begin{equation}
-x_{||} = vv^Tx
-\end{equation}
-\item Minimize an error function: error equivalent to maximizing the variance of the projected data
-\begin{equation}
-E = \frac{1}{M} \sum\limits_I \sum\limits_M … = &amp;lt; |x^{\prime \mu} - x_{||}^{\prime \mu}|^2 &amp;gt;&lt;em&gt;{\mu}
-\end{equation}
-$I$ dimensions
-\item WHY IS THIS?
-\item Trying to find the directions of maximum variance
-\item Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)
-\item If the covariance matrix is diagonal, then finding the direction of maximum variance is easy
-\item Rotate your coordinate system so that the covariance matrix becomes diagonal.
-\item This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?
-\item Solve all top-k possible subspaces
-\item Valid for all of them
-\item Check the error depending on many dimensions we used. A tradeoff
-\item $\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
-\item Projection $x&lt;/em&gt;{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$
-\item Projection operator = $\mathbf{V}\mathbf{V}^T$
-\item But in general $P$ is of low rank and loses info
-\item Variance and reconstruction error
-\begin{equation}
-&amp;lt;x^Tx&amp;gt; - &amp;lt;y_{||}^T y_{||}&amp;gt;
-\end{equation}
-\item Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)
-\item Spectral analysis of the covariance matrix:
-if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors
-\item The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative
-\item Have diagonalized the covariance matrix, aligned, which was what we set out to do
-\item This is an extremal trace problem?
-\item 
-\begin{equation}
-\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2
-\end{equation}
-\item $ = \mbox{tr }(V^{\prime T} \Lambda V^{\prime})$
-\item To maximize the variance, need to put as mucch weight as possible on the large eigenvalues
-\item The reconstruction error is 
-\begin{equation}
-\sum\limits_{i=P+1}^I \lambda_i
-\end{equation}
-\item Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace
-\item \textbf{Main Lesson from PCA}: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix
-\item The eigenvectors give us the frame that we need – align with it
-\end{itemize}
-\subsection{PCA Examples}
-\begin{itemize}
-\item First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)
-\item This is simply what the analysis gives.
-\item The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)
-\item Geography of where an individual came from is reflected in their genetic material
-\item Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix
-\item PCA works very well here
-\item View matrices as points in high-dimensional space
-\item Recover grid structure for deformed sphere
-\item Get circular pattern of galloping horse from points
-\end{itemize}
-\subsection{Trick}
-\begin{itemize}
-\item What if we have fewer data points than dimensions $M&amp;lt;I$? Think of images…
-\item By SVD, transpose your data
-\item Think of your data as rows, not columns
-\item Data becomes first pixel across 1000 images
-\item Covariance matrix $C_2$ of transposed problem
-\item Rows of transformed X (PCA’d X) are just eigenvectors of $C_1$
-\item Corresponding eigenvalues are just those of $C_2$, scaled by $I/M$&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PCA has one key hyperparameter: the dimensionality of the lower-dim space.&lt;/strong&gt; How many dimensions do we need to explain most of the variability in the data?&lt;/p&gt;
+
+&lt;p&gt;The key idea is that we will project the points from high-D to low-D, and then when we project them back into high-D, the “reconstruction error” should be minimized.&lt;/p&gt;
+
+&lt;p&gt;\item Pearson (1901) – find a single lower dimensional subspace that captures most of the variation in the data
+\item What should be the dimensionality of the lower-dim space?&lt;/p&gt;
+
+&lt;p&gt;Acts as a proxy for the real space&lt;/p&gt;
+
+&lt;p&gt;Minimize errors introudced by projecting the data into this subspace&lt;/p&gt;
+
+&lt;p&gt;Assumption: data has zero mean, ``centered data’’&lt;/p&gt;
+
+&lt;p&gt;Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system&lt;/p&gt;
+
+&lt;p&gt;As a consequence, variance becomes just the 2nd moment&lt;/p&gt;
+
+&lt;p&gt;Data points in 2D -&amp;gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
+Bring it back onto the best fit line (multiply by vector)&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{||} = vv^Tx&lt;/script&gt;
+
+&lt;p&gt;Minimize an error function: error equivalent to maximizing the variance of the projected data&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+E = \frac{1}{M} \sum\limits_I \sum\limits_M ... = &lt; \|x^{\prime \mu} - x_{||}^{\prime \mu}\|^2 &gt;_{\mu} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;$I$ dimensions
+WHY IS THIS?
+Trying to find the directions of maximum variance
+Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)&lt;/p&gt;
+
+&lt;p&gt;If the covariance matrix is diagonal, then finding the direction of maximum variance is easy&lt;/p&gt;
+
+&lt;p&gt;Rotate your coordinate system so that the covariance matrix becomes diagonal.&lt;/p&gt;
+
+&lt;p&gt;This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?&lt;/p&gt;
+
+&lt;p&gt;Solve all top-k possible subspaces&lt;/p&gt;
+
+&lt;p&gt;Valid for all of them&lt;/p&gt;
+
+&lt;p&gt;Check the error depending on many dimensions we used. A tradeoff
+$\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
+Projection $x_{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$&lt;/p&gt;
+
+&lt;p&gt;Projection operator = $\mathbf{V}\mathbf{V}^T$&lt;/p&gt;
+
+&lt;p&gt;But in general $P$ is of low rank and loses info&lt;/p&gt;
+
+&lt;p&gt;Variance and reconstruction error&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+&lt;x^Tx&gt; - &lt;y_{||}^T y_{||}&gt; %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)&lt;/p&gt;
+
+&lt;p&gt;Spectral analysis of the covariance matrix:
+if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors&lt;/p&gt;
+
+&lt;p&gt;The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative&lt;/p&gt;
+
+&lt;p&gt;Have diagonalized the covariance matrix, aligned, which was what we set out to do&lt;/p&gt;
+
+&lt;p&gt;This is an extremal trace problem?&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \mbox{tr }(V^{\prime T} \Lambda V^{\prime})&lt;/script&gt;
+
+&lt;p&gt;To maximize the variance, need to put as mucch weight as possible on the large eigenvalues&lt;/p&gt;
+
+&lt;p&gt;The reconstruction error is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=P+1}^I \lambda_i&lt;/script&gt;
+
+&lt;p&gt;Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace&lt;/p&gt;
+
+&lt;h3 id=&quot;eigenvectors-solve-pca&quot;&gt;Eigenvectors Solve PCA&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Main Lesson from PCA&lt;/strong&gt;: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix&lt;/p&gt;
+
+&lt;p&gt;The eigenvectors give us the frame that we need – align with it&lt;/p&gt;
+
+&lt;h3 id=&quot;pca-examples&quot;&gt;PCA Examples&lt;/h3&gt;
+
+&lt;p&gt;First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)&lt;/p&gt;
+
+&lt;p&gt;This is simply what the analysis gives.&lt;/p&gt;
+
+&lt;p&gt;The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)&lt;/p&gt;
+
+&lt;p&gt;Geography of where an individual came from is reflected in their genetic material&lt;/p&gt;
+
+&lt;p&gt;Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix&lt;/p&gt;
+
+&lt;p&gt;PCA works very well here&lt;/p&gt;
+
+&lt;p&gt;View matrices as points in high-dimensional space&lt;/p&gt;
+
+&lt;p&gt;Recover grid structure for deformed sphere&lt;/p&gt;
+
+&lt;p&gt;Get circular pattern of galloping horse from points&lt;/p&gt;
+
+&lt;h3 id=&quot;svd-trick&quot;&gt;SVD Trick&lt;/h3&gt;
+
+&lt;p&gt;What if we have fewer data points than dimensions &lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+M&lt;I %]]&gt;&lt;/script&gt;? Think of images…&lt;/p&gt;
+
+&lt;p&gt;By SVD, transpose your data&lt;/p&gt;
+
+&lt;p&gt;Think of your data as rows, not columns&lt;/p&gt;
+
+&lt;p&gt;Data becomes first pixel across 1000 images&lt;/p&gt;
+
+&lt;p&gt;Covariance matrix &lt;script type=&quot;math/tex&quot;&gt;C_2&lt;/script&gt; of transposed problem&lt;/p&gt;
+
+&lt;p&gt;Rows of transformed X (PCA’d X) are just eigenvectors of &lt;script type=&quot;math/tex&quot;&gt;C_1&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Corresponding eigenvalues are just those of &lt;script type=&quot;math/tex&quot;&gt;C_2&lt;/script&gt;, scaled by &lt;script type=&quot;math/tex&quot;&gt;I/M&lt;/script&gt;&lt;/p&gt;
 
 &lt;p&gt;ntroduced by Pearson (1901)
 and Hotelling (1933) to
@@ -474,6 +515,10 @@ of the covariance matrix&lt;/p&gt;
 &lt;p&gt;Eigenfaces (PCA on face images)&lt;/p&gt;
 
 &lt;p&gt;M. Turk and A. Pentland, Face Recognition using Eigenfaces, CVPR 1991&lt;/p&gt;
+
+&lt;p&gt;https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf&lt;/p&gt;
+
+&lt;p&gt;http://theory.stanford.edu/~tim/s17/l/l8.pdf&lt;/p&gt;
 
 &lt;h2 id=&quot;multi-dimensional-scaling-mds&quot;&gt;Multi-Dimensional Scaling (MDS)&lt;/h2&gt;
 
@@ -603,7 +648,7 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 &lt;p&gt;[7] Karl Pearson. &lt;em&gt;On Lines and Planes of Closest Fit to Systems of Points in Space&lt;/em&gt;. 1901. Philosophical Magazine. 2 (11): 559–572.&lt;/p&gt;
 
 &lt;p&gt;[8] H Hotelling. &lt;em&gt;Analysis of a complex of statistical variables into principal components&lt;/em&gt;. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
-Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/gaussians-and-covariance</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -696,6 +741,37 @@ Here &lt;script type=&quot;math/tex&quot;&gt;X = X_s&lt;/script&gt;, and functio
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\varepsilon = \frac{1-P}{2 \pi |\Sigma|^{1/2}} = \frac{1-0.95}{2 \pi |\Sigma|^{1/2}} = \frac{0.05}{2 \pi |\Sigma|^{1/2}}&lt;/script&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{B}(\varepsilon) = \Big\{ x \mid p(x) \geq \varepsilon \Big\}&lt;/script&gt;
+
+&lt;h2 id=&quot;covariance&quot;&gt;Covariance&lt;/h2&gt;
+
+&lt;p&gt;Cavariance Matrix How can we determine the direction of maximal variance? The first
+we can do is to determine the variances of the individual components. If the data points (or
+vectors) are written as x = (x1, x2)T (T indicates transpose), then the variances of the first
+and second component can be written as C11 := “x1x1# and C22 := “x2x2# (angle brackets
+indicate averaging over all data points). If C11 is large compared to C22, then the direction of
+maximal variance is close to (1, 0)T , while if C11 is small, the direction of maximal variance
+is close to (0, 1)T . (Notice that variance doesn’t have a polarity, so that one could use the
+inverse vector (−1, 0)T instead of (1, 0)T equally well for indicating the direction of maximal
+variance.)
+But what if C11 is of similar value as C22, like in the example of Figure 1? Then the
+co-variance between the two components, C12 := “x1x2#, can give us additional information
+(notice that C21 := “x2x1# is equal to C12). A large positive value of C12 indicates a strong
+correlation between x1 and x2 and that the data cloud is extended along the (1, 1)T direction.
+A negative value would indicate anti-correlation and an extension along the (−1, 1)T
+direction. A small value of C12 would indicate no correlation and thus little structure of
+the data, i.e. no prominent direction of maximal variance. The variances and covariances
+are conveniently arranged in a matrix with components Cij , which is called covariance matrix
+(assuming zero mean data). Figure 3 shows several data clouds and the corresponding
+covariance matrices.&lt;/p&gt;
+
+&lt;p&gt;0.2 0
+0 1&lt;/p&gt;
+
+&lt;p&gt;1 -0.5
+-0.5 0.3&lt;/p&gt;
+
+&lt;p&gt;1 0 
+0 1&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
 import numpy as np
@@ -913,16 +989,132 @@ def unit_test1():
 
 if __name__ == '__main__':
 	unit_test1()
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://localhost:4000/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/conjugate-gradients</id><content type="html" xml:base="http://localhost:4000/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://johnwlambert.github.io/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/conjugate-gradients</id><content type="html" xml:base="http://johnwlambert.github.io/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#krylov-subspaces&quot;&gt;Krylov Subspaces&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#cayley-hamilton-thm&quot;&gt;Cayley-Hamilton Theorem&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#cg-algo&quot;&gt;The CG Algorithm&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#precondition&quot;&gt;Preconditioning&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a name=&quot;conjugate-gradients&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/h2&gt;</content><author><name></name></author><summary type="html">Krylov subspaces ...</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;h2 id=&quot;conjugate-gradients-cg&quot;&gt;Conjugate Gradients (CG)&lt;/h2&gt;
+
+&lt;p&gt;Conjugate Gradients (CG) is a well-studied method introduced in 1952 by Hestenes and Stiefel [4] for solving a system of &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; equations, &lt;script type=&quot;math/tex&quot;&gt;Ax=b&lt;/script&gt;, where &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; is positive definite. Solving such a system becomes quite challenging when &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; is large. CG continues to be used today, especially in state-of-the-art reinforcement learning algorithms like &lt;a href=&quot;/policy-gradients/trunc-natural-grad&quot;&gt;TRPO&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The CG method is interesting because we never give a set of numbers for &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;. In fact, we never form or even store the matrix &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;. This could be desirable when &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; is huge. Instead, CG is simply a method for calculating &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; times a vector [1] that relies upon a deep result, the &lt;em&gt;Cayley-Hamilton Theorem&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;A common example where CG proves useful is minimization of the following quadratic form, where &lt;script type=&quot;math/tex&quot;&gt;A \in \mathbf{R}^{n \times n}&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f(x) = \frac{1}{2} x^TAx - b^Tx&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;f(x)&lt;/script&gt; is a convex function when &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; is positive definite. The gradient of &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\nabla f(x) = Ax - b&lt;/script&gt;
+
+&lt;p&gt;Setting the gradient equal to &lt;script type=&quot;math/tex&quot;&gt;0&lt;/script&gt; allows us to find the solution to this system of equations, &lt;script type=&quot;math/tex&quot;&gt;x^{\star} = A^{-1}b&lt;/script&gt;. CG is an appropriate method to do so when inverting &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; directly is not feasible.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;krylov-subspaces&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-krylov-subspace&quot;&gt;The Krylov Subspace&lt;/h2&gt;
+
+&lt;p&gt;CG relies upon an idea named the &lt;em&gt;Krylov subspace&lt;/em&gt;. The Krylov subspace is defined as the span of the vectors generated from successively higher powers of &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{K}_k = \mbox{span} \{b, Ab, \dots, A^{k-1}b \}&lt;/script&gt;
+
+&lt;p&gt;The Krylov sequence is a sequence of solutions to our convex objective &lt;script type=&quot;math/tex&quot;&gt;f(x)&lt;/script&gt;. Each successive solution has to come from a subspace &lt;script type=&quot;math/tex&quot;&gt;\mathcal{K}_k&lt;/script&gt; of progressively higher power &lt;script type=&quot;math/tex&quot;&gt;k&lt;/script&gt;. Formally, the Krylov sequence &lt;script type=&quot;math/tex&quot;&gt;x^{(1)},x^{(2)},\dots&lt;/script&gt; is defined as:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x^{(k)} = \underset{x \in \mathcal{K}_k}{\mbox{argmin }} f(x)&lt;/script&gt;
+
+&lt;p&gt;The CG algorithm generates the Krylov sequence.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Properties of the Krylov Sequence&lt;/strong&gt;
+It should be clear that &lt;script type=&quot;math/tex&quot;&gt;x^{(k)}=p_k(A)b&lt;/script&gt;, where &lt;script type=&quot;math/tex&quot;&gt;p_k&lt;/script&gt; is a polynomial with degree &lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+p_k &lt; k %]]&gt;&lt;/script&gt;, because &lt;script type=&quot;math/tex&quot;&gt;x^{(k)} \in \mathcal{K}_k&lt;/script&gt;. Surprisingly enough, the Krylov sequence is a two-term recurrence:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;x^{(k+1)} = x^{(k)} + \alpha_k r^{(k)} + \beta_k (x^{(k)} - x^{(k+1)})&lt;/script&gt;
+
+&lt;p&gt;for some values &lt;script type=&quot;math/tex&quot;&gt;\alpha_k, \beta_k&lt;/script&gt;.This means the current iterate is a linear combination of the previous two iterates.  This is the basis of the CG algorithm.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;cayley-hamilton-thm&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;cayley-hamilton-theorem&quot;&gt;Cayley-Hamilton Theorem&lt;/h2&gt;
+
+&lt;p&gt;The reason the Krylov subspace is helpful is because &lt;script type=&quot;math/tex&quot;&gt;x^{\star} = A^{-1}b \in \mathcal{K}_n&lt;/script&gt;. I will show why. The Cayley-Hamilton Theorem states that if &lt;script type=&quot;math/tex&quot;&gt;A \in \mathbf{R}^{n \times n}&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A^n + \alpha_1 A^{n-1} + \cdots + \alpha_n I = 0&lt;/script&gt;
+
+&lt;p&gt;We can solve for &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt; by rearranging terms:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\alpha_n I = - A^n + - \alpha_1 A^{n-1} + \cdots + \alpha_{n-1} A^{1}&lt;/script&gt;
+
+&lt;p&gt;We now divide by &lt;script type=&quot;math/tex&quot;&gt;\alpha_n&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;I = - \frac{1}{\alpha_n} A^n + -  \frac{\alpha_1}{\alpha_n} A^{n-1} + \cdots +  \frac{\alpha_{n-1}}{\alpha_n} A^{1}&lt;/script&gt;
+
+&lt;p&gt;We now left-multiply all terms by &lt;script type=&quot;math/tex&quot;&gt;A^{-1}&lt;/script&gt; and simplify:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{aligned}
+A^{-1}I &amp; = - \frac{1}{\alpha_n} A^{-1} A^n + -  \frac{\alpha_1}{\alpha_n} A^{-1} A^{n-1} + \cdots +  \frac{\alpha_{n-1}}{\alpha_n} A^{-1} A^{1} \\
+A^{-1} &amp; = - \frac{1}{\alpha_n} A^{n-1} + -  \frac{\alpha_1}{\alpha_n}  A^{n-2} + \cdots +  \frac{\alpha_{n-1}}{\alpha_n} I \\
+\end{aligned} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;We can now see that &lt;script type=&quot;math/tex&quot;&gt;x^{\star}&lt;/script&gt; is a linear combination of the vectors that span the Krylov subspace. Thus, &lt;script type=&quot;math/tex&quot;&gt;x^{\star} = A^{-1}b \in \mathcal{K}_n&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;cg-algo&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-cg-algorithm&quot;&gt;The CG Algorithm&lt;/h2&gt;
+
+&lt;p&gt;We will maintain the square of the residual &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; at each step, which we call &lt;script type=&quot;math/tex&quot;&gt;r_k&lt;/script&gt;. If the square root of your residual is small enough, &lt;script type=&quot;math/tex&quot;&gt;\sqrt{\rho_{k-1}}&lt;/script&gt;, then you can quit. Your search direction is &lt;script type=&quot;math/tex&quot;&gt;p&lt;/script&gt;: the combination of your current r esidual and the previous search direction [2,3].&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;\(x:=0\),  \(r:=b\),  \( \rho_0 := | r |^2 \)&lt;/li&gt;
+  &lt;li&gt;for &lt;script type=&quot;math/tex&quot;&gt;k=1,\dots,N_{max}&lt;/script&gt;
+    &lt;ul&gt;
+      &lt;li&gt;quit if &lt;script type=&quot;math/tex&quot;&gt;\sqrt{\rho_{k-1}} \leq \epsilon \|b\|&lt;/script&gt;&lt;/li&gt;
+      &lt;li&gt;if \(k=1\)
+        &lt;ul&gt;
+          &lt;li&gt;\( p:= r \)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;else
+        &lt;ul&gt;
+          &lt;li&gt;\( p:= r + \frac{\rho_{k-1}}{\rho_{k-2}} \)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;\( w:=Ap \)&lt;/li&gt;
+      &lt;li&gt;\( \alpha := \frac{ \rho_{k-1} }{ p^Tw } \)&lt;/li&gt;
+      &lt;li&gt;\( x := x + \alpha p \)&lt;/li&gt;
+      &lt;li&gt;\( r := r - \alpha w \)&lt;/li&gt;
+      &lt;li&gt;\( \rho_k := |r|^2 \)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Along the way, we’ve created the Krylov sequence &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;. Operations like &lt;script type=&quot;math/tex&quot;&gt;x + \alpha p&lt;/script&gt; or &lt;script type=&quot;math/tex&quot;&gt;r - \alpha w&lt;/script&gt; are &lt;script type=&quot;math/tex&quot;&gt;\mathcal{O}(n)&lt;/script&gt; (BLAS level-1).&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;precondition&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;preconditioning&quot;&gt;Preconditioning&lt;/h2&gt;
+
+&lt;p&gt;It turns out that CG will often just fail. The trick in CG is to change coordinates first (precondition) and then run CG on the system in the changed coordinates. This is because of round-off errors that accumulate, leading to unstability and divergence. For example, we may want to make the spectrum of &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; clustered.&lt;/p&gt;
+
+&lt;p&gt;A generic preconditioner is a diagonal matrix, e.g.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;M = \mbox{diag}(\frac{1}{A_{11}}, \dots, \frac{1}{A_{nn}})&lt;/script&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Stephen Boyd. &lt;em&gt;Conjugate Gradient Method&lt;/em&gt;. EE364b Lectures Slides, Stanford University. &lt;a href=&quot;https://web.stanford.edu/class/ee364b/lectures/conj_grad_slides.pdf&quot;&gt;https://web.stanford.edu/class/ee364b/lectures/conj_grad_slides.pdf&lt;/a&gt;. &lt;a href=&quot;https://www.youtube.com/watch?v=E4gl91l0l40&quot;&gt;Video&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[2] C.T. Kelley. &lt;em&gt;Iterative Methods for Optimization&lt;/em&gt;. SIAM, 2000.&lt;/p&gt;
+
+&lt;p&gt;[3] C. Kelley. &lt;em&gt;Iterative Methods for Linear and Nonlinear Equations&lt;/em&gt;. Frontiers in Applied Mathematics SIAM, (1995). &lt;a href=&quot;https://archive.siam.org/books/textbooks/fr16_book.pdf&quot;&gt;https://archive.siam.org/books/textbooks/fr16_book.pdf&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[4] Magnus Hestenes and Eduard Stiefel. &lt;em&gt;Method of Conjugate Gradients for Solving Linear Systems&lt;/em&gt;. Journal of Research of the National Bureau of Standards, Vol. 49, No. 6, December 1952. &lt;a href=&quot;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&quot;&gt;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://johnwlambert.github.io/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/slam</id><content type="html" xml:base="http://johnwlambert.github.io/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -955,7 +1147,7 @@ simultaneous localization and mapping. IEEE Transactions on Robotics,
 applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 2005.&lt;/p&gt;
 
-&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://localhost:4000/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/sfm</id><content type="html" xml:base="http://localhost:4000/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://johnwlambert.github.io/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/sfm</id><content type="html" xml:base="http://johnwlambert.github.io/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1029,7 +1221,7 @@ applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 
 &lt;p&gt;[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. &lt;em&gt;Bundle Adjustment — A Modern Synthesis&lt;/em&gt;. &lt;a href=&quot;https://hal.inria.fr/inria-00548290/document&quot;&gt;https://hal.inria.fr/inria-00548290/document&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://localhost:4000/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/particle-filter</id><content type="html" xml:base="http://localhost:4000/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://johnwlambert.github.io/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/particle-filter</id><content type="html" xml:base="http://johnwlambert.github.io/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1522,7 +1714,7 @@ Important for SLAM, because in SLAM we often want to estimate the history of the
 
 &lt;p&gt;[2] SJ Julier, JK Uhlmann, HF Durrant-Whyte. &lt;em&gt;A new approach for filtering nonlinear systems&lt;/em&gt;. Proceedings of the American Control Conference, June 1995, Volume 3, pages 1628-1632.&lt;/p&gt;
 
-&lt;p&gt;[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. &lt;em&gt;A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators&lt;/em&gt;. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry><entry><title type="html">Robot Localization</title><link href="http://localhost:4000/robot-localization/" rel="alternate" type="text/html" title="Robot Localization" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/localization</id><content type="html" xml:base="http://localhost:4000/robot-localization/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. &lt;em&gt;A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators&lt;/em&gt;. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry><entry><title type="html">Robot Localization</title><link href="http://johnwlambert.github.io/robot-localization/" rel="alternate" type="text/html" title="Robot Localization" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/localization</id><content type="html" xml:base="http://johnwlambert.github.io/robot-localization/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;

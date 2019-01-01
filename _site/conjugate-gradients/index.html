@@ -7,12 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Conjugate Gradients</title>
-  <meta name="description" content="Krylov subspaces ...">
+  <meta name="description" content="large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem">
    <link rel="stylesheet" href="/css/main.css">
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/conjugate-gradients/">
+  <link rel="canonical" href="http://johnwlambert.github.io/conjugate-gradients/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -93,14 +93,131 @@
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
-  <li><a href="#costfunctions">Cost Functions</a></li>
-  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+  <li><a href="#conjugate-gradients">Conjugate Gradients</a></li>
+  <li><a href="#krylov-subspaces">Krylov Subspaces</a></li>
+  <li><a href="#cayley-hamilton-thm">Cayley-Hamilton Theorem</a></li>
+  <li><a href="#cg-algo">The CG Algorithm</a></li>
+  <li><a href="#precondition">Preconditioning</a></li>
 </ul>
 
-<p><a name="sfmpipeline"></a></p>
+<p><a name="conjugate-gradients"></a></p>
 
-<h2 id="conjugate-gradients">Conjugate Gradients</h2>
+<h2 id="conjugate-gradients-cg">Conjugate Gradients (CG)</h2>
+
+<p>Conjugate Gradients (CG) is a well-studied method introduced in 1952 by Hestenes and Stiefel [4] for solving a system of <script type="math/tex">n</script> equations, <script type="math/tex">Ax=b</script>, where <script type="math/tex">A</script> is positive definite. Solving such a system becomes quite challenging when <script type="math/tex">n</script> is large. CG continues to be used today, especially in state-of-the-art reinforcement learning algorithms like <a href="/policy-gradients/trunc-natural-grad">TRPO</a>.</p>
+
+<p>The CG method is interesting because we never give a set of numbers for <script type="math/tex">A</script>. In fact, we never form or even store the matrix <script type="math/tex">A</script>. This could be desirable when <script type="math/tex">A</script> is huge. Instead, CG is simply a method for calculating <script type="math/tex">A</script> times a vector [1] that relies upon a deep result, the <em>Cayley-Hamilton Theorem</em>.</p>
+
+<p>A common example where CG proves useful is minimization of the following quadratic form, where <script type="math/tex">A \in \mathbf{R}^{n \times n}</script>:</p>
+
+<script type="math/tex; mode=display">f(x) = \frac{1}{2} x^TAx - b^Tx</script>
+
+<p><script type="math/tex">f(x)</script> is a convex function when <script type="math/tex">A</script> is positive definite. The gradient of <script type="math/tex">f</script> is:</p>
+
+<script type="math/tex; mode=display">\nabla f(x) = Ax - b</script>
+
+<p>Setting the gradient equal to <script type="math/tex">0</script> allows us to find the solution to this system of equations, <script type="math/tex">x^{\star} = A^{-1}b</script>. CG is an appropriate method to do so when inverting <script type="math/tex">A</script> directly is not feasible.</p>
+
+<p><a name="krylov-subspaces"></a></p>
+
+<h2 id="the-krylov-subspace">The Krylov Subspace</h2>
+
+<p>CG relies upon an idea named the <em>Krylov subspace</em>. The Krylov subspace is defined as the span of the vectors generated from successively higher powers of <script type="math/tex">A</script>:</p>
+
+<script type="math/tex; mode=display">\mathcal{K}_k = \mbox{span} \{b, Ab, \dots, A^{k-1}b \}</script>
+
+<p>The Krylov sequence is a sequence of solutions to our convex objective <script type="math/tex">f(x)</script>. Each successive solution has to come from a subspace <script type="math/tex">\mathcal{K}_k</script> of progressively higher power <script type="math/tex">k</script>. Formally, the Krylov sequence <script type="math/tex">x^{(1)},x^{(2)},\dots</script> is defined as:</p>
+
+<script type="math/tex; mode=display">x^{(k)} = \underset{x \in \mathcal{K}_k}{\mbox{argmin }} f(x)</script>
+
+<p>The CG algorithm generates the Krylov sequence.</p>
+
+<p><strong>Properties of the Krylov Sequence</strong>
+It should be clear that <script type="math/tex">x^{(k)}=p_k(A)b</script>, where <script type="math/tex">p_k</script> is a polynomial with degree <script type="math/tex">% <![CDATA[
+p_k < k %]]></script>, because <script type="math/tex">x^{(k)} \in \mathcal{K}_k</script>. Surprisingly enough, the Krylov sequence is a two-term recurrence:</p>
+
+<script type="math/tex; mode=display">x^{(k+1)} = x^{(k)} + \alpha_k r^{(k)} + \beta_k (x^{(k)} - x^{(k+1)})</script>
+
+<p>for some values <script type="math/tex">\alpha_k, \beta_k</script>.This means the current iterate is a linear combination of the previous two iterates.  This is the basis of the CG algorithm.</p>
+
+<p><a name="cayley-hamilton-thm"></a></p>
+
+<h2 id="cayley-hamilton-theorem">Cayley-Hamilton Theorem</h2>
+
+<p>The reason the Krylov subspace is helpful is because <script type="math/tex">x^{\star} = A^{-1}b \in \mathcal{K}_n</script>. I will show why. The Cayley-Hamilton Theorem states that if <script type="math/tex">A \in \mathbf{R}^{n \times n}</script>:</p>
+
+<script type="math/tex; mode=display">A^n + \alpha_1 A^{n-1} + \cdots + \alpha_n I = 0</script>
+
+<p>We can solve for <script type="math/tex">I</script> by rearranging terms:</p>
+
+<script type="math/tex; mode=display">\alpha_n I = - A^n + - \alpha_1 A^{n-1} + \cdots + \alpha_{n-1} A^{1}</script>
+
+<p>We now divide by <script type="math/tex">\alpha_n</script>:</p>
+
+<script type="math/tex; mode=display">I = - \frac{1}{\alpha_n} A^n + -  \frac{\alpha_1}{\alpha_n} A^{n-1} + \cdots +  \frac{\alpha_{n-1}}{\alpha_n} A^{1}</script>
+
+<p>We now left-multiply all terms by <script type="math/tex">A^{-1}</script> and simplify:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+A^{-1}I & = - \frac{1}{\alpha_n} A^{-1} A^n + -  \frac{\alpha_1}{\alpha_n} A^{-1} A^{n-1} + \cdots +  \frac{\alpha_{n-1}}{\alpha_n} A^{-1} A^{1} \\
+A^{-1} & = - \frac{1}{\alpha_n} A^{n-1} + -  \frac{\alpha_1}{\alpha_n}  A^{n-2} + \cdots +  \frac{\alpha_{n-1}}{\alpha_n} I \\
+\end{aligned} %]]></script>
+
+<p>We can now see that <script type="math/tex">x^{\star}</script> is a linear combination of the vectors that span the Krylov subspace. Thus, <script type="math/tex">x^{\star} = A^{-1}b \in \mathcal{K}_n</script>.</p>
+
+<p><a name="cg-algo"></a></p>
+
+<h2 id="the-cg-algorithm">The CG Algorithm</h2>
+
+<p>We will maintain the square of the residual <script type="math/tex">r</script> at each step, which we call <script type="math/tex">r_k</script>. If the square root of your residual is small enough, <script type="math/tex">\sqrt{\rho_{k-1}}</script>, then you can quit. Your search direction is <script type="math/tex">p</script>: the combination of your current r esidual and the previous search direction [2,3].</p>
+
+<ul>
+  <li>\(x:=0\),  \(r:=b\),  \( \rho_0 := | r |^2 \)</li>
+  <li>for <script type="math/tex">k=1,\dots,N_{max}</script>
+    <ul>
+      <li>quit if <script type="math/tex">\sqrt{\rho_{k-1}} \leq \epsilon \|b\|</script></li>
+      <li>if \(k=1\)
+        <ul>
+          <li>\( p:= r \)</li>
+        </ul>
+      </li>
+      <li>else
+        <ul>
+          <li>\( p:= r + \frac{\rho_{k-1}}{\rho_{k-2}} \)</li>
+        </ul>
+      </li>
+      <li>\( w:=Ap \)</li>
+      <li>\( \alpha := \frac{ \rho_{k-1} }{ p^Tw } \)</li>
+      <li>\( x := x + \alpha p \)</li>
+      <li>\( r := r - \alpha w \)</li>
+      <li>\( \rho_k := |r|^2 \)</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Along the way, we’ve created the Krylov sequence <script type="math/tex">x</script>. Operations like <script type="math/tex">x + \alpha p</script> or <script type="math/tex">r - \alpha w</script> are <script type="math/tex">\mathcal{O}(n)</script> (BLAS level-1).</p>
+
+<p><a name="precondition"></a></p>
+
+<h2 id="preconditioning">Preconditioning</h2>
+
+<p>It turns out that CG will often just fail. The trick in CG is to change coordinates first (precondition) and then run CG on the system in the changed coordinates. This is because of round-off errors that accumulate, leading to unstability and divergence. For example, we may want to make the spectrum of <script type="math/tex">A</script> clustered.</p>
+
+<p>A generic preconditioner is a diagonal matrix, e.g.</p>
+
+<script type="math/tex; mode=display">M = \mbox{diag}(\frac{1}{A_{11}}, \dots, \frac{1}{A_{nn}})</script>
+
+<h2 id="references">References</h2>
+
+<p>[1] Stephen Boyd. <em>Conjugate Gradient Method</em>. EE364b Lectures Slides, Stanford University. <a href="https://web.stanford.edu/class/ee364b/lectures/conj_grad_slides.pdf">https://web.stanford.edu/class/ee364b/lectures/conj_grad_slides.pdf</a>. <a href="https://www.youtube.com/watch?v=E4gl91l0l40">Video</a>.</p>
+
+<p>[2] C.T. Kelley. <em>Iterative Methods for Optimization</em>. SIAM, 2000.</p>
+
+<p>[3] C. Kelley. <em>Iterative Methods for Linear and Nonlinear Equations</em>. Frontiers in Applied Mathematics SIAM, (1995). <a href="https://archive.siam.org/books/textbooks/fr16_book.pdf">https://archive.siam.org/books/textbooks/fr16_book.pdf</a>.</p>
+
+<p>[4] Magnus Hestenes and Eduard Stiefel. <em>Method of Conjugate Gradients for Solving Linear Systems</em>. Journal of Research of the National Bureau of Standards, Vol. 49, No. 6, December 1952. <a href="https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf">https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf</a>.</p>
+
 
   </article>
 

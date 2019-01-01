@@ -52,9 +52,18 @@ Today, the computer vision community is learning how to use statistical learning
       </div>
     </div>
 
+    <div class="module-header">Module 2: Numerical Linear Algebra </div>
+    
+    <div class="materials-item">
+      <a href="conjugate-gradients/">
+         Conjugate Gradients
+      </a>
+      <div class="kw">
+        large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem
+      </div>
+    </div>
 
-
-    <div class="module-header">Module 2: SVMs and Optimization </div>
+    <div class="module-header">Module 3: SVMs and Optimization </div>
 
     <div class="materials-item">
       <a href="kernel-trick/">
@@ -92,9 +101,6 @@ Today, the computer vision community is learning how to use statistical learning
         Convex Optimization Part II
       </div>
     </div>
-
-
-    <div class="module-header">Module 3: MPI </div>
 
     <div class="module-header">Module 4: State Estimation </div>
 
@@ -159,7 +165,7 @@ Today, the computer vision community is learning how to use statistical learning
 
     <div class="module-header">Module 7: Geometric Data Analysis </div>
 
-
+    <div class="module-header">Module 8: MPI </div>
  
   </div>
 </div>

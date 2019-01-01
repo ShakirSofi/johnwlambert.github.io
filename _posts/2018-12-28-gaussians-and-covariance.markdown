@@ -131,6 +131,42 @@ $$
 $$
 
 
+## Covariance
+
+Cavariance Matrix How can we determine the direction of maximal variance? The first
+we can do is to determine the variances of the individual components. If the data points (or
+vectors) are written as x = (x1, x2)T (T indicates transpose), then the variances of the first
+and second component can be written as C11 := "x1x1# and C22 := "x2x2# (angle brackets
+indicate averaging over all data points). If C11 is large compared to C22, then the direction of
+maximal variance is close to (1, 0)T , while if C11 is small, the direction of maximal variance
+is close to (0, 1)T . (Notice that variance doesn’t have a polarity, so that one could use the
+inverse vector (−1, 0)T instead of (1, 0)T equally well for indicating the direction of maximal
+variance.)
+But what if C11 is of similar value as C22, like in the example of Figure 1? Then the
+co-variance between the two components, C12 := "x1x2#, can give us additional information
+(notice that C21 := "x2x1# is equal to C12). A large positive value of C12 indicates a strong
+correlation between x1 and x2 and that the data cloud is extended along the (1, 1)T direction.
+A negative value would indicate anti-correlation and an extension along the (−1, 1)T
+direction. A small value of C12 would indicate no correlation and thus little structure of
+the data, i.e. no prominent direction of maximal variance. The variances and covariances
+are conveniently arranged in a matrix with components Cij , which is called covariance matrix
+(assuming zero mean data). Figure 3 shows several data clouds and the corresponding
+covariance matrices.
+
+0.2 0
+0 1
+
+
+1 -0.5
+-0.5 0.3
+
+
+1 0 
+0 1
+
+
+
+
 ```
 
 import numpy as np
