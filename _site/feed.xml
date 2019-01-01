@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2018-12-29T22:21:24-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://johnwlambert.github.io/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/lie-groups</id><content type="html" xml:base="http://johnwlambert.github.io/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-31T22:56:16-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Lie Groups&lt;/a&gt;&lt;/li&gt;
@@ -292,7 +292,126 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 \vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/gaussians-and-covariance</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;semantic-segmentation-of-features&quot;&gt;Semantic Segmentation of Features&lt;/h2&gt;
+
+&lt;h2 id=&quot;instance-segmentation-of-features&quot;&gt;Instance Segmentation of Features&lt;/h2&gt;
+
+&lt;p&gt;SPGN…&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://localhost:4000/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/dimensionality-reduction</id><content type="html" xml:base="http://localhost:4000/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;linear-methods&quot;&gt;Linear Methods&lt;/h2&gt;
+
+&lt;h3 id=&quot;pca&quot;&gt;PCA&lt;/h3&gt;
+
+&lt;h2 id=&quot;non-linear-methods&quot;&gt;Non-Linear Methods&lt;/h2&gt;
+
+&lt;h2 id=&quot;creating-graphs-from-geometric-point-data&quot;&gt;Creating Graphs from Geometric Point Data&lt;/h2&gt;
+
+&lt;p&gt;Rely upon neighborhood relations. A graph can be constructed via (1) k-nearest neighbors or (2) &lt;script type=&quot;math/tex&quot;&gt;\epsilon&lt;/script&gt;-balls.&lt;/p&gt;
+
+&lt;h3 id=&quot;isomap&quot;&gt;Isomap&lt;/h3&gt;
+
+&lt;h3 id=&quot;eigenmap&quot;&gt;EigenMap&lt;/h3&gt;
+
+&lt;h3 id=&quot;locally-linear-embedding-lle&quot;&gt;Locally Linear Embedding (LLE)&lt;/h3&gt;
+
+&lt;p&gt;LLE is a method that learns linear weights that locally reconstruct points in order to map points to a lower dimension [1,4]. The method requires solving two successive optimization problems and requires a connectivity graph. Almost all methods start with the nearest neihgbor graph, since it’s the only thing that we can trust.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;strong&gt;first step of LLE&lt;/strong&gt;, we find weights that reconstruct each data point from its neighbors:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+\underset{w}{\mbox{minimize }} &amp; \| x_i - \sum\limits_{j \in N(i)} w_{ij}x_j \|^2 \\
+\mbox{subject to} &amp; \sum\limits_j w_{ij} = 1
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;We can use linear least squares with Lagrange multipliers to obtain optimal linear combinations.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;strong&gt;second step of LLE&lt;/strong&gt;, We then &lt;strong&gt;fix these weights&lt;/strong&gt; &lt;script type=&quot;math/tex&quot;&gt;w_{ij}&lt;/script&gt; while optimizing for &lt;script type=&quot;math/tex&quot;&gt;x_i^{\prime}&lt;/script&gt;. We try to find low-dimensional coordinates:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{array}{ll}
+\underset{x_1^{\prime}, \dots, x_n^{\prime}}{\mbox{minimize }} \sum\limits_i \| x_i^{\prime} - \sum\limits_{j \in N(i)} w_{ij}x_j^{\prime} \|^2
+\end{array}&lt;/script&gt;
+
+&lt;p&gt;This is a sparse eigenvalue problem that requires constraints in order to prevent degenerate solutions:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;(1.) The coordinates &lt;script type=&quot;math/tex&quot;&gt;x_i^{\prime}&lt;/script&gt; can be translated by a constant
+displacement without affecting the cost. We can remove this degree of freedom by requiring the coordinates to be centered on the origin.&lt;/li&gt;
+  &lt;li&gt;(2.) We constrain the embedding vectors to have unit covariance.
+The optimization problem becomes:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{array}{ll}
+\underset{x_1^{\prime}, \dots, x_n^{\prime}}{\mbox{minimize }} &amp; \sum\limits_i \| x_i^{\prime} - \sum\limits_{j \in N(i)} w_{ij}x_j^{\prime} \|^2 \\
+\mbox{subject to} &amp; \sum\limits_i x_i^{\prime} = 0 \\
+&amp; \frac{1}{n} \sum\limits_i x_i^{\prime}x_i^{\prime T} = I
+\end{array} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;These weights &lt;script type=&quot;math/tex&quot;&gt;w_{ij}&lt;/script&gt; capture the local shape. As Roweis and Saul point out, “&lt;em&gt;LLE illustrates a general principle of manifold learning…that overlapping
+local neighborhoods – collectively analyzed – can provide information about global
+geometry&lt;/em&gt;”” [4].&lt;/p&gt;
+
+&lt;h3 id=&quot;stochastic-neighbor-embedding-sne&quot;&gt;Stochastic Neighbor Embedding (SNE)&lt;/h3&gt;
+
+&lt;p&gt;The Stochastic Neighbor Embedding (SNE) converts high-dimensional points to low-dimensional points by preserving distances. The method takes a probabilistic point of view: high-dimensional Euclidean point distances are converted into conditional probabilities that represent similarities [2,3].&lt;/p&gt;
+
+&lt;p&gt;Similarity of datapoints in &lt;strong&gt;high himension&lt;/strong&gt;: The conditional probability is given by&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p_{j \mid i} = \frac{\mbox{exp }\big( - \frac{\|x_i - x_j\|^2}{2 \sigma_i^2}\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \frac{\|x_i - x_k\|^2}{2 \sigma_i^2} \big)}&lt;/script&gt;
+
+&lt;p&gt;Similarity of datapoints in &lt;strong&gt;the low dimension&lt;/strong&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;q_{j \mid i} = \frac{\mbox{exp }\big( - \|y_i - y_j\|^2\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \|y_i - y_k\|^2 \big)}&lt;/script&gt;
+
+&lt;p&gt;If similarities between &lt;script type=&quot;math/tex&quot;&gt;x_i,x_j&lt;/script&gt; are correctly mapped to similarities between &lt;script type=&quot;math/tex&quot;&gt;y_i,y_j&lt;/script&gt; by SNE, then the conditional probabilities should be equal: &lt;script type=&quot;math/tex&quot;&gt;q_{j \mid i} = p_{j \mid i}&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;SNE seeks minimize the following cost function using gradient descent, which measures the dissimilarity between the two distributions (Kullback-Leibler divergence):&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;C = \sum\limits_i KL(P_i || Q_i) = \sum\limits_i \sum\limits_j p_{j \mid i} \mbox{ log } \frac{p_{j \mid i}}{q_{j \mid i}}&lt;/script&gt;
+
+&lt;p&gt;This is known as asymetric SNE. The gradient turns out to be analytically simple:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial C}{\partial y_i} = 2 \sum\limits_j (p_{j \mid i} - q_{j \mid i} - p_{i \mid j} - q_{i \mid j} )(y_i - y_j)&lt;/script&gt;
+
+&lt;p&gt;However, the Kullback-Leibler divergence is not symmetric, so a formulation with a joint distribution can be made.&lt;/p&gt;
+
+&lt;h3 id=&quot;t-sne&quot;&gt;t-SNE&lt;/h3&gt;
+
+&lt;p&gt;An improvement to SNE is t-Distributed Stochastic Neighbor Embedding (t-SNE). t-SNE employs a Gaussian in the high-dimension, but a t-Student distribution in low-dim. The t-Student distribution has longer tails than a Gaussian and is thus happier to have points far away than a Gaussian. The motivation for doing so is that in low-D, you have have less freedom than you would in the high-dimension to put many things closeby. This is because there is not much space around (crowded easily), so we penalize having points far away less.&lt;/p&gt;
+
+&lt;p&gt;The joint distribution in the low-distribution is:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;q_{ij} = \frac{ (1+ \| y_i −y_j \|^2)^{−1} }{ \sum\limits_{k \neq l} (1+ \|y_k −y_l\|^2)^{−1} }&lt;/script&gt;
+
+&lt;h3 id=&quot;mnist-examples&quot;&gt;MNIST examples&lt;/h3&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Multi-Dimensional Scaling, Non-Linear Dimensionality Reduction&lt;/em&gt;. Class lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in 18 April 2018.&lt;/p&gt;
+
+&lt;p&gt;[2] Geoffrey Hinton and Sam Roweis. &lt;em&gt;Stochastic Neighbor Embedding&lt;/em&gt;. Advances in Neural Information Processing Systems (NIPS) 2003, pages 857–864. &lt;a href=&quot;http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf&quot;&gt;http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[3] L.J.P. van der Maaten and G.E. Hinton. &lt;em&gt;Visualizing High-Dimensional Data Using t-SNE&lt;/em&gt;. Journal of Machine Learning Research 9 (Nov):2579-2605, 2008.&lt;/p&gt;
+
+&lt;p&gt;[4] Sam T. Roweis and Lawrence K. Saul. &lt;em&gt;Nonlinear Dimensionality Reduction by Locally Linear Embedding&lt;/em&gt;. Science Magazine, Vol. 290,  22 Dec. 2000.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -602,7 +721,7 @@ def unit_test1():
 
 if __name__ == '__main__':
 	unit_test1()
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://johnwlambert.github.io/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/conjugate-gradients</id><content type="html" xml:base="http://johnwlambert.github.io/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://localhost:4000/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/conjugate-gradients</id><content type="html" xml:base="http://localhost:4000/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -611,7 +730,7 @@ if __name__ == '__main__':
 
 &lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/h2&gt;</content><author><name></name></author><summary type="html">Krylov subspaces ...</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://johnwlambert.github.io/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/slam</id><content type="html" xml:base="http://johnwlambert.github.io/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;h2 id=&quot;conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/h2&gt;</content><author><name></name></author><summary type="html">Krylov subspaces ...</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -644,7 +763,7 @@ simultaneous localization and mapping. IEEE Transactions on Robotics,
 applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 2005.&lt;/p&gt;
 
-&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://johnwlambert.github.io/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/sfm</id><content type="html" xml:base="http://johnwlambert.github.io/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://localhost:4000/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/sfm</id><content type="html" xml:base="http://localhost:4000/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -718,7 +837,7 @@ applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 
 &lt;p&gt;[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. &lt;em&gt;Bundle Adjustment — A Modern Synthesis&lt;/em&gt;. &lt;a href=&quot;https://hal.inria.fr/inria-00548290/document&quot;&gt;https://hal.inria.fr/inria-00548290/document&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://johnwlambert.github.io/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/particle-filter</id><content type="html" xml:base="http://johnwlambert.github.io/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://localhost:4000/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/particle-filter</id><content type="html" xml:base="http://localhost:4000/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1211,7 +1330,7 @@ Important for SLAM, because in SLAM we often want to estimate the history of the
 
 &lt;p&gt;[2] SJ Julier, JK Uhlmann, HF Durrant-Whyte. &lt;em&gt;A new approach for filtering nonlinear systems&lt;/em&gt;. Proceedings of the American Control Conference, June 1995, Volume 3, pages 1628-1632.&lt;/p&gt;
 
-&lt;p&gt;[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. &lt;em&gt;A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators&lt;/em&gt;. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry><entry><title type="html">Robot Localization</title><link href="http://johnwlambert.github.io/robot-localization/" rel="alternate" type="text/html" title="Robot Localization" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/localization</id><content type="html" xml:base="http://johnwlambert.github.io/robot-localization/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. &lt;em&gt;A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators&lt;/em&gt;. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry><entry><title type="html">Robot Localization</title><link href="http://localhost:4000/robot-localization/" rel="alternate" type="text/html" title="Robot Localization" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/localization</id><content type="html" xml:base="http://localhost:4000/robot-localization/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1291,7 +1410,7 @@ the intensity map are discretized at a spatial resolution of 5cm covering a 30m�
 
 &lt;p&gt;[8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. &lt;em&gt;Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes&lt;/em&gt;. In IEEE International Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.&lt;/p&gt;
 
-&lt;p&gt;[9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. &lt;em&gt;Learning to Localize Using a LiDAR Intensity Map&lt;/em&gt;. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">ICP, grid histograms, ...</summary></entry><entry><title type="html">The Kalman Filter</title><link href="http://johnwlambert.github.io/kalman-filter/" rel="alternate" type="text/html" title="The Kalman Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/kalman-filter</id><content type="html" xml:base="http://johnwlambert.github.io/kalman-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. &lt;em&gt;Learning to Localize Using a LiDAR Intensity Map&lt;/em&gt;. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">ICP, grid histograms, ...</summary></entry><entry><title type="html">The Kalman Filter</title><link href="http://localhost:4000/kalman-filter/" rel="alternate" type="text/html" title="The Kalman Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/kalman-filter</id><content type="html" xml:base="http://localhost:4000/kalman-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1333,356 +1452,4 @@ x_{t+1} = Ax_t + B u_t + w_t, &amp;amp; w_t \sim \mathcal{N}(0,Q) &lt;br /&gt;
 y_t = Cx_t + Du_t + v_t, &amp;amp; v_t \sim \mathcal{N}(O, R)
 \end{array}
 \end{equation}
-where $w_t, v_t$ are zero-mean white noise&lt;/p&gt;</content><author><name></name></author><summary type="html">Multivariate Gaussians, ...</summary></entry><entry><title type="html">What is State Estimation? and the Bayes Filter</title><link href="http://johnwlambert.github.io/bayes-filter/" rel="alternate" type="text/html" title="What is State Estimation? and the Bayes Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/bayes-filter</id><content type="html" xml:base="http://johnwlambert.github.io/bayes-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#state-estimation&quot;&gt;What is State Estimation?&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#dt-lds&quot;&gt;Discrete-time Linear Dynamical Systems&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#probability-review&quot;&gt;Probability Review: The Chain Rule, Marginalization, &amp;amp; Bayes Rule&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bayes-estimation&quot;&gt;Recursive Bayesian Estimation + Conditional Independence&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#pgm-bayes-filter&quot;&gt;Graphical Model: The Structure of Variables in the Bayes Filter&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bayes-filter-deriv-predict&quot;&gt;Derivation of the Bayes Filter: Predict Step&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bayes-filter-deriv-update&quot;&gt;Derivation of the Bayes Filter: Update Step&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;state-estimation&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;what-is-state-estimation&quot;&gt;What is State Estimation?&lt;/h2&gt;
-
-&lt;p&gt;State estimation is the study of reproducing the state of a robot (e.g. its orientation, location) from noisy measurements. Unfortunately, we can’t obtain the state &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; directly. Instead, we can obtain get a measurement that is all tangled up with noise.&lt;/p&gt;
-
-&lt;p&gt;A more formal definition: Given a history of measurements &lt;script type=&quot;math/tex&quot;&gt;y_1, \dots, y_t)&lt;/script&gt;, and system inputs &lt;script type=&quot;math/tex&quot;&gt;(u_1, \dots, u_t)&lt;/script&gt;, find an estimate &lt;script type=&quot;math/tex&quot;&gt;\hat{x}_t&lt;/script&gt; of the state &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; with small error &lt;script type=&quot;math/tex&quot;&gt;\|\hat{x}_t - x_t \|&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;What do we have to work with?&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;(1) We are given the measurements &lt;script type=&quot;math/tex&quot;&gt;y_t&lt;/script&gt;, whose distribution is modeled  as &lt;script type=&quot;math/tex&quot;&gt;p(y_t \mid x_t, u_t)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;(2) We assume that we know the state transition distribution &lt;script type=&quot;math/tex&quot;&gt;p(x_{t+1} \mid x_t, u_t)&lt;/script&gt;, i.e. the robot dynamics.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The goal of state estimation is to find the posterior distribution of &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; given all of the prior measurements and inputs:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid y_{1:t}, u_{1:t})&lt;/script&gt;
-
-&lt;h2 id=&quot;why-do-we-need-a-distribution-instead-of-a-single-state-estimate&quot;&gt;Why do we need a distribution instead of a single state estimate?&lt;/h2&gt;
-
-&lt;p&gt;The goal of state estimation is not to obtain a single &lt;script type=&quot;math/tex&quot;&gt;\hat{x}&lt;/script&gt;. Rather, we desire a distribution over &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;’s. You might ask, &lt;em&gt;why?&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;The mean of a distribution may not be representative of the distribution whatsoever. For example, consider a bimodal distribution with a mean around 0, but consisting of two camel humps. There is more information in the Bayesian estimate that we can use for control. In the case of a Kalman Filter, we will express the state distribution as a Gaussian, which is parameterized compactly by a mean and covariance.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;dt-lds&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;discrete-time-linear-dynamical-systems-dt-lds&quot;&gt;Discrete-time Linear Dynamical Systems (DT LDS)&lt;/h2&gt;
-
-&lt;p&gt;Filtering and estimation is much more easily described in discrete time than in continuous time. We use Linear Dynamical Systems as a key tool in state estimation.&lt;/p&gt;
-
-&lt;p&gt;Suppose we have a system with state &lt;script type=&quot;math/tex&quot;&gt;x \in R^n&lt;/script&gt;, which changes over timesteps &lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt; [1,2]. The matrix &lt;script type=&quot;math/tex&quot;&gt;A(t) \in R^{n \times n}&lt;/script&gt; is called the dynamics matrix. Suppose we provide an input &lt;script type=&quot;math/tex&quot;&gt;u \in R^m&lt;/script&gt; at time &lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;.  &lt;script type=&quot;math/tex&quot;&gt;B(t)&lt;/script&gt; is the &lt;script type=&quot;math/tex&quot;&gt;R^{n \times m}&lt;/script&gt; input matrix. The vector &lt;script type=&quot;math/tex&quot;&gt;c(t) \in R^n&lt;/script&gt; is called the offset. We can express the system as:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x(t + 1) = A(t)x(t) + B(t)u(t) + c(t)&lt;/script&gt;
-
-&lt;p&gt;We will use the shorthand notation for simplicity:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{t + 1} = A_t x_t + B_t u_t + c_t&lt;/script&gt;
-
-&lt;p&gt;As Boyd and Vandenberghe point out [2], the LDS is a “special case of a Markov system where the next state is a linear function of the current state.” Suppose we also have an output of the system &lt;script type=&quot;math/tex&quot;&gt;y(t) \in R^{p}&lt;/script&gt;. &lt;script type=&quot;math/tex&quot;&gt;C(t) \in R^{p \times n}&lt;/script&gt; is the output or sensor matrix. This equation can be modeled as:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y(t) = C(t)x(t) + D(t)u(t)&lt;/script&gt;
-
-&lt;p&gt;or in shorthand, as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_t = C_t x_t + D_t u_t&lt;/script&gt;
-
-&lt;p&gt;where  &lt;script type=&quot;math/tex&quot;&gt;t \in Z = \{0, \pm 1, \pm 2, \dots \}&lt;/script&gt; and vector signals &lt;script type=&quot;math/tex&quot;&gt;x,u,y&lt;/script&gt; are sequences. It is not hard to see that the DT LDS is a first-order vector recursion [1].&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;probability-review&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;probability-review-the-chain-rule-marginalization--bayes-rule&quot;&gt;Probability Review: The Chain Rule, Marginalization, &amp;amp; Bayes Rule&lt;/h2&gt;
-
-&lt;p&gt;The &lt;strong&gt;Chain Rule&lt;/strong&gt; states that if &lt;script type=&quot;math/tex&quot;&gt;y_1,...y_t&lt;/script&gt; are events, and &lt;script type=&quot;math/tex&quot;&gt;p(y_i) &gt; 0&lt;/script&gt;, then:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(y_1 \cap y_2 \cap \dots \cap y_t) = p(y_1) p(y_2 \mid y_1)···p(y_t \mid y_1 \cap \dots \cap y_{t-1})&lt;/script&gt;
-
-&lt;p&gt;&lt;strong&gt;Marginalization&lt;/strong&gt; is a method of variable elimination. If &lt;script type=&quot;math/tex&quot;&gt;X_1,X_2&lt;/script&gt; are independent:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\int\limits_{x_2} p(x_1,x_2) dx_2 = \int\limits_{x_2} p(x_1)p(x_2)dx = p(x_1) \int\limits_{x_2} p(x_2)dx_2 = p(x_1)&lt;/script&gt;
-
-&lt;p&gt;We recall &lt;strong&gt;Bayes’ Rule&lt;/strong&gt; states that if &lt;script type=&quot;math/tex&quot;&gt;x,y&lt;/script&gt; are events, and &lt;script type=&quot;math/tex&quot;&gt;p(x) &gt; 0&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;p(y) &gt; 0&lt;/script&gt;, then:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid y) = \frac{p(y \mid x)p(x)}{p(y)} = \frac{p(y,x)}{p(y)}&lt;/script&gt;
-
-&lt;p&gt;In the domain of state estimation, we can assign the following meaning to these distributions:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt; is our prior.&lt;/li&gt;
-  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;p(y \mid x)&lt;/script&gt; is our measurement likelihood.&lt;/li&gt;
-  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt; is the normalization term.&lt;/li&gt;
-  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;p(x \mid y)&lt;/script&gt; is our posterior (what we can’t see, given what we can see).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;One problem is that we may not know &lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt; directly. Fortunately, it turns out &lt;em&gt;we don’t need to&lt;/em&gt;.
-By marginalization of &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; from the joint distribution &lt;script type=&quot;math/tex&quot;&gt;p(x,y)&lt;/script&gt;, we can write the normalization constant &lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt; in the denominator differently:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid y)  = \frac{p(y \mid x) p(x)}{\int\limits_x p(y\mid x)p(x) dx}&lt;/script&gt;
-
-&lt;p&gt;&lt;a name=&quot;bayes-estimation&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;recursive-bayesian-estimation--conditional-independence&quot;&gt;Recursive Bayesian Estimation + Conditional Independence&lt;/h2&gt;
-
-&lt;p&gt;In estimation, the state &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; is static. In filtering, the state &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; is dynamic. We will address the &lt;strong&gt;Bayesian estimation&lt;/strong&gt; case first, which can be modeled graphically as Naive Bayes, and &lt;strong&gt;later we’ll address the Bayesian filtering&lt;/strong&gt; case.&lt;/p&gt;
-
-&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
-  &lt;img src=&quot;/assets/naive_bayes.png&quot; width=&quot;45%&quot; /&gt;
-  &lt;div class=&quot;figcaption&quot;&gt;
-Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a static state. Assume Y_1,..., Y_t are conditionally independent given X. This is the Naive Bayes' structure of Bayesian estimation.
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;p&gt;We’ll now derive the recursion, which iterates upon the previous timesteps. The key insight is that &lt;strong&gt;we can factor Bayes Rule via conditional independence.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Suppose we have observed a measurement &lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt; for &lt;script type=&quot;math/tex&quot;&gt;t-1&lt;/script&gt; timesteps. In the &lt;strong&gt;previous time step&lt;/strong&gt; we had posterior:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid y_{1:t-1})  = \frac{p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx}&lt;/script&gt;
-
-&lt;p&gt;We want to compute:
-&lt;script type=&quot;math/tex&quot;&gt;p(x \mid y_{1:t})  = \frac{p(y_{1:t} \mid x) p(x)}{\int\limits_x p(y_{1:t}\mid x)p(x) dx}&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;By the Chain Rule:
-&lt;script type=&quot;math/tex&quot;&gt;p(x \mid y_{1:t})  = \frac{ p(y_t, x, y_{1:t-1}) }{\int\limits_x p(y_{1:t}, x) dx} =  \frac{ p(y_t \mid x, y_{1:t-1}) p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t}\mid x)p(x) dx}&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;We assume that conditioned upon &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;, all &lt;script type=&quot;math/tex&quot;&gt;y_i&lt;/script&gt; are conditionally independent. Thus, we can discard evidence: &lt;script type=&quot;math/tex&quot;&gt;p(y_t \mid x, y_{1:t-1}) = p(y_t \mid x)&lt;/script&gt;. Simplifying, we see:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) p(y_{1:t-1} \mid x) p(x)}{\int\limits_x  p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}&lt;/script&gt;
-
-&lt;p&gt;Rewrite it in terms of the posterior from the previous time step. We see the previous time step’s posterior also included &lt;script type=&quot;math/tex&quot;&gt;p(y_{1:t-1} \mid x) p(x)&lt;/script&gt; (the unnormalized previous time step posterior)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) \frac{p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }{ \frac{\int\limits_x p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }&lt;/script&gt;
-
-&lt;p&gt;Since constant w.r.t integral, can combine integrals, and see previous posterior in the denominator. Get:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid y_{1:t}) = \frac{p(y_t \mid x) p(x \mid y_{1:t-1})}{ \int\limits_x p(y_t \mid x) p(x \mid y_{1:t-1})dx} = f\Bigg(y_t, p(x \mid y_{1:t-1}) \Bigg)&lt;/script&gt;
-
-&lt;p&gt;In the recursive Bayes Filter, the prior is just the posterior from the previous time step. Thus, we have the following loop: &lt;strong&gt;Measure-&amp;gt;Estimate-&amp;gt;Measure-&amp;gt;Estimate…&lt;/strong&gt;. We only got this from conditional independence of measurements, given the state. The graphical model is Naive Bayes.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;pgm-bayes-filter&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;graphical-model-the-structure-of-variables-in-the-bayes-filter&quot;&gt;Graphical Model: The Structure of Variables in the Bayes Filter&lt;/h2&gt;
-
-&lt;p&gt;Now consider a dynamic state &lt;script type=&quot;math/tex&quot;&gt;X_t&lt;/script&gt;, instead of a static &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt;. This system can be modeled as a Hidden Markov Model.&lt;/p&gt;
-
-&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
-  &lt;img src=&quot;/assets/bayesian_filter_hmm.png&quot; width=&quot;65%&quot; /&gt;
-  &lt;div class=&quot;figcaption&quot;&gt;
-    As we move forward in time, the state evolves from $$X_0 \rightarrow X_1 \rightarrow \dots \rightarrow X_t$$
-  &lt;/div&gt;
-&lt;/div&gt;
-
-&lt;p&gt;The HMM structure gives us two gifts: (1) the Markov Property, and (2) Conditional Independence.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;The Markov Property (Markovianity)&lt;/strong&gt;: discard information regarding the state&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid x_{1:t-1}, y_{1:t-1}) = p(x_t \mid x_{t-1})&lt;/script&gt;
-
-&lt;p&gt;&lt;strong&gt;Conditional Independence of Measurements&lt;/strong&gt;: discard information regarding the measurement&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t)&lt;/script&gt;
-
-&lt;p&gt;&lt;a name=&quot;bayes-filter-deriv-predict&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;derivation-of-the-bayes-filter-predict-step&quot;&gt;Derivation of the Bayes Filter: Predict Step&lt;/h2&gt;
-
-&lt;p&gt;Suppose we start with our posterior from the previous timestep, which incorporates all measurements &lt;script type=&quot;math/tex&quot;&gt;y_1,\dots, y_{t-1}&lt;/script&gt;: Via marginalization, we can rewrite the expression as:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t}, x_{t-1}  \mid y_{1:t-1})dx_{t-1}&lt;/script&gt;
-
-&lt;p&gt;By the chain rule, we can factor:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t},   \mid x_{t-1}, y_{1:t-1})  p( x_{t-1}  \mid y_{1:t-1})   dx_{t-1}&lt;/script&gt;
-
-&lt;p&gt;By Markovianity, we can simplify the expression above, giving us &lt;strong&gt;the Predict Step&lt;/strong&gt;:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t-1}) = \int_{x_t-1} p(x_{t} \mid x_{t-1}) p(x_{t-1} \mid y_{1:t-1})dx_{t-1}&lt;/script&gt;
-
-&lt;p&gt;&lt;a name=&quot;bayes-filter-deriv-update&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;derivation-of-the-bayes-filter-update-step&quot;&gt;Derivation of the Bayes Filter: Update Step&lt;/h2&gt;
-
-&lt;p&gt;In what we call the update step, we simply express the posterior using Bayes’ Rule:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t}) = \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{p(y_{1:t})} =  \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_{1:t} \mid x_{t}) p(x_{t}) dx_{t}}&lt;/script&gt;
-
-&lt;p&gt;We can now factor the numerator with the chain rule:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t, y_{1:t-1}) p(y_{1:t-1} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_t \mid x_t, y_{1:t-1}) p(y_{1:t-1} \mid x_{t}) p(x_{t})dx_{t}}&lt;/script&gt;
-
-&lt;p&gt;By the conditional independence of measurements &lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;, we know &lt;script type=&quot;math/tex&quot;&gt;p(y_t \mid x_t, y_{1:t-1}) = p(y_t \mid x_t)&lt;/script&gt;, so we can simplify:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(y_{1:t-1} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_t \mid x_t) p(y_{1:t-1} \mid x_{t}) p(x_{t})dx_{t}}&lt;/script&gt;
-
-&lt;p&gt;Interestingly enough, we can see above in the right hand side two terms from Bayes’ Rule. We’ll be able to collapse them into a single term. Using these two terms, the left side of Bayes’ Rule would be:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid y_{1:t-1}) = \frac{p(y_{1:t-1} \mid x_{t}) p(x_{t})}{ \int_{x_t}p(y_{1:t-1} \mid x_{t}) p(x_{t})  dx_t }&lt;/script&gt;
-
-&lt;p&gt;Multiplying by the denominator, we obtain:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid y_{1:t-1}) \int_{x_t}p(y_{1:t-1} \mid x_{t}) p(x_{t})  dx_t = p(y_{1:t-1} \mid x_{t}) p(x_{t})&lt;/script&gt;
-
-&lt;p&gt;Since by marginalization &lt;script type=&quot;math/tex&quot;&gt;\int_{x_t}p(y_{1:t-1} \mid x_{t}) p(x_{t})  dx_t = p(y_{1:t-1})&lt;/script&gt;, we can simplify the line above to:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid y_{1:t-1}) p(y_{1:t-1}) = p(y_{1:t-1} \mid x_{t}) p(x_{t})&lt;/script&gt;
-
-&lt;p&gt;We now plug this substitution into the numerator and in the denominator of the posterior:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1})   }{\int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1}) dx_{t}}&lt;/script&gt;
-
-&lt;p&gt;Since &lt;script type=&quot;math/tex&quot;&gt;p(y_{1:t-1})&lt;/script&gt; does not depend upon &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;, we can pull it out of the integral, and the term cancels in the top and bottom:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1})   }{ p(y_{1:t-1})\int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}} = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}}&lt;/script&gt;
-
-&lt;p&gt;This is the closed form expression for the &lt;strong&gt;Update Step&lt;/strong&gt; of the Bayes’ Filter.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t} \mid y_{1:t}) = \frac{p(y_{t} \mid x_{t})p(x_{t} \mid y_{1:t-1})}{\int\limits_{x_{t}} p(y_{t} \mid x_{t}) p(x_{t} \mid y_{1:t-1}) dx_{t}}&lt;/script&gt;
-
-&lt;p&gt;The algorithm consists of repeatedly applying two steps: (1) the &lt;strong&gt;predict step&lt;/strong&gt;, where we move forward the time step, and (2) the &lt;strong&gt;update step&lt;/strong&gt;, where we incorporate the measurement.  They appear in an arbitrary order and constitute a cycle, but you have to start somewhere. At the end of the update step, we have the best estimate.&lt;/p&gt;
-
-&lt;p&gt;It turns out that we can write out these integrals analytically for a very special family of distributions: Gaussian distributed random variables. This will be the Kalman Filter, which is covered in the next blog post in the &lt;em&gt;State Estimation&lt;/em&gt; module.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;p&gt;[1] Stephen Boyd and Reza Mahalati. Lecture 1,  Introduction to Linear Dynamical Systems (EE 263). &lt;a href=&quot;http://ee263.stanford.edu/lectures/overview.pdf&quot;&gt;http://ee263.stanford.edu/lectures/overview.pdf&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[2] Stephen Boyd and Lieven Vandenberghe. &lt;em&gt;Introduction to Applied Linear Algebra – Vectors, Matrices, and Least Squares&lt;/em&gt;. Cambridge University Press, 2018. &lt;a href=&quot;https://web.stanford.edu/~boyd/vmls/vmls.pdf&quot;&gt;https://web.stanford.edu/~boyd/vmls/vmls.pdf&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;[3] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html">linear dynamical systems, bayes' rule, bayesian filtering &amp; estimation ...</summary></entry><entry><title type="html">Iterative Closest Point</title><link href="http://johnwlambert.github.io/icp/" rel="alternate" type="text/html" title="Iterative Closest Point" /><published>2018-11-29T06:00:00-05:00</published><updated>2018-11-29T06:00:00-05:00</updated><id>http://johnwlambert.github.io/icp</id><content type="html" xml:base="http://johnwlambert.github.io/icp/">&lt;h2 id=&quot;the-3d-registration-problem&quot;&gt;The 3D Registration Problem&lt;/h2&gt;
-&lt;p&gt;Given two shapes A and B which partially overlap&lt;/p&gt;
-
-&lt;p&gt;Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B&lt;/p&gt;
-
-&lt;p&gt;Assume A and B are positioned close to each other&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min\limits_T \delta(A, T(B))&lt;/script&gt;
-
-&lt;h2 id=&quot;degrees-of-freedom-transform-estimation&quot;&gt;Degrees of Freedom: Transform estimation&lt;/h2&gt;
-
-&lt;p&gt;A rigid motion has 6 degrees of freedom (3 for translation and 3 for rotation). We typically estimate the motion using many more pairs of corresponding points, so the problem is overdetermined (which is good, given noise, outliers, etc – use least squares approaches).&lt;/p&gt;
-
-&lt;h2 id=&quot;key-challenges-of-the-hard-optimization-problem&quot;&gt;Key Challenges of the Hard Optimization Problem&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;(1) We must estimate correspondences. This gives rise to combinatorial searches.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;(2) We must estimate the aligning transform. Transforms may be non-linear.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Fortunately, the low-dimensionality of some transforms helps.&lt;/p&gt;
-
-&lt;h2 id=&quot;optimal-transformation-for-point-clouds&quot;&gt;Optimal Transformation for Point Clouds&lt;/h2&gt;
-
-&lt;p&gt;When given correspondences, the problem is formulated as:&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Given two sets points:&lt;/em&gt; &lt;script type=&quot;math/tex&quot;&gt;\{a_i \}_{i=1}^n, \{ b_i \}_{i=1}^n&lt;/script&gt; &lt;em&gt;in&lt;/em&gt;   . &lt;em&gt;Find the rigid transform&lt;/em&gt; \(\mathbf{R}, t\) &lt;em&gt;that minimizes&lt;/em&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\underset{\mathbf{R}, t}{\mbox{minimize }} \sum\limits_{i=1}^N \| \mathbf{R}x_i + t - y_i \|_2^2&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n \|Ra_i − t − b_i \|_2^2&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{a} = \frac{1}{|A|} \sum\limits_i a_i&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{b} = \frac{1}{|B|} \sum\limits_i b_i&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;a_i^{\prime} = a_i − \bar{a}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;b_i^{\prime} = b_i − \bar{b}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;a_i = a_i^{\prime} + \bar{a},  b_i = b_i^{\prime} + \bar{b}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \sum\limits_{i=1}^n \|R(a_i^{\prime} + \bar{a}) − t − (b_i^{\prime} + \bar{b})\|_2^2&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \sum\limits_{i=1}^n \|Ra_i^{\prime} − b_i^{\prime} + (R\bar{a} − \bar{b} − t)\|_2^2&lt;/script&gt;
-
-&lt;p&gt;Let&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;t = R\bar{a} − \bar{b}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n \|Ra_i − t − b_i \|_2^2 = \sum\limits_{i=1}^n \|Ra_i^{\prime} − b_i^{\prime}\|_2^2&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;tr(RN)&lt;/script&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def find_rigid_alignment(A, B):
-	&quot;&quot;&quot;
-	2-D or 3-D registration with known correspondences.
-	Registration occurs in the zero centered coordinate system, and then
-	must be transported back.
-
-		Args:
-		-	A: Numpy array of shape (N,D) -- Reference Point Cloud (target)
-		-	B: Numpy array of shape (N,D) -- Point Cloud to Align (source)
-
-		Returns:
-		-	R: optimal rotation
-		-	t: optimal translation
-	&quot;&quot;&quot;
-	num_pts = A.shape[0]
-	dim = A.shape[1]
-
-	a_mean = np.mean(A, axis=0)
-	b_mean = np.mean(B, axis=0)
-
-	# Zero-center the point clouds
-	A -= a_mean
-	B -= b_mean
-
-	N = np.zeros((dim, dim))
-	for i in range(num_pts):
-		N += A[i].reshape(dim,1).dot( B[i].reshape(1,dim) )
-	N = A.T.dot(B)
-
-	U, D, V_T = np.linalg.svd(N)
-	S = np.eye(dim)
-	det = np.linalg.det(U) * np.linalg.det(V_T.T)
-	
-	# Check for reflection case
-	if not np.isclose(det,1.):
-		S[dim-1,dim-1] = -1
-
-	R = U.dot(S).dot(V_T)
-	t = R.dot( b_mean.reshape(dim,1) ) - a_mean.reshape(dim,1)
-	return R, -t.squeeze()
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Similar code named the &lt;em&gt;Umeyama Transform&lt;/em&gt; after[4] ships with &lt;a href=&quot;https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60&quot;&gt;Eigen&lt;/a&gt; as &lt;a href=&quot;https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html&quot;&gt;Umeyama&lt;/a&gt;. The Open3D library utilizes the Umeyama method also (source code &lt;a href=&quot;https://github.com/IntelVCL/Open3D/blob/master/src/Core/Registration/TransformationEstimation.cpp#L47&quot;&gt;here&lt;/a&gt;).&lt;/p&gt;
-
-&lt;h2 id=&quot;local-methods&quot;&gt;Local Methods&lt;/h2&gt;
-
-&lt;h3 id=&quot;iterated-closest-pair-icp-2&quot;&gt;Iterated Closest Pair (ICP) [2]&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Align the A points to their closest B neighbors, then repeat.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Converges, if starting positions are “close enough”.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;variants&quot;&gt;Variants&lt;/h2&gt;
-
-&lt;h3 id=&quot;exhaustive-search&quot;&gt;Exhaustive Search&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Compare (ideally) all alignments&lt;/li&gt;
-  &lt;li&gt;Sample the space of possible initial alignments.&lt;/li&gt;
-  &lt;li&gt;Correspondence is determined by the alignment at which models are closest.&lt;/li&gt;
-  &lt;li&gt;Provides optimal result&lt;/li&gt;
-  &lt;li&gt;Can be unnecessarily slow&lt;/li&gt;
-  &lt;li&gt;Does not generalize well to non-rigid deformations&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;p&gt;[1] Leonidas Guibas. Alignments and Correspondences, Geometric Features. CS 233: Geometric and Topological Data Analysis, 9 May 2018.&lt;/p&gt;
-
-&lt;p&gt;[2] Besl, McKay 1992.&lt;/p&gt;
-
-&lt;p&gt;[3] Shinji Umeyama. Least-squares estimation of transformation parameters between two point patterns”, PAMI 1991. &lt;a href=&quot;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&quot;&gt;http://web.stanford.edu/class/cs273/refs/umeyama.pdf&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. &lt;a href=&quot;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&quot;&gt;https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Constrained Optimization, Lagrangians, Duality, and Interior Point Methods</summary></entry></feed>
+where $w_t, v_t$ are zero-mean white noise&lt;/p&gt;</content><author><name></name></author><summary type="html">Multivariate Gaussians, ...</summary></entry></feed>

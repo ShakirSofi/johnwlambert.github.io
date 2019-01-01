@@ -157,6 +157,7 @@ Today, the computer vision community is learning how to use statistical learning
       </div>
     </div>
 
+    <div class="module-header">Module 7: Geometric Data Analysis </div>
 
 
  
