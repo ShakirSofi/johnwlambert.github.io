@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Dimensionality Reduction</title>
+  <meta name="description" content="PCA, ISOMAP, LLE, SNE, t-SNE">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/dimensionality-reduction/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Dimensionality Reduction</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
+  <li><a href="#costfunctions">Cost Functions</a></li>
+  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+</ul>
+
+<p><a name="sfmpipeline"></a></p>
+
+<h2 id="linear-methods">Linear Methods</h2>
+
+<h3 id="pca">PCA</h3>
+
+<h2 id="non-linear-methods">Non-Linear Methods</h2>
+
+<h2 id="creating-graphs-from-geometric-point-data">Creating Graphs from Geometric Point Data</h2>
+
+<p>Rely upon neighborhood relations. A graph can be constructed via (1) k-nearest neighbors or (2) <script type="math/tex">\epsilon</script>-balls.</p>
+
+<h3 id="isomap">Isomap</h3>
+
+<h3 id="eigenmap">EigenMap</h3>
+
+<h3 id="locally-linear-embedding-lle">Locally Linear Embedding (LLE)</h3>
+
+<p>LLE is a method that learns linear weights that locally reconstruct points in order to map points to a lower dimension [1,4]. The method requires solving two successive optimization problems and requires a connectivity graph. Almost all methods start with the nearest neihgbor graph, since it’s the only thing that we can trust.</p>
+
+<p>In the <strong>first step of LLE</strong>, we find weights that reconstruct each data point from its neighbors:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+\underset{w}{\mbox{minimize }} & \| x_i - \sum\limits_{j \in N(i)} w_{ij}x_j \|^2 \\
+\mbox{subject to} & \sum\limits_j w_{ij} = 1
+\end{array} %]]></script>
+
+<p>We can use linear least squares with Lagrange multipliers to obtain optimal linear combinations.</p>
+
+<p>In the <strong>second step of LLE</strong>, We then <strong>fix these weights</strong> <script type="math/tex">w_{ij}</script> while optimizing for <script type="math/tex">x_i^{\prime}</script>. We try to find low-dimensional coordinates:</p>
+
+<script type="math/tex; mode=display">\begin{array}{ll}
+\underset{x_1^{\prime}, \dots, x_n^{\prime}}{\mbox{minimize }} \sum\limits_i \| x_i^{\prime} - \sum\limits_{j \in N(i)} w_{ij}x_j^{\prime} \|^2
+\end{array}</script>
+
+<p>This is a sparse eigenvalue problem that requires constraints in order to prevent degenerate solutions:</p>
+<ul>
+  <li>(1.) The coordinates <script type="math/tex">x_i^{\prime}</script> can be translated by a constant
+displacement without affecting the cost. We can remove this degree of freedom by requiring the coordinates to be centered on the origin.</li>
+  <li>(2.) We constrain the embedding vectors to have unit covariance.
+The optimization problem becomes:</li>
+</ul>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+\underset{x_1^{\prime}, \dots, x_n^{\prime}}{\mbox{minimize }} & \sum\limits_i \| x_i^{\prime} - \sum\limits_{j \in N(i)} w_{ij}x_j^{\prime} \|^2 \\
+\mbox{subject to} & \sum\limits_i x_i^{\prime} = 0 \\
+& \frac{1}{n} \sum\limits_i x_i^{\prime}x_i^{\prime T} = I
+\end{array} %]]></script>
+
+<p>These weights <script type="math/tex">w_{ij}</script> capture the local shape. As Roweis and Saul point out, “<em>LLE illustrates a general principle of manifold learning…that overlapping
+local neighborhoods – collectively analyzed – can provide information about global
+geometry</em>”” [4].</p>
+
+<h3 id="stochastic-neighbor-embedding-sne">Stochastic Neighbor Embedding (SNE)</h3>
+
+<p>The Stochastic Neighbor Embedding (SNE) converts high-dimensional points to low-dimensional points by preserving distances. The method takes a probabilistic point of view: high-dimensional Euclidean point distances are converted into conditional probabilities that represent similarities [2,3].</p>
+
+<p>Similarity of datapoints in <strong>high himension</strong>: The conditional probability is given by</p>
+
+<script type="math/tex; mode=display">p_{j \mid i} = \frac{\mbox{exp }\big( - \frac{\|x_i - x_j\|^2}{2 \sigma_i^2}\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \frac{\|x_i - x_k\|^2}{2 \sigma_i^2} \big)}</script>
+
+<p>Similarity of datapoints in <strong>the low dimension</strong></p>
+
+<script type="math/tex; mode=display">q_{j \mid i} = \frac{\mbox{exp }\big( - \|y_i - y_j\|^2\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \|y_i - y_k\|^2 \big)}</script>
+
+<p>If similarities between <script type="math/tex">x_i,x_j</script> are correctly mapped to similarities between <script type="math/tex">y_i,y_j</script> by SNE, then the conditional probabilities should be equal: <script type="math/tex">q_{j \mid i} = p_{j \mid i}</script>.</p>
+
+<p>SNE seeks minimize the following cost function using gradient descent, which measures the dissimilarity between the two distributions (Kullback-Leibler divergence):</p>
+
+<script type="math/tex; mode=display">C = \sum\limits_i KL(P_i || Q_i) = \sum\limits_i \sum\limits_j p_{j \mid i} \mbox{ log } \frac{p_{j \mid i}}{q_{j \mid i}}</script>
+
+<p>This is known as asymetric SNE. The gradient turns out to be analytically simple:</p>
+
+<script type="math/tex; mode=display">\frac{\partial C}{\partial y_i} = 2 \sum\limits_j (p_{j \mid i} - q_{j \mid i} - p_{i \mid j} - q_{i \mid j} )(y_i - y_j)</script>
+
+<p>However, the Kullback-Leibler divergence is not symmetric, so a formulation with a joint distribution can be made.</p>
+
+<h3 id="t-sne">t-SNE</h3>
+
+<p>An improvement to SNE is t-Distributed Stochastic Neighbor Embedding (t-SNE). t-SNE employs a Gaussian in the high-dimension, but a t-Student distribution in low-dim. The t-Student distribution has longer tails than a Gaussian and is thus happier to have points far away than a Gaussian. The motivation for doing so is that in low-D, you have have less freedom than you would in the high-dimension to put many things closeby. This is because there is not much space around (crowded easily), so we penalize having points far away less.</p>
+
+<p>The joint distribution in the low-distribution is:</p>
+
+<script type="math/tex; mode=display">q_{ij} = \frac{ (1+ \| y_i −y_j \|^2)^{−1} }{ \sum\limits_{k \neq l} (1+ \|y_k −y_l\|^2)^{−1} }</script>
+
+<h3 id="mnist-examples">MNIST examples</h3>
+
+<h2 id="references">References</h2>
+
+<p>[1] Leonidas Guibas. <em>Multi-Dimensional Scaling, Non-Linear Dimensionality Reduction</em>. Class lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in 18 April 2018.</p>
+
+<p>[2] Geoffrey Hinton and Sam Roweis. <em>Stochastic Neighbor Embedding</em>. Advances in Neural Information Processing Systems (NIPS) 2003, pages 857–864. <a href="http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf">http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf</a>.</p>
+
+<p>[3] L.J.P. van der Maaten and G.E. Hinton. <em>Visualizing High-Dimensional Data Using t-SNE</em>. Journal of Machine Learning Research 9 (Nov):2579-2605, 2008.</p>
+
+<p>[4] Sam T. Roweis and Lawrence K. Saul. <em>Nonlinear Dimensionality Reduction by Locally Linear Embedding</em>. Science Magazine, Vol. 290,  22 Dec. 2000.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
