@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Collaborators</title>
-  <meta name="description" content="Ph.D. Candidate in Computer Vision.">
+  <title>The Histogram Filter</title>
+  <meta name="description" content="">
    <link rel="stylesheet" href="/css/main.css">
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/collaborators/">
+  <link rel="canonical" href="http://localhost:4000/histogram-filter/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -83,35 +83,57 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post">
+        <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Collaborators</h1>
+    <h1>The Histogram Filter</h1>
+    <p class="meta">Dec 27, 2018</p>
   </header>
 
-  <div class="post-content">
-    <h2 id="current-collaborators">Current Collaborators</h2>
+  <article class="post-content">
+  <p>Table of Contents:</p>
 <ul>
-  <li><a href="https://www.cc.gatech.edu/~psangklo/">Patsorn Sangkloy</a></li>
-  <li><a href="https://www.cc.gatech.edu/~hays/">James Hays</a></li>
-  <li><a href="https://www.simonlucey.com/">Simon Lucey</a></li>
-  <li>Allie Chang</li>
-  <li>Jagjeet Singh</li>
+  <li><a href="#need-for-dr">Need for Dimensionality Reduction</a></li>
+  <li><a href="#pca">PCA</a></li>
 </ul>
 
-<h2 id="past-collaborators">Past Collaborators</h2>
+<p><a name="need-for-dr"></a></p>
+
+<h2 id="the-histogram-filter">The Histogram Filter</h2>
+
+<p>An alternative to continuous distributions are piecewise constant approximations, such as histograms. These are <em>nonparametric</em> filters, since they do not utilize parameters like a mean and covariance <script type="math/tex">(\mu, \Sigma)</script> to define a distribution. Thus, nonparametric filters do not rely on a <em>fixed functional form of the posterior</em>, like the Gaussian does [1].</p>
+
+<p>The Histogram Filter is a type of nonparametric filters that discretizes the state space into a finite number of regions. The histogram assigns to each region a single cumulative probability.</p>
+
+<h2 id="1-d-histogram-filter">1-D Histogram Filter</h2>
+
 <ul>
-  <li><a href="http://ozansener.net/">Ozan Sener</a></li>
-  <li><a href="http://cvgl.stanford.edu/silvio/">Silvio Savarese</a></li>
-  <li><a href="http://alan.vision/">Alan Luo</a></li>
-  <li><a href="https://www.assafhoogi.com/">Assaf Hoogi</a></li>
+  <li>for all \(k\) do:
+    <ul>
+      <li>\( \hat{p}<em>{k,t} = \sum\limits_i p(X_t = x_k \mid u_t, X</em>{t-1} = x_i) p_{i,t-1} \)</li>
+      <li>\( p_{k,t} = \eta p(z_t \mid X_t = x_k) \hat{p}_{k,t}) \)</li>
+    </ul>
+  </li>
 </ul>
 
+<h2 id="2-d-histogram-filter-and-grid-localization">2-D Histogram Filter and Grid Localization</h2>
 
-  </div>
+<h2 id="references">References</h2>
 
-</article>
+<p>[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. <em>Probabilistic Robotics</em>. The MIT Press, Cambridge, MA, 2005.</p>
 
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
       </div>
     </main>
 
