@@ -165,7 +165,7 @@ Today, the computer vision community is learning how to use statistical learning
 
     <div class="module-header">Module 7: Geometric Data Analysis </div>
 
-    <div class="module-header">Module 8: MPI </div>
+    <div class="module-header">Module 8: Message Passing Interface (MPI) </div>
  
   </div>
 </div>
