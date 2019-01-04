@@ -19,3 +19,12 @@ permalink: /collaborators/
 * [Alan Luo](http://alan.vision/)
 * [Assaf Hoogi](https://www.assafhoogi.com/)
 
+
+
+## Office
+
+College of Computing Building (CCB) \\
+Room 309 (3rd Floor) \\
+Georgia Institute of Technology \\
+801 Atlantic Drive NW, \\
+Atlanta, GA 30332

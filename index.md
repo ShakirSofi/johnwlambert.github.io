@@ -6,28 +6,23 @@ layout: default
 
 ## Bio
 
-I am a Ph.D. student at Georgia Tech, advised by Professor [James Hays](https://www.cc.gatech.edu/~hays/). I completed my Bachelor's and Master's degrees in Computer Science at Stanford University in 2018, specializing in artificial intelligence.  My research interests revolve around the semantic understanding of geometric data.
-
-I enjoy creating teaching materials for topics in computer vision, a field which relies heavily upon numerical optimization and statistical machine learning tools.
+I am a Ph.D. student at Georgia Tech, advised by Professor [James Hays](https://www.cc.gatech.edu/~hays/). I completed my Bachelor's and Master's degrees in Computer Science at Stanford University in 2018, specializing in artificial intelligence.  
 
 You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found here](http://github.com/johnwlambert/).
 
-Office: 
-College of Computing Building (CCB) 
-Room 309 (3rd Floor)
-Georgia Institute of Technology
-801 Atlantic Drive NW,
-Atlanta, GA 30332
 
 [[My CV]](/assets/cv.pdf)
 
 
 ## Research
-Humans have an amazing ability to understand the world through their visual system, but computers struggle with the task. The real world is 3D, not 2D, so reasoning in the 2D image plane is insufficient. 3D is high-dimensional and challenging and has a high data requirement.
+Humans have an amazing ability to understand the world through their visual system but designing automated systems to perform the task continues to prove difficult. We take for granted almost everything our visual system is capable of. While great progress has been made in 2D image understanding, the real world is 3D, not 2D, so reasoning in the 2D image plane is insufficient. The 3D world is high-dimensional and challenging and has a high data requirement.
 
-Today, the computer vision community is learning how to use statistical learning and numerical optimization techniques for handling 3D sensor data. Accurate 3D understanding of environments will have enormous benefit for people all over the world, with implications for safer transportation and safer workplaces.
+My research interests revolve around geometric and semantic understanding of 3D environments. Accurate understanding of 3D environments will have enormous benefit for people all over the world, with implications for safer transportation and safer workplaces.
 
 ## Teaching
+
+Aside from research, another passion of mine is teaching.
+I enjoy creating teaching materials for topics related to computer vision, a field which relies heavily upon numerical optimization and statistical machine learning tools. A number of teaching modules I've written can be found below:
 
 <div class="teaching-home">
   <div class="materials-wrap">
@@ -169,4 +164,6 @@ Today, the computer vision community is learning how to use statistical learning
  
   </div>
 </div>
+
+
 
