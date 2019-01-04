@@ -13,6 +13,7 @@ permalink: /collaborators/
 * Jagjeet Singh
 
 ## Past Collaborators
+* [Ersin Yumer](http://www.meyumer.com/)
 * [Ozan Sener](http://ozansener.net/)
 * [Silvio Savarese](http://cvgl.stanford.edu/silvio/)
 * [Alan Luo](http://alan.vision/)

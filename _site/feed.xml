@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-01T21:13:25-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://johnwlambert.github.io/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/lie-groups</id><content type="html" xml:base="http://johnwlambert.github.io/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-01-03T22:38:12-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Lie Groups&lt;/a&gt;&lt;/li&gt;
@@ -292,7 +292,179 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 \vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">The Histogram Filter</title><link href="http://johnwlambert.github.io/histogram-filter/" rel="alternate" type="text/html" title="The Histogram Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/histogram-filter</id><content type="html" xml:base="http://johnwlambert.github.io/histogram-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://localhost:4000/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/precision-recall</id><content type="html" xml:base="http://localhost:4000/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#recall&quot;&gt;Recall&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#precision&quot;&gt;Precision&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#map&quot;&gt;Mean Average Precision (mAP)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;need-for-dr&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-need-for-more-finely-grained-measures-of-accuracy&quot;&gt;The Need for More Finely-Grained Measures of Accuracy&lt;/h2&gt;
+
+&lt;p&gt;We’ll suppose that we are performing binary classification: classifying objects into different classes.&lt;/p&gt;
+
+&lt;p&gt;Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.&lt;/p&gt;
+
+&lt;h3 id=&quot;recall&quot;&gt;Recall&lt;/h3&gt;
+
+&lt;p&gt;Recall measures how many objects you missed. You can have very high recall by classifying everythin as some class (at the expense of precision).&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{Recall} = \frac{tp}{tp+fn}&lt;/script&gt;
+
+&lt;h3 id=&quot;precision&quot;&gt;Precision&lt;/h3&gt;
+
+&lt;p&gt;Precision measures your discriminative ability. If you claimed that all of the objects you saw were of a particular class, and you were usually wrong because they belonged to a different class, you would have low precision. Your judgments can’t be considered &lt;em&gt;precise&lt;/em&gt;.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mbox{Precision} = \frac{tp}{tp+fp}&lt;/script&gt;
+
+&lt;h2 id=&quot;mean-average-precision&quot;&gt;Mean Average Precision&lt;/h2&gt;
+
+&lt;p&gt;When performing the task of object detection, we would like to be discriminative not just about two classes&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def voc_eval(detpath,
+             annopath,
+             imagesetfile,
+             classname,
+             cachedir,
+             ovthresh=0.5,
+             use_07_metric=False):
+    &quot;&quot;&quot;rec, prec, ap = voc_eval(detpath,
+                                annopath,
+                                imagesetfile,
+                                classname,
+                                [ovthresh],
+                                [use_07_metric])
+
+    Top level function that does the PASCAL VOC evaluation.
+
+    detpath: Path to detections
+        detpath.format(classname) should produce the detection results file.
+    annopath: Path to annotations
+        annopath.format(imagename) should be the xml annotations file.
+    imagesetfile: Text file containing the list of images, one image per line.
+    classname: Category name (duh)
+    cachedir: Directory for caching the annotations
+    [ovthresh]: Overlap threshold (default = 0.5)
+    [use_07_metric]: Whether to use VOC07's 11 point AP computation
+        (default False)
+    &quot;&quot;&quot;
+    # assumes detections are in detpath.format(classname)
+    # assumes annotations are in annopath.format(imagename)
+    # assumes imagesetfile is a text file with each line an image name
+    # cachedir caches the annotations in a pickle file
+
+    # first load gt
+    if not os.path.isdir(cachedir):
+        os.mkdir(cachedir)
+    cachefile = os.path.join(cachedir, 'annots.pkl')
+    # read list of images
+    with open(imagesetfile, 'r') as f:
+        lines = f.readlines()
+    imagenames = [x.strip() for x in lines]
+
+    if not os.path.isfile(cachefile):
+        # load annots
+        recs = {}
+        for i, imagename in enumerate(imagenames):
+            recs[imagename] = parse_rec(annopath.format(imagename))
+            if i % 100 == 0:
+                print 'Reading annotation for {:d}/{:d}'.format(
+                    i + 1, len(imagenames))
+        # save
+        print 'Saving cached annotations to {:s}'.format(cachefile)
+        with open(cachefile, 'w') as f:
+            cPickle.dump(recs, f)
+    else:
+        # load
+        with open(cachefile, 'r') as f:
+            recs = cPickle.load(f)
+
+    # extract gt objects for this class
+    class_recs = {}
+    npos = 0
+    for imagename in imagenames:
+        R = [obj for obj in recs[imagename] if obj['name'] == classname]
+        bbox = np.array([x['bbox'] for x in R])
+        difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
+        det = [False] * len(R)
+        npos = npos + sum(~difficult)
+        class_recs[imagename] = {'bbox': bbox,
+                                 'difficult': difficult,
+                                 'det': det}
+
+    # read dets
+    detfile = detpath.format(classname)
+    with open(detfile, 'r') as f:
+        lines = f.readlines()
+
+    splitlines = [x.strip().split(' ') for x in lines]
+    image_ids = [x[0] for x in splitlines]
+    confidence = np.array([float(x[1]) for x in splitlines])
+    BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
+
+    # sort by confidence
+    sorted_ind = np.argsort(-confidence)
+    sorted_scores = np.sort(-confidence)
+    BB = BB[sorted_ind, :]
+    image_ids = [image_ids[x] for x in sorted_ind]
+
+    # go down dets and mark TPs and FPs
+    nd = len(image_ids)
+    tp = np.zeros(nd)
+    fp = np.zeros(nd)
+    for d in range(nd):
+        R = class_recs[image_ids[d]]
+        bb = BB[d, :].astype(float)
+        ovmax = -np.inf
+        BBGT = R['bbox'].astype(float)
+
+        if BBGT.size &amp;gt; 0:
+            # compute overlaps
+            # intersection
+            ixmin = np.maximum(BBGT[:, 0], bb[0])
+            iymin = np.maximum(BBGT[:, 1], bb[1])
+            ixmax = np.minimum(BBGT[:, 2], bb[2])
+            iymax = np.minimum(BBGT[:, 3], bb[3])
+            iw = np.maximum(ixmax - ixmin + 1., 0.)
+            ih = np.maximum(iymax - iymin + 1., 0.)
+            inters = iw * ih
+
+            # union
+            uni = ((bb[2] - bb[0] + 1.) * (bb[3] - bb[1] + 1.) +
+                   (BBGT[:, 2] - BBGT[:, 0] + 1.) *
+                   (BBGT[:, 3] - BBGT[:, 1] + 1.) - inters)
+
+            overlaps = inters / uni
+            ovmax = np.max(overlaps)
+            jmax = np.argmax(overlaps)
+
+        if ovmax &amp;gt; ovthresh:
+            if not R['difficult'][jmax]:
+                if not R['det'][jmax]:
+                    tp[d] = 1.
+                    R['det'][jmax] = 1
+                else:
+                    fp[d] = 1.
+        else:
+            fp[d] = 1.
+
+    # compute precision recall
+    fp = np.cumsum(fp)
+    tp = np.cumsum(tp)
+    rec = tp / float(npos)
+    # avoid divide by zero in case the first detection matches a difficult
+    # ground truth
+    prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
+    ap = voc_ap(rec, prec, use_07_metric)
+
+    return rec, prec, ap
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. &lt;a href=&quot;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&quot;&gt;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">The Histogram Filter</title><link href="http://localhost:4000/histogram-filter/" rel="alternate" type="text/html" title="The Histogram Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/histogram-filter</id><content type="html" xml:base="http://localhost:4000/histogram-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -321,7 +493,7 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. &lt;em&gt;Probabilistic Robotics&lt;/em&gt;. The MIT Press, Cambridge, MA, 2005.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://johnwlambert.github.io/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/spectral-clustering</id><content type="html" xml:base="http://johnwlambert.github.io/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. &lt;em&gt;Probabilistic Robotics&lt;/em&gt;. The MIT Press, Cambridge, MA, 2005.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://localhost:4000/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/spectral-clustering</id><content type="html" xml:base="http://localhost:4000/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -358,7 +530,7 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/learning-point-cloud-features</id><content type="html" xml:base="http://johnwlambert.github.io/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -373,7 +545,7 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;p&gt;SPGN…&lt;/p&gt;
 
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://johnwlambert.github.io/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/dimensionality-reduction</id><content type="html" xml:base="http://johnwlambert.github.io/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://localhost:4000/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/dimensionality-reduction</id><content type="html" xml:base="http://localhost:4000/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -677,7 +849,7 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 &lt;p&gt;[7] Karl Pearson. &lt;em&gt;On Lines and Planes of Closest Fit to Systems of Points in Space&lt;/em&gt;. 1901. Philosophical Magazine. 2 (11): 559–572.&lt;/p&gt;
 
 &lt;p&gt;[8] H Hotelling. &lt;em&gt;Analysis of a complex of statistical variables into principal components&lt;/em&gt;. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
-Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/gaussians-and-covariance</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1018,7 +1190,7 @@ def unit_test1():
 
 if __name__ == '__main__':
 	unit_test1()
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://johnwlambert.github.io/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/conjugate-gradients</id><content type="html" xml:base="http://johnwlambert.github.io/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://localhost:4000/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/conjugate-gradients</id><content type="html" xml:base="http://localhost:4000/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#krylov-subspaces&quot;&gt;Krylov Subspaces&lt;/a&gt;&lt;/li&gt;
@@ -1143,7 +1315,7 @@ A^{-1} &amp; = - \frac{1}{\alpha_n} A^{n-1} + -  \frac{\alpha_1}{\alpha_n}  A^{n
 
 &lt;p&gt;[3] C. Kelley. &lt;em&gt;Iterative Methods for Linear and Nonlinear Equations&lt;/em&gt;. Frontiers in Applied Mathematics SIAM, (1995). &lt;a href=&quot;https://archive.siam.org/books/textbooks/fr16_book.pdf&quot;&gt;https://archive.siam.org/books/textbooks/fr16_book.pdf&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[4] Magnus Hestenes and Eduard Stiefel. &lt;em&gt;Method of Conjugate Gradients for Solving Linear Systems&lt;/em&gt;. Journal of Research of the National Bureau of Standards, Vol. 49, No. 6, December 1952. &lt;a href=&quot;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&quot;&gt;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://johnwlambert.github.io/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/slam</id><content type="html" xml:base="http://johnwlambert.github.io/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[4] Magnus Hestenes and Eduard Stiefel. &lt;em&gt;Method of Conjugate Gradients for Solving Linear Systems&lt;/em&gt;. Journal of Research of the National Bureau of Standards, Vol. 49, No. 6, December 1952. &lt;a href=&quot;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&quot;&gt;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1176,7 +1348,7 @@ simultaneous localization and mapping. IEEE Transactions on Robotics,
 applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 2005.&lt;/p&gt;
 
-&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://johnwlambert.github.io/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/sfm</id><content type="html" xml:base="http://johnwlambert.github.io/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://localhost:4000/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/sfm</id><content type="html" xml:base="http://localhost:4000/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1250,497 +1422,4 @@ applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 
 &lt;p&gt;[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. &lt;em&gt;Bundle Adjustment — A Modern Synthesis&lt;/em&gt;. &lt;a href=&quot;https://hal.inria.fr/inria-00548290/document&quot;&gt;https://hal.inria.fr/inria-00548290/document&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry><entry><title type="html">Particle Filter</title><link href="http://johnwlambert.github.io/particle-filter/" rel="alternate" type="text/html" title="Particle Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/particle-filter</id><content type="html" xml:base="http://johnwlambert.github.io/particle-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;particle-filter&quot;&gt;Particle Filter&lt;/h2&gt;
-
-&lt;p&gt;The &lt;strong&gt;Particle Filter&lt;/strong&gt; is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. This is because it contains no assumptions about the form of the state distribution. It was published in 1995 [2,3] by Simon Julier, Jeffrey Uhlmann, and Hugh Durrant-Whyte at Oxford. It is often called the &lt;strong&gt;“Unscented Kalman Filter” (UKF)&lt;/strong&gt; because the inventors thought “it didn’t stink” like the EKF.&lt;/p&gt;
-
-&lt;p&gt;The main idea is to Represent a distribution &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt; with a collection of samples (particles) from &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt;: &lt;script type=&quot;math/tex&quot;&gt;x^i \sim p(x), i=1,\dots, N&lt;/script&gt; i.i.d. We know that empirical moments are related to true distribution by the Law of Large Numbers. The algorithm is simple, but expensive to compute with a for loop.&lt;/p&gt;
-
-&lt;h2 id=&quot;whats-wrong-with-the-ekf&quot;&gt;What’s Wrong With the EKF?&lt;/h2&gt;
-
-&lt;p&gt;The Particle Filter addresses a number of problems with the EKF:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Problem No. 1&lt;/strong&gt; The initial conditions (I.C.s)!
-&lt;em&gt;If your initial guess is wrong, the Kalman filter will tell you exactly the wrong thing. The linearization can be vastly different at different parts of the state space&lt;/em&gt;. For example, the EKF could diverge if the residual $| \mu_{0 \mid 0} - x |$ on the initial condition is large. In fact, if $ | \mu_{t \mid t} - x_t |$ large at any time, then the EKF could diverge. This has to do with severity of non-linearity. This is the most commonly found problem.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Problem No. 2: Covariance&lt;/strong&gt;
-&lt;em&gt;In the EKF, the “covariance matrix” does not literally represent the covariance.&lt;/em&gt; Unfortunately, the covariance matrix only literally captures the covariance in the Kalman Filter. In the EKF, it is just a matrix! We don’t know what it means! If we treat it as confidence, then it is reasonable enough. And commonly true, as long as $\mu$ is tracking $x$ pretty well. However, this estimate tends to be overconfident since we are not incorporating linearization errors! Instead, &lt;script type=&quot;math/tex&quot;&gt;\Sigma_{t \mid t}&lt;/script&gt; incorporates only the noise errors &lt;script type=&quot;math/tex&quot;&gt;Q_t, R_t&lt;/script&gt;. Thus, &lt;script type=&quot;math/tex&quot;&gt;\Sigma_{t \mid t}&lt;/script&gt;  tends to be smaller than the true covariance matrix.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Problem No. 3: No Canary in the Goldmine&lt;/strong&gt;
-An additional problem with the EKF is that we have no signal to know if we’re going awry.&lt;/p&gt;
-
-&lt;h2 id=&quot;a-different-parameterization-particles&quot;&gt;A Different Parameterization: Particles&lt;/h2&gt;
-
-&lt;p&gt;The UKF represents a different type of compromise than the EKF. In the Kalman Filter and its Extended variant, &lt;script type=&quot;math/tex&quot;&gt;\mu, \Sigma&lt;/script&gt; are the parameters that define the distribution &lt;script type=&quot;math/tex&quot;&gt;\mathcal{N}(\mu, \Sigma)&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;The UKF parameterizes the state distribution in a different way by using “Sigma points.” Consequently, the parameterization is called the (&lt;script type=&quot;math/tex&quot;&gt;\sigma&lt;/script&gt;-points) parameterization. Thus, we move from &lt;script type=&quot;math/tex&quot;&gt;(\mu, \Sigma)&lt;/script&gt; to a set of points with a weight associated with each, e.g. &lt;script type=&quot;math/tex&quot;&gt;\{ (x^0,w^0), \cdots, (x^{2n}, w^{2n}) \}&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;The “Unscented Transform” is a curve-fitting exercise that converts individual points to a mean and covariance, i.e. &lt;script type=&quot;math/tex&quot;&gt;UT(\mu, \Sigma) = \{ (x^i, w^i) \}_i&lt;/script&gt;. An advantage of the UKF is that it is very easy to propagate these individual points through nonlinearities like non-linear dynamics, whereas it is harder to push &lt;script type=&quot;math/tex&quot;&gt;\mu, \Sigma&lt;/script&gt; through the nonlinearities.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Properties that we want the unscented transform to have&lt;/em&gt;
-\item UT(&lt;script type=&quot;math/tex&quot;&gt;\cdot&lt;/script&gt;):&lt;br /&gt;
-&lt;script type=&quot;math/tex&quot;&gt;(\mu, \Sigma) = \{ (x^i, w^i) \}_i&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;UT^{-1}(\cdot)&lt;/script&gt; &lt;br /&gt;
-&lt;script type=&quot;math/tex&quot;&gt;\{ (x^i, w^i) \}_i = (\mu, \Sigma)&lt;/script&gt;
-We want the sample sigma points to share the same mean, covariance&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mu = \sum\limits_{i=0}^{2n} w^ix^i&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Sigma = \sum\limits_{i=0}^{2n} w^i (x^i - \mu)(x^i - \mu)^T&lt;/script&gt;
-
-&lt;p&gt;They are redundant (an overparameterization of the Gaussian)&lt;/p&gt;
-
-&lt;p&gt;We have redundancy for a smoothing effect, since won’t be for a perfect Gaussian&lt;/p&gt;
-
-&lt;p&gt;Here is the transform &lt;script type=&quot;math/tex&quot;&gt;UT(\cdot)&lt;/script&gt;:&lt;br /&gt;
-&lt;script type=&quot;math/tex&quot;&gt;x^0 = \mu&lt;/script&gt; &lt;br /&gt;
-&lt;script type=&quot;math/tex&quot;&gt;x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )_i, i = 1, \dots, n&lt;/script&gt;\&lt;/p&gt;
-
-&lt;p&gt;This is a matrix square root&lt;/p&gt;
-
-&lt;p&gt;The index $i$ is the &lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;‘th column in the matrix square root&lt;/p&gt;
-
-&lt;p&gt;We also have a mirror image set:&lt;br /&gt;
-$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$\&lt;/p&gt;
-
-&lt;p&gt;Those were the points. The weights themselves:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w^0 = \frac{\lambda}{n+\lambda}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w^i = \frac{1}{2(n+\lambda)}, i \geq 1&lt;/script&gt;
-
-&lt;p&gt;Each of these points plot points around the circle/ellipse
-Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;n \times n&lt;/script&gt; matrix is &lt;script type=&quot;math/tex&quot;&gt;\sqrt{(n+\lambda) \Sigma}&lt;/script&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;verify-inverse-unscented-transform&quot;&gt;Verify Inverse Unscented Transform**&lt;/h2&gt;
-
-&lt;p&gt;We verify &lt;script type=&quot;math/tex&quot;&gt;UT^{-1}(\cdot)&lt;/script&gt; as claimed&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=0}^{2n} w^ix^i = \frac{\lambda}{n+\lambda}(\mu) + \sum\limits_{i=1}^n  \frac{1}{2(n+\lambda)} \Bigg(\mu + ( \sqrt{(n+\lambda) \Sigma } )_i \Bigg) + \sum\limits_{i=n+1}^{2n} \frac{1}{2(n+\lambda)} \Bigg(\mu +  - ( \sqrt{(n+\lambda) \Sigma })_{i-n} \Bigg)&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \frac{\lambda}{n+\lambda}(\mu) +  \frac{n}{2(n+\lambda)} \Bigg(\mu  \Bigg) +  \frac{n}{2(n+\lambda)} \Bigg(\mu \Bigg) - \mu&lt;/script&gt;
-
-&lt;p&gt;Everything also cancels in the $\Sigma$ calculation&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n \frac{ (\sqrt{n_\lambda})(\sqrt{n_\lambda})}{ (n+\lambda)} (\sqrt{\Sigma}_i) (\sqrt{\Sigma})_i^T = \Sigma&lt;/script&gt;
-
-&lt;p&gt;We notice that if $AA^T = B$, then we can decompose $A$ as&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-A = \begin{bmatrix}
-| &amp; \cdots &amp; | \\
-a_1 \cdots a_n \\
-| &amp; \cdots &amp; | 
-\end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;then &lt;script type=&quot;math/tex&quot;&gt;AA^T&lt;/script&gt; is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-= \begin{bmatrix}
-| &amp; \cdots &amp; | \\
-a_1 &amp; \cdots  &amp; a_n \\
-| &amp; \cdots &amp; | 
-\end{bmatrix}
-\begin{bmatrix}
--- &amp; a_1^T &amp; -- \\
--- &amp; \cdots &amp; -- \\
--- &amp; a_n^T &amp; -- | 
-\end{bmatrix} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Inverting the transform is just as simple
-We get &lt;script type=&quot;math/tex&quot;&gt;a_1 a_1^T + a_2 a_2^T + \cdots + a_n a_n^T&lt;/script&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n a_i a_i^T = AA^T = B&lt;/script&gt;
-
-&lt;p&gt;therefore&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=1}^n (\sqrt{\Sigma})_i (\sqrt{\Sigma})_i^T = (\sqrt{\Sigma}) (\sqrt{\Sigma})^T = \Sigma&lt;/script&gt;
-
-&lt;h2 id=&quot;matrix-square-roots&quot;&gt;Matrix Square Roots&lt;/h2&gt;
-
-&lt;p&gt;You might prefer the Cholesky Factorization for numerical versions
-Matrix Square Root! Can use SVD or Cholesky Factorization
-There are SVD matrix square roots:
-(i) &lt;script type=&quot;math/tex&quot;&gt;\sqrt{\Sigma} = U \Lambda^{1/2}&lt;/script&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sqrt{\Sigma} (\sqrt{\Sigma})^T = U \Lambda^{1/2} (U \Lambda^{1/2})^T = \Sigma&lt;/script&gt;
-
-&lt;p&gt;Columns of $U$ matrix are principal directions of ellipse. SVD gives you this geometric intution of the points around the semi axes, etc.&lt;/p&gt;
-
-&lt;p&gt;(ii)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sqrt{\Sigma} = U \Lambda^{1/2} U^T = \Sigma&lt;/script&gt;
-
-&lt;p&gt;SVD computation takes $O(4n^3)$ time&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Cholesky Decomposition&lt;/strong&gt;
-&lt;script type=&quot;math/tex&quot;&gt;M = LU&lt;/script&gt;, where lower triangular times upper triangular
-When &lt;script type=&quot;math/tex&quot;&gt;M=M^T&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;L = U^T&lt;/script&gt;
-Let &lt;script type=&quot;math/tex&quot;&gt;M=LL^T&lt;/script&gt;
-(iii) &lt;script type=&quot;math/tex&quot;&gt;L = \sqrt{\Sigma}&lt;/script&gt;
-People prefer cholesky in UKF because it has complexity &lt;script type=&quot;math/tex&quot;&gt;O( \frac{1}{6} n^3)&lt;/script&gt;, just a constant savings.&lt;/p&gt;
-
-&lt;p&gt;We choose &lt;script type=&quot;math/tex&quot;&gt;\sqrt{\Sigma} \sqrt{\Sigma}^T = LL^T = \Sigma&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Zero out successive row elements of your vector, it is not along semi axes, but more along different axis-aligned directions as you zero  out rows&lt;/p&gt;
-
-&lt;h2 id=&quot;ukf-sigma-point-filter&quot;&gt;UKF (Sigma Point Filter)&lt;/h2&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;(\mu, \Sigma) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow predict \rightarrow (\bar{x}^i, \bar{w}^i) \rightarrow UT^{-1}(\cdot) \rightarrow  (\bar{\mu}, \bar{\Sigma}) \rightarrow UT(\cdot) \rightarrow (x^i, w^i) \rightarrow update \rightarrow&lt;/script&gt;
-
-&lt;p&gt;&lt;strong&gt;Predict Step&lt;/strong&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;UT(\cdot)&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-x_{t \mid t}^0 = \mu_{t \mid t} \\
-x_{t \mid t}^i = \mu_{t \mid t} + (\sqrt{(n+\lambda) \Sigma_{t \mid t}})_i, i = 1, \dots, n \\
-x_{t \mid t}^i = \mu_{t \mid t} - (\cdots), i = n+1, \dots, 2n \\
-\bar{x}_{t +1 \mid t}^i = f(x_{t \mid t}^i, u_t)
-\end{aligned}&lt;/script&gt;
-
-&lt;p&gt;We predict through nonlinear dynamics&lt;/p&gt;
-
-&lt;p&gt;Now we run &lt;script type=&quot;math/tex&quot;&gt;UT^{-1}&lt;/script&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-\mu_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \bar{x}_{t+1 \mid t}^i \\
-\Sigma_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i (\bar{x}_{t+1 \mid t}^i - \mu_{t+1 \mid t})(\bar{x}_{t+1 \mid t}^i - \mu_{t+1 \mid t})^T
-\end{aligned}&lt;/script&gt;
-
-&lt;p&gt;We recall the Gaussian estimate!&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-\mu_{t \mid t} = \mu + \Sigma_{XY} \Sigma_{YY}^{-1} (y - \hat{y}) \\
-\Sigma_{t \mid t} = \Sigma - \Sigma_{XY} \Sigma_{YY}^{-1} \Sigma_{YX}
-\end{aligned}&lt;/script&gt;
-
-&lt;p&gt;\item Now the UPDATE step:&lt;br /&gt;
-We run &lt;script type=&quot;math/tex&quot;&gt;UT(\cdot)&lt;/script&gt;&lt;br /&gt;
-&lt;script type=&quot;math/tex&quot;&gt;x_{t +1 \mid t}^0&lt;/script&gt;&lt;br /&gt;
-&lt;script type=&quot;math/tex&quot;&gt;x_{t+1 \mid t}^{2n}&lt;/script&gt;\&lt;/p&gt;
-
-&lt;p&gt;Let’s build $\hat{y}&lt;em&gt;{t+1 \mid t}$ and $\Sigma&lt;/em&gt;{t+1 \mid t}^{XY}$, $\Sigma_{t+1 \mid t}^{YY}$
-\item Now&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\hat{y}_{t+1 \mid t} = \sum\limits_{i=0}^{2n} w^i \hat{y}_{t+1 \mid t}^i&lt;/script&gt;
-
-&lt;p&gt;which is the expected measurment
-Now,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{aligned}
-\Sigma_{t+1 \mid t}^{YY} = \sum\limits_{i=0}^{2n} w^i (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t}) (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t})^T
-\end{aligned}&lt;/script&gt;
-
-&lt;p&gt;Now&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\begin{aligned}
-\Sigma_{t+1 \mid t}^{XY} = \sum\limits_{i=0}^{2n} w^i (x_{t+1 \mid t}^i - \mu_{t+1 \mid t}) (\hat{y}&lt;em&gt;{t+1 \mid t}^i - \hat{y}&lt;/em&gt;{t+1 \mid t})^T
-\end{aligned}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;We are doing a fitting operation. That is why we have more sigma points than we need. Smooth out the anomalies due to any one point getting weird.&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\Sigma_{t+1 \mid t+1} = \Sigma_{t+1 \mid t} - \Sigma_{t+1 \mid t}^{XY} \Sigma_{t+1 \mid t}^{YY}
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\mu_{t+1 \mid t+1 } = \mu_{t+1 \mid t } + \Sigma_{t+1 \mid t}^{XY} (\Sigma_{t+1 \mid t}^{YY})^{-1} (y_{t+1} - \hat{y}&lt;em&gt;{t+1 \mid t})
-\end{equation}
-where $y&lt;/em&gt;{t+1}$ is the actual measurement.&lt;/p&gt;
-
-&lt;h2 id=&quot;choosing-lambda&quot;&gt;Choosing Lambda&lt;/h2&gt;
-
-&lt;p&gt;What is &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;? Problem specific.  Consider SVD square root, so that sigma points will be along principal axes.&lt;/p&gt;
-
-&lt;p&gt;Suppose we have &lt;script type=&quot;math/tex&quot;&gt;x^0&lt;/script&gt; at the center of the ellipse, and &lt;script type=&quot;math/tex&quot;&gt;x^1, \dots, x^4&lt;/script&gt; lie at each corner of the principal semi-axes&lt;/p&gt;
-
-&lt;p&gt;$$\lambda$ is the “confidence-value” of the error ellipse&lt;/p&gt;
-
-&lt;p&gt;If &lt;script type=&quot;math/tex&quot;&gt;n+\lambda = 1&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;x^i = \mu \pm \sqrt{\Sigma}_i&lt;/script&gt; and each column represents one standard deviation&lt;/p&gt;
-
-&lt;p&gt;Standard deviation in each direction. Bigger &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; is, then the bigger is the ellipse (And vice versa: smaller &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; gives smaller ellipse)&lt;/p&gt;
-
-&lt;p&gt;The size of the ellipse matters because this is what we take as the region about which we create our linearization&lt;/p&gt;
-
-&lt;p&gt;UKF is a linearization, takes average slope over a neighborhood. But it is not from the Taylor Series Expansion&lt;/p&gt;
-
-&lt;p&gt;Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborhood about which we fit the Gaussian is determined by  &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;The smaller &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt; is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)&lt;/p&gt;
-
-&lt;p&gt;Interesting value of &lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;: &lt;script type=&quot;math/tex&quot;&gt;\lambda=2&lt;/script&gt;. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
-\item Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
-\end{itemize}
-\subsection{PRO version of UKF}
-\begin{itemize}
-\item Other Form of UKF:&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-\lambda = \alpha^2 ( n + k) - n
-\end{equation}
-this gives us two parameters to tune&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x^i = \mu \pm \alpha ( \sqrt{(n+k) \Sigma})_i&lt;/script&gt;
-
-&lt;p&gt;where the two parameters are &lt;script type=&quot;math/tex&quot;&gt;\alpha,k&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;We now have to redefine the weights to be&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)&lt;/script&gt;
-
-&lt;p&gt;where $\beta$ is another parameter&lt;/p&gt;
-
-&lt;p&gt;Hugh Durrant White, the original paper has this original form&lt;/p&gt;
-
-&lt;p&gt;How does it work?&lt;/p&gt;
-
-&lt;p&gt;Algorithm is simple, but expensive to compute (with for loop)&lt;/p&gt;
-
-&lt;p&gt;In UKF, samples deterministally extracted&lt;/p&gt;
-
-&lt;p&gt;In Particle filter, no assumption about form of distribution, but need many form of them, and probabilistically extracted&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Main Idea:&lt;/strong&gt; Represent a distribution $p(x)$ with a collection of samples from &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt;: &lt;script type=&quot;math/tex&quot;&gt;x^i \sim p(x), i=1,\dots, N&lt;/script&gt; i.i.d.&lt;/p&gt;
-
-&lt;p&gt;What does it mean to ``represent’’ a distribution &lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt; with a bunch of particles &lt;script type=&quot;math/tex&quot;&gt;\{ x_1, \dots, x_N \}&lt;/script&gt;?&lt;/p&gt;
-
-&lt;p&gt;We know that empirical moments are related to true distribution by the law of large number&lt;/p&gt;
-
-&lt;p&gt;Recall&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{lll}
-\mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, &amp; x_i \sim p(x), &amp; i=1,\dots, N, i.i.d
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Then&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-\Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, &amp; x_i \sim p(x)
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Also,&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)&lt;/script&gt;
-
-&lt;p&gt;The Law of Large numbers states that&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]&lt;/script&gt;
-
-&lt;p&gt;as &lt;script type=&quot;math/tex&quot;&gt;N \rightarrow \infty&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Problem: Given a set of particles&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ x_{t+1 \mid t}^1, \dots, x_{t+1  \mid t}^N \} \sim p(x_{t+1} \mid y_{1:t} )&lt;/script&gt;
-
-&lt;p&gt;drawn from the above distribution&lt;/p&gt;
-
-&lt;p&gt;We recall the update step&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_t \mid y_{1:t} ) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) dx_t }&lt;/script&gt;
-
-&lt;p&gt;We have particles from the top right expression, &lt;script type=&quot;math/tex&quot;&gt;x_{t \mid t-1}^i \sim p( x_t \mid y_{1:t-1})&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;We want to use Bayes Rule so that we can transform our particles so that they approximate the posterior (this will be one step of the Bayesian Filter)&lt;/p&gt;
-
-&lt;p&gt;We will use :&lt;/p&gt;
-
-&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;q(x)&lt;/script&gt; the proposal distribution, the particles are actually from here&lt;/p&gt;
-
-&lt;p&gt;We want them to be from $p(x)$ the target distribution, we wish they were from here&lt;/p&gt;
-
-&lt;p&gt;We use Particle Weights&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]&lt;/script&gt;
-
-&lt;p&gt;Given ${x^1, \dots, x^N }$
-New set: ${ (x^1,w^1), \dots, (x^N,w^N) }$ where $w^i = w(x^i)$
-Now the expectation is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathbbm{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i&lt;/script&gt;
-
-&lt;p&gt;and &lt;script type=&quot;math/tex&quot;&gt;w(x) = \frac{p(x)}{q(x)}&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;If we knew &lt;script type=&quot;math/tex&quot;&gt;p,q&lt;/script&gt;, then we would know the weights
-But in the filtering setup, we don’t know the posterior, the distribution we are trying to hit! But in fact, we don’t need the target distribution!&lt;/p&gt;
-
-&lt;p&gt;Proposal: What we have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;q(x) = p(x_t \mid y_{1:t-1})&lt;/script&gt;
-
-&lt;p&gt;Target: What we want&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x) = p(x_t \mid y_{1:t})&lt;/script&gt;
-
-&lt;p&gt;So we get weights:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w^i = w(x^i) = \frac{ p(x^i) }{ q(x^i) } = \frac{p(x_t^i \mid y_{1:t})^i}{p(x_t^i \mid y_{1:t-1}) }&lt;/script&gt;
-
-&lt;p&gt;Now, by Bayes Rule, we can say that the PRIOR cancels out, which was the only thing we didn’t know???&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \frac{     \frac{p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int_{x_t} \cdots dx_t }     }{ p(x_t \mid y_{1:t-1}) }&lt;/script&gt;
-
-&lt;p&gt;When the prior cancels, we get&lt;/p&gt;
-
-&lt;p&gt;\begin{equation}
-w(x_t^i) = \frac{p(y_t \mid x_t^i ) }{ \int_{x_t} \cdots dx_t } 
-\end{equation}&lt;/p&gt;
-
-&lt;p&gt;We just care about the relative weights, so&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w} (x_t^i) = p(y_t \mid x_t^i)&lt;/script&gt;
-
-&lt;p&gt;(unnormalized)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(x_t^i) = \frac{ \bar{w}(x_t^i) }{  \sum\limits_{i=1}^N \bar{w}(x_t^i) }&lt;/script&gt;
-
-&lt;p&gt;Example: suppose we have measurement noise $v_t \sim \mathcal{N}(0, R_t)$&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y_t = g(x_t) + v_t&lt;/script&gt;
-
-&lt;p&gt;Given $x_{t \mid t-1}^i \sim p(x_t \mid y_{1:t-1})$, then find&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ (x_{t \mid t}^i, w_{t \mid t}^i \}_i&lt;/script&gt;
-
-&lt;p&gt;to represent $p(x_t \mid y_{1:t})$. The weights are&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_{t \mid t-1}^i) \sim \mathcal{N}( g(x_{t \mid t-1}^i, R_t)&lt;/script&gt;
-
-&lt;p&gt;And now&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t \mid t}^i = \eta \mbox{exp } \{ -\frac{1}{2} (y_t - g(x_{t \mid t-1}^i)^T R_t^{-1} (y_t - g(x_{t \mid t-1}^i) ) \}&lt;/script&gt;
-
-&lt;p&gt;Renormalize&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(x_t^i) = \frac{ \bar{w}(x_t^i) }{ \sum\limits_{i=1}^N \bar{w}(x_t^i)  }&lt;/script&gt;
-
-&lt;p&gt;Then multiply the weights, and renormalize (could have started with weighted particles instead of just particles)&lt;/p&gt;
-
-&lt;p&gt;Only the weight changes in the UPDATE step (but we keep two different time indices for weights). Time indices are redundant for the &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; particles, which are the input&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ (x_t^i, w_{t \mid t-1}^i) \}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t \mid t}^i = p(y_t \mid x_t = x_t^i) w_{t \mid t-1}^i&lt;/script&gt;
-
-&lt;p&gt;and&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_{t \mid t}^i  = \frac{ \bar{w}_{t \mid t}^i }{ \sum\limits_{i=1}^N \bar{w}_{t \mid t}^i  }&lt;/script&gt;
-
-&lt;h2 id=&quot;predict-step&quot;&gt;Predict Step&lt;/h2&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{t+1} \mid y_{1:t}) = \int_x p(x_{t+1} \mid x_t) p(x_t \mid y_{1:t}) dx_t&lt;/script&gt;
-
-&lt;p&gt;the left side is the transition distribution (which we have)&lt;/p&gt;
-
-&lt;p&gt;the right side is ${ (x_t^i, w_{t \mid t}^i) }$&lt;/p&gt;
-
-&lt;p&gt;Let’s just “simulate” &lt;script type=&quot;math/tex&quot;&gt;p(x_{t+1} \mid x_t)&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Draw &lt;script type=&quot;math/tex&quot;&gt;x_{t+1}^i \sim p(x_{t+1} \mid x_t = x_t^i )&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;x_{t+1} = f(x_t, u_t) + w_t&lt;/script&gt;, the process noise &lt;script type=&quot;math/tex&quot;&gt;w_t \sim \mathcal{N}(0, Q_t)&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;We sample 
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-w_t \sim \mathcal{N}(0, Q_t), &amp; \rightarrow x_{t+1}^i = f(x_{t}^i, u_t) + w_t 
-\end{array} %]]&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;1000 particles per dimension &lt;script type=&quot;math/tex&quot;&gt;(1000^{D}&lt;/script&gt; where &lt;script type=&quot;math/tex&quot;&gt;D&lt;/script&gt;=dimension&lt;/p&gt;
-
-&lt;p&gt;Exponential explosion of particles required to keep the same resolution&lt;/p&gt;
-
-&lt;p&gt;Full Filter: Given&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\{ (x_{t }^i, w_{t \mid t}^i \}_i&lt;/script&gt;
-
-&lt;p&gt;Predict:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{t+1}^i \sim p(x_{t+1} \mid x_t = x_t^i )&lt;/script&gt;
-
-&lt;p&gt;Update:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\bar{w}_{t+1 \mid t+1}^i = p(y_{t+1} \mid x_{t+1} = x_{t+1}^i) w_{t \mid t}^i&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_{t+1 \mid t+1 }^i  = \frac{ \bar{w}_{t+1 \mid t+1}^i }{ \sum\limits_{i=1}^N \bar{w}_{t+1 \mid t+1}^i  }&lt;/script&gt;
-
-&lt;h2 id=&quot;sample-degeneracy&quot;&gt;Sample Degeneracy&lt;/h2&gt;
-
-&lt;p&gt;Unfortunately, it is easy to end up with degenerate samples in the UKF, meaning the samples won’t do anything for you because they are all spread apart. TODO: Only one takes the weight, why?&lt;/p&gt;
-
-&lt;p&gt;The &lt;strong&gt;solution&lt;/strong&gt;: resample points in a very clever way, via importance (re-)sampling. In a &lt;em&gt;survival of the fittest&lt;/em&gt;, those samples with high weight end up lots of children, and those with low weight disappear. I&lt;/p&gt;
-
-&lt;p&gt;\item We sample a new set of particles at time $t$, get new $x_t^i$ s.t.
-\item This is sequential important re-sampling.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;Pr( x_t^i = x_t^j) = w_t^j&lt;/script&gt;
-
-&lt;p&gt;The noisy prediction will disperse them. The new weights are uniform, i.e. &lt;script type=&quot;math/tex&quot;&gt;w_t^i = \frac{1}{N}&lt;/script&gt;
-\item Particle impoverishment; all particles clumped at one point because not enough noise to disperse them
-\item If the resampling happens too frequently, in comparison with the dispersal via noise, then we get sample impoverishment!&lt;/p&gt;
-
-&lt;p&gt;We will get that all $x_t^i \approx x_t^j$, and $w_t^i \approx \frac{1}{N}, \forall i$&lt;/p&gt;
-
-&lt;p&gt;So no diversity in the distribution anymore&lt;/p&gt;
-
-&lt;p&gt;To fix it, resample less often&lt;/p&gt;
-
-&lt;p&gt;Or you could just throw some random particles into your bag&lt;/p&gt;
-
-&lt;p&gt;Check how different weights are at every time. If too different, trigger a resample (variance without subtracting mean is &lt;script type=&quot;math/tex&quot;&gt;\sum\limits_{i=1}^N (w_t^i)^2 \geq \mbox{thresh}&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;If maximally different, then you would get &lt;script type=&quot;math/tex&quot;&gt;1&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;0&lt;/script&gt;, maximally different&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Low Variance Resampling:&lt;/strong&gt; in previous formulation, you could have gotten all copies of the same particle
-One number line is &lt;script type=&quot;math/tex&quot;&gt;r \sim v[0, \frac{1}{N}]&lt;/script&gt;
-Then map each of these to the right interval above in the weighted bins. Determinsitic resampling
-Make &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; copies of it in every uniform bin&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Swept under Rug&lt;/strong&gt;
-All filters have tried to compute the Bayesian posterior (either exactly or approximately)
-The particle filter does not do this (look at prediction step)
-PF tracks approximates the posterior of the trajectory instead&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_{0:t} \mid y_{1:t})&lt;/script&gt;
-
-&lt;p&gt;Because of the prediction step, where we say draw sample&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{t+1}^i \sim p(x_{t+1} \mid x_t  = x_t^i )&lt;/script&gt;
-
-&lt;p&gt;What we really wanted was&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{t+1}^i \sim p(x_{t+1} \mid y_{1:t} ) = \int_{x_t} p(x_{t+1} \mid x_t) p(x_t \mid y_{1:t}) dx_t&lt;/script&gt;
-
-&lt;p&gt;\item Instead, the Particle Filter finds&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{t+1}^i \sim p(x_{t+1}, x_t \mid y_{1:t}) = p(x_{t+1} \mid x_t = x_t^i) p(x_t = x_t^i \mid y_{1:t})&lt;/script&gt;
-
-&lt;p&gt;Track distribution of the whole TRAJECTORY, given all of the measurements.
-Important for SLAM, because in SLAM we often want to estimate the history of the trajectory of the robot
-\end{itemize}&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;p&gt;[1] Mac Schwager. Lecture Presentations of AA 273: State Estimation and Filtering for Aerospace Systems, taught at Stanford University in April-June 2018.&lt;/p&gt;
-
-&lt;p&gt;[2] SJ Julier, JK Uhlmann, HF Durrant-Whyte. &lt;em&gt;A new approach for filtering nonlinear systems&lt;/em&gt;. Proceedings of the American Control Conference, June 1995, Volume 3, pages 1628-1632.&lt;/p&gt;
-
-&lt;p&gt;[3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. &lt;em&gt;A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators&lt;/em&gt;. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.&lt;/p&gt;</content><author><name></name></author><summary type="html">multi-modal distributions, sigma point transform, matrix square roots ...</summary></entry></feed>
+&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry></feed>
