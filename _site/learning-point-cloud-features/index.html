@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/learning-point-cloud-features/">
+  <link rel="canonical" href="http://localhost:4000/learning-point-cloud-features/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -100,13 +100,346 @@
 
 <p><a name="sfmpipeline"></a></p>
 
-<h2 id="semantic-segmentation-of-features">Semantic Segmentation of Features</h2>
+<h2 id="3d-semantic-segmentation-of-features">3D Semantic Segmentation of Features</h2>
 
-<h2 id="instance-segmentation-of-features">Instance Segmentation of Features</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import torch
+import torch.nn as nn
+import math
+import torch.nn.functional as F
 
-<p>SPGN…</p>
+class PointNetBase(nn.Module):
+
+	def __init__(self, opt):
+		"""
+		Multilayer perceptrons with shared weights are implemented as 
+		convolutions. This is because we are mapping from K inputs to 64 
+		outputs, so we can just consider each of the 64 K-dim filters as 
+		describing the weight matrix for each point dimension (X,Y,Z,...) to
+		each index of the 64 dimension embeddings
+		"""
+		# Call the super constructor
+		super(PointNetBase, self).__init__()
+
+		self.opt = opt
+		# stddev=1e-3,
+		# weight_decay=0.0,
+		# activation_fn=tf.nn.relu,
+
+		self.autoencoder_mlp = self.make_ae_layers([32,64,64,128,128]) 
+		self.decoder_fc = self.make_fc_layers([256, 256, self.opt.n_pc_per_model * 3])
+
+		# 4 part classes
+		# dim is 128 + 3
+		self.seg_branch = nn.Sequential(nn.Conv1d(128+3,4,1))
+
+		self._initialize_weights()
+
+
+	def make_ae_layers(self, cfg):
+		"""
+		[1,3] kernel, stride [1,1]
+		then [1,1] kernel and stride[1,1] everywhere
+
+		Point functions (MLP implemented as conv2d)
+		"""
+		layers = []
+		in_channels = 3
+		for v in cfg:
+			conv1d = nn.Conv1d(in_channels, v, 1)
+			layers += [conv1d, nn.BatchNorm1d(v), nn.ReLU()]
+			in_channels = v
+		return nn.Sequential(*layers)
+
+
+	def make_fc_layers(self, cfg):
+		"""
+		MLP on global point cloud vector
+		"""
+		layers = []
+		in_channels = 128
+		for v_idx, v in enumerate(cfg):
+			fc = nn.Linear(in_channels, v, 1)
+			if v_idx == len(cfg) - 1:
+				# on the final layer, no activation fn here
+				layers += [fc]
+			else:
+				layers += [fc, nn.ReLU(True), nn.Dropout(p=self.opt.dropout_prob) ]
+			in_channels = v
+		return nn.Sequential(*layers)
+
+
+	def _initialize_weights(self):
+		for m in self.modules():
+			if isinstance(m, nn.Conv2d):
+				n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+				m.weight.data.normal_(0, math.sqrt(2. / n))
+				if m.bias is not None:
+					m.bias.data.zero_()
+			elif isinstance(m, nn.BatchNorm2d):
+				m.weight.data.fill_(1)
+				m.bias.data.zero_()
+			elif isinstance(m, nn.Linear):
+				n = m.weight.size(1)
+				m.weight.data.normal_(0, 0.01)
+				m.bias.data.zero_()
+
+
+	def forward(self, x):
+		"""
+		K = 3
+		Take as input a B x K x N matrix of B batches of N points with K 
+		dimensions
+
+		Points come in as torch.Size([B=50, N=1024, K=3])
+		We turn them into ([B=50 x K=3 x N=1024])
+		"""
+		cloned_input = x.clone()
+		# Number of points put into the network
+		x = torch.transpose(x, 1, 2)
+		N = x.size(2)
+
+		# Input is B x K x N
+		# Run the transformed inputs through the autoencoder MLP
+		x = self.autoencoder_mlp(x)
+		# Output is B x 128 x N
+
+		# Pool over the number of points. This results in the "global feature"
+		# Output should be B x 128 x 1 --&gt; B x 128 (after squeeze)
+		global_feature = F.max_pool1d(x, N).squeeze(2)
+		latent_codes = global_feature.clone()
+
+		per_pt_logits = None
+		if self.opt.use_parts:
+			pdb.set_trace()
+			# segmentation fc for scores over num_class
+			per_pt_latent_codes = global_feature.clone()
+			per_pt_latent_codes = per_pt_latent_codes.repeat(N)
+			per_pt_input =  torch.cat( [per_pt_latent_codes, cloned_input] )
+			per_pt_logits = self.seg_branch(per_pt_input)
+
+		# output has size ([B=50, N=3072])
+		x = self.decoder_fc(global_feature)
+		return x, latent_codes, per_pt_logits
+</code></pre></div></div>
+
+<h2 id="3d-instance-segmentation-of-features">3D Instance Segmentation of Features</h2>
+
+<p>The line between 3D object detection and 3D instance segmentation in point clouds is blurry because both representations are easily derived from the other.</p>
+
+<p>The Similarity Group Proposal Network (SGPN) [1] is the first network architecture designed to perform instance-level and semantic segmentation directly on point clouds.</p>
+
+<p>It is possible to re-formulate the instance segmentation problem as semantic segmentation of 3 “similarity” classes in the following way. The 3 classes for each pair of points <script type="math/tex">\{Pi, Pj\}</script> are:</p>
+<ol>
+  <li><script type="math/tex">P_i</script> and <script type="math/tex">P_j</script> belong to the same object instance</li>
+  <li><script type="math/tex">P_i</script> and <script type="math/tex">P_j</script> share the same semantic class but do not belong to the same object instance</li>
+  <li><script type="math/tex">P_i</script> and <script type="math/tex">P_j</script> do not share the same semantic class. Pairs of points should lie progressively further away from each other in feature space as their similarity class increases.</li>
+</ol>
+
+<p>single network to predict point grouping proposals
+and a corresponding semantic class for each proposal, from
+which we can directly extract instance segmentation results</p>
+
+<p>similarity matrix that indicates the similarity between each pair of points in embedded feature space, thus producing an accurate grouping proposal for each point</p>
+
+<p>a similarity matrix
+yielding point-wise group proposals,</p>
+
+<p>uses PointNet/PointNet++ to extract a descriptive feature vector for each point in the point cloud</p>
+
+<p>This feature extraction network
+produces a matrix F. SGPN then diverges into three
+branches that each pass F through a single PointNet layer to
+obtain sized Np × Nf feature matrices FSIM, FCF , FSEM,
+which we respectively use to obtain a similarity matrix, a
+confidence map and a semantic segmentation map. The ith
+row in a Np×Nf feature matrix is a Nf -dimensional vector
+that represents point Pi
+in an embedded feature space</p>
+
+<script type="math/tex; mode=display">L = L_{sim} + L_{cf} + L_{sem}</script>
+
+<p>The matrix <script type="math/tex">S \in \mathbf{R}^{N_p \times N_p}</script>, and element <script type="math/tex">S_{ij}</script> classifies whether or
+not points <script type="math/tex">P_i</script> and <script type="math/tex">P_j</script> belong to the same object instance.
+Each row of <script type="math/tex">S</script> can be viewed as a proposed grouping of
+points that form a candidate object instance.</p>
+
+<p>We obtain <script type="math/tex">S</script> by, for each pair of
+points <script type="math/tex">\{Pi, Pj\}</script>, simply subtracting their corresponding feature vectors <script type="math/tex">\{F_{sim_i}, F_{sim_j} \}</script> and taking the <script type="math/tex">\ell_2</script> norm such that <script type="math/tex">S_{ij} = \|F_{sim_i} − F_{sim_j} \|_2</script></p>
+
+<p><strong>Metric Learning With 3 Classes</strong></p>
+
+<p>Operates on matrix <script type="math/tex">S</script> which has <script type="math/tex">\ell_2</script> norm entries</p>
+
+<script type="math/tex; mode=display">L_{sim} = \sum\limits_{i}^{N_p} \sum\limits_{j}^{N_p}l(i, j)</script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+l(i, j) = \begin{cases}
+\|F_{sim_i} − F_{sim_j} \|_2 & C_{ij} = 1 \\
+\alpha \max(0, K_1 − \|F_{sim_i} − F_{sim_j} \|_2) & C_{ij} = 2 \\
+\max(0, K_2 − \|F_{sim_i} − F_{sim_j} \|_2) & C_{ij} = 3 \end{cases} %]]></script>
+
+<p>such that <script type="math/tex">\alpha > 1, K2 > K1</script>.</p>
+
+<p><strong>Confidence Loss</strong></p>
+
+<p>we expect the
+ground-truth value in the confidence map CMi
+to be the intersection
+over union (IoU) between the set of points in the
+predicted group Si and the ground truth group Gi
+. O</p>
+
+<p><strong>Merging Group Proposals</strong></p>
+
+<p>The similarity matrix S produces Np group proposals,
+many of which are noisy or represent the same object.</p>
+
+<p>discard proposals with predicted confidence less than
+T hC or cardinality less than T hM2. We further prune
+our proposals into clean, non-overlapping object instances
+by applying Non-Maximum Suppression; groups with IoU
+greater than T hM1 are merged together by selecting the
+group with the maximum cardinality</p>
+
+<p>T hM1 is set to 0.6 and T hM2 is set to 200. T hC is
+set to 0.1. Our network is implemented</p>
+
+<p><strong>Instance Segmentation Without the 3-part Multi-Task Loss</strong></p>
+
+<p>We also compare instance segmentation performance
+with the following method (which we call Seg-Cluster):
+Perform semantic segmentation using our network and then
+select all points as seeds. Starting from a seed point, BFS
+is used to search neighboring points with the same label. If
+a cluster with more than 200 points has been found, it is
+viewed as a valid group. Our GroupMerging algorithm is
+then used to merge these valid groups.</p>
+
+<p>naive method like Seg-Cluster tends to
+properly separate regions far away for large objects like the
+ceiling and floor. However for small object, Seg-Cluster
+fails to segment instances with the same label if they are
+close to each other</p>
+
+<p>The method of Armeni [2] was …</p>
+
+<h2 id="chamfer-distance">Chamfer Distance</h2>
+
+<p>The symmetric Chamfer distance is a pseudo-metric, not a metric. It is defined as</p>
+
+<p>The Chamfer distance is defined as</p>
+
+<script type="math/tex; mode=display">d_{Chamfer}(\mathbf{A,B}) = \Big( \sum\limits_{x_B \in \mathbf{B}} \underset{x_A \in \mathbf{A}}{\mbox{min}} |X_B - X_A|^2 \Big) + \Big( \sum\limits_{x_A \in \mathbf{A}} \underset{x_B \in \mathbf{B}}{\mbox{min}} |X_B - X_A|^2 \Big)</script>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import numpy as np 
+import torch
+
+# def tensorflow_chamfer_distance(pc1, pc2):
+#     '''
+#     Input:
+#         pc1: float TF tensor in shape (B,N,C) the first point cloud
+#         pc2: float TF tensor in shape (B,M,C) the second point cloud
+#     Output:
+#         dist1: float TF tensor in shape (B,N) distance from first to second
+#         idx1: int32 TF tensor in shape (B,N) nearest neighbor from first to second
+#         dist2: float TF tensor in shape (B,M) distance from second to first
+#         idx2: int32 TF tensor in shape (B,M) nearest neighbor from second to first
+#     '''
+#     N = pc1.get_shape()[1].value
+#     M = pc2.get_shape()[1].value
+#     pc1_expand_tile = tf.tile(tf.expand_dims(pc1,2), [1,1,M,1])
+#     pc2_expand_tile = tf.tile(tf.expand_dims(pc2,1), [1,N,1,1])
+#     pc_diff = pc1_expand_tile - pc2_expand_tile # B,N,M,C
+#     pc_dist = tf.reduce_sum(pc_diff ** 2, axis=-1) # B,N,M
+#     dist1 = tf.reduce_min(pc_dist, axis=2) # B,N
+#     idx1 = tf.argmin(pc_dist, axis=2) # B,N
+#     dist2 = tf.reduce_min(pc_dist, axis=1) # B,M
+#     idx2 = tf.argmin(pc_dist, axis=1) # B,M
+#     return dist1, idx1, dist2, idx2
+
+
+# def pytorch_chamfer_distance(pc1, pc2):
+#     '''
+#     Input:
+#         pc1: float TF tensor in shape (B,N,C) the first point cloud
+#         pc2: float TF tensor in shape (B,M,C) the second point cloud
+#     Output:
+#         dist1: float TF tensor in shape (B,N) distance from first to second
+#         idx1: int32 TF tensor in shape (B,N) nearest neighbor from first to second
+#         dist2: float TF tensor in shape (B,M) distance from second to first
+#         idx2: int32 TF tensor in shape (B,M) nearest neighbor from second to first
+#     '''
+#     N = pc1.size(1)
+#     M = pc2.size(1)
+
+# 	pc1_expand_tile = pc1.view(-1, 1).repeat(1, 3).view(1,1,M,1)
+# 	pc2_expand_tile = pc2.view(-1, 1).repeat(1, 3).view(1,N,1,1)
+
+
+
+#      = tf.tile(tf.expand_dims(pc1,2), [1,1,M,1])
+#     pc2_expand_tile = tf.tile(tf.expand_dims(pc2,1), [1,N,1,1])
+#     pc_diff = pc1_expand_tile - pc2_expand_tile # B,N,M,C
+#     pc_dist = tf.reduce_sum(pc_diff ** 2, axis=-1) # B,N,M
+#     dist1 = tf.reduce_min(pc_dist, axis=2) # B,N
+#     idx1 = tf.argmin(pc_dist, axis=2) # B,N
+#     dist2 = tf.reduce_min(pc_dist, axis=1) # B,M
+#     idx2 = tf.argmin(pc_dist, axis=1) # B,M
+#     return dist1, idx1, dist2, idx2
+
+
+
+def batch_pairwise_dist(x, y, cuda):
+    # 32, 2500, 3
+    bs, num_points, points_dim = x.size()
+    xx = torch.bmm(x, x.transpose(2, 1))
+    yy = torch.bmm(y, y.transpose(2, 1))
+    zz = torch.bmm(x, y.transpose(2, 1))
+    if cuda:
+        diag_ind = torch.arange(0, num_points).type(torch.cuda.LongTensor)
+    else:
+        diag_ind = torch.arange(0, num_points).type(torch.LongTensor)
+    rx = xx[:, diag_ind, diag_ind].unsqueeze(1).expand_as(xx)
+    ry = yy[:, diag_ind, diag_ind].unsqueeze(1).expand_as(yy)
+    P = (rx.transpose(2, 1) + ry - 2 * zz)
+    return P
+
+
+def batch_NN_loss(x, y, cuda):
+    bs, num_points, points_dim = x.size()
+    dist1 = batch_pairwise_dist(x, y, cuda)
+    values1, indices1 = dist1.min(dim=2)
+
+    dist2 = batch_pairwise_dist(y, x, cuda)
+    values2, indices2 = dist2.min(dim=2)
+    a = torch.div(torch.sum(values1,1), num_points)
+    b = torch.div(torch.sum(values2,1), num_points)
+    chamfer = torch.div(torch.sum(a), bs) + torch.div(torch.sum(b), bs)
+
+    #print('batch size: %d, and chamfer dist = %f' % (bs, chamfer.data[0]) )
+
+    return chamfer
+</code></pre></div></div>
+
+<h2 id="graph-neural-networks">Graph Neural Networks</h2>
+
+<p>Dynamic Graph CNN (DGCNN) [3] …</p>
+
+<h2 id="meanshift">Meanshift</h2>
+
+<p>Comaniciu … PAMI 2002</p>
 
 <h2 id="references">References</h2>
+
+<p>[1] W. Wang, R. Yu, Q. Huang, and U. Neumann. SGPN: Similarity Group Proposal Network for 3D Point Cloud Instance Segmentation. In CVPR, 2018. <a href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_SGPN_Similarity_Group_CVPR_2018_paper.pdf">http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_SGPN_Similarity_Group_CVPR_2018_paper.pdf</a>.</p>
+
+<p>[2] I. Armeni, O. Sener, A. R. Zamir, H. Jiang, I. Brilakis, M. Fischer, and S. Savarese. 3d semantic parsing of largescale indoor spaces. In CVPR, 2016.</p>
+
+<p>[3] Dynamic Graph CNN.</p>
+
+<p>https://www.mathworks.com/matlabcentral/fileexchange/6110-toolbox-fast-marching</p>
+
 
   </article>
 

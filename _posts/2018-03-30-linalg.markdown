@@ -18,6 +18,21 @@ mathjax: true
  -->
 ## Linear Algebra Definitions
 Before we do anything interesting with machine learning or optimization, we'll need to review some absolutely **essential** linear algebra concepts.
+
+Suppose we have two vectors $$u,v \in \mathbf{R}^{n \times 1}$$. Their *outer product* is defined as $$u \cdot v^T$$, which is an $$n \times n$$ matrix. The inner product of $$u$$ and $$v$$ is defined $$u^Tv \in \mathbf{R}^{1 \times 1}$$, a scalar.
+
+Orthogonal vectors satisfy $$v^Tu = 0$$. For all $$x \neq 0$$, if the quadratic form is positive $$x^TAx > 0$$, then the matrix is symmetric positive matrix; if instead $$x^TAx \geq 0$$, the matrix is symmetric positive semi-definite.
+
+A vector norm assigns a scalar value to vector or matrix. It turns out that all norms are *equivalent*, meaning we can bound a certain norm above and below
+
+$$
+\delta \|x\|_0 \leq \|x\|_{\square} \leq \gamma \|x\|_0
+$$
+
+e.g. $$\|x\|_{\alpha} \leq C_{\alpha \beta} \| x \|_{\beta}$$, or $$\|x\|_2 \leq \|x\|_1 \leq \sqrt{n} \|x\|_2$$.
+
+Many matrix norms are *induced* from vector norms. 
+
 ### Matrix Rank
 
 ### Vector Space
@@ -318,13 +333,23 @@ We call \\(A^{\dagger}\\) a right-inverse of \\(A\\) because \\(AA^{\dagger}=I\\
 
 ## Singular Value Decomposition (SVD)
 
+The Singular Value Decomposition (SVD), although often attributed to Eckart and Young, was discovered in the late 19th century by Beltrami, Jordan, Sylvester. The SVD is a type of factorization, also known as a decomposition in numerical linear algebra.  While some factorizations exist for all matrices, exist for only certain matrices. The SVD works for any matrix, even those that are nonsquare or include complex elements.
+
 ### SVD Definition
+
+Formally, any matrix (complex or real) $$A \in C^{m \times n}$$ can be decomposed into $$A=U \Sigma V^T$$ where $$U \in \mathbf{C}^{m \times m}, V \in \mathbf{C}^{n \times n}$$.
 
 $$
 A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} \sigma_1 & & \\ & \ddots & \\ & & \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix}
 $$
 
 where \\(U\\), \\(V\\) are orthogonal matrices, meaning \\(U^TU = I\\), \\(UU^T=I\\). 
+
+Diagonal elements are sorted in non-increasing order:
+
+$$\sigma_1 \geq \sigma_2 \geq \dots \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0$$ 
+
+where $$p = \min(m,n)$$:
 
 We call \\(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\\) the right/input singular vectors, because this is the first matrix to interact with an input vector \\(x\\) when we compute \\(y=Ax\\).
 
@@ -421,9 +446,80 @@ $$
 
 ## Eigenvectors
 
-These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford's EE 263 course (Linear Dynamical Systems).
+An eigenvector is a vector $$x$$ such that
 
-References:
+$$Ax = \lambda x, x \neq 0$$
+
+## The Sherman-Morrison Formula
+
+Let $$A \in \mathbf{R}^{n \times n}$$ (nonsingular) and $$b \in \mathbf{R}^{n \times 1}$$. Suppose we wish to solve $$Ax=b$$. Although it is a correct procedure to find $$x$$ by computing $$x=A^{-1}b$$, there exists more efficient solutions. It is not necessary to compute $$A^{-1}$$ explicitly.
+
+Assume we already have $$A^{-1}$$. However, the matrix $$A$$ changed in a very specific way: via a *rank-1 update*. We now wish to solve the following system:
+
+$$(A + uv^T)x = d$$.
+
+It turns out that computing the inverse of the new matrix (as long as $$vT A^{−1}u  \neq −1$$) is quite easy:
+
+$$
+B = (A + uv^T )^{−1} = A^{−1} − \frac{A^{−1}uv^T A^{−1}}{1+v^TA^{−1}u}
+$$
+
+where we call $$uv^T$$ the rank-1 update.
+
+**Proof:**
+To show that $$B$$ is a valid inverse, we must show that $$(A + uv^T )B = I$$
+
+$$
+(A + uv^T ) \bigg(A^{−1} − \frac{A^{−1}uv^T A^{−1}}{1+v^TA^{−1}u} \bigg) ?= I
+$$
+
+Note that $$v^TA^{-1}u$$ is a scalar: $$(1 \times n)(n \times n)(n \times 1) = (1 \times 1)$$.
+
+## Sherman-Woodbury-Woodbury Formula
+
+The generalization of the Sherman-Morrison update to a rank-k update from a rank-1 update is called the *Sherman-Woodbury-Woodbury Formula*.
+
+For example, a rank-2 update is
+
+$$
+A + uv^T + gh^T = A + \begin{bmatrix} u & g \end{bmatrix} \begin{bmatrix} v^T \\ h^T \end{bmatrix}
+$$
+
+In general, the update $$A + UV^T$$, where $$A \in \mathbf{R}^{n \times n}, U \in \mathbf{R}^{n \times k}, V \in \mathbf{R}^{k \times n}$$.
+
+$$
+(A+UV^T)^{−1} =A^{−1} −A^{−1}U(I_k +V^TA^{−1}U)^{−1}VA^{−1}
+$$
+
+Changing a single matrix entry is a rank-1 update. Consider two matrices, $$A,B$$:
+
+$$
+A = \begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9 \\
+\end{bmatrix}, B = 
+\begin{bmatrix}
+1 & 2 & 3  \\
+4 & 5 & 5 \\
+7 & 8 & 9 \\
+\end{bmatrix}
+$$
+
+$$
+B - A = uv^T = \begin{bmatrix} 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 0 & 0 \end{bmatrix}
+$$
+
+As a linear combination of the rows
+0 -1 0 )(0 0 1)
+
+As a linear combination of the columns
+(0 1 0)(0 0 -1)
+
+
+## References:
+
+These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stanford's EE 263 course (Linear Dynamical Systems).
 
 1. Duchi, John. [Properties of the Trace and Matrix Derivatives](https://web.stanford.edu/~jduchi/projects/matrix_prop.pdf).
 

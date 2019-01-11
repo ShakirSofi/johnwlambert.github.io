@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Stereo and Disparity</title>
+  <meta name="description" content="focal length, similar triangles, depth">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/stereo/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Stereo and Disparity</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#sfmpipeline">Stereo Matching</a></li>
+  <li><a href="#costfunctions">Disparity</a></li>
+  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+</ul>
+
+<p><a name="sfmpipeline"></a></p>
+
+<h2 id="stereo-vision-and-stereo-matching">Stereo Vision and Stereo Matching</h2>
+
+<p>“Stereo matching” is the task of estimating a 3D model of a scene from two or more images. The task requires finding matching pixels in the two images and converting the 2D positions of these matches into 3D depths [1]</p>
+
+<p>Humans have stereo vision with a baseline of 60 mm.</p>
+
+<h2 id="disparity">Disparity</h2>
+
+<p>Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the <script type="math/tex">Z</script>-axis. A figure is shown below:</p>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/stereo_vision_setup.png" width="50%" />
+  <div class="figcaption">
+    Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
+  </div>
+</div>
+<p>In this figure, the world point <script type="math/tex">P=(x,z)</script> is projected into the left image as <script type="math/tex">p_l</script> and into the right image as <script type="math/tex">p_r</script>.</p>
+
+<p>By defining right triangles we can find two similar triangles: with vertices at <script type="math/tex">(0,0)-(0,z)-(x,z)</script> and <script type="math/tex">(0,0)-(0,f)-(f,x_l)</script>. Since they share the same angle <script type="math/tex">\theta</script>, then <script type="math/tex">\mbox{tan}(\theta)= \frac{\mbox{opposite}}{\mbox{adjacent}}</script> for both, meaning:</p>
+
+<script type="math/tex; mode=display">\frac{z}{f} = \frac{x}{x_l}</script>
+
+<p>We notice another pair of similar triangles
+<script type="math/tex">(b,0)-(b,z)-(x,z)</script> and <script type="math/tex">(b,0)-(b,f)-(b+x_r,f)</script>, which by the same logic gives us</p>
+
+<script type="math/tex; mode=display">\frac{z}{f} = \frac{x-b}{x_r}</script>
+
+<p>We’ll derive a closed form expression for depth in terms of disparity. We already know that</p>
+
+<script type="math/tex; mode=display">\frac{z}{f} = \frac{x}{x_l}</script>
+
+<p>Multiply both sides by <script type="math/tex">f</script>, and we get an expression for our depth from the observer:</p>
+
+<script type="math/tex; mode=display">z = f(\frac{x}{x_l})</script>
+
+<p>We now want to find an expression for <script type="math/tex">\frac{x}{x_l}</script> in terms of <script type="math/tex">x_l-x_r</script>, the <em>disparity</em> between the two images.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+\frac{x}{x_l} &= \frac{x-b}{x_r} & \text{By similar triangles} \\
+x x_r &= x_l (x-b) & \text{Multiply diagonals of the fraction} \\
+x x_r &= x_lx - x_l b & \text{Distribute terms} \\
+x_r &= \frac{x_lx}{x} - b(\frac{x_l}{x}) & \text{Divide all terms by } x \\
+x_r &= x_l - b(\frac{x_l}{x}) & \text{Simplify} \\
+b\frac{x_l}{x} &= x_l - x_r & \text{Rearrange terms to opposite sides} \\
+b (\frac{x_l}{x}) (\frac{x}{x_l}) &= (x_l - x_r) (\frac{x}{x_l}) & \text{Multiply both sides by fraction inverse} \\
+b &= (x_l - x_r) (\frac{x}{x_l}) & \text{Simplify} \\
+\frac{b}{x_l - x_r} &= \frac{x}{x_l} & \text{Divide both sides by } (x_l - x_r) \\
+\end{align} %]]></script>
+
+<p>We can now plug this back in</p>
+
+<script type="math/tex; mode=display">z = f(\frac{x}{x_l}) = f(\frac{b}{x_l - x_r})</script>
+
+<p>What is our takeaway? The amount of horizontal distance between the object in Image L and image R (<em>the disparity</em> <script type="math/tex">d</script>) is inversely proportional to the distance <script type="math/tex">z</script> from the observer. This makes perfect sense. Far away objects (large distance from the observer) will move very little between the left and right image. Very closeby objects (small distance from the observer) will move quite a bit more. The focal length <script type="math/tex">f</script> and the baseline <script type="math/tex">b</script> between the cameras are just constant scaling factors.</p>
+
+<p>We made two large assumptions:</p>
+
+<ol>
+  <li>We know the focal length <script type="math/tex">f</script> and the baseline <script type="math/tex">b</script>. This requires prior knowledge or camera calibration.</li>
+  <li>We need to find point correspondences, e.g. find the corresponding <script type="math/tex">(x_r,y_r)</script> for
+each <script type="math/tex">(x_l,y_l)</script>.</li>
+</ol>
+
+<h2 id="the-epipolar-line-plane-and-constraint">The Epipolar Line, Plane, and Constraint</h2>
+
+<p>Unfortunately, just because we know</p>
+
+<p>how to compute for a given pixel in one image the range of possible locations the pixel might appear at in the other image, i.e., its epipolar lin</p>
+
+<h2 id="sum-of-squared-differences">Sum of Squared-Differences</h2>
+
+<p>The matching cost is the squared difference of intensity values at a given disparity.</p>
+
+<h2 id="cost-volumes">Cost Volumes</h2>
+
+<p>Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Scharstein et al. 2008)</p>
+
+<h2 id="object-detection-in-stereo">Object Detection in Stereo</h2>
+
+<p>3DOP (NIPS 2018) Urtasun</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Richard Szeliski.</p>
+
+<p>[2] James Hays. <a href="https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf">PDF</a>.</p>
+
+<p>[3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. <a href="https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf">PDF</a>.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
