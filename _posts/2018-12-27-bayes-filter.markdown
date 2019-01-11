@@ -23,7 +23,7 @@ Table of Contents:
 
 State estimation is the study of reproducing the state of a robot (e.g. its orientation, location) from noisy measurements. Unfortunately, we can't obtain the state $$x$$ directly. Instead, we can obtain get a measurement that is all tangled up with noise.
 
-A more formal definition: Given a history of measurements $$y_1, \dots, y_t)$$, and system inputs $$(u_1, \dots, u_t)$$, find an estimate $$\hat{x}_t$$ of the state $$x$$ with small error $$\|\hat{x}_t - x_t \|$$.
+A more formal definition: Given a history of measurements $$(y_1, \dots, y_t)$$, and system inputs $$(u_1, \dots, u_t)$$, find an estimate $$\hat{x}_t$$ of the state $$x$$ with small error $$\|\hat{x}_t - x_t \|$$.
 
 What do we have to work with? 
 - (1) We are given the measurements $$y_t$$, whose distribution is modeled  as $$ p(y_t \mid x_t, u_t) $$. 

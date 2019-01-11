@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-03T23:51:33-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://johnwlambert.github.io/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/lie-groups</id><content type="html" xml:base="http://johnwlambert.github.io/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-01-11T02:55:57-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Lie Groups&lt;/a&gt;&lt;/li&gt;
@@ -292,7 +292,104 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 \vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://johnwlambert.github.io/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/precision-recall</id><content type="html" xml:base="http://johnwlambert.github.io/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Stereo and Disparity</title><link href="http://localhost:4000/stereo/" rel="alternate" type="text/html" title="Stereo and Disparity" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/stereo-and-disparity</id><content type="html" xml:base="http://localhost:4000/stereo/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;Stereo Matching&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Disparity&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;stereo-vision-and-stereo-matching&quot;&gt;Stereo Vision and Stereo Matching&lt;/h2&gt;
+
+&lt;p&gt;“Stereo matching” is the task of estimating a 3D model of a scene from two or more images. The task requires finding matching pixels in the two images and converting the 2D positions of these matches into 3D depths [1]&lt;/p&gt;
+
+&lt;p&gt;Humans have stereo vision with a baseline of 60 mm.&lt;/p&gt;
+
+&lt;h2 id=&quot;disparity&quot;&gt;Disparity&lt;/h2&gt;
+
+&lt;p&gt;Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the &lt;script type=&quot;math/tex&quot;&gt;Z&lt;/script&gt;-axis. A figure is shown below:&lt;/p&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;/assets/stereo_vision_setup.png&quot; width=&quot;50%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;
+    Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;In this figure, the world point &lt;script type=&quot;math/tex&quot;&gt;P=(x,z)&lt;/script&gt; is projected into the left image as &lt;script type=&quot;math/tex&quot;&gt;p_l&lt;/script&gt; and into the right image as &lt;script type=&quot;math/tex&quot;&gt;p_r&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;By defining right triangles we can find two similar triangles: with vertices at &lt;script type=&quot;math/tex&quot;&gt;(0,0)-(0,z)-(x,z)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(0,0)-(0,f)-(f,x_l)&lt;/script&gt;. Since they share the same angle &lt;script type=&quot;math/tex&quot;&gt;\theta&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;\mbox{tan}(\theta)= \frac{\mbox{opposite}}{\mbox{adjacent}}&lt;/script&gt; for both, meaning:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{z}{f} = \frac{x}{x_l}&lt;/script&gt;
+
+&lt;p&gt;We notice another pair of similar triangles
+&lt;script type=&quot;math/tex&quot;&gt;(b,0)-(b,z)-(x,z)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(b,0)-(b,f)-(b+x_r,f)&lt;/script&gt;, which by the same logic gives us&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{z}{f} = \frac{x-b}{x_r}&lt;/script&gt;
+
+&lt;p&gt;We’ll derive a closed form expression for depth in terms of disparity. We already know that&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{z}{f} = \frac{x}{x_l}&lt;/script&gt;
+
+&lt;p&gt;Multiply both sides by &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;, and we get an expression for our depth from the observer:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;z = f(\frac{x}{x_l})&lt;/script&gt;
+
+&lt;p&gt;We now want to find an expression for &lt;script type=&quot;math/tex&quot;&gt;\frac{x}{x_l}&lt;/script&gt; in terms of &lt;script type=&quot;math/tex&quot;&gt;x_l-x_r&lt;/script&gt;, the &lt;em&gt;disparity&lt;/em&gt; between the two images.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\frac{x}{x_l} &amp;= \frac{x-b}{x_r} &amp; \text{By similar triangles} \\
+x x_r &amp;= x_l (x-b) &amp; \text{Multiply diagonals of the fraction} \\
+x x_r &amp;= x_lx - x_l b &amp; \text{Distribute terms} \\
+x_r &amp;= \frac{x_lx}{x} - b(\frac{x_l}{x}) &amp; \text{Divide all terms by } x \\
+x_r &amp;= x_l - b(\frac{x_l}{x}) &amp; \text{Simplify} \\
+b\frac{x_l}{x} &amp;= x_l - x_r &amp; \text{Rearrange terms to opposite sides} \\
+b (\frac{x_l}{x}) (\frac{x}{x_l}) &amp;= (x_l - x_r) (\frac{x}{x_l}) &amp; \text{Multiply both sides by fraction inverse} \\
+b &amp;= (x_l - x_r) (\frac{x}{x_l}) &amp; \text{Simplify} \\
+\frac{b}{x_l - x_r} &amp;= \frac{x}{x_l} &amp; \text{Divide both sides by } (x_l - x_r) \\
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;We can now plug this back in&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;z = f(\frac{x}{x_l}) = f(\frac{b}{x_l - x_r})&lt;/script&gt;
+
+&lt;p&gt;What is our takeaway? The amount of horizontal distance between the object in Image L and image R (&lt;em&gt;the disparity&lt;/em&gt; &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;) is inversely proportional to the distance &lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt; from the observer. This makes perfect sense. Far away objects (large distance from the observer) will move very little between the left and right image. Very closeby objects (small distance from the observer) will move quite a bit more. The focal length &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; and the baseline &lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt; between the cameras are just constant scaling factors.&lt;/p&gt;
+
+&lt;p&gt;We made two large assumptions:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;We know the focal length &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; and the baseline &lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt;. This requires prior knowledge or camera calibration.&lt;/li&gt;
+  &lt;li&gt;We need to find point correspondences, e.g. find the corresponding &lt;script type=&quot;math/tex&quot;&gt;(x_r,y_r)&lt;/script&gt; for
+each &lt;script type=&quot;math/tex&quot;&gt;(x_l,y_l)&lt;/script&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;the-epipolar-line-plane-and-constraint&quot;&gt;The Epipolar Line, Plane, and Constraint&lt;/h2&gt;
+
+&lt;p&gt;Unfortunately, just because we know&lt;/p&gt;
+
+&lt;p&gt;how to compute for a given pixel in one image the range of possible locations the pixel might appear at in the other image, i.e., its epipolar lin&lt;/p&gt;
+
+&lt;h2 id=&quot;sum-of-squared-differences&quot;&gt;Sum of Squared-Differences&lt;/h2&gt;
+
+&lt;p&gt;The matching cost is the squared difference of intensity values at a given disparity.&lt;/p&gt;
+
+&lt;h2 id=&quot;cost-volumes&quot;&gt;Cost Volumes&lt;/h2&gt;
+
+&lt;p&gt;Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Scharstein et al. 2008)&lt;/p&gt;
+
+&lt;h2 id=&quot;object-detection-in-stereo&quot;&gt;Object Detection in Stereo&lt;/h2&gt;
+
+&lt;p&gt;3DOP (NIPS 2018) Urtasun&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Richard Szeliski.&lt;/p&gt;
+
+&lt;p&gt;[2] James Hays. &lt;a href=&quot;https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. &lt;a href=&quot;https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">focal length, similar triangles, depth</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://localhost:4000/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/precision-recall</id><content type="html" xml:base="http://localhost:4000/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#recall&quot;&gt;Recall&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#precision&quot;&gt;Precision&lt;/a&gt;&lt;/li&gt;
@@ -464,7 +561,7 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. &lt;a href=&quot;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&quot;&gt;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">The Histogram Filter</title><link href="http://johnwlambert.github.io/histogram-filter/" rel="alternate" type="text/html" title="The Histogram Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/histogram-filter</id><content type="html" xml:base="http://johnwlambert.github.io/histogram-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. &lt;a href=&quot;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&quot;&gt;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">The Histogram Filter</title><link href="http://localhost:4000/histogram-filter/" rel="alternate" type="text/html" title="The Histogram Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/histogram-filter</id><content type="html" xml:base="http://localhost:4000/histogram-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -493,7 +590,7 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. &lt;em&gt;Probabilistic Robotics&lt;/em&gt;. The MIT Press, Cambridge, MA, 2005.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://johnwlambert.github.io/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/spectral-clustering</id><content type="html" xml:base="http://johnwlambert.github.io/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. &lt;em&gt;Probabilistic Robotics&lt;/em&gt;. The MIT Press, Cambridge, MA, 2005.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://localhost:4000/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/spectral-clustering</id><content type="html" xml:base="http://localhost:4000/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -530,7 +627,7 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/learning-point-cloud-features</id><content type="html" xml:base="http://johnwlambert.github.io/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -539,13 +636,345 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;semantic-segmentation-of-features&quot;&gt;Semantic Segmentation of Features&lt;/h2&gt;
+&lt;h2 id=&quot;3d-semantic-segmentation-of-features&quot;&gt;3D Semantic Segmentation of Features&lt;/h2&gt;
 
-&lt;h2 id=&quot;instance-segmentation-of-features&quot;&gt;Instance Segmentation of Features&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+import torch
+import torch.nn as nn
+import math
+import torch.nn.functional as F
 
-&lt;p&gt;SPGN…&lt;/p&gt;
+class PointNetBase(nn.Module):
 
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://johnwlambert.github.io/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/dimensionality-reduction</id><content type="html" xml:base="http://johnwlambert.github.io/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+	def __init__(self, opt):
+		&quot;&quot;&quot;
+		Multilayer perceptrons with shared weights are implemented as 
+		convolutions. This is because we are mapping from K inputs to 64 
+		outputs, so we can just consider each of the 64 K-dim filters as 
+		describing the weight matrix for each point dimension (X,Y,Z,...) to
+		each index of the 64 dimension embeddings
+		&quot;&quot;&quot;
+		# Call the super constructor
+		super(PointNetBase, self).__init__()
+
+		self.opt = opt
+		# stddev=1e-3,
+		# weight_decay=0.0,
+		# activation_fn=tf.nn.relu,
+
+		self.autoencoder_mlp = self.make_ae_layers([32,64,64,128,128]) 
+		self.decoder_fc = self.make_fc_layers([256, 256, self.opt.n_pc_per_model * 3])
+
+		# 4 part classes
+		# dim is 128 + 3
+		self.seg_branch = nn.Sequential(nn.Conv1d(128+3,4,1))
+
+		self._initialize_weights()
+
+
+	def make_ae_layers(self, cfg):
+		&quot;&quot;&quot;
+		[1,3] kernel, stride [1,1]
+		then [1,1] kernel and stride[1,1] everywhere
+
+		Point functions (MLP implemented as conv2d)
+		&quot;&quot;&quot;
+		layers = []
+		in_channels = 3
+		for v in cfg:
+			conv1d = nn.Conv1d(in_channels, v, 1)
+			layers += [conv1d, nn.BatchNorm1d(v), nn.ReLU()]
+			in_channels = v
+		return nn.Sequential(*layers)
+
+
+	def make_fc_layers(self, cfg):
+		&quot;&quot;&quot;
+		MLP on global point cloud vector
+		&quot;&quot;&quot;
+		layers = []
+		in_channels = 128
+		for v_idx, v in enumerate(cfg):
+			fc = nn.Linear(in_channels, v, 1)
+			if v_idx == len(cfg) - 1:
+				# on the final layer, no activation fn here
+				layers += [fc]
+			else:
+				layers += [fc, nn.ReLU(True), nn.Dropout(p=self.opt.dropout_prob) ]
+			in_channels = v
+		return nn.Sequential(*layers)
+
+
+	def _initialize_weights(self):
+		for m in self.modules():
+			if isinstance(m, nn.Conv2d):
+				n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+				m.weight.data.normal_(0, math.sqrt(2. / n))
+				if m.bias is not None:
+					m.bias.data.zero_()
+			elif isinstance(m, nn.BatchNorm2d):
+				m.weight.data.fill_(1)
+				m.bias.data.zero_()
+			elif isinstance(m, nn.Linear):
+				n = m.weight.size(1)
+				m.weight.data.normal_(0, 0.01)
+				m.bias.data.zero_()
+
+
+	def forward(self, x):
+		&quot;&quot;&quot;
+		K = 3
+		Take as input a B x K x N matrix of B batches of N points with K 
+		dimensions
+
+		Points come in as torch.Size([B=50, N=1024, K=3])
+		We turn them into ([B=50 x K=3 x N=1024])
+		&quot;&quot;&quot;
+		cloned_input = x.clone()
+		# Number of points put into the network
+		x = torch.transpose(x, 1, 2)
+		N = x.size(2)
+
+		# Input is B x K x N
+		# Run the transformed inputs through the autoencoder MLP
+		x = self.autoencoder_mlp(x)
+		# Output is B x 128 x N
+
+		# Pool over the number of points. This results in the &quot;global feature&quot;
+		# Output should be B x 128 x 1 --&amp;gt; B x 128 (after squeeze)
+		global_feature = F.max_pool1d(x, N).squeeze(2)
+		latent_codes = global_feature.clone()
+
+		per_pt_logits = None
+		if self.opt.use_parts:
+			pdb.set_trace()
+			# segmentation fc for scores over num_class
+			per_pt_latent_codes = global_feature.clone()
+			per_pt_latent_codes = per_pt_latent_codes.repeat(N)
+			per_pt_input =  torch.cat( [per_pt_latent_codes, cloned_input] )
+			per_pt_logits = self.seg_branch(per_pt_input)
+
+		# output has size ([B=50, N=3072])
+		x = self.decoder_fc(global_feature)
+		return x, latent_codes, per_pt_logits
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;3d-instance-segmentation-of-features&quot;&gt;3D Instance Segmentation of Features&lt;/h2&gt;
+
+&lt;p&gt;The line between 3D object detection and 3D instance segmentation in point clouds is blurry because both representations are easily derived from the other.&lt;/p&gt;
+
+&lt;p&gt;The Similarity Group Proposal Network (SGPN) [1] is the first network architecture designed to perform instance-level and semantic segmentation directly on point clouds.&lt;/p&gt;
+
+&lt;p&gt;It is possible to re-formulate the instance segmentation problem as semantic segmentation of 3 “similarity” classes in the following way. The 3 classes for each pair of points &lt;script type=&quot;math/tex&quot;&gt;\{Pi, Pj\}&lt;/script&gt; are:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;P_i&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P_j&lt;/script&gt; belong to the same object instance&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;P_i&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P_j&lt;/script&gt; share the same semantic class but do not belong to the same object instance&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;P_i&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P_j&lt;/script&gt; do not share the same semantic class. Pairs of points should lie progressively further away from each other in feature space as their similarity class increases.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;single network to predict point grouping proposals
+and a corresponding semantic class for each proposal, from
+which we can directly extract instance segmentation results&lt;/p&gt;
+
+&lt;p&gt;similarity matrix that indicates the similarity between each pair of points in embedded feature space, thus producing an accurate grouping proposal for each point&lt;/p&gt;
+
+&lt;p&gt;a similarity matrix
+yielding point-wise group proposals,&lt;/p&gt;
+
+&lt;p&gt;uses PointNet/PointNet++ to extract a descriptive feature vector for each point in the point cloud&lt;/p&gt;
+
+&lt;p&gt;This feature extraction network
+produces a matrix F. SGPN then diverges into three
+branches that each pass F through a single PointNet layer to
+obtain sized Np × Nf feature matrices FSIM, FCF , FSEM,
+which we respectively use to obtain a similarity matrix, a
+confidence map and a semantic segmentation map. The ith
+row in a Np×Nf feature matrix is a Nf -dimensional vector
+that represents point Pi
+in an embedded feature space&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L = L_{sim} + L_{cf} + L_{sem}&lt;/script&gt;
+
+&lt;p&gt;The matrix &lt;script type=&quot;math/tex&quot;&gt;S \in \mathbf{R}^{N_p \times N_p}&lt;/script&gt;, and element &lt;script type=&quot;math/tex&quot;&gt;S_{ij}&lt;/script&gt; classifies whether or
+not points &lt;script type=&quot;math/tex&quot;&gt;P_i&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;P_j&lt;/script&gt; belong to the same object instance.
+Each row of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; can be viewed as a proposed grouping of
+points that form a candidate object instance.&lt;/p&gt;
+
+&lt;p&gt;We obtain &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; by, for each pair of
+points &lt;script type=&quot;math/tex&quot;&gt;\{Pi, Pj\}&lt;/script&gt;, simply subtracting their corresponding feature vectors &lt;script type=&quot;math/tex&quot;&gt;\{F_{sim_i}, F_{sim_j} \}&lt;/script&gt; and taking the &lt;script type=&quot;math/tex&quot;&gt;\ell_2&lt;/script&gt; norm such that &lt;script type=&quot;math/tex&quot;&gt;S_{ij} = \|F_{sim_i} − F_{sim_j} \|_2&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Metric Learning With 3 Classes&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Operates on matrix &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; which has &lt;script type=&quot;math/tex&quot;&gt;\ell_2&lt;/script&gt; norm entries&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;L_{sim} = \sum\limits_{i}^{N_p} \sum\limits_{j}^{N_p}l(i, j)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+l(i, j) = \begin{cases}
+\|F_{sim_i} − F_{sim_j} \|_2 &amp; C_{ij} = 1 \\
+\alpha \max(0, K_1 − \|F_{sim_i} − F_{sim_j} \|_2) &amp; C_{ij} = 2 \\
+\max(0, K_2 − \|F_{sim_i} − F_{sim_j} \|_2) &amp; C_{ij} = 3 \end{cases} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;such that &lt;script type=&quot;math/tex&quot;&gt;\alpha &gt; 1, K2 &gt; K1&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Confidence Loss&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;we expect the
+ground-truth value in the confidence map CMi
+to be the intersection
+over union (IoU) between the set of points in the
+predicted group Si and the ground truth group Gi
+. O&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Merging Group Proposals&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;The similarity matrix S produces Np group proposals,
+many of which are noisy or represent the same object.&lt;/p&gt;
+
+&lt;p&gt;discard proposals with predicted confidence less than
+T hC or cardinality less than T hM2. We further prune
+our proposals into clean, non-overlapping object instances
+by applying Non-Maximum Suppression; groups with IoU
+greater than T hM1 are merged together by selecting the
+group with the maximum cardinality&lt;/p&gt;
+
+&lt;p&gt;T hM1 is set to 0.6 and T hM2 is set to 200. T hC is
+set to 0.1. Our network is implemented&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Instance Segmentation Without the 3-part Multi-Task Loss&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;We also compare instance segmentation performance
+with the following method (which we call Seg-Cluster):
+Perform semantic segmentation using our network and then
+select all points as seeds. Starting from a seed point, BFS
+is used to search neighboring points with the same label. If
+a cluster with more than 200 points has been found, it is
+viewed as a valid group. Our GroupMerging algorithm is
+then used to merge these valid groups.&lt;/p&gt;
+
+&lt;p&gt;naive method like Seg-Cluster tends to
+properly separate regions far away for large objects like the
+ceiling and floor. However for small object, Seg-Cluster
+fails to segment instances with the same label if they are
+close to each other&lt;/p&gt;
+
+&lt;p&gt;The method of Armeni [2] was …&lt;/p&gt;
+
+&lt;h2 id=&quot;chamfer-distance&quot;&gt;Chamfer Distance&lt;/h2&gt;
+
+&lt;p&gt;The symmetric Chamfer distance is a pseudo-metric, not a metric. It is defined as&lt;/p&gt;
+
+&lt;p&gt;The Chamfer distance is defined as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;d_{Chamfer}(\mathbf{A,B}) = \Big( \sum\limits_{x_B \in \mathbf{B}} \underset{x_A \in \mathbf{A}}{\mbox{min}} |X_B - X_A|^2 \Big) + \Big( \sum\limits_{x_A \in \mathbf{A}} \underset{x_B \in \mathbf{B}}{\mbox{min}} |X_B - X_A|^2 \Big)&lt;/script&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np 
+import torch
+
+# def tensorflow_chamfer_distance(pc1, pc2):
+#     '''
+#     Input:
+#         pc1: float TF tensor in shape (B,N,C) the first point cloud
+#         pc2: float TF tensor in shape (B,M,C) the second point cloud
+#     Output:
+#         dist1: float TF tensor in shape (B,N) distance from first to second
+#         idx1: int32 TF tensor in shape (B,N) nearest neighbor from first to second
+#         dist2: float TF tensor in shape (B,M) distance from second to first
+#         idx2: int32 TF tensor in shape (B,M) nearest neighbor from second to first
+#     '''
+#     N = pc1.get_shape()[1].value
+#     M = pc2.get_shape()[1].value
+#     pc1_expand_tile = tf.tile(tf.expand_dims(pc1,2), [1,1,M,1])
+#     pc2_expand_tile = tf.tile(tf.expand_dims(pc2,1), [1,N,1,1])
+#     pc_diff = pc1_expand_tile - pc2_expand_tile # B,N,M,C
+#     pc_dist = tf.reduce_sum(pc_diff ** 2, axis=-1) # B,N,M
+#     dist1 = tf.reduce_min(pc_dist, axis=2) # B,N
+#     idx1 = tf.argmin(pc_dist, axis=2) # B,N
+#     dist2 = tf.reduce_min(pc_dist, axis=1) # B,M
+#     idx2 = tf.argmin(pc_dist, axis=1) # B,M
+#     return dist1, idx1, dist2, idx2
+
+
+# def pytorch_chamfer_distance(pc1, pc2):
+#     '''
+#     Input:
+#         pc1: float TF tensor in shape (B,N,C) the first point cloud
+#         pc2: float TF tensor in shape (B,M,C) the second point cloud
+#     Output:
+#         dist1: float TF tensor in shape (B,N) distance from first to second
+#         idx1: int32 TF tensor in shape (B,N) nearest neighbor from first to second
+#         dist2: float TF tensor in shape (B,M) distance from second to first
+#         idx2: int32 TF tensor in shape (B,M) nearest neighbor from second to first
+#     '''
+#     N = pc1.size(1)
+#     M = pc2.size(1)
+
+# 	pc1_expand_tile = pc1.view(-1, 1).repeat(1, 3).view(1,1,M,1)
+# 	pc2_expand_tile = pc2.view(-1, 1).repeat(1, 3).view(1,N,1,1)
+
+
+
+#      = tf.tile(tf.expand_dims(pc1,2), [1,1,M,1])
+#     pc2_expand_tile = tf.tile(tf.expand_dims(pc2,1), [1,N,1,1])
+#     pc_diff = pc1_expand_tile - pc2_expand_tile # B,N,M,C
+#     pc_dist = tf.reduce_sum(pc_diff ** 2, axis=-1) # B,N,M
+#     dist1 = tf.reduce_min(pc_dist, axis=2) # B,N
+#     idx1 = tf.argmin(pc_dist, axis=2) # B,N
+#     dist2 = tf.reduce_min(pc_dist, axis=1) # B,M
+#     idx2 = tf.argmin(pc_dist, axis=1) # B,M
+#     return dist1, idx1, dist2, idx2
+
+
+
+def batch_pairwise_dist(x, y, cuda):
+    # 32, 2500, 3
+    bs, num_points, points_dim = x.size()
+    xx = torch.bmm(x, x.transpose(2, 1))
+    yy = torch.bmm(y, y.transpose(2, 1))
+    zz = torch.bmm(x, y.transpose(2, 1))
+    if cuda:
+        diag_ind = torch.arange(0, num_points).type(torch.cuda.LongTensor)
+    else:
+        diag_ind = torch.arange(0, num_points).type(torch.LongTensor)
+    rx = xx[:, diag_ind, diag_ind].unsqueeze(1).expand_as(xx)
+    ry = yy[:, diag_ind, diag_ind].unsqueeze(1).expand_as(yy)
+    P = (rx.transpose(2, 1) + ry - 2 * zz)
+    return P
+
+
+def batch_NN_loss(x, y, cuda):
+    bs, num_points, points_dim = x.size()
+    dist1 = batch_pairwise_dist(x, y, cuda)
+    values1, indices1 = dist1.min(dim=2)
+
+    dist2 = batch_pairwise_dist(y, x, cuda)
+    values2, indices2 = dist2.min(dim=2)
+    a = torch.div(torch.sum(values1,1), num_points)
+    b = torch.div(torch.sum(values2,1), num_points)
+    chamfer = torch.div(torch.sum(a), bs) + torch.div(torch.sum(b), bs)
+
+    #print('batch size: %d, and chamfer dist = %f' % (bs, chamfer.data[0]) )
+
+    return chamfer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;graph-neural-networks&quot;&gt;Graph Neural Networks&lt;/h2&gt;
+
+&lt;p&gt;Dynamic Graph CNN (DGCNN) [3] …&lt;/p&gt;
+
+&lt;h2 id=&quot;meanshift&quot;&gt;Meanshift&lt;/h2&gt;
+
+&lt;p&gt;Comaniciu … PAMI 2002&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] W. Wang, R. Yu, Q. Huang, and U. Neumann. SGPN: Similarity Group Proposal Network for 3D Point Cloud Instance Segmentation. In CVPR, 2018. &lt;a href=&quot;http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_SGPN_Similarity_Group_CVPR_2018_paper.pdf&quot;&gt;http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_SGPN_Similarity_Group_CVPR_2018_paper.pdf&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[2] I. Armeni, O. Sener, A. R. Zamir, H. Jiang, I. Brilakis, M. Fischer, and S. Savarese. 3d semantic parsing of largescale indoor spaces. In CVPR, 2016.&lt;/p&gt;
+
+&lt;p&gt;[3] Dynamic Graph CNN.&lt;/p&gt;
+
+&lt;p&gt;https://www.mathworks.com/matlabcentral/fileexchange/6110-toolbox-fast-marching&lt;/p&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://localhost:4000/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/dimensionality-reduction</id><content type="html" xml:base="http://localhost:4000/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -849,7 +1278,7 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 &lt;p&gt;[7] Karl Pearson. &lt;em&gt;On Lines and Planes of Closest Fit to Systems of Points in Space&lt;/em&gt;. 1901. Philosophical Magazine. 2 (11): 559–572.&lt;/p&gt;
 
 &lt;p&gt;[8] H Hotelling. &lt;em&gt;Analysis of a complex of statistical variables into principal components&lt;/em&gt;. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
-Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/gaussians-and-covariance</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/gaussians-and-covariance</id><content type="html" xml:base="http://localhost:4000/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1190,7 +1619,7 @@ def unit_test1():
 
 if __name__ == '__main__':
 	unit_test1()
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://johnwlambert.github.io/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/conjugate-gradients</id><content type="html" xml:base="http://johnwlambert.github.io/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry><entry><title type="html">Conjugate Gradients</title><link href="http://localhost:4000/conjugate-gradients/" rel="alternate" type="text/html" title="Conjugate Gradients" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/conjugate-gradients</id><content type="html" xml:base="http://localhost:4000/conjugate-gradients/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#conjugate-gradients&quot;&gt;Conjugate Gradients&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#krylov-subspaces&quot;&gt;Krylov Subspaces&lt;/a&gt;&lt;/li&gt;
@@ -1315,7 +1744,7 @@ A^{-1} &amp; = - \frac{1}{\alpha_n} A^{n-1} + -  \frac{\alpha_1}{\alpha_n}  A^{n
 
 &lt;p&gt;[3] C. Kelley. &lt;em&gt;Iterative Methods for Linear and Nonlinear Equations&lt;/em&gt;. Frontiers in Applied Mathematics SIAM, (1995). &lt;a href=&quot;https://archive.siam.org/books/textbooks/fr16_book.pdf&quot;&gt;https://archive.siam.org/books/textbooks/fr16_book.pdf&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[4] Magnus Hestenes and Eduard Stiefel. &lt;em&gt;Method of Conjugate Gradients for Solving Linear Systems&lt;/em&gt;. Journal of Research of the National Bureau of Standards, Vol. 49, No. 6, December 1952. &lt;a href=&quot;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&quot;&gt;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://johnwlambert.github.io/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/slam</id><content type="html" xml:base="http://johnwlambert.github.io/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[4] Magnus Hestenes and Eduard Stiefel. &lt;em&gt;Method of Conjugate Gradients for Solving Linear Systems&lt;/em&gt;. Journal of Research of the National Bureau of Standards, Vol. 49, No. 6, December 1952. &lt;a href=&quot;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&quot;&gt;https://web.njit.edu/~jiang/math614/hestenes-stiefel.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">large systems of equations, Krylov subspaces, Cayley-Hamilton Theorem</summary></entry><entry><title type="html">Simultaneous Localization and Mapping (SLAM)</title><link href="http://localhost:4000/slam/" rel="alternate" type="text/html" title="Simultaneous Localization and Mapping (SLAM)" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/slam</id><content type="html" xml:base="http://localhost:4000/slam/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1348,78 +1777,4 @@ simultaneous localization and mapping. IEEE Transactions on Robotics,
 applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 2005.&lt;/p&gt;
 
-&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry><entry><title type="html">Structure From Motion</title><link href="http://johnwlambert.github.io/sfm/" rel="alternate" type="text/html" title="Structure From Motion" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/sfm</id><content type="html" xml:base="http://johnwlambert.github.io/sfm/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;a-basic-structure-from-motion-sfm-pipeline&quot;&gt;A Basic Structure-from-Motion (SFM) Pipeline&lt;/h2&gt;
-
-&lt;p&gt;As described in [1], there are generally four steps to the algorithm:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;(1) Find interest points in each image&lt;/li&gt;
-  &lt;li&gt;(2) Find candidate correspondences (match descriptors for each interest point)&lt;/li&gt;
-  &lt;li&gt;(3) Perform geometric verification of correspondences (RANSAC + fundamental matrix)&lt;/li&gt;
-  &lt;li&gt;(4) Solve for 3D points and camera that minimize reprojection error.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;costfunctions&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;cost-functionserror-modelling&quot;&gt;Cost Functions/Error Modelling&lt;/h2&gt;
-
-&lt;p&gt;The choice of cost function quantifies the total prediction error of the model. It measures how well the model fits the observations and background knowledge.&lt;/p&gt;
-
-&lt;h3 id=&quot;reprojection-error-for-a-single-keypoint-in-two-images&quot;&gt;Reprojection Error for a Single Keypoint in Two Images&lt;/h3&gt;
-
-&lt;p&gt;Imagine we have matched two keypoints, &lt;script type=&quot;math/tex&quot;&gt;x_1,x_2&lt;/script&gt; in two different images &lt;script type=&quot;math/tex&quot;&gt;I_1,I_2&lt;/script&gt; via a SIFT-like feature matching pipeline. We are viewing the projection of the same 3D point &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}&lt;/script&gt; in both images. We now wish to identify the coordinates describing the location of &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;If image &lt;script type=&quot;math/tex&quot;&gt;I_1&lt;/script&gt; was captured with projection matrix &lt;script type=&quot;math/tex&quot;&gt;M_1&lt;/script&gt;, and image &lt;script type=&quot;math/tex&quot;&gt;I_2&lt;/script&gt; was captured with projection matrix &lt;script type=&quot;math/tex&quot;&gt;M_2&lt;/script&gt;, we can enforce that the 3D point &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}&lt;/script&gt; is projected into the image into the right location in both images. This is called &lt;em&gt;triangulation&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;If the camera calibration determining &lt;script type=&quot;math/tex&quot;&gt;M_1,M_2&lt;/script&gt; are &lt;strong&gt;known&lt;/strong&gt;, then the optimization problem for a single matched keypoint in two images becomes:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min_{\mathbf{X}} f(\mathbf{X}) = \| x_1 - Proj(\mathbf{X},M_1)\|^2 + \| x_2 - Proj(\mathbf{X},M_2)\|^2&lt;/script&gt;
-
-&lt;h3 id=&quot;reprojection-error-for-many-keypoints-in-many-cameras&quot;&gt;Reprojection Error for Many Keypoints in Many Cameras&lt;/h3&gt;
-
-&lt;p&gt;Imagine now that we have &lt;script type=&quot;math/tex&quot;&gt;m&lt;/script&gt; different cameras, and each camera has a &lt;strong&gt;known&lt;/strong&gt; projection matrix &lt;script type=&quot;math/tex&quot;&gt;\{M_i\}_{i=1}^m&lt;/script&gt;. Suppose we match &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; different keypoints across the images, denoted &lt;script type=&quot;math/tex&quot;&gt;\{\mathbf{X}_j\}_{j=1}^n&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;The optimization problem becomes:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min_{\mathbf{X}_1,\mathbf{X}_2, \dots} \sum\limits_{i=1}^m \sum\limits_{j=1}^n \| x_{ij} - Proj(\mathbf{X_j},M_i)\|^2&lt;/script&gt;
-
-&lt;p&gt;In this case &lt;script type=&quot;math/tex&quot;&gt;x_{ij}&lt;/script&gt; is the observed location of the &lt;script type=&quot;math/tex&quot;&gt;j&lt;/script&gt;‘th keypoint into the &lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;‘th image, as discovered by a keypoint detector in the SIFT-like pipeline. We penalize solutions for &lt;script type=&quot;math/tex&quot;&gt;\mathbf{X}_1,\mathbf{X}_2,\dots&lt;/script&gt; in which &lt;script type=&quot;math/tex&quot;&gt;x_{ij}&lt;/script&gt; is not very close to &lt;script type=&quot;math/tex&quot;&gt;Proj(\mathbf{X_j},M_i)&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;bundleadjustment&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;bundle-adjustment&quot;&gt;Bundle Adjustment&lt;/h2&gt;
-
-&lt;p&gt;Imagine now that we are working with arbitrary images for which we have no calibration information. Thus, the projection matrices &lt;script type=&quot;math/tex&quot;&gt;\{M_i\}_{i=1}^m&lt;/script&gt; are &lt;strong&gt;unknown&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;Bundle adjustment is the process of minimizing reprojection error over (1) multiple 3D points and (2) multiple cameras. Triggs &lt;em&gt;et al.&lt;/em&gt; define it as &lt;em&gt;“the problem of refining a visual reconstruction to produce jointly optimal structure and viewing parameter estimates”&lt;/em&gt; [2]. The optimization problem changes only by adding new, additional variables for which we solve.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\min_{\mathbf{X}_1,\mathbf{X}_2, \dots, M_1,M_2,\dots} \sum\limits_{i=1}^m \sum\limits_{j=1}^n \| x_{ij} - Proj(\mathbf{X_j},M_i)\|^2&lt;/script&gt;
-
-&lt;p&gt;According to [2], the name “Bundle Adjustment” refers to &lt;em&gt;bundles&lt;/em&gt; of light rays leaving each 3D point and converging on each camera center, &lt;em&gt;“which are ‘adjusted’ optimally with respect to both feature and camera positions”&lt;/em&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;gauss-newton&quot;&gt;Gauss-Newton&lt;/h2&gt;
-
-&lt;p&gt;Gauss-Newton is generally preferred to Second Order methods like Newton’s Method for a simple reason: deriving and implementing calculations of the second derivatives of the projection model &lt;script type=&quot;math/tex&quot;&gt;Proj(X_j,M_i)&lt;/script&gt; is difficult and error-prone [2].&lt;/p&gt;
-
-&lt;p&gt;For example, the seminal work in SfM, “Building Rome in a Day” [3] uses Trust-Region Gauss-Newton optimization (Levenberg-Marquardt) that chooses between a truncated and an exact step Levenberg-Marquardt algorithm.&lt;/p&gt;
-
-&lt;!-- ## Network Graph  shows which features are seen in which images, --&gt;
-
-&lt;h2 id=&quot;exploiting-sparsity&quot;&gt;Exploiting Sparsity&lt;/h2&gt;
-
-&lt;p&gt;Those who use generic optimization routines to solve SfM problems will find the optimization slow. This would be unwise, however, since the problem sparsity can be exploited.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-&lt;p&gt;[1] Ramanan, Deva. &lt;em&gt;Structure from Motion.&lt;/em&gt; &lt;a href=&quot;http://16720.courses.cs.cmu.edu/lec/sfm.pdf&quot;&gt;http://16720.courses.cs.cmu.edu/lec/sfm.pdf&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[2] Bill Triggs, Philip McLauchlan, Richard Hartley and Andrew Fitzgibbon. &lt;em&gt;Bundle Adjustment — A Modern Synthesis&lt;/em&gt;. &lt;a href=&quot;https://hal.inria.fr/inria-00548290/document&quot;&gt;https://hal.inria.fr/inria-00548290/document&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. &lt;em&gt;Building Rome in a Day&lt;/em&gt;. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. &lt;a href=&quot;https://grail.cs.washington.edu/rome/rome_paper.pdf&quot;&gt;https://grail.cs.washington.edu/rome/rome_paper.pdf&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">Deriving bundle adjustment</summary></entry></feed>
+&lt;p&gt;. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.&lt;/p&gt;</content><author><name></name></author><summary type="html">GraphSLAM, loop closures</summary></entry></feed>
