@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-12T12:06:37-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-12T12:11:31-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
 </subtitle><entry><title type="html">Factor Graphs for SLAM and SfM</title><link href="http://johnwlambert.github.io/factor-graphs/" rel="alternate" type="text/html" title="Factor Graphs for SLAM and SfM" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/factor-graphs-slam</id><content type="html" xml:base="http://johnwlambert.github.io/factor-graphs/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Factor Graphs&lt;/a&gt;&lt;/li&gt;
@@ -406,7 +406,11 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 &lt;p&gt;Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the &lt;script type=&quot;math/tex&quot;&gt;Z&lt;/script&gt;-axis. A figure is shown below:&lt;/p&gt;
 
 &lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
   &lt;img src=&quot;/assets/stereo_vision_setup.jpg&quot; width=&quot;50%&quot; /&gt;
+=======
+  &lt;img src=&quot;/assets/stereo_vision_setup.png&quot; width=&quot;50%&quot; /&gt;
+&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt;&amp;gt; bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f
   &lt;div class=&quot;figcaption&quot;&gt;
     Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
   &lt;/div&gt;
@@ -494,7 +498,25 @@ each &lt;script type=&quot;math/tex&quot;&gt;(x_l,y_l)&lt;/script&gt;.&lt;/li&gt
 
 &lt;p&gt;[3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. &lt;a href=&quot;https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. &lt;em&gt;3D Object Proposals for Accurate Object Class Detection.&lt;/em&gt;  Advances in Neural Information Processing Systems 28 (NIPS 2015). &lt;a href=&quot;https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">focal length, similar triangles, depth</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://johnwlambert.github.io/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/precision-recall</id><content type="html" xml:base="http://johnwlambert.github.io/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;«««&amp;lt; HEAD
+[4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. &lt;em&gt;3D Object Proposals for Accurate Object Class Detection.&lt;/em&gt;  Advances in Neural Information Processing Systems 28 (NIPS 2015). &lt;a href=&quot;https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;=======&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;blockquote&gt;
+    &lt;blockquote&gt;
+      &lt;blockquote&gt;
+        &lt;blockquote&gt;
+          &lt;blockquote&gt;
+            &lt;blockquote&gt;
+              &lt;p&gt;bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f&lt;/p&gt;
+            &lt;/blockquote&gt;
+          &lt;/blockquote&gt;
+        &lt;/blockquote&gt;
+      &lt;/blockquote&gt;
+    &lt;/blockquote&gt;
+  &lt;/blockquote&gt;
+&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">focal length, similar triangles, depth</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://johnwlambert.github.io/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/precision-recall</id><content type="html" xml:base="http://johnwlambert.github.io/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#recall&quot;&gt;Recall&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#precision&quot;&gt;Precision&lt;/a&gt;&lt;/li&gt;

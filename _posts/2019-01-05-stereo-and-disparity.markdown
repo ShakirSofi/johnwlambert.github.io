@@ -30,7 +30,11 @@ Humans have stereo vision with a baseline of 60 mm.
 Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the $$Z$$-axis. A figure is shown below:
 
 <div class="fig figcenter fighighlight">
+<<<<<<< HEAD
   <img src="/assets/stereo_vision_setup.jpg" width="50%">
+=======
+  <img src="/assets/stereo_vision_setup.png" width="50%">
+>>>>>>> bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f
   <div class="figcaption">
     Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
   </div>
@@ -132,5 +136,8 @@ From 2017
 
 [3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. [PDF](https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf).
 
+<<<<<<< HEAD
 [4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. *3D Object Proposals for Accurate Object Class Detection.*  Advances in Neural Information Processing Systems 28 (NIPS 2015). [PDF](https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection).
 
+=======
+>>>>>>> bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f
