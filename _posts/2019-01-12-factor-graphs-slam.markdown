@@ -9,21 +9,20 @@ mathjax: true
 
 ---
 Table of Contents:
-- [Why do we need Lie Groups?](#whyliegroups)
-- [Lie Groups](#liegroups)
-- [SO(N)](#son)
-- [SO(2)](#so2)
-- [SO(3)](#so3)
-- [SE(2)](#se2)
-- [SE(3)](#se3)
-- [Conjugation in Group Theory](#conjugation)
-- [The Lie Algebra](#lie-algebra)
+- [Factor Graphs](#whyliegroups)
+- [Factor Densities](#liegroups)
+- [MAP Inference on Factor Graphs](#son)
+- [Factor Graph Variable Elimanation](#so2)
 
 <a name='whyliegroups'></a>
 
+## Factor Graphs for Robot Vision
 
-## Factor Graphs
+A factor graph is a probabilistic graphical model, theory which represents the marriage of graph theory with probability.
 
+To use factor graphs for computer vision in robotics, we will need another tool: numerical linear algebra. These problems can be reformulated as very large least-squares problems. In fact, the size of the matrix that would not need be to inverted to solve the system of equations makes these problems solvable only by iterative methods, rather than direct methods.
+
+## Factor Graphs: Background
 
 A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).
 
