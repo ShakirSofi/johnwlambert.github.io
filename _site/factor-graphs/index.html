@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/factor-graphs/">
+  <link rel="canonical" href="http://johnwlambert.github.io/factor-graphs/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -45,8 +45,6 @@
           
           <a class="page-link" href="/collaborators/">Collaborators</a>
           
-          
-        
           
         
           
@@ -93,20 +91,21 @@
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#whyliegroups">Why do we need Lie Groups?</a></li>
-  <li><a href="#liegroups">Lie Groups</a></li>
-  <li><a href="#son">SO(N)</a></li>
-  <li><a href="#so2">SO(2)</a></li>
-  <li><a href="#so3">SO(3)</a></li>
-  <li><a href="#se2">SE(2)</a></li>
-  <li><a href="#se3">SE(3)</a></li>
-  <li><a href="#conjugation">Conjugation in Group Theory</a></li>
-  <li><a href="#lie-algebra">The Lie Algebra</a></li>
+  <li><a href="#whyliegroups">Factor Graphs</a></li>
+  <li><a href="#liegroups">Factor Densities</a></li>
+  <li><a href="#son">MAP Inference on Factor Graphs</a></li>
+  <li><a href="#so2">Factor Graph Variable Elimanation</a></li>
 </ul>
 
 <p><a name="whyliegroups"></a></p>
 
-<h2 id="factor-graphs">Factor Graphs</h2>
+<h2 id="factor-graphs-for-robot-vision">Factor Graphs for Robot Vision</h2>
+
+<p>A factor graph is a probabilistic graphical model, theory which represents the marriage of graph theory with probability.</p>
+
+<p>To use factor graphs for computer vision in robotics, we will need another tool: numerical linear algebra. These problems can be reformulated as very large least-squares problems. In fact, the size of the matrix that would not need be to inverted to solve the system of equations makes these problems solvable only by iterative methods, rather than direct methods.</p>
+
+<h2 id="factor-graphs-background">Factor Graphs: Background</h2>
 
 <p>A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).</p>
 
