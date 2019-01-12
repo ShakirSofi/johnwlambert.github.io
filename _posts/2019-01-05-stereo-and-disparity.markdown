@@ -30,7 +30,7 @@ Humans have stereo vision with a baseline of 60 mm.
 Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the $$Z$$-axis. A figure is shown below:
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/stereo_vision_setup.png" width="50%">
+  <img src="/assets/stereo_vision_setup.jpg" width="50%">
   <div class="figcaption">
     Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
   </div>
@@ -105,10 +105,24 @@ The matching cost is the squared difference of intensity values at a given dispa
 Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Scharstein et al. 2008)
 
 
+## Simple Example on KITTI
+
+$$
+E = R \mbox{ } [t]_{\times}
+$$
+
+
+
 
 ## Object Detection in Stereo
 
-3DOP (NIPS 2018) Urtasun
+Chen *et al.*
+3DOP (NIPS 2015) Urtasun [4]
+
+## Unsupervised Learning of Depth
+
+From 2017
+
 
 ## References
 
@@ -117,4 +131,6 @@ Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Schars
 [2] James Hays. [PDF](https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf).
 
 [3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. [PDF](https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf).
+
+[4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. *3D Object Proposals for Accurate Object Class Detection.*  Advances in Neural Information Processing Systems 28 (NIPS 2015). [PDF](https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection).
 

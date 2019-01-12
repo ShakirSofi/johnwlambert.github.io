@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Factor Graphs for SLAM and SfM</title>
+  <meta name="description" content="Gaussian densities, direct methods, iterative methods">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://localhost:4000/factor-graphs/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Factor Graphs for SLAM and SfM</h1>
+    <p class="meta">Dec 28, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#whyliegroups">Why do we need Lie Groups?</a></li>
+  <li><a href="#liegroups">Lie Groups</a></li>
+  <li><a href="#son">SO(N)</a></li>
+  <li><a href="#so2">SO(2)</a></li>
+  <li><a href="#so3">SO(3)</a></li>
+  <li><a href="#se2">SE(2)</a></li>
+  <li><a href="#se3">SE(3)</a></li>
+  <li><a href="#conjugation">Conjugation in Group Theory</a></li>
+  <li><a href="#lie-algebra">The Lie Algebra</a></li>
+</ul>
+
+<p><a name="whyliegroups"></a></p>
+
+<h2 id="factor-graphs">Factor Graphs</h2>
+
+<p>A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).</p>
+
+<p>Bayesian Networks are directed graphs where edges in the graph are associated with conditional probability distributions (CPDs), assigning the probability of children in the graph taking on certain values based on the values of the parents.</p>
+
+<p>In undirected models like MRFs and Factor Graphs, instead of specifying CPDs, we specify (non-negative) potential functions (or factors) over sets of variables associated with cliques (complete subgraphs) C of the graph.  Like Conditional Prob. Distributions, a factor/potential can be represented as a table, but it is not normalized (does not sum to one).</p>
+
+<p>A factor graph is a bipartite undirected graph with variable nodes (circles) and factor nodes (squares). Edges are only between the variable nodes and the factor nodes.</p>
+
+<p>The variable nodes can take on certain values, and the likelihood of that event for a set of variables is expressed in the potential (factor node) attached to those variables.  Each factor node is associated with a single potential, whose scope is the set of variables that are neighbors in the factor graph.</p>
+
+<p>A small example might make this clearer. Suppose we have a group of four people: Alex, Bob, Catherine, David A=Alex’s hair color (red, green, blue)</p>
+
+<p>B=Bob’s hair color</p>
+
+<p>C=Catherine’s hair color</p>
+
+<p>D=David’s hair color</p>
+
+<p>Alex and Bob are friends, Bob and Catherine are friends, Catherine and David are friends, David and Alex are friends</p>
+
+<p>Friends never have the same hair color!</p>
+
+<p>It turns out that this distribution p cannot be represented (perfectly) by any Bayesian network. But it is succinctly represented by a Factor Graph or MRF.
+https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmsma7unw07s/Screen_Shot_20181002_at_11.48.05_PM.png</p>
+
+<p>The Factor Graph distribution is same as the MRF – this is just a different graph data structure.</p>
+
+<h2 id="factor-densities">Factor Densities</h2>
+
+<p>The most often used probability densities involve the multi-variate Gaussian distribution [1], whose density is given by</p>
+
+<script type="math/tex; mode=display">x \sim p(x) = \mathcal{N}(\mu, \Sigma) = 
+\frac{1}{\sqrt{(2\pi)^n|\Sigma|}}\mbox{exp}
+\Big\{ -\frac{1}{2} (x - \mu)^T \Sigma^{-1} (x - \mu) \Big\}</script>
+
+<p>For the sake of brevity, we can write this as:</p>
+
+<script type="math/tex; mode=display">x \sim p(x) = \mathcal{N}(\mu, \Sigma) = 
+\frac{1}{\sqrt{(2\pi)^n|\Sigma|}}\mbox{exp}
+\Big\{ -\frac{1}{2} \|(x - \mu)^T \|_{\Sigma^{-1}}^2 \Big\}</script>
+
+<h2 id="map-inference-on-factor-graphs">MAP Inference on Factor Graphs</h2>
+
+<p>MAP inference in SLAM is exactly the process of determining those
+values for the unknowns that maximally agree with the information
+present in the uncertain measurements [1]</p>
+
+<p>We wish to solve for <script type="math/tex">X</script>, the position of the robot at all timesteps.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+X^{MAP} &= \mbox{arg }\underset{X}{\mbox{max }} \phi(X) & \mbox{Maximum likelihood Defn.} \\
+ &= \mbox{arg }\underset{X}{\mbox{max }} \prod\limits_i \phi_i(X_i) & \mbox{text} \\
+  &= \mbox{arg }\underset{X}{\mbox{max }} \prod\limits_i \mbox{exp } \bigg\{ -\frac{1}{2}\|h_i(X_i) - z_i\|_{\Sigma_i}^2 \bigg\} & \mbox{Use Gaussian prior and likelihood factors} \\
+    &= \mbox{arg }\underset{X}{\mbox{max }} \mbox{log } \prod\limits_i  \mbox{exp } \bigg\{ -\frac{1}{2}\|h_i(X_i) - z_i\|_{\Sigma_i}^2 \bigg\} & \mbox{Log is monotonically increasing} \\
+     &= \mbox{arg }\underset{X}{\mbox{max }} \sum\limits_i \mbox{log }   \mbox{exp } \bigg\{ -\frac{1}{2}\|h_i(X_i) - z_i\|_{\Sigma_i}^2 \bigg\} & \mbox{Log of a product is a sum of logs.} \\
+       &= \mbox{arg }\underset{X}{\mbox{max }} \sum\limits_i  \bigg( -\frac{1}{2}\|h_i(X_i) - z_i\|_{\Sigma_i}^2 \bigg) & \mbox{Simplify } f(f^{-1}(x))=x \\
+        &= \mbox{arg }\underset{X}{\mbox{min }} \sum\limits_i  \bigg( \frac{1}{2}\|h_i(X_i) - z_i\|_{\Sigma_i}^2 \bigg) & \mbox{Max of } -f(x) \mbox{ is min of } f(x) \\
+\end{aligned} %]]></script>
+
+<p>We’ve reduce the problem to minimization of a sum of nonlinear least-squares.</p>
+
+<p>Along the way, we decided to maximize the log-likelihood instead of the likelihood because the argument that maximizes the log of a function also maximizes the function itself.</p>
+
+<h2 id="factor-graph-variable-elimanation">Factor Graph Variable Elimanation</h2>
+
+<p>If you’re wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.</p>
+
+<p>In the table above, we have variables as the columns and factors as the rows. We can combines factors progressively to involve more and more variables.</p>
+
+<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7d71g2p/Screen_Shot_20181003_at_2.05.56_PM.png</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Frank Dellaert and Michael Kaess. <em>Factor Graphs for Robot Perception</em>. Foundations and Trends® in Robotics, Vol. 6, No. 1-2 (2017) 1–139. <a href="https://www.ri.cmu.edu/wp-content/uploads/2018/05/Dellaert17fnt.pdf">PDF</a>.</p>
+
+<p>[2] Stefano Ermon.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

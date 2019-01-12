@@ -158,7 +158,7 @@ By adding an extra dimension to the input points and transformation matrix $$T$$
 
 ### SE(3)
 
-The real space $$SE(3)$$ are $$4 \times 4$$ matrices, the real space resembles:
+The real space $$SE(3)$$ is a 6-dimensional manifold. Its dimensions is exactly the number of degrees of freedom of a free-floating rigid body in space [3]. $$SE(3)$$ can be parameterized with a $$4 \times 4$$ matrix as follows:
 
 $$
 \begin{bmatrix}

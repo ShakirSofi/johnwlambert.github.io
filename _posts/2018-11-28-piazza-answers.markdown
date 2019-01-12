@@ -202,61 +202,6 @@ I'm not sure if I can explain why all of those are the way they are, but I hope 
 
 
 
-
-## Factor Graphs
-
-I'm trying to understand the few slides on factor graph variable elimination, does anyone have an intuitive explanation or good resources to explain what's going on?
-
-A factor graph is a probabilistic graphical model (in the same family with Markov Random Fields (MRFs) and Bayesian Networks). It is an undirected graph (meaning there are no parents or topological ordering).
-
- 
-
-Bayesian Networks are directed graphs where edges in the graph are associated with conditional probability distributions (CPDs), assigning the probability of children in the graph taking on certain values based on the values of the parents.
-
- 
-
-In undirected models like MRFs and Factor Graphs, instead of specifying CPDs, we specify (non-negative) potential functions (or factors) over sets of variables associated with cliques (complete subgraphs) C of the graph.  Like Conditional Prob. Distributions, a factor/potential can be represented as a table, but it is not normalized (does not sum to one). 
-
- 
-
-A factor graph is a bipartite undirected graph with variable nodes (circles) and factor nodes (squares). Edges are only between the variable nodes and the factor nodes.
-
- 
-
-The variable nodes can take on certain values, and the likelihood of that event for a set of variables is expressed in the potential (factor node) attached to those variables.  Each factor node is associated with a single potential, whose scope is the set of variables that are neighbors in the factor graph.
-
- 
-
-A small example might make this clearer. Suppose we have a group of four people: Alex, Bob, Catherine, David A=Alex’s hair color (red, green, blue)
-
-B=Bob’s hair color
-
-C=Catherine’s hair color
-
-D=David’s hair color
-
-Alex and Bob are friends, Bob and Catherine are friends, Catherine and David are friends, David and Alex are friends
-
-Friends never have the same hair color!
-
- 
-
-It turns out that this distribution p cannot be represented (perfectly) by any Bayesian network. But it is succinctly represented by a Factor Graph or MRF.
-https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmsma7unw07s/Screen_Shot_20181002_at_11.48.05_PM.png
-
-
-The Factor Graph distribution is same as the MRF – this is just a different graph data structure
-
-
-If you're wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.
-
- 
-
-In the table Prof. Dellaert showed, we have variables as the columns and factors as the rows. He combines factors progressively to involve more and more variables.
-
-https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7d71g2p/Screen_Shot_20181003_at_2.05.56_PM.png
-
-
 $$ Normalizing SIFT
 
 

@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/stereo/">
+  <link rel="canonical" href="http://localhost:4000/stereo/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -111,7 +111,7 @@
 <p>Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the <script type="math/tex">Z</script>-axis. A figure is shown below:</p>
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/stereo_vision_setup.png" width="50%" />
+  <img src="/assets/stereo_vision_setup.jpg" width="50%" />
   <div class="figcaption">
     Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
   </div>
@@ -178,9 +178,18 @@ each <script type="math/tex">(x_l,y_l)</script>.</li>
 
 <p>Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Scharstein et al. 2008)</p>
 
+<h2 id="simple-example-on-kitti">Simple Example on KITTI</h2>
+
+<script type="math/tex; mode=display">E = R \mbox{ } [t]_{\times}</script>
+
 <h2 id="object-detection-in-stereo">Object Detection in Stereo</h2>
 
-<p>3DOP (NIPS 2018) Urtasun</p>
+<p>Chen <em>et al.</em>
+3DOP (NIPS 2015) Urtasun [4]</p>
+
+<h2 id="unsupervised-learning-of-depth">Unsupervised Learning of Depth</h2>
+
+<p>From 2017</p>
 
 <h2 id="references">References</h2>
 
@@ -189,6 +198,8 @@ each <script type="math/tex">(x_l,y_l)</script>.</li>
 <p>[2] James Hays. <a href="https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf">PDF</a>.</p>
 
 <p>[3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. <a href="https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf">PDF</a>.</p>
+
+<p>[4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. <em>3D Object Proposals for Accurate Object Class Detection.</em>  Advances in Neural Information Processing Systems 28 (NIPS 2015). <a href="https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection">PDF</a>.</p>
 
 
   </article>
