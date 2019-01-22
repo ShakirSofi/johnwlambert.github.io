@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Simultaneous Localization and Mapping (SLAM)</title>
-  <meta name="description" content="GraphSLAM, loop closures">
+  <title>Graph Cuts</title>
+  <meta name="description" content="">
    <link rel="stylesheet" href="/css/main.css">
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/slam/">
+  <link rel="canonical" href="http://johnwlambert.github.io/2019/01/16/graph-cuts.html">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -84,63 +84,17 @@
         <div class="post">
 
   <header class="post-header">
-    <h1>Simultaneous Localization and Mapping (SLAM)</h1>
-    <p class="meta">Dec 27, 2018</p>
+    <h1>Graph Cuts</h1>
+    <p class="meta">Jan 16, 2019</p>
   </header>
 
   <article class="post-content">
-  <p>Table of Contents:</p>
-<ul>
-  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
-  <li><a href="#costfunctions">Cost Functions</a></li>
-  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
-</ul>
-
-<p><a name="sfmpipeline"></a></p>
-
-<h2 id="slam">SLAM</h2>
-
-<h2 id="orbslam">ORBSlam</h2>
-
-<h2 id="graphslam">GraphSLAM</h2>
-
-<p>SLAM methods [2, 10, 13, 14, 21, 30]</p>
-
-<p>M. Bosse, P. Newman, J. Leonard, M. Soika, W. Feiten, and S. Teller. Simultaneous localization and map building in large-scale cyclic envi- ronments using the atlas framework. IJRR, 23(12), 2004.</p>
-
-<p>T. Duckett, S. Marsland, and J. Shapiro. Learning globally consistent
-maps by relaxation. ICRA 2000.</p>
-
-<p>J. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.
-[14] U. Frese, P. Larsson, and T. Duckett. A multigrid algorithm for
-simultaneous localization and mapping. IEEE Transactions on Robotics,
-2005.</p>
-
-<p>K. Konolige. Large-scale map-making. AAAI, 2004.</p>
-
-<p>S. Thrun and M. Montemerlo. The GraphSLAM algorithm with
-applications to large-scale mapping of urban structures. IJRR, 25(5/6),
-2005.</p>
-
-<p>. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.</p>
-
-<h2 id="deep-learning--slam">Deep Learning + SLAM</h2>
-
-<p>https://arxiv.org/abs/1612.00603
-https://www.ci2cv.net/media/papers/AAAI2018_chenhuan.pdf</p>
-
-<p>core idea of optimizing variable in latent space is similar</p>
-<ul>
-  <li>Prior for 3D Shape. https://ci2cv.net/media/papers/WACV18.pdf</li>
-  <li>Prior for depth map. code slam</li>
-</ul>
-
+  
+<p>http://www.csd.uwo.ca/~yuri/Papers/pami04.pdf</p>
 
   </article>
 
   <!-- mathjax -->
-  
-  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   
   
   <!-- disqus comments -->

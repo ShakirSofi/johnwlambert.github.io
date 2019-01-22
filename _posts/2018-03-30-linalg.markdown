@@ -228,6 +228,50 @@ $$
 \end{array}
 \end{aligned}
 $$
+
+
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/gram_schmidt_toy_example.png" width="65%">
+  <div class="figcaption">
+   Gram Schmidt: Suppose we start with the red and blue vectors. We wish to obtain two orthogonal, unit length vectors (green and magenta).
+  </div>
+</div>
+In a few lines of Python, we can generate this plot:
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+a1 = np.array([0.9,2.2])
+a2 = np.array([2.,1.9])
+
+q1 = a1 / np.linalg.norm(a1)
+
+q2_tilde = a2 - (a1.T.dot(q1)) * (q1)
+q2 = q2_tilde / np.linalg.norm(q2_tilde)
+
+plt.arrow(0, 0, a1[0], a1[1], color='r', head_width=.1, length_includes_head=True)
+plt.arrow(0, 0, a2[0], a2[1], color='b', head_width=.1,length_includes_head=True)
+
+plt.arrow(0, 0, q1[0], q1[1], color='g', head_width=.1, length_includes_head=True)
+plt.arrow(0, 0, q2[0], q2[1], color='m', head_width=.1, length_includes_head=True)
+
+plt.xlim([-3,3])
+plt.ylim([-3,3])
+
+# generate n points along a circle
+n = 100
+radius = 1
+circ_x = np.array([np.cos(2*np.pi/n*x)*radius for x in range(0,n+1)])
+circ_y = np.array([np.sin(2*np.pi/n*x)*radius for x in range(0,n+1)])
+plt.plot(circ_x,circ_y, 'y--')
+
+plt.show()
+```
+
+
+
+
 ## Solving Systems of Equations
 
 ### Overdetermined Systems
@@ -516,6 +560,69 @@ As a linear combination of the rows
 As a linear combination of the columns
 (0 1 0)(0 0 -1)
 
+
+## Perspectives on Matrix Multiplication
+Thinking Elementwise
+Consider two matrices, $$A,B$$, where
+
+$$
+\begin{array}{ll}
+ A = \begin{bmatrix} a_1 & \dots & a_n \end{bmatrix} = \begin{bmatrix} g_1^T \\ \vdots \\ g_n^T \end{bmatrix}, &  B = \begin{bmatrix} b_1 & \dots & b_n \end{bmatrix} = \begin{bmatrix} h_1^T \\ \vdots \\ h_n^T \end{bmatrix}
+\end{array}
+ $$
+
+
+$$
+C = A \times B
+$$
+$$A \in \mathbf{R}^{m \times n}, B \in \mathbf{R}^{n \times p}$$
+
+Can see $$C_{ij} = \sum\limits_{k=1}^n a_{ik} b_{kj}$$
+
+You can also see it as a sum of many outer products:
+
+$$
+c = A \times B = \begin{bmatrix} a_1 & \dots & a_n \end{bmatrix} \begin{bmatrix} h_1^T \\ \vdots \\ h_n^T \end{bmatrix} = a_1 h_1^T + \dots + a_n h_n^T
+$$
+
+or as each element coming from an inner product, i.e. $$C_{ij} = g_i^Tb_j$$:
+
+$$
+C = \begin{bmatrix} g_1^T \\ \vdots \\ g_n^T \end{bmatrix} \begin{bmatrix} b_1 & \dots & b_n \end{bmatrix} = \begin{bmatrix} g_1^Tb_1 & g_1^T b_2 & \dots & g_1^Tb_p \\ g_2^Tb_1 & & & \\ \vdots & & & \\ g_m^Tb_1 & &  \dots & g_m^Tb_p \end{bmatrix}
+$$
+
+Or get the first row of $$C$$, then get the $$j$$'th column:
+
+$$
+C_{ij} = (e_i^T C) e_j = e_i^TABe_j = (e_i^TA)(Be_j)
+$$
+
+## LU Factorization
+
+A = L * U
+
+We will often transform $$A$$ with left multiplciation of non-singular matrices to get an upper-triangular matrix
+
+$$
+\square \dots \square A
+$$
+
+Algorithm: Back Substitution
+
+-	for $$k = n: -1: 1$$
+		-	for $$j = k + 1 : n$$
+			- \\(b_k = b_k - a_{k_j}x_j\\)
+-	end
+-	\\(x_k = b_k / a_{k,k}\\)
+-	end
+
+1 flop: $$a_{44}x_4 = b_4 \rightarrow x_4 = b_4 / a_{44}$$
+
+3 flops: $$a_{33} x_3 + a_{34}x_4 = b_3 \rightarrow x_3 = (b_3-a_{34}x_4)/a_{33}$$
+
+For the $$i$$'th row, we have $$\begin{bmatrix} 0 & \dots & 0 & a_{ii} & a_{ii+1} & \dots & a_{in} \end{bmatrix} \begin{bmatrix} x_1 \\ \dots \\ x_i \\ x_{i+1} \\ \dots \\ x_n \end{bmatrix} = b_i$$
+
+Takes $$n^2$$ flops to solve a triangular system. However, to convert this to a triangular system, we need $$n^3$$ flops.
 
 ## References:
 

@@ -113,7 +113,7 @@ https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7
 
 ## References
 
-[1] Frank Dellaert and Michael Kaess. *Factor Graphs for Robot Perception*. Foundations and Trends® in Robotics, Vol. 6, No. 1-2 (2017) 1–139. [PDF](https://www.ri.cmu.edu/wp-content/uploads/2018/05/Dellaert17fnt.pdf).
+[1] Frank Dellaert and Michael Kaess. *Factor Graphs for Robot Perception*. Foundations and Trends in Robotics, Vol. 6, No. 1-2 (2017) 1–139. [PDF](https://www.ri.cmu.edu/wp-content/uploads/2018/05/Dellaert17fnt.pdf).
 
 [2] Stefano Ermon. 
 

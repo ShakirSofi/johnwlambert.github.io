@@ -125,7 +125,13 @@ Chen *et al.*
 
 ## Unsupervised Learning of Depth
 
-From 2017
+From 2017 [5]
+
+Let $$p_t$$ denote homogeneous coordinates in the target view. $$K$$ denotes the camera intrinsic matrix.
+
+$$
+p_s \sim K \hat{T}_{t \rightarrow s} \hat{D}_t (p_t) K^{-1} p_t
+$$
 
 
 ## References
@@ -136,8 +142,10 @@ From 2017
 
 [3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. [PDF](https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf).
 
-<<<<<<< HEAD
 [4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. *3D Object Proposals for Accurate Object Class Detection.*  Advances in Neural Information Processing Systems 28 (NIPS 2015). [PDF](https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection).
 
-=======
->>>>>>> bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f
+[5]
+
+[PDF](http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html).
+
+

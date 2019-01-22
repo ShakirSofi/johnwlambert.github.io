@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Simultaneous Localization and Mapping (SLAM)</title>
-  <meta name="description" content="GraphSLAM, loop closures">
+  <title>Junction Trees</title>
+  <meta name="description" content="... PGM ...">
    <link rel="stylesheet" href="/css/main.css">
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/slam/">
+  <link rel="canonical" href="http://johnwlambert.github.io/junction-trees/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -84,57 +84,20 @@
         <div class="post">
 
   <header class="post-header">
-    <h1>Simultaneous Localization and Mapping (SLAM)</h1>
-    <p class="meta">Dec 27, 2018</p>
+    <h1>Junction Trees</h1>
+    <p class="meta">Mar 30, 2018</p>
   </header>
 
   <article class="post-content">
-  <p>Table of Contents:</p>
-<ul>
-  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
-  <li><a href="#costfunctions">Cost Functions</a></li>
-  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
-</ul>
+  <h2 id="junction-trees">Junction Trees</h2>
 
-<p><a name="sfmpipeline"></a></p>
+<p>[1] <a href="https://www.cs.ubc.ca/~murphyk/Bayes/bayes.html">PDF</a>.</p>
 
-<h2 id="slam">SLAM</h2>
+<p>[2] http://videolectures.net/mlss05au_roweis_pgm/?q=sam%20roweis</p>
 
-<h2 id="orbslam">ORBSlam</h2>
+<p>[3] Michael Jordan. https://www.cc.gatech.edu/~bboots3/STR-Spring2018/readings/graphical_model_Jordan.pdf.</p>
 
-<h2 id="graphslam">GraphSLAM</h2>
-
-<p>SLAM methods [2, 10, 13, 14, 21, 30]</p>
-
-<p>M. Bosse, P. Newman, J. Leonard, M. Soika, W. Feiten, and S. Teller. Simultaneous localization and map building in large-scale cyclic envi- ronments using the atlas framework. IJRR, 23(12), 2004.</p>
-
-<p>T. Duckett, S. Marsland, and J. Shapiro. Learning globally consistent
-maps by relaxation. ICRA 2000.</p>
-
-<p>J. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.
-[14] U. Frese, P. Larsson, and T. Duckett. A multigrid algorithm for
-simultaneous localization and mapping. IEEE Transactions on Robotics,
-2005.</p>
-
-<p>K. Konolige. Large-scale map-making. AAAI, 2004.</p>
-
-<p>S. Thrun and M. Montemerlo. The GraphSLAM algorithm with
-applications to large-scale mapping of urban structures. IJRR, 25(5/6),
-2005.</p>
-
-<p>. Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.</p>
-
-<h2 id="deep-learning--slam">Deep Learning + SLAM</h2>
-
-<p>https://arxiv.org/abs/1612.00603
-https://www.ci2cv.net/media/papers/AAAI2018_chenhuan.pdf</p>
-
-<p>core idea of optimizing variable in latent space is similar</p>
-<ul>
-  <li>Prior for 3D Shape. https://ci2cv.net/media/papers/WACV18.pdf</li>
-  <li>Prior for depth map. code slam</li>
-</ul>
-
+<p>[4]</p>
 
   </article>
 
@@ -144,7 +107,22 @@ https://www.ci2cv.net/media/papers/AAAI2018_chenhuan.pdf</p>
   
   
   <!-- disqus comments -->
-<!--   -->
+<!--  
+ <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+   -->
   
 </div>
       </div>

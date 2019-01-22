@@ -257,7 +257,7 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
 
 <p>To find many vectors, we can follow an iterative procedure:</p>
 
-<p><script type="math/tex">% <![CDATA[
+<script type="math/tex; mode=display">% <![CDATA[
 \begin{aligned}
 \begin{array}{ll}
 \mbox{Step 1a:} & \tilde{q_1} = a_1 \\
@@ -268,7 +268,45 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
  &  = a_3 - (a_3^Tq_2)q_2 - (a_3^Tq_1)q_1 \\
 \mbox{Step 3b:} & q_3 = \frac{\tilde{q_3} }{\|\tilde{q_3}\|} \\
 \end{array}
-\end{aligned} %]]></script></p>
+\end{aligned} %]]></script>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/gram_schmidt_toy_example.png" width="65%" />
+  <div class="figcaption">
+   Gram Schmidt: Suppose we start with the red and blue vectors. We wish to obtain two orthogonal, unit length vectors (green and magenta).
+  </div>
+</div>
+<p>In a few lines of Python, we can generate this plot:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.2</span><span class="p">])</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.9</span><span class="p">])</span>
+
+<span class="n">q1</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+
+<span class="n">q2_tilde</span> <span class="o">=</span> <span class="n">a2</span> <span class="o">-</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+<span class="n">q2</span> <span class="o">=</span> <span class="n">q2_tilde</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q2_tilde</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">a1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span><span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'m'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="c"># generate n points along a circle</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">circ_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">radius</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+<span class="n">circ_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">radius</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">circ_x</span><span class="p">,</span><span class="n">circ_y</span><span class="p">,</span> <span class="s">'y--'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
 <h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
 
 <h3 id="overdetermined-systems">Overdetermined Systems</h3>
@@ -501,6 +539,62 @@ B - A = uv^T = \begin{bmatrix} 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 0 & 0 \end{bmatrix
 
 <p>As a linear combination of the columns
 (0 1 0)(0 0 -1)</p>
+
+<h2 id="perspectives-on-matrix-multiplication">Perspectives on Matrix Multiplication</h2>
+<p>Thinking Elementwise
+Consider two matrices, <script type="math/tex">A,B</script>, where</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+ A = \begin{bmatrix} a_1 & \dots & a_n \end{bmatrix} = \begin{bmatrix} g_1^T \\ \vdots \\ g_n^T \end{bmatrix}, &  B = \begin{bmatrix} b_1 & \dots & b_n \end{bmatrix} = \begin{bmatrix} h_1^T \\ \vdots \\ h_n^T \end{bmatrix}
+\end{array} %]]></script>
+
+<p><script type="math/tex">C = A \times B</script>
+<script type="math/tex">A \in \mathbf{R}^{m \times n}, B \in \mathbf{R}^{n \times p}</script></p>
+
+<p>Can see <script type="math/tex">C_{ij} = \sum\limits_{k=1}^n a_{ik} b_{kj}</script></p>
+
+<p>You can also see it as a sum of many outer products:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+c = A \times B = \begin{bmatrix} a_1 & \dots & a_n \end{bmatrix} \begin{bmatrix} h_1^T \\ \vdots \\ h_n^T \end{bmatrix} = a_1 h_1^T + \dots + a_n h_n^T %]]></script>
+
+<p>or as each element coming from an inner product, i.e. <script type="math/tex">C_{ij} = g_i^Tb_j</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+C = \begin{bmatrix} g_1^T \\ \vdots \\ g_n^T \end{bmatrix} \begin{bmatrix} b_1 & \dots & b_n \end{bmatrix} = \begin{bmatrix} g_1^Tb_1 & g_1^T b_2 & \dots & g_1^Tb_p \\ g_2^Tb_1 & & & \\ \vdots & & & \\ g_m^Tb_1 & &  \dots & g_m^Tb_p \end{bmatrix} %]]></script>
+
+<p>Or get the first row of <script type="math/tex">C</script>, then get the <script type="math/tex">j</script>‘th column:</p>
+
+<script type="math/tex; mode=display">C_{ij} = (e_i^T C) e_j = e_i^TABe_j = (e_i^TA)(Be_j)</script>
+
+<h2 id="lu-factorization">LU Factorization</h2>
+
+<p>A = L * U</p>
+
+<p>We will often transform <script type="math/tex">A</script> with left multiplciation of non-singular matrices to get an upper-triangular matrix</p>
+
+<script type="math/tex; mode=display">\square \dots \square A</script>
+
+<p>Algorithm: Back Substitution</p>
+
+<ul>
+  <li>for <script type="math/tex">k = n: -1: 1</script>
+    -	for <script type="math/tex">j = k + 1 : n</script>
+        - \(b_k = b_k - a_{k_j}x_j\)</li>
+  <li>end</li>
+  <li>\(x_k = b_k / a_{k,k}\)</li>
+  <li>end</li>
+</ul>
+
+<p>1 flop: <script type="math/tex">a_{44}x_4 = b_4 \rightarrow x_4 = b_4 / a_{44}</script></p>
+
+<p>3 flops: <script type="math/tex">a_{33} x_3 + a_{34}x_4 = b_3 \rightarrow x_3 = (b_3-a_{34}x_4)/a_{33}</script></p>
+
+<p>For the <script type="math/tex">i</script>‘th row, we have <script type="math/tex">% <![CDATA[
+\begin{bmatrix} 0 & \dots & 0 & a_{ii} & a_{ii+1} & \dots & a_{in} \end{bmatrix} \begin{bmatrix} x_1 \\ \dots \\ x_i \\ x_{i+1} \\ \dots \\ x_n \end{bmatrix} = b_i %]]></script></p>
+
+<p>Takes <script type="math/tex">n^2</script> flops to solve a triangular system. However, to convert this to a triangular system, we need <script type="math/tex">n^3</script> flops.</p>
 
 <h2 id="references">References:</h2>
 

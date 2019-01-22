@@ -57,6 +57,17 @@ particle filter method for correlating LIDAR measurements [1]
 
 ## 2D grids
 
+
+
+## NDT 
+
+In [10], ...
+
+
+Yoneda [11] ... Kato [12]
+
+
+
 ## Using Deep Learning
 
 Barsan *et al.* are the first to use CNNs on LiDAR orthographic (bird's-eye-view) images of the ground for the online localization, feature matching step [9].  embeds both LiDAR intensity maps
@@ -90,4 +101,15 @@ the intensity map are discretized at a spatial resolution of 5cm covering a 30m�
 [8] G. Wan, X. Yang, R. Cai, H. Li, Y. Zhou, H. Wang, and S. Song. *Robust and precise vehicle localization based on multi-sensor fusion in diverse city scenes*. In IEEE International Conference on Robotics and Automation (ICRA), pages 4670–4677, May 2018.
 
 [9] Ioan Andrei Barsan, Shenlong Wang, Andrei Pokrovsky, Raquel Urtasun. *Learning to Localize Using a LiDAR Intensity Map*. Proceedings of The 2nd Conference on Robot Learning, PMLR 87:605-616, 2018.
+
+[10] P. Biber and W. Straßer. The normal distributions transform: A new approach to laser scan matching. In Proceedings 2003 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), volume 3, pages 2743–2748, 2003.
+
+[11] K. Yoneda, H. Tehrani, T. Ogawa, N. Hukuyama, and S. Mita. LiDAR scan feature for localization with highly precise 3-D map. In IEEE Intelligent Vehicles Symposium Proceedings, pages 1345–1350, June 2014.
+
+[12] S. Kato, E. Takeuchi, Y. Ishiguro, Y. Ninomiya, K. Takeda, and T. Hamada. An open approach to autonomous vehicles. IEEE Micro, 35(6):60–68, Nov 2015.
+
+
+
+
+
 
