@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Piazza Answers</title>
+  <title>Visualizing Cnns</title>
   <meta name="description" content="">
    <link rel="stylesheet" href="/css/main.css">
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/2018/11/28/piazza-answers.html">
+  <link rel="canonical" href="http://localhost:4000/2018/11/28/visualizing-cnns.html">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -84,12 +84,17 @@
         <div class="post">
 
   <header class="post-header">
-    <h1>Piazza Answers</h1>
+    <h1>Visualizing Cnns</h1>
     <p class="meta">Nov 28, 2018</p>
   </header>
 
   <article class="post-content">
   
+<p>Question:
+How is 1x1 convolution idential to a fully-connected layer</p>
+
+<p>5x5 kernel, with 5x5 input. Elementwise multiply. Same as matrix multiplication because…</p>
+
 <h2 id="visualizing-cnns-via-deconvolution">Visualizing CNNs via deconvolution</h2>
 
 <p>It concerns slide 4 in this presentation.
@@ -389,42 +394,6 @@ https://www.cc.gatech.edu/~hays/compvision/lectures/07.pdf</p>
 
 <p>Then you could try the trilinear interpolation afterwards once that is working (without trilinear interpolation, you can still get »80% accuracy on Notre Dame).</p>
 
-<h2 id="sobel-vs-gaussian">Sobel vs. Gaussian</h2>
-
-<p>Hi, I’m trying to decide which is a better way to compute the gradient for the Harris corner detection, before I compute my cornerness function. I’m confused about the difference between both.</p>
-
-<p>If I run just Sobel on my image, that means I’m getting the derivative, and smoothing with Gaussian in one go, right? And if I want to use Gaussian, I find the derivatives of the pixels, and apply Gaussian separately on the image? Not sure if one way is better than the other, and why.</p>
-
-<p>You can also do both with one filter.</p>
-
-<p>Suppose we have the image  <script type="math/tex">I</script>:</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-<br/><br/>I = \begin{bmatrix}<br/><br/>a & b & c \\<br/><br/>d & e & f \\<br/><br/>g & h & i<br/><br/>\end{bmatrix}<br/><br/><br/> %]]></script>
-
-<p>One way to think about the Sobel x-derivative filter is that rather than looking at only <script type="math/tex">\frac{rise}{run}=\frac{f-d}{2}</script> (centered at pixel e), we also use the x-derivatives above it and below it, e.g. <script type="math/tex">\frac{c-a}{2}</script> and <script type="math/tex">\frac{i-g}{2}</script>. But we weight the x-derivative in the center the most (this is a form of smoothing) so we use an approximation like</p>
-
-<script type="math/tex; mode=display">\frac{ 2 \cdot (f-d) + (i-g)+ (c-a) }{8}</script>
-
-<p>meaning our kernel resembles</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\frac{1}{8}<br/><br/>\begin{bmatrix}<br/><br/>1 & 0 & -1 \\<br/><br/>2 & 0 & -2 \\<br/><br/>1 & 0 & -1<br/><br/>\end{bmatrix}<br/><br/><br/> %]]></script>
-
-<p>It is actually derived with directional derivatives.
-https://www.researchgate.net/publication/239398674_An_Isotropic_3_3_Image_Gradient_Operator</p>
-
-<p>This is not identical to first blurring the image with a Gaussian filter, and then computing derivatives. We blur the image first because it makes the gradients less noisy.</p>
-
-<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1ficspl6jw/smoothing_gradients.png</p>
-
-<p>https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1fiqeigs2g/derivative_theorem.png</p>
-
-<p>And an elegant fact that can save a step in smoothed gradient computation is to simply blur with the x and y derivatives of a Gaussian filter, by the following property:</p>
-
-<p>http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf
-Slides</p>
-
 <h2 id="nearest-neighbor-distance-ratio-algorithm-418">nearest neighbor distance ratio algorithm 4.18</h2>
 <p>1) in the formula 4.18, what is meant by target descriptor, here it is Da ?</p>
 
@@ -511,87 +480,6 @@ and we differentiate between four quadrants based on the angle that we supply to
 Given that the value of tan(α) is positive, we cannot distinguish, whether the angle was from the first or third quadrant and if it is negative, it could come from the second or fourth quadrant. So by convention, atan() returns an angle from the first or fourth quadrant (i.e. -π/2 &lt;= atan() &lt;= π/2), regardless of the original input to the tangent.</p>
 
 <p>In order to get back the full information, we must not use the result of the division sin(α) / cos(α) but we have to look at the values of the sine and cosine separately. And this is what atan2() does. It takes both, the sin(α) and cos(α) and resolves all four quadrants by adding π to the result of atan() whenever the cosine is negative.</p>
-
-<h2 id="autocorrelation-matrix">Autocorrelation Matrix</h2>
-
-<p>Nicolas, that <script type="math/tex">*</script> in the equation you’ve written is not multiplication – it is convolution. Szeliski states that he has “replaced the weighted summations with discrete convolutions with the weighting kernel <script type="math/tex">w</script>”.</p>
-
-<p>So before we had values <script type="math/tex">w(x,y)</script> that could have been values from a Gaussian probability density function. Let <script type="math/tex">z = \begin{bmatrix} x \\ y \end{bmatrix}</script> be the stacked 2D coordinate locations.</p>
-
-<script type="math/tex; mode=display">w(z) = \frac{1}{(2 \pi)^{n/2} |\Sigma|^{1/2}} \mbox{exp} \Bigg( - \frac{1}{2} (z − \mu)^T \Sigma^{-1} (z − \mu) \Bigg)</script>
-
-<p>For example, where <script type="math/tex">\mu</script> is the center pixel location and <script type="math/tex">z</script> is the location of each pixel in the local neighborhood. These were used as weights in summations over a local neighborhood,</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-M = \sum\limits_{x,y} w(x,y) \begin{bmatrix}I_x^2 & I_xI_y \\I_xI_y & I_y^2\end{bmatrix} %]]></script>
-
-<p>But the elegant convolution approach is used here because it is equivalent to summing a bunch of elementwise multiplications –  each point in a local neighborhood with its weight value (as we saw in Proj 1, and here filtering is equivalent to convolution since Gaussian filter is symmetric).</p>
-
-<h2 id="image-derivatives">Image Derivatives</h2>
-
-<p>Great question – there are a number of ways to do it, and they will all give different results.</p>
-
-<p>Prof. Hays discussed in lecture how convolving (not cross-correlation filtering) with the Sobel filter is a good way to approximate image derivatives (here we could treat a Gaussian filter as the image to find its derivatives).</p>
-
-<p>We’ve recommended a number of potentially useful OpenCV and SciPy functions that can do so in the project page. These will be very helpful!</p>
-
-<p>Another simple way to approximate the derivative is to calculate the 1st discrete difference along the given axis. For example, in order to compute horizontal discrete differences, shift the image by 1 pixel to the left and subtract the two</p>
-
-<p>For example, suppose you have a matrix b</p>
-
-<p>b = np.array([[  0,   1,   1,   2],</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   [  3,   5,   8,  13],
-
-   [ 21,  34,  55,  89],
-
-   [144, 233, 377, 610]])
-</code></pre></div></div>
-
-<p>b[:,1:] - b[:,:-1]
-We would get:</p>
-
-<p>array([[  1,   0,   1],</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   [  2,   3,   5],
-
-   [ 13,  21,  34],
-
-   [ 89, 144, 233]])
-</code></pre></div></div>
-
-<p>Then we could the pad the matrix with zeros on the right column to bring it back to the original size.</p>
-
-<h2 id="harris">Harris</h2>
-
-<p>A gaussian filter is expressed as <script type="math/tex">g(\sigma_1)</script>.</p>
-
-<p>The second moment matrix at each pixel is convolved as follows:
-<script type="math/tex">% <![CDATA[
-\mu(\sigma_1,\sigma_D) = g(\sigma_1) * \begin{bmatrix} I_x^2 (\sigma_D) & I_xI_y (\sigma_D) \\ I_xI_y (\sigma_D) & I_{y}^2 (\sigma_D) \end{bmatrix} %]]></script>
-Giving a cornerness function in the lecture slides:
-<script type="math/tex">har = \mbox{ det }[\mu(\sigma_1,\sigma_D)] - \alpha[\mbox{trace }\Big(\mu(\sigma_1,\sigma_D)\Big)]</script></p>
-
-<p>or, when evaluated,</p>
-
-<script type="math/tex; mode=display">har = g(I_x^2)g(I_y^2) - [g(I_xI_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2</script>
-
-<p>So in the lecture slides notation, we can write <script type="math/tex">\mu(\sigma_1,\sigma_D)</script> more simply by bringing in the filtering (identical to convolution here) operation:</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * I_x^2 (\sigma_D) & g(\sigma_1) * I_xI_y (\sigma_D) \\ g(\sigma_1) * I_xI_y (\sigma_D) & g(\sigma_1) * I_{y}^2 (\sigma_D) \end{bmatrix} %]]></script>
-
-<p>It may be easier to understand if we write the equation in the following syntax:</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 & g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] & g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]></script>
-
-<p>I should have explained that above – <script type="math/tex">\odot</script> is the Hadamard product (element wise multiplication).</p>
-
-<p>Question:
-How is 1x1 convolution idential to a fully-connected layer</p>
-
-<p>5x5 kernel, with 5x5 input. Elementwise multiply. Same as matrix multiplication because…</p>
 
 
   </article>

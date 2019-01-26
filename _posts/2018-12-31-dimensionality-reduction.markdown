@@ -331,7 +331,7 @@ $$
 
 [4] Sam T. Roweis and Lawrence K. Saul. *Nonlinear Dimensionality Reduction by Locally Linear Embedding*. Science Magazine, Vol. 290,  22 Dec. 2000.
 
-[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. *A Global Geometric Framework for Nonlinear Dimensionality Reduction*. Science 290 (5500): 2319-2323, 22 December 2000.
+[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. *A Global Geometric Framework for Nonlinear Dimensionality Reduction*. Science 290 (5500): 2319-2323, 22 December 2000. [PDF](http://web.mit.edu/cocosci/Papers/sci_reprint.pdf).
 
 [6] Laurenz Wiskott. *Principal Component Analysis*. 11 March 2004. [Online PDF](https://pdfs.semanticscholar.org/d657/68e1dad46bbdb5cfb17eb19eb07cc0f5947c.pdf).
 

@@ -1,5 +1,241 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-22T18:47:48-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Graph Cuts</title><link href="http://johnwlambert.github.io/2019/01/16/graph-cuts.html" rel="alternate" type="text/html" title="Graph Cuts" /><published>2019-01-16T00:00:00-05:00</published><updated>2019-01-16T00:00:00-05:00</updated><id>http://johnwlambert.github.io/2019/01/16/graph-cuts</id><content type="html" xml:base="http://johnwlambert.github.io/2019/01/16/graph-cuts.html">&lt;p&gt;http://www.csd.uwo.ca/~yuri/Papers/pami04.pdf&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Factor Graphs for SLAM and SfM</title><link href="http://johnwlambert.github.io/factor-graphs/" rel="alternate" type="text/html" title="Factor Graphs for SLAM and SfM" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/factor-graphs-slam</id><content type="html" xml:base="http://johnwlambert.github.io/factor-graphs/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-01-26T16:26:03-05:00</updated><id>http://localhost:4000/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Image Derivatives and the Harris Corner Detector</title><link href="http://localhost:4000/image-derivatives-harris/" rel="alternate" type="text/html" title="Image Derivatives and the Harris Corner Detector" /><published>2019-01-24T06:01:00-05:00</published><updated>2019-01-24T06:01:00-05:00</updated><id>http://localhost:4000/image-derivatives-harris</id><content type="html" xml:base="http://localhost:4000/image-derivatives-harris/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;Image Derivatives&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Summed-Square Difference Error&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;The Autocorrelation (AC) Surface&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Taylor Approximations of the AC Surface&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;The Harris Corner Detector&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Ellipse Analogy&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;image-derivatives&quot;&gt;Image Derivatives&lt;/h2&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    ksize = 7
+    sigma = 5
+
+    g = cv2.getGaussianKernel(ksize=ksize, sigma=sigma)
+    small_filter = g * g.T
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_approx_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'np_grad'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gradient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_approx_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'finite_diff'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;kx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ky&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;kx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# compute gradient on x-direction&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ky&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diff&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# compute gradient on y-direction&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_approx_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'cv2_sobel'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;kx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Sobel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CV_64F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ksize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;8.&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ky&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Sobel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cv2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CV_64F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ksize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;8.&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grad_approx_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'scipy_sobel'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sobel_x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+                            &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+                            &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sobel_y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+                            &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+                            &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;kx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scipy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;signal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;convolve2d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;in1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;in2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sobel_x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'same'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;boundary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'fill'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;fillvalue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;8.&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ky&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scipy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;signal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;convolve2d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;in1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;in2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sobel_y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;mode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'same'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;boundary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'fill'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                        &lt;span class=&quot;n&quot;&gt;fillvalue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;8.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ky&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;image-derivatives-1&quot;&gt;Image Derivatives&lt;/h2&gt;
+
+&lt;p&gt;Great question – there are a number of ways to do it, and they will all give different results.&lt;/p&gt;
+
+&lt;p&gt;Convolving (not cross-correlation filtering) with the Sobel filter is a good way to approximate image derivatives (here we could treat a Gaussian filter as the image to find its derivatives).&lt;/p&gt;
+
+&lt;p&gt;We’ve recommended a number of potentially useful OpenCV and SciPy functions that can do so in the project page. These will be very helpful!&lt;/p&gt;
+
+&lt;p&gt;Another simple way to approximate the derivative is to calculate the 1st discrete difference along the given axis. For example, in order to compute horizontal discrete differences, shift the image by 1 pixel to the left and subtract the two&lt;/p&gt;
+
+&lt;p&gt;For example, suppose you have a matrix b&lt;/p&gt;
+
+&lt;p&gt;b = np.array([[  0,   1,   1,   2],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [  3,   5,   8,  13],
+
+   [ 21,  34,  55,  89],
+
+   [144, 233, 377, 610]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;b[:,1:] - b[:,:-1]
+We would get:&lt;/p&gt;
+
+&lt;p&gt;array([[  1,   0,   1],&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   [  2,   3,   5],
+
+   [ 13,  21,  34],
+
+   [ 89, 144, 233]])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then we could the pad the matrix with zeros on the right column to bring it back to the original size.&lt;/p&gt;
+
+&lt;h2 id=&quot;sobel-vs-gaussian&quot;&gt;Sobel vs. Gaussian&lt;/h2&gt;
+
+&lt;p&gt;Hi, I’m trying to decide which is a better way to compute the gradient for the Harris corner detection, before I compute my cornerness function. I’m confused about the difference between both.&lt;/p&gt;
+
+&lt;p&gt;If I run just Sobel on my image, that means I’m getting the derivative, and smoothing with Gaussian in one go, right? And if I want to use Gaussian, I find the derivatives of the pixels, and apply Gaussian separately on the image? Not sure if one way is better than the other, and why.&lt;/p&gt;
+
+&lt;p&gt;You can also do both with one filter.&lt;/p&gt;
+
+&lt;p&gt;Suppose we have the image  &lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+I = \begin{bmatrix}a &amp; b &amp; c \\d &amp; e &amp; f \\g &amp; h &amp; i\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;One way to think about the Sobel x-derivative filter is that rather than looking at only &lt;script type=&quot;math/tex&quot;&gt;\frac{rise}{run}=\frac{f-d}{2}&lt;/script&gt; (centered at pixel e), we also use the x-derivatives above it and below it, e.g. &lt;script type=&quot;math/tex&quot;&gt;\frac{c-a}{2}&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\frac{i-g}{2}&lt;/script&gt;. But we weight the x-derivative in the center the most (this is a form of smoothing) so we use an approximation like&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{ 2 \cdot (f-d) + (i-g)+ (c-a) }{8}&lt;/script&gt;
+
+&lt;p&gt;meaning our kernel resembles&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\frac{1}{8}\begin{bmatrix}1 &amp; 0 &amp; -1 \\2 &amp; 0 &amp; -2 \\1 &amp; 0 &amp; -1\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;It is actually derived with directional derivatives.
+https://www.researchgate.net/publication/239398674_An_Isotropic_3_3_Image_Gradient_Operator&lt;/p&gt;
+
+&lt;p&gt;This is not identical to first blurring the image with a Gaussian filter, and then computing derivatives. We blur the image first because it makes the gradients less noisy.&lt;/p&gt;
+
+&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1ficspl6jw/smoothing_gradients.png&lt;/p&gt;
+
+&lt;p&gt;https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jm1fiqeigs2g/derivative_theorem.png&lt;/p&gt;
+
+&lt;p&gt;And an elegant fact that can save a step in smoothed gradient computation is to simply blur with the x and y derivatives of a Gaussian filter, by the following property:&lt;/p&gt;
+
+&lt;p&gt;http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf
+Slides&lt;/p&gt;
+
+&lt;h2 id=&quot;the-autocorrelation-functionsurface&quot;&gt;The Autocorrelation Function/Surface&lt;/h2&gt;
+
+&lt;p&gt;Suppose we wish to match a keypoint in image &lt;script type=&quot;math/tex&quot;&gt;I_0&lt;/script&gt; with a keypoint in an image &lt;script type=&quot;math/tex&quot;&gt;I_1&lt;/script&gt;. Matching RGB values at a single pixel location will be completely uninformative. However, comparing &lt;em&gt;local patches&lt;/em&gt; around the supposed keypoints can be quite effective because the local window captures necessary context.&lt;/p&gt;
+
+&lt;p&gt;Suppose we shift image &lt;script type=&quot;math/tex&quot;&gt;I_1&lt;/script&gt; by displacement &lt;script type=&quot;math/tex&quot;&gt;\mathbf{u} = (u,v)&lt;/script&gt;, and then compare its shifted RGB values with &lt;script type=&quot;math/tex&quot;&gt;I_0&lt;/script&gt;. This function of weighted summed square difference (WSSD) error is known as the autocorrelation function or surface [1]. We compute the values of this function at every single possible displacement &lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;. We loop over &lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt; locations in the local window neighborhood and at each &lt;script type=&quot;math/tex&quot;&gt;x_i = (x,y)&lt;/script&gt;, compute the difference:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;E_{WSSD}(\mathbf{u}) = \sum\limits_i w(x_i)\bigg[I_1(x_i + \mathbf{u}) − I_0(x_i)\bigg]^2&lt;/script&gt;
+
+&lt;p&gt;This is accomplished in a few lines of Python (&lt;a href=&quot;https://gist.github.com/johnwlambert/b5e8fb75a8b474ad90f37d95af523b41&quot;&gt;code here&lt;/a&gt;):&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;window_h&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;patch_img&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;window_w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;patch_img&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;img_h&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mtn_img&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;img_w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mtn_img&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;e_ssd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img_h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;window_h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img_w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;window_w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# start at top-left corner&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img_h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;window_h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;img_w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;window_w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;e_ssd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;square&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mtn_img&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;window_h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;window_w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,:]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;patch_img&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;/assets/mtn_img_centered_full.png&quot; width=&quot;49%&quot; /&gt;
+    &lt;img src=&quot;/assets/mtn_img_centered_patch.png&quot; width=&quot;20%&quot; /&gt;
+  &lt;div class=&quot;figcaption&quot;&gt;
+    Left: Original mountain scene from [1]. Right: Centered patch cropped from the image.
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;fig figcenter fighighlight&quot;&gt;
+  &lt;img src=&quot;/assets/surface_3d_view.png&quot; width=&quot;30%&quot; /&gt;
+  &lt;img src=&quot;/assets/overhead_surface.png&quot; width=&quot;30%&quot; /&gt;
+  &lt;img src=&quot;/assets/localized_patch.png&quot; width=&quot;30%&quot; /&gt;
+
+  &lt;div class=&quot;figcaption&quot;&gt;
+    Left: 3D surface plot of the error function. Blue is lower error, red is higher error. Center: Overhead (bird's eye view) of the 3D surface plot. Right: The localized patch, computed using the displacement that minimizes the error function, is plotted in red.
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;However, this method is unbelievable slow – it took 25 minutes even to localize this simple patch within an image.&lt;/p&gt;
+
+&lt;p&gt;When performing keypoint detection, we want to match local patches between images. However, we don’t know which local patches are the most informative, so we compute an “informativeness” score: how stable the WSSD function is with respect to small variations in position (&lt;script type=&quot;math/tex&quot;&gt;\Delta \mathbf{u}&lt;/script&gt;).&lt;/p&gt;
+
+&lt;h2 id=&quot;taylor-approximation-the-autocorrelation-matrix&quot;&gt;Taylor Approximation: The Autocorrelation Matrix&lt;/h2&gt;
+
+&lt;p&gt;Unfortunately, it turns out that the autocorrelation function is extraordinarily slow to evaluate.&lt;/p&gt;
+
+&lt;p&gt;The &lt;script type=&quot;math/tex&quot;&gt;*&lt;/script&gt; in the equation you’ve written is not multiplication – it is convolution. Szeliski [1] states that he has “replaced the weighted summations with discrete convolutions with the weighting kernel &lt;script type=&quot;math/tex&quot;&gt;w&lt;/script&gt;”.&lt;/p&gt;
+
+&lt;p&gt;So before we had values &lt;script type=&quot;math/tex&quot;&gt;w(x,y)&lt;/script&gt; that could have been values from a Gaussian probability density function. Let &lt;script type=&quot;math/tex&quot;&gt;z = \begin{bmatrix} x \\ y \end{bmatrix}&lt;/script&gt; be the stacked 2D coordinate locations.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;w(z) = \frac{1}{(2 \pi)^{n/2} |\Sigma|^{1/2}} \mbox{exp} \Bigg( - \frac{1}{2} (z − \mu)^T \Sigma^{-1} (z − \mu) \Bigg)&lt;/script&gt;
+
+&lt;p&gt;For example, where &lt;script type=&quot;math/tex&quot;&gt;\mu&lt;/script&gt; is the center pixel location and &lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt; is the location of each pixel in the local neighborhood. These were used as weights in summations over a local neighborhood,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+M = \sum\limits_{x,y} w(x,y) \begin{bmatrix}I_x^2 &amp; I_xI_y \\I_xI_y &amp; I_y^2\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;But the elegant convolution approach is used here because it is equivalent to summing a bunch of elementwise multiplications –  each point in a local neighborhood with its weight value (as we saw in Proj 1, and here filtering is equivalent to convolution since Gaussian filter is symmetric).&lt;/p&gt;
+
+&lt;h2 id=&quot;the-harris-corner-detector&quot;&gt;The Harris Corner Detector&lt;/h2&gt;
+
+&lt;p&gt;A gaussian filter is expressed as &lt;script type=&quot;math/tex&quot;&gt;g(\sigma_1)&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;The second moment matrix at each pixel is convolved as follows:
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+\mu(\sigma_1,\sigma_D) = g(\sigma_1) * \begin{bmatrix} I_x^2 (\sigma_D) &amp; I_xI_y (\sigma_D) \\ I_xI_y (\sigma_D) &amp; I_{y}^2 (\sigma_D) \end{bmatrix} %]]&gt;&lt;/script&gt;
+Giving a cornerness function in the lecture slides:
+&lt;script type=&quot;math/tex&quot;&gt;har = \mbox{ det }[\mu(\sigma_1,\sigma_D)] - \alpha[\mbox{trace }\Big(\mu(\sigma_1,\sigma_D)\Big)]&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;or, when evaluated,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;har = g(I_x^2)g(I_y^2) - [g(I_xI_y)]^2 - \alpha [g(I_x^2) + g(I_y^2)]^2&lt;/script&gt;
+
+&lt;p&gt;So in the lecture slides notation, we can write &lt;script type=&quot;math/tex&quot;&gt;\mu(\sigma_1,\sigma_D)&lt;/script&gt; more simply by bringing in the filtering (identical to convolution here) operation:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * I_x^2 (\sigma_D) &amp; g(\sigma_1) * I_xI_y (\sigma_D) \\ g(\sigma_1) * I_xI_y (\sigma_D) &amp; g(\sigma_1) * I_{y}^2 (\sigma_D) \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;It may be easier to understand if we write the equation in the following syntax:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\mu(\sigma_1,\sigma_D) = \begin{bmatrix} g(\sigma_1) * \Big(g(\sigma_D) * I_x \Big)^2 &amp; g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] \\g(\sigma_1) * \Bigg[ \Big(g(\sigma_D) * I_x \Big) \odot \Big(g(\sigma_D) * I_x \Big) \Bigg] &amp; g(\sigma_1) * \Bigg[g(\sigma_D) * I_y \Bigg]^2\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;I should have explained that above – &lt;script type=&quot;math/tex&quot;&gt;\odot&lt;/script&gt; is the Hadamard product (element wise multiplication).&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;[1] Richard Szeliski. Computer Vision: Algorithms and Applications. &lt;a href=&quot;http://szeliski.org/Book/drafts/SzeliskiBook_20100903_draft.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;[2] Fei-Fei Li. &lt;a href=&quot;http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author></entry><entry><title type="html">Graph Cuts and Flows in Computer Vision</title><link href="http://localhost:4000/graphs-cuts-flows/" rel="alternate" type="text/html" title="Graph Cuts and Flows in Computer Vision" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/graph-cuts</id><content type="html" xml:base="http://localhost:4000/graphs-cuts-flows/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Factor Graphs&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Factor Densities&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#son&quot;&gt;MAP Inference on Factor Graphs&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#so2&quot;&gt;Factor Graph Variable Elimanation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;whyliegroups&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;min-cut-is-max-cost-flow&quot;&gt;Min Cut is Max-Cost Flow&lt;/h2&gt;
+
+&lt;h2 id=&quot;min-cost-flow&quot;&gt;Min-Cost Flow&lt;/h2&gt;
+
+&lt;p&gt;http://www.csd.uwo.ca/~yuri/Papers/pami04.pdf&lt;/p&gt;
+
+&lt;p&gt;MIT 6.046J Design and Analysis of Algorithms, Spring 2015
+View the complete course: http://ocw.mit.edu/6-046JS15
+Instructor: Srinivas Devadas&lt;/p&gt;
+
+&lt;p&gt;https://www.youtube.com/watch?v=VYZGlgzr_As&amp;amp;t=129s&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Factor Graphs for SLAM and SfM</title><link href="http://localhost:4000/factor-graphs/" rel="alternate" type="text/html" title="Factor Graphs for SLAM and SfM" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/factor-graphs-slam</id><content type="html" xml:base="http://localhost:4000/factor-graphs/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Factor Graphs&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Factor Densities&lt;/a&gt;&lt;/li&gt;
@@ -93,7 +329,7 @@ X^{MAP} &amp;= \mbox{arg }\underset{X}{\mbox{max }} \phi(X) &amp; \mbox{Maximum 
 
 &lt;p&gt;[1] Frank Dellaert and Michael Kaess. &lt;em&gt;Factor Graphs for Robot Perception&lt;/em&gt;. Foundations and Trends in Robotics, Vol. 6, No. 1-2 (2017) 1–139. &lt;a href=&quot;https://www.ri.cmu.edu/wp-content/uploads/2018/05/Dellaert17fnt.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;[2] Stefano Ermon.&lt;/p&gt;</content><author><name></name></author><summary type="html">Gaussian densities, direct methods, iterative methods</summary></entry><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://johnwlambert.github.io/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://johnwlambert.github.io/lie-groups</id><content type="html" xml:base="http://johnwlambert.github.io/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[2] Stefano Ermon.&lt;/p&gt;</content><author><name></name></author><summary type="html">Gaussian densities, direct methods, iterative methods</summary></entry><entry><title type="html">Lie Groups and Rigid Body Kinematics</title><link href="http://localhost:4000/lie-groups/" rel="alternate" type="text/html" title="Lie Groups and Rigid Body Kinematics" /><published>2018-12-28T06:00:00-05:00</published><updated>2018-12-28T06:00:00-05:00</updated><id>http://localhost:4000/lie-groups</id><content type="html" xml:base="http://localhost:4000/lie-groups/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#whyliegroups&quot;&gt;Why do we need Lie Groups?&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#liegroups&quot;&gt;Lie Groups&lt;/a&gt;&lt;/li&gt;
@@ -386,7 +622,7 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 \vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; -\mbox{sin} \theta \ 0 &amp;amp; \mbox{cos} \phi &amp;amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp;amp; -\mbox{sin} \phi &amp;amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
 \end{equation}&lt;/p&gt;
 
-&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Stereo and Disparity</title><link href="http://johnwlambert.github.io/stereo/" rel="alternate" type="text/html" title="Stereo and Disparity" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/stereo-and-disparity</id><content type="html" xml:base="http://johnwlambert.github.io/stereo/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$&lt;/p&gt;</content><author><name></name></author><summary type="html">SO(2), SO(3), SE(2), SE(3), Lie algebras</summary></entry><entry><title type="html">Stereo and Disparity</title><link href="http://localhost:4000/stereo/" rel="alternate" type="text/html" title="Stereo and Disparity" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/stereo-and-disparity</id><content type="html" xml:base="http://localhost:4000/stereo/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;Stereo Matching&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Disparity&lt;/a&gt;&lt;/li&gt;
@@ -506,7 +742,13 @@ each &lt;script type=&quot;math/tex&quot;&gt;(x_l,y_l)&lt;/script&gt;.&lt;/li&gt
 
 &lt;p&gt;[5]&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html">focal length, similar triangles, depth</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://johnwlambert.github.io/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/precision-recall</id><content type="html" xml:base="http://johnwlambert.github.io/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;STEREO http://people.scs.carleton.ca/~c_shu/Courses/comp4900d/notes/simple_stereo.pdf
+DEPTH http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineVision_Chapter11.pdf
+STEREO https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
+SFM http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
+JAMES MULTI-VIEW https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf&lt;/p&gt;</content><author><name></name></author><summary type="html">focal length, similar triangles, depth</summary></entry><entry><title type="html">Recall and Precision</title><link href="http://localhost:4000/recall-precision/" rel="alternate" type="text/html" title="Recall and Precision" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/precision-recall</id><content type="html" xml:base="http://localhost:4000/recall-precision/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#recall&quot;&gt;Recall&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#precision&quot;&gt;Precision&lt;/a&gt;&lt;/li&gt;
@@ -678,7 +920,7 @@ each &lt;script type=&quot;math/tex&quot;&gt;(x_l,y_l)&lt;/script&gt;.&lt;/li&gt
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. &lt;a href=&quot;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&quot;&gt;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">The Histogram Filter</title><link href="http://johnwlambert.github.io/histogram-filter/" rel="alternate" type="text/html" title="The Histogram Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/histogram-filter</id><content type="html" xml:base="http://johnwlambert.github.io/histogram-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. &lt;a href=&quot;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&quot;&gt;https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">The Histogram Filter</title><link href="http://localhost:4000/histogram-filter/" rel="alternate" type="text/html" title="The Histogram Filter" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/histogram-filter</id><content type="html" xml:base="http://localhost:4000/histogram-filter/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -707,7 +949,7 @@ each &lt;script type=&quot;math/tex&quot;&gt;(x_l,y_l)&lt;/script&gt;.&lt;/li&gt
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. &lt;em&gt;Probabilistic Robotics&lt;/em&gt;. The MIT Press, Cambridge, MA, 2005.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://johnwlambert.github.io/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/spectral-clustering</id><content type="html" xml:base="http://johnwlambert.github.io/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Sebastian Thrun, Wolfram Burgard, Dieter Fox. &lt;em&gt;Probabilistic Robotics&lt;/em&gt;. The MIT Press, Cambridge, MA, 2005.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Spectral Clustering</title><link href="http://localhost:4000/spectral-clustering/" rel="alternate" type="text/html" title="Spectral Clustering" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/spectral-clustering</id><content type="html" xml:base="http://localhost:4000/spectral-clustering/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -744,7 +986,7 @@ J = \sum\limits_j \sum\limits_k r_{ji}(y_j - \mu_i)^2 ??
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/learning-point-cloud-features</id><content type="html" xml:base="http://johnwlambert.github.io/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Graph Laplacians, Laplacian Embeddings, and Spectral Clustering&lt;/em&gt;. Lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in Spring 2018.&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://localhost:4000/learning-point-cloud-features/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/learning-point-cloud-features</id><content type="html" xml:base="http://localhost:4000/learning-point-cloud-features/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
@@ -1091,7 +1333,7 @@ def batch_NN_loss(x, y, cuda):
 
 &lt;p&gt;[3] Dynamic Graph CNN.&lt;/p&gt;
 
-&lt;p&gt;https://www.mathworks.com/matlabcentral/fileexchange/6110-toolbox-fast-marching&lt;/p&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://johnwlambert.github.io/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/dimensionality-reduction</id><content type="html" xml:base="http://johnwlambert.github.io/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;p&gt;https://www.mathworks.com/matlabcentral/fileexchange/6110-toolbox-fast-marching&lt;/p&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://localhost:4000/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://localhost:4000/dimensionality-reduction</id><content type="html" xml:base="http://localhost:4000/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
@@ -1388,352 +1630,11 @@ geometry&lt;/em&gt;”” [4].&lt;/p&gt;
 
 &lt;p&gt;[4] Sam T. Roweis and Lawrence K. Saul. &lt;em&gt;Nonlinear Dimensionality Reduction by Locally Linear Embedding&lt;/em&gt;. Science Magazine, Vol. 290,  22 Dec. 2000.&lt;/p&gt;
 
-&lt;p&gt;[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. &lt;em&gt;A Global Geometric Framework for Nonlinear Dimensionality Reduction&lt;/em&gt;. Science 290 (5500): 2319-2323, 22 December 2000.&lt;/p&gt;
+&lt;p&gt;[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. &lt;em&gt;A Global Geometric Framework for Nonlinear Dimensionality Reduction&lt;/em&gt;. Science 290 (5500): 2319-2323, 22 December 2000. &lt;a href=&quot;http://web.mit.edu/cocosci/Papers/sci_reprint.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;[6] Laurenz Wiskott. &lt;em&gt;Principal Component Analysis&lt;/em&gt;. 11 March 2004. &lt;a href=&quot;https://pdfs.semanticscholar.org/d657/68e1dad46bbdb5cfb17eb19eb07cc0f5947c.pdf&quot;&gt;Online PDF&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;[7] Karl Pearson. &lt;em&gt;On Lines and Planes of Closest Fit to Systems of Points in Space&lt;/em&gt;. 1901. Philosophical Magazine. 2 (11): 559–572.&lt;/p&gt;
 
 &lt;p&gt;[8] H Hotelling. &lt;em&gt;Analysis of a complex of statistical variables into principal components&lt;/em&gt;. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
-Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry><entry><title type="html">Understanding Multivariate Gaussians and Covariance</title><link href="http://johnwlambert.github.io/gauss-covariance/" rel="alternate" type="text/html" title="Understanding Multivariate Gaussians and Covariance" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/gaussians-and-covariance</id><content type="html" xml:base="http://johnwlambert.github.io/gauss-covariance/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;A Basic SfM Pipeline&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Cost Functions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Bundle Adjustment&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;what-is-a-multivariate-gaussian-random-variable&quot;&gt;What is a multivariate Gaussian random variable?&lt;/h2&gt;
-
-&lt;p&gt;Gaussian R.V.s are parameterized by two quantities:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;X \sim p(x)  = \mathcal{N}(\mu_x, \Sigma_x)&lt;/script&gt;
-
-&lt;p&gt;Preceded by a term for normalization&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(\mu_x, \Sigma_x) = 
-\frac{1}{\sqrt{(2\pi)^n|\Sigma_x|}}\mbox{exp}
-\Bigg\{ -\frac{1}{2} (x - \mu_x)^T \Sigma_x^{-1} (x - \mu_x) \Bigg\}&lt;/script&gt;
-
-&lt;p&gt;where &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt; is the dimension, i.e. &lt;script type=&quot;math/tex&quot;&gt;X \in \mathbbm{R}^n&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;And of course in the scalar case, we see&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{N}(\mu_x, \sigma_x) =&lt;/script&gt;
-
-&lt;p&gt;Level sets trace out ellipses that are centered at &lt;script type=&quot;math/tex&quot;&gt;\mu_x&lt;/script&gt;, have minor and major axes (in 2D), and ellipsoids in higher dimensions&lt;/p&gt;
-
-&lt;p&gt;Mean:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;E[X] = \int_x x p(x) dx&lt;/script&gt;
-
-&lt;p&gt;need to show&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mu_x = \int_x x \mathcal{N}(\mu_x,\Sigma_x) dx&lt;/script&gt;
-
-&lt;p&gt;Covariance&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;E[(X- \mu_x)(X - \mu_x)^T] = \int_x (x-\mu_x)(x-\mu_x)^T p(x) dx&lt;/script&gt;
-
-&lt;p&gt;need to show&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Sigma_x = \int_x (x- \mu_x) (x-\mu_x)^T \mathcal{N}(\mu_x, \Sigma_x) dx&lt;/script&gt;
-
-&lt;p&gt;Gaussian distribution is a second-order distribution, which does not mean that the higher order moments are zero (not true in general)
-Convert between a standard normal, and any multivariate Gaussian&lt;/p&gt;
-
-&lt;h2 id=&quot;the-standard-normal-distribution&quot;&gt;The Standard Normal Distribution&lt;/h2&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;X_s \sim \mathcal{N}(0, I)&lt;/script&gt;
-
-&lt;p&gt;unit (identity) covariance, so each axis decouples, compute integral over each axis separately&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;How to generate any Gaussian R.V. from standard normal&lt;/strong&gt; $$X_s$?$&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;X = \Sigma_x^{1/2}X_s + \mu_x&lt;/script&gt;
-
-&lt;p&gt;Can obtain by scaling by covariance matrix, and by translating by mean
-Very good for simulating
-With MATLAB, can generate scalar, unit variance, 0 mean Gaussian R.V. with \texttt{randn}
-Call \texttt{randn} $n$ times to populate $X_s$, and them multiply, then add
-And we can compute via Cholesky Decomposition (unique if positive definite)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\Sigma = \Sigma_x^{1/2}(\Sigma_x^{1/2})^T&lt;/script&gt;
-
-&lt;h2 id=&quot;matrix-square-roots&quot;&gt;Matrix Square Roots&lt;/h2&gt;
-
-&lt;p&gt;\item There are other possible matrix square roots
-\item \textbf{How to transform any Gaussian R.V. to the standard normal} $X_s$?
-\item Do so via rearrangement:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-X_s = \Sigma_x^{-1/2}(X - \mu_x), &amp; X \sim \mathcal{N}(\mu_x, \Sigma_x)
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Much easier to integrate over the form on the RHS, not LHS
-Comes from method of derived distributions
-Derived Distributions: Given &lt;script type=&quot;math/tex&quot;&gt;X \sim p(x)&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;Y=f(X)&lt;/script&gt;, find &lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt;
-Here &lt;script type=&quot;math/tex&quot;&gt;X = X_s&lt;/script&gt;, and function &lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt; is the linear distribution &lt;script type=&quot;math/tex&quot;&gt;AX + b&lt;/script&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;properties-of-multivariate-gaussians&quot;&gt;Properties of Multivariate Gaussians&lt;/h2&gt;
-
-&lt;h2 id=&quot;how-can-we-understand-a-covariance-matrix&quot;&gt;How can we understand a covariance matrix?&lt;/h2&gt;
-
-&lt;p&gt;Larger covariance means more uncertainty. Isocontours/error ellipses&lt;/p&gt;
-
-&lt;p&gt;We set &lt;script type=&quot;math/tex&quot;&gt;P=0.95&lt;/script&gt;:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\varepsilon = \frac{1-P}{2 \pi |\Sigma|^{1/2}} = \frac{1-0.95}{2 \pi |\Sigma|^{1/2}} = \frac{0.05}{2 \pi |\Sigma|^{1/2}}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{B}(\varepsilon) = \Big\{ x \mid p(x) \geq \varepsilon \Big\}&lt;/script&gt;
-
-&lt;h2 id=&quot;covariance&quot;&gt;Covariance&lt;/h2&gt;
-
-&lt;p&gt;Cavariance Matrix How can we determine the direction of maximal variance? The first
-we can do is to determine the variances of the individual components. If the data points (or
-vectors) are written as x = (x1, x2)T (T indicates transpose), then the variances of the first
-and second component can be written as C11 := “x1x1# and C22 := “x2x2# (angle brackets
-indicate averaging over all data points). If C11 is large compared to C22, then the direction of
-maximal variance is close to (1, 0)T , while if C11 is small, the direction of maximal variance
-is close to (0, 1)T . (Notice that variance doesn’t have a polarity, so that one could use the
-inverse vector (−1, 0)T instead of (1, 0)T equally well for indicating the direction of maximal
-variance.)
-But what if C11 is of similar value as C22, like in the example of Figure 1? Then the
-co-variance between the two components, C12 := “x1x2#, can give us additional information
-(notice that C21 := “x2x1# is equal to C12). A large positive value of C12 indicates a strong
-correlation between x1 and x2 and that the data cloud is extended along the (1, 1)T direction.
-A negative value would indicate anti-correlation and an extension along the (−1, 1)T
-direction. A small value of C12 would indicate no correlation and thus little structure of
-the data, i.e. no prominent direction of maximal variance. The variances and covariances
-are conveniently arranged in a matrix with components Cij , which is called covariance matrix
-(assuming zero mean data). Figure 3 shows several data clouds and the corresponding
-covariance matrices.&lt;/p&gt;
-
-&lt;p&gt;0.2 0
-0 1&lt;/p&gt;
-
-&lt;p&gt;1 -0.5
--0.5 0.3&lt;/p&gt;
-
-&lt;p&gt;1 0 
-0 1&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
-import numpy as np
-import pdb
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-
-import scipy
-
-sns.set_style({'font.family': 'Times New Roman'})
-
-def plot_gauss_ellipse(mu, cov, color='g', rad=2, ):
-	&quot;&quot;&quot;
-	Adapted from Piotr Dollar's https://github.com/pdollar/toolbox/
-	Plots a 2D ellipse derived from a 2D Gaussian specified by mu &amp;amp; cov.
-	
-	USAGE:
-		hs = plotGaussEllipses( mus, Cs, [rad] )
-	
-	Args:
-	-	mus: Numpy array of shape (2,), representing mean
-	-	Cs: Numpy array of shape (2,2), representing covariance matrix
-	-	color: string representing Matplotlib color
-	-	rad: [2] Number of std to create the ellipse to
-	
-	Returns:
-	-	None
-	
-	color choices: ['b', 'g', 'r', 'c', 'm', 'y', 'k']
-	&quot;&quot;&quot;
-	cRow, ccol, ra, rb, phi = gauss2ellipse( mu, cov, rad)
-	plotEllipse( cRow, ccol, ra, rb, phi, color)
-
-
-
-def gauss2ellipse(mu, C, rad=2):
-	&quot;&quot;&quot;
-	Adapted from Piotr Dollar's https://github.com/pdollar/toolbox/
-	Creates an ellipse representing the 2D Gaussian distribution.
-	
-	Creates an ellipse representing the 2D Gaussian distribution with mean mu
-	and covariance matrix C.  Returns 5 parameters that specify the ellipse.
-	
-	USAGE
-	 [cRow, cCol, ra, rb, phi] = gauss2ellipse( mu, C, [rad] )
-	
-	Args:
-	-	mu: 1x2 vector representing the center of the ellipse
-	-	C: 2x2 cov matrix
-	-	rad: [2] Number of std to create the ellipse to
-	
-	OUTPUTS
-	-	cRow: the row location of the center of the ellipse
-	-	cCol: the column location of the center of the ellipse
-	-	ra: semi-major axis length (in pixels) of the ellipse
-	-	rb: semi-minor axis length (in pixels) of the ellipse
-	-	phi: rotation angle (radians) of semimajor axis from x-axis
-	
-	EXAMPLE
-	#  [cRow, cCol, ra, rb, phi] = gauss2ellipse( [5 5], [1 0; .5 2] )
-	#  plotEllipse( cRow, cCol, ra, rb, phi );
-	&quot;&quot;&quot;
-	# error check
-	if mu.size != 2 or C.shape != (2,2):
-		print('Works only for 2D Gaussians')
-		quit()
-
-	# decompose using SVD
-	_,D,Rh = np.linalg.svd(C)
-	R = Rh.T
-	normstd = np.sqrt(D)
-
-	# get angle of rotation (in row/column format)
-	phi = np.arccos(R[0,0])
-
-	if R[1,0] &amp;lt; 0:
-		phi = 2*np.pi - phi
-	phi = np.pi/2 - phi
-
-	# get ellipse radii
-	ra = rad * normstd[0]
-	rb = rad * normstd[1]
-
-	# center of ellipse
-	cRow = mu[0]
-	cCol = mu[1]
-
-	return cRow, cCol, ra, rb, phi
-
-
-
-def plotEllipse(cRow,cCol,ra,rb,phi,color='b',nPnts=100,lw=1,ls='-'):
-	&quot;&quot;&quot;
-	Adapted from Piotr Dollar's https://github.com/pdollar/toolbox/
-	Adds an ellipse to the current plot.
-	
-	USAGE:
-	-	h,hc,hl = plotEllipse(cRow,cCol,ra,rb,phi,[color],[nPnts],[lw],[ls])
-	
-	Args:
-	-	cRow: the row location of the center of the ellipse
-	-	cCol: the column location of the center of the ellipse
-	-	ra: semi-major axis radius length (in pixels) of the ellipse
-	-	rb: semi-minor axis radius length (in pixels) of the ellipse
-	-	phi: rotation angle (radians) of semimajor axis from x-axis
-	-	color: ['b'] color for ellipse
-	-	nPnts: [100] number of points used to draw each ellipse
-	-	lw: [1] line width
-	-	ls: ['-'] line style
-
-	Returns:
-	-	h : handle to ellipse
-	-	hc: handle to ellipse center
-	-	hl: handle to ellipse orient
-
-	EXAMPLE:
-		plotEllipse( 3, 2, 1, 5, pi/6, 'g');
-	&quot;&quot;&quot;
-	# plot ellipse (rotate a scaled circle):
-	ts = np.linspace(-np.pi, np.pi, nPnts+1)
-	cts = np.cos(ts)
-	sts = np.sin(ts)
-
-	x = ra * cts * np.cos(-phi) + rb * sts * np.sin(-phi) + cCol
-	y = rb * sts * np.cos(-phi) - ra * cts * np.sin(-phi) + cRow
-	h = plt.plot(x,y, color=color, linewidth=lw, linestyle=ls)
-
-	# plot center point and line indicating orientation
-	hc = plt.plot(cCol, cRow, 'k+', color=color, linewidth=lw, linestyle=ls)
-
-	x = [cCol, cCol+np.cos(-phi)*ra]
-	y = [cRow, cRow-np.sin(-phi)*ra]
-	hl = plt.plot(x, y, color=color, linewidth=lw, linestyle=ls)
-
-	return h,hc,hl
-
-
-def gen_from_distribution():
-
-
-
-	Sigma_sqrt = scipy.linalg.sqrtm(Sigma)
-	Sigma_inv = np.linalg.inv(Sigma)
-	tiled_mu = np.tile(mu,(1000,1)).T
-	samples = np.matmul( Sigma_sqrt, np.random.randn(2,1000) ) + tiled_mu
-	exterior_samples = np.zeros((1,2))
-	interior_samples = np.zeros((1,2))
-
-	for i in range(samples.shape[1]):
-			X = samples[:,i]
-			f_val = 0.5 * np.matmul( np.matmul( (X - mu).T, Sigma_inv), X - mu )
-			if f_val &amp;lt; -np.log(0.05):
-				interior_samples = np.vstack([interior_samples, np.reshape(X,(1,2)) ])
-			else:
-				exterior_samples = np.vstack([exterior_samples, np.reshape(X,(1,2)) ])
-
-	plt.scatter(interior_samples[:,0], interior_samples[:,1], c= 'b')
-	plt.scatter(exterior_samples[:,0], exterior_samples[:,1], c= 'b')
-
-def plot_gauss_ellipse_v2():
-	&quot;&quot;&quot;
-	&quot;&quot;&quot;
-	d = 2 # dimension of samples
-	p = 0.95 # probability
-	num_samples = 1000
-
-	mu = np.array(0,0) # dimension (2,)
-
-	# define covar matrices of dim (2,2)
-	cov_mats[0] = np.array([[1,0],
-							[0,1]])
-	cov_mats[1] = np.array([[2,0],
-							[0,2]])
-	cov_mats[2] = np.array([[0.25, 0.3]
-							[0.3, 1]])
-	cov_mats[3] = np.array([[10., 5]
-							[5., 5]])
-
-	for covar_mat in cov_mats:
-
-
-		# generate and plot 1000 samples
-		generate_gaussian_samples()
-		plt.plot()
-
-		# plot the error ellipse
-		r = np.sqrt(ellipse_const)
-		n_pts = int((2*np.pi) / 0.01)+1
-		theta = np.linspace(0,2*np.pi,n_pts)
-		w1 = r * np.cos(theta)
-		w2 = r * np.sin(theta)
-		w = np.array([w1,w2]).reshape(2,1)
-
-		# transferred back to x coordinates
-		x = scipy.linalg.sqrtm(sigma).dot(w) + mu
-		plt.plot()
-
-
-def unit_test1():
-	&quot;&quot;&quot;
-	&quot;&quot;&quot;
-
-	# plot_gauss_ellipse(mu=np.array([10., 10.]), cov=np.eye(2))
-	# plot_gauss_ellipse(mu=np.array([10., 10.]), cov=np.eye(2)*2.)
-	# plt.show()
-
-	fig()
-
-	plot_gauss_ellipse(mu=np.array([10., 10.]), cov=np.array([[5,0],[0,3]]) )
-	plt.show()
-
-
-
-
-if __name__ == '__main__':
-	unit_test1()
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">error ellipses, uncertainty</summary></entry></feed>
+Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry></feed>

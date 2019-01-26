@@ -149,3 +149,11 @@ $$
 [PDF](http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html).
 
 
+STEREO http://people.scs.carleton.ca/~c_shu/Courses/comp4900d/notes/simple_stereo.pdf
+DEPTH http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineVision_Chapter11.pdf
+STEREO https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
+SFM http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
+JAMES MULTI-VIEW https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf
+
+
+

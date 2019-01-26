@@ -15,15 +15,15 @@ Table of Contents:
 
 <a name='sfmpipeline'></a>
 
-## Localization
+## Localization: Why do we need a map?
 
-Navigation in urban environments requires clever solutions because sensors like GPS can't provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1].
+Navigation in urban environments requires clever solutions because sensors like GPS can't provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1]. One can consider a map to be a "database" or "index" of points and features, and a query to the closest match in database provides your current pose.
 
 In order for an autonomous robot to stay in a specific lane, it needs to know where the lane is. For an autonomous robot to stay in a lane, the localization requirements are in the order of decimeters [1].
 
-I'll review some methods from 2007-2018.
+I'll review some methods from 2007-2019.
 
-## Building a Map
+## How does one build a map?
 
 The dominant method is to learn a detailed map of the environment, and then to use a vehicle’s LIDAR sensor to localize relative to this map [1]. In [1], a "map" was a 2-D overhead view of the road surface, taken in the infrared spectrum with 5-cm resolution. This 2-D grid assigns to each x-y location in the environment an infrared reflectivity value. Thus, their ground map is a orthographic infrared photograph of the ground. To acquire such a map, multiple laser range finders are mounted on a vehicle, pointing downwards at the road surface. Obtain range + infrared reflectivity. GraphSLAM is employed to map roads.
 
@@ -108,6 +108,7 @@ the intensity map are discretized at a spatial resolution of 5cm covering a 30m�
 
 [12] S. Kato, E. Takeuchi, Y. Ishiguro, Y. Ninomiya, K. Takeda, and T. Hamada. An open approach to autonomous vehicles. IEEE Micro, 35(6):60–68, Nov 2015.
 
+[13] Johannes L. Schönberger, Marc Pollefeys, Andreas Geiger, Torsten Sattler. Semantic Visual Localization. 
 
 
 

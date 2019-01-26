@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/robot-localization/">
+  <link rel="canonical" href="http://localhost:4000/robot-localization/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -98,15 +98,15 @@
 
 <p><a name="sfmpipeline"></a></p>
 
-<h2 id="localization">Localization</h2>
+<h2 id="localization-why-do-we-need-a-map">Localization: Why do we need a map?</h2>
 
-<p>Navigation in urban environments requires clever solutions because sensors like GPS can’t provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1].</p>
+<p>Navigation in urban environments requires clever solutions because sensors like GPS can’t provide centimeter-level accuracy.  Precise localization requires fusing signals from sensors like GPS, IMU, wheel odometry, and LIDAR data in concert with pre-built maps [1]. One can consider a map to be a “database” or “index” of points and features, and a query to the closest match in database provides your current pose.</p>
 
 <p>In order for an autonomous robot to stay in a specific lane, it needs to know where the lane is. For an autonomous robot to stay in a lane, the localization requirements are in the order of decimeters [1].</p>
 
-<p>I’ll review some methods from 2007-2018.</p>
+<p>I’ll review some methods from 2007-2019.</p>
 
-<h2 id="building-a-map">Building a Map</h2>
+<h2 id="how-does-one-build-a-map">How does one build a map?</h2>
 
 <p>The dominant method is to learn a detailed map of the environment, and then to use a vehicle’s LIDAR sensor to localize relative to this map [1]. In [1], a “map” was a 2-D overhead view of the road surface, taken in the infrared spectrum with 5-cm resolution. This 2-D grid assigns to each x-y location in the environment an infrared reflectivity value. Thus, their ground map is a orthographic infrared photograph of the ground. To acquire such a map, multiple laser range finders are mounted on a vehicle, pointing downwards at the road surface. Obtain range + infrared reflectivity. GraphSLAM is employed to map roads.</p>
 
@@ -182,6 +182,8 @@ the intensity map are discretized at a spatial resolution of 5cm covering a 30m�
 <p>[11] K. Yoneda, H. Tehrani, T. Ogawa, N. Hukuyama, and S. Mita. LiDAR scan feature for localization with highly precise 3-D map. In IEEE Intelligent Vehicles Symposium Proceedings, pages 1345–1350, June 2014.</p>
 
 <p>[12] S. Kato, E. Takeuchi, Y. Ishiguro, Y. Ninomiya, K. Takeda, and T. Hamada. An open approach to autonomous vehicles. IEEE Micro, 35(6):60–68, Nov 2015.</p>
+
+<p>[13] Johannes L. Schönberger, Marc Pollefeys, Andreas Geiger, Torsten Sattler. Semantic Visual Localization.</p>
 
 
   </article>
