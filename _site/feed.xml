@@ -1,5 +1,177 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-01-26T16:38:31-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
-</subtitle><entry><title type="html">Image Derivatives and the Harris Corner Detector</title><link href="http://johnwlambert.github.io/image-derivatives-harris/" rel="alternate" type="text/html" title="Image Derivatives and the Harris Corner Detector" /><published>2019-01-24T06:01:00-05:00</published><updated>2019-01-24T06:01:00-05:00</updated><id>http://johnwlambert.github.io/image-derivatives-harris</id><content type="html" xml:base="http://johnwlambert.github.io/image-derivatives-harris/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-02-13T03:58:38-05:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+</subtitle><entry><title type="html">Direct Methods for Linear System Solving</title><link href="http://johnwlambert.github.io/direct-methods/" rel="alternate" type="text/html" title="Direct Methods for Linear System Solving" /><published>2019-02-12T06:00:00-05:00</published><updated>2019-02-12T06:00:00-05:00</updated><id>http://johnwlambert.github.io/direct-methods-linear-systems</id><content type="html" xml:base="http://johnwlambert.github.io/direct-methods/">&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;Back Substitution&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;LU Factorization&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bundleadjustment&quot;&gt;Cholesky Factorization&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;sfmpipeline&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;back-substitution-for-triangular-matrices&quot;&gt;Back Substitution for Triangular Matrices&lt;/h2&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;back_substitution&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot; &quot;&quot;&quot;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;back_substitution_demo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;randint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;triu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;randint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;x_est&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;back_substitution&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;lu-decomposition&quot;&gt;LU Decomposition&lt;/h2&gt;
+&lt;p&gt;In the LU Decomposition/Factorization, we seek to find two matrices &lt;script type=&quot;math/tex&quot;&gt;L,U&lt;/script&gt; such that &lt;script type=&quot;math/tex&quot;&gt;A = L * U&lt;/script&gt;, and where &lt;script type=&quot;math/tex&quot;&gt;L&lt;/script&gt; is unit lower triangular (1’s along the diagonal), and where &lt;script type=&quot;math/tex&quot;&gt;U&lt;/script&gt; is upper triangular.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;LU_demo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot; &quot;&quot;&quot;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;randint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LU&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+A =  \begin{bmatrix}  7&amp; 5&amp; 4&amp; 6&amp; 7&amp; 1&amp; 4&amp; 1&amp; 1&amp; 2 \\
+            9&amp; 1&amp; 2&amp; 2&amp; 4&amp; 8&amp; 9&amp; 5&amp; 4&amp; 5 \\
+            6&amp; 5&amp; 6&amp; 2&amp; 1&amp; 5&amp; 6&amp; 2&amp; 7&amp; 4 \\
+            6&amp; 8&amp; 3&amp; 6&amp; 2&amp; 5&amp; 8&amp; 4&amp; 7&amp; 3 \\
+            6&amp; 7&amp; 6&amp; 7&amp; 8&amp; 4&amp; 8&amp; 7&amp; 8&amp; 8 \\
+            4&amp; 4&amp; 4&amp; 4&amp; 5&amp; 2&amp; 1&amp; 7&amp; 4&amp; 2 \\
+            3&amp; 7&amp; 4&amp; 9&amp; 7&amp; 5&amp; 3&amp; 8&amp; 2&amp; 3 \\
+            7&amp; 1&amp; 8&amp; 8&amp; 7&amp; 6&amp; 4&amp; 8&amp; 5&amp; 8 \\
+            4&amp; 5&amp; 3&amp; 5&amp; 1&amp; 4&amp; 6&amp; 4&amp; 3&amp; 3 \\
+            3&amp; 3&amp; 3&amp; 3&amp; 7&amp; 4&amp; 5&amp; 2&amp; 5&amp; 9 \end{bmatrix}, M_0 = \begin{bmatrix} 1.     &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -1.285 &amp;  1.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.857 &amp;  0.        &amp;  1.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.857 &amp;  0.        &amp;  0.        &amp;  1.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.857 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  1.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.571 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 1.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.428 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  1.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -1.    &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  1.        &amp;  0.        &amp;  0.        \\
+                -0.571 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  1.        &amp;  0.        \\
+                -0.428 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  1.       \\
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;LU&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+	&lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot; 
+	Alternatively, we could compute multipliers,
+	update the A matrix entries that change 
+	(lower square block), and then store the
+	multipliers in the empty, lower triangular part of A.
+	&quot;&quot;&quot;&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+	&lt;span class=&quot;c&quot;&gt;# loop over the columns of U&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+		&lt;span class=&quot;c&quot;&gt;# compute multipliers for each row under the diagonal&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+			&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+		&lt;span class=&quot;c&quot;&gt;# must update the matrix to compute&lt;/span&gt;
+		&lt;span class=&quot;c&quot;&gt;# multipliers for next column&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;pdb&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_trace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+	&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eye&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;c&quot;&gt;# left-multiply higher M matrices&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;k&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linalg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Suppose we wish to see how &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt; changes when &lt;script type=&quot;math/tex&quot;&gt;M_0&lt;/script&gt; is applied: the zero’th column is now upper triangular.&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+M_0 A = \begin{bmatrix} 7. &amp;  5. &amp;  4. &amp;  6. &amp;  7. &amp;  1. &amp;  4. &amp;  1. &amp;  1. &amp;  2.  \\
+			 0. &amp; -5.4&amp; -3.1&amp; -5.7&amp; -5. &amp;  6.7&amp;  3.9&amp;  3.7&amp;  2.7&amp;  2.4 \\
+			 0. &amp;  0.7&amp;  2.6&amp; -3.1&amp; -5. &amp;  4.1&amp;  2.6&amp;  1.1&amp;  6.1&amp;  2.3 \\
+			 0. &amp;  3.7&amp; -0.4&amp;  0.9&amp; -4. &amp;  4.1&amp;  4.6&amp;  3.1&amp;  6.1&amp;  1.3 \\
+			 0. &amp;  2.7&amp;  2.6&amp;  1.9&amp;  2. &amp;  3.1&amp;  4.6&amp;  6.1&amp;  7.1&amp;  6.3 \\
+			 0. &amp;  1.1&amp;  1.7&amp;  0.6&amp;  1. &amp;  1.4&amp; -1.3&amp;  6.4&amp;  3.4&amp;  0.9 \\
+			 0. &amp;  4.9&amp;  2.3&amp;  6.4&amp;  4. &amp;  4.6&amp;  1.3&amp;  7.6&amp;  1.6&amp;  2.1 \\
+			 0. &amp; -4. &amp;  4. &amp;  2. &amp;  0. &amp;  5. &amp;  0. &amp;  7. &amp;  4. &amp;  6.  \\
+			 0. &amp;  2.1&amp;  0.7&amp;  1.6&amp; -3. &amp;  3.4&amp;  3.7&amp;  3.4&amp;  2.4&amp;  1.9 \\
+			 0. &amp;  0.9&amp;  1.3&amp;  0.4&amp;  4. &amp;  3.6&amp;  3.3&amp;  1.6&amp;  4.6&amp;  8.1 \end{bmatrix}, A = \begin{bmatrix}  7&amp; 5&amp; 4&amp; 6&amp; 7&amp; 1&amp; 4&amp; 1&amp; 1&amp; 2 \\
+            9&amp; 1&amp; 2&amp; 2&amp; 4&amp; 8&amp; 9&amp; 5&amp; 4&amp; 5 \\
+            6&amp; 5&amp; 6&amp; 2&amp; 1&amp; 5&amp; 6&amp; 2&amp; 7&amp; 4 \\
+            6&amp; 8&amp; 3&amp; 6&amp; 2&amp; 5&amp; 8&amp; 4&amp; 7&amp; 3 \\
+            6&amp; 7&amp; 6&amp; 7&amp; 8&amp; 4&amp; 8&amp; 7&amp; 8&amp; 8 \\
+            4&amp; 4&amp; 4&amp; 4&amp; 5&amp; 2&amp; 1&amp; 7&amp; 4&amp; 2 \\
+            3&amp; 7&amp; 4&amp; 9&amp; 7&amp; 5&amp; 3&amp; 8&amp; 2&amp; 3 \\
+            7&amp; 1&amp; 8&amp; 8&amp; 7&amp; 6&amp; 4&amp; 8&amp; 5&amp; 8 \\
+            4&amp; 5&amp; 3&amp; 5&amp; 1&amp; 4&amp; 6&amp; 4&amp; 3&amp; 3 \\
+            3&amp; 3&amp; 3&amp; 3&amp; 7&amp; 4&amp; 5&amp; 2&amp; 5&amp; 9 \end{bmatrix} %]]&gt;&lt;/script&gt;
+I’m actually rounding the entries above, i.e. showing the output of:&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;round&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;A fact that makes computing the inverses of these elementary GE matrices trivial: simply negate the spike entries below the diagonal.&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+M_0 = \begin{bmatrix} 1.     &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -1.285 &amp;  1.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.857 &amp;  0.        &amp;  1.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.857 &amp;  0.        &amp;  0.        &amp;  1.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.857 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  1.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.571 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 1.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -0.428 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  1.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                -1.    &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  1.        &amp;  0.        &amp;  0.        \\
+                -0.571 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  1.        &amp;  0.        \\
+                -0.428 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  1.       \\
+\end{bmatrix},  M_0^{-1} = \begin{bmatrix} 1.     &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                1.285 &amp;  1.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                0.857 &amp;  0.        &amp;  1.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                0.857 &amp;  0.        &amp;  0.        &amp;  1.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                0.857 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  1.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                0.571 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 1.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                0.428 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  1.        &amp;  0.        &amp;  0.        &amp;  0.        \\
+                1.    &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  1.        &amp;  0.        &amp;  0.        \\
+                0.571 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  1.        &amp;  0.        \\
+                0.428 &amp;  0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp; 0.        &amp;  0.        &amp;  0.        &amp;  0.        &amp;  1.       \\
+\end{bmatrix} %]]&gt;&lt;/script&gt;
+Indeed, &lt;script type=&quot;math/tex&quot;&gt;L&lt;/script&gt; is lower-triangular and &lt;script type=&quot;math/tex&quot;&gt;U&lt;/script&gt; is upper-triangular, as desired:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+L = \begin{bmatrix}   1.&amp;    0.&amp;   0.&amp;    0.&amp;   0.&amp;    0.&amp;    0.&amp;    0.&amp;   0. &amp; 0. \\
+    1.&amp;    1.&amp;    0.&amp;   0.&amp;    0.&amp;    0.&amp;    0.&amp;    0.&amp;   0.&amp; 0. \\
+    1.&amp;   0.&amp;    1.&amp;   0.&amp;   0.&amp;   0.&amp;    0.&amp;    0.&amp;    0.&amp; 0. \\
+    1.&amp;   -1.&amp;   -1.&amp;    1.&amp;   0.&amp;    0.&amp;   0.&amp;   0.&amp;   0.&amp; 0. \\
+    1.&amp;   0.&amp;    0.&amp;   0.&amp;    1.&amp;   0.&amp;    0.&amp;   0.&amp;    0. &amp; 0. \\
+    1.&amp;   0.&amp;    0.&amp;   0.&amp;    1.&amp;    1.&amp;    0.&amp;    0.&amp;    0.&amp; 0. \\
+    0.&amp;   -1.&amp;   -0.&amp;   0.&amp;   -4.&amp;  -69.&amp;    1.&amp;   0.&amp;   0. &amp; 0. \\
+    1.&amp;    1.&amp;    3.&amp;   -2.&amp;  -19.&amp; -249.&amp;    4.&amp;    1.&amp;   0. &amp; 0. \\
+    1.&amp;   0.&amp;   0.&amp;    0.&amp;   -5.&amp;  -67.&amp;    1.&amp;    0.&amp;    1.&amp; 0. \\
+    0.&amp;   0.&amp;    0.&amp;   -0.&amp;    6.&amp;   53.&amp;   -1.&amp;   0.&amp;   -1.&amp; 1. \end{bmatrix} , U =  \begin{bmatrix}  7. &amp;    5. &amp;    4. &amp;    6. &amp;    7. &amp;    1. &amp;    4. &amp;    1. &amp;  1. &amp;    2.  \\
+   0. &amp;   -5.4&amp;   -3.1&amp;   -5.7&amp;   -5. &amp;    6.7&amp;    3.9&amp;    3.7&amp;  2.7&amp;    2.4 \\
+   0. &amp;    0. &amp;    2.2&amp;   -3.9&amp;   -5.7&amp;    5. &amp;    3.1&amp;    1.6&amp;   6.5&amp;    2.6 \\
+   0. &amp;    0. &amp;    0. &amp;   -7.7&amp;  -14.2&amp;   14.7&amp;   10.9&amp;    7.6&amp;   15.8&amp;    6.1 \\
+   0. &amp;    0. &amp;    0. &amp;    0. &amp;    0.6&amp;    5.7&amp;    6.2&amp;    8. &amp;  7.1&amp;    6.9 \\
+   0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;   -0.5&amp;   -3.8&amp;    3. &amp;  -0.7&amp;   -2.9 \\
+   0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp; -230.1&amp;  247.9&amp; -15.8&amp; -169.  \\
+   0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;   33.3&amp; 27.7&amp;    8.8 \\
+   0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp; -3.7&amp;   -0.8 \\
+   0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp;    0. &amp; 0. &amp;    3.   \end{bmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;There is a very small amount of numerical error introduced in the process:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i,j} (A - LU) = 2.80 \times 10^{-12}&lt;/script&gt;
+
+&lt;h2 id=&quot;cholesky&quot;&gt;Cholesky&lt;/h2&gt;</content><author><name></name></author><summary type="html">LU, Cholesky, QR</summary></entry><entry><title type="html">Image Derivatives and the Harris Corner Detector</title><link href="http://johnwlambert.github.io/image-derivatives-harris/" rel="alternate" type="text/html" title="Image Derivatives and the Harris Corner Detector" /><published>2019-01-24T06:01:00-05:00</published><updated>2019-01-24T06:01:00-05:00</updated><id>http://johnwlambert.github.io/image-derivatives-harris</id><content type="html" xml:base="http://johnwlambert.github.io/image-derivatives-harris/">&lt;p&gt;Table of Contents:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#sfmpipeline&quot;&gt;Image Derivatives&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#costfunctions&quot;&gt;Summed-Square Difference Error&lt;/a&gt;&lt;/li&gt;
@@ -1333,308 +1505,4 @@ def batch_NN_loss(x, y, cuda):
 
 &lt;p&gt;[3] Dynamic Graph CNN.&lt;/p&gt;
 
-&lt;p&gt;https://www.mathworks.com/matlabcentral/fileexchange/6110-toolbox-fast-marching&lt;/p&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry><entry><title type="html">Dimensionality Reduction</title><link href="http://johnwlambert.github.io/dimensionality-reduction/" rel="alternate" type="text/html" title="Dimensionality Reduction" /><published>2018-12-27T06:00:00-05:00</published><updated>2018-12-27T06:00:00-05:00</updated><id>http://johnwlambert.github.io/dimensionality-reduction</id><content type="html" xml:base="http://johnwlambert.github.io/dimensionality-reduction/">&lt;p&gt;Table of Contents:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#need-for-dr&quot;&gt;Need for Dimensionality Reduction&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#pca&quot;&gt;PCA&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#nonlinear-dr-methods&quot;&gt;Nonlinear Dimensionality Reduction Methods&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#isomap&quot;&gt;ISOMAP&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#lle&quot;&gt;LLE&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#sne&quot;&gt;SNE&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#t-sne&quot;&gt;t-SNE&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;a name=&quot;need-for-dr&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;the-need-for-dimensionality-reduction&quot;&gt;The Need for Dimensionality Reduction&lt;/h2&gt;
-
-&lt;p&gt;When the dimensionality of data points is high, interpretation or visualization of the data can be quite challenging.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;pca&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;linear-methods&quot;&gt;Linear Methods&lt;/h3&gt;
-
-&lt;h2 id=&quot;principal-components-analysis-pca&quot;&gt;Principal Components Analysis (PCA)&lt;/h2&gt;
-
-&lt;p&gt;PCA is an algorithm for linear dimensionality reduction that can be surprisingly confusing. There are many different ways to explain the algorithm, and it is not new – Karl Pearson (University College, London) introduced the ideas in 1901 and Harold Hostelling (Columbia) developed the terminology and more of the math about principal components in 1933.&lt;/p&gt;
-
-&lt;p&gt;To understand PCA, we must first consider data as points in a Euclidean space.  Suppose the lies in a high-dimensional subspace, but the real space of the data could be low-dimensional. We would like to identify the real, lower-dim subspace where lower-dim structure corresponds to linear subspaces in the high-dim space.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;PCA has one key hyperparameter: the dimensionality of the lower-dim space.&lt;/strong&gt; How many dimensions do we need to explain most of the variability in the data?&lt;/p&gt;
-
-&lt;p&gt;The key idea is that we will project the points from high-D to low-D, and then when we project them back into high-D, the “reconstruction error” should be minimized.&lt;/p&gt;
-
-&lt;p&gt;\item Pearson (1901) – find a single lower dimensional subspace that captures most of the variation in the data
-\item What should be the dimensionality of the lower-dim space?&lt;/p&gt;
-
-&lt;p&gt;Acts as a proxy for the real space&lt;/p&gt;
-
-&lt;p&gt;Minimize errors introudced by projecting the data into this subspace&lt;/p&gt;
-
-&lt;p&gt;Assumption: data has zero mean, ``centered data’’&lt;/p&gt;
-
-&lt;p&gt;Move the origin to the middle of the data, the data will live in the hyperplane. Becomes subspace in new translated coordinate system&lt;/p&gt;
-
-&lt;p&gt;As a consequence, variance becomes just the 2nd moment&lt;/p&gt;
-
-&lt;p&gt;Data points in 2D -&amp;gt; project onto the best fit line (projection onto 1D), then assess how well the data looks now when you lay out the projected points onto the best fit line (this is the reconstruction)
-Bring it back onto the best fit line (multiply by vector)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_{||} = vv^Tx&lt;/script&gt;
-
-&lt;p&gt;Minimize an error function: error equivalent to maximizing the variance of the projected data&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-E = \frac{1}{M} \sum\limits_I \sum\limits_M ... = &lt; \|x^{\prime \mu} - x_{||}^{\prime \mu}\|^2 &gt;_{\mu} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;$I$ dimensions
-WHY IS THIS?
-Trying to find the directions of maximum variance
-Knowing the covariance matrix tells us about the 2nd order moments, but not about the highest-order structure of the data (unless data is normal)&lt;/p&gt;
-
-&lt;p&gt;If the covariance matrix is diagonal, then finding the direction of maximum variance is easy&lt;/p&gt;
-
-&lt;p&gt;Rotate your coordinate system so that the covariance matrix becomes diagonal.&lt;/p&gt;
-
-&lt;p&gt;This becomes an eigenvalue problem: the eigenvectors of the covariance matrix point in the directions of maximal variance?&lt;/p&gt;
-
-&lt;p&gt;Solve all top-k possible subspaces&lt;/p&gt;
-
-&lt;p&gt;Valid for all of them&lt;/p&gt;
-
-&lt;p&gt;Check the error depending on many dimensions we used. A tradeoff
-$\mathbf{V}^T \mathbf{V} = I$ because $\mathbf{V}$ is an orthonormal matrix
-Projection $x_{||} = \mathbf{V}y = \mathbf{V}\mathbf{V}^Tx$&lt;/p&gt;
-
-&lt;p&gt;Projection operator = $\mathbf{V}\mathbf{V}^T$&lt;/p&gt;
-
-&lt;p&gt;But in general $P$ is of low rank and loses info&lt;/p&gt;
-
-&lt;p&gt;Variance and reconstruction error&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-&lt;x^Tx&gt; - &lt;y_{||}^T y_{||}&gt; %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Want to be able to maximize the variance in the projected subspace… (FIND OUT WHY THAT IS)&lt;/p&gt;
-
-&lt;p&gt;Spectral analysis of the covariance matrix:
-if covariance matrix is symmetric, it always has real eigenvalues and orthogonal eigenvectors&lt;/p&gt;
-
-&lt;p&gt;The total variance fo the data is just the sum of the eigenvalues of the covariance matrix, all non-negative&lt;/p&gt;
-
-&lt;p&gt;Have diagonalized the covariance matrix, aligned, which was what we set out to do&lt;/p&gt;
-
-&lt;p&gt;This is an extremal trace problem?&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_i \lambda_i \sum\limits_p (v_{ip}^{\prime})^2&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;= \mbox{tr }(V^{\prime T} \Lambda V^{\prime})&lt;/script&gt;
-
-&lt;p&gt;To maximize the variance, need to put as mucch weight as possible on the large eigenvalues&lt;/p&gt;
-
-&lt;p&gt;The reconstruction error is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sum\limits_{i=P+1}^I \lambda_i&lt;/script&gt;
-
-&lt;p&gt;Aligns the axis with your data, so that for any $P$, can find $P$-dimensional subspace&lt;/p&gt;
-
-&lt;h3 id=&quot;eigenvectors-solve-pca&quot;&gt;Eigenvectors Solve PCA&lt;/h3&gt;
-
-&lt;p&gt;&lt;strong&gt;Main Lesson from PCA&lt;/strong&gt;: For any P, the optimal $P$-dimensional subspace is the one spanned by the first $P$ eigenvectors of the covariance matrix&lt;/p&gt;
-
-&lt;p&gt;The eigenvectors give us the frame that we need – align with it&lt;/p&gt;
-
-&lt;h3 id=&quot;pca-examples&quot;&gt;PCA Examples&lt;/h3&gt;
-
-&lt;p&gt;First principal component does not always have semantic meaning (combination of arts, recreation, transportation, health, and housing explain the ratings of places the most)&lt;/p&gt;
-
-&lt;p&gt;This is simply what the analysis gives.&lt;/p&gt;
-
-&lt;p&gt;The math is beautiful, but semantic meaning is not always clear. Sparse PCA tries to fix this (linear combinations of only a small number of variables)&lt;/p&gt;
-
-&lt;p&gt;Geography of where an individual came from is reflected in their genetic material&lt;/p&gt;
-
-&lt;p&gt;Machinery gives us a way to understand distortions of changes: a recipe encoded as a matrix&lt;/p&gt;
-
-&lt;p&gt;PCA works very well here&lt;/p&gt;
-
-&lt;p&gt;View matrices as points in high-dimensional space&lt;/p&gt;
-
-&lt;p&gt;Recover grid structure for deformed sphere&lt;/p&gt;
-
-&lt;p&gt;Get circular pattern of galloping horse from points&lt;/p&gt;
-
-&lt;h3 id=&quot;svd-trick&quot;&gt;SVD Trick&lt;/h3&gt;
-
-&lt;p&gt;What if we have fewer data points than dimensions &lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-M&lt;I %]]&gt;&lt;/script&gt;? Think of images…&lt;/p&gt;
-
-&lt;p&gt;By SVD, transpose your data&lt;/p&gt;
-
-&lt;p&gt;Think of your data as rows, not columns&lt;/p&gt;
-
-&lt;p&gt;Data becomes first pixel across 1000 images&lt;/p&gt;
-
-&lt;p&gt;Covariance matrix &lt;script type=&quot;math/tex&quot;&gt;C_2&lt;/script&gt; of transposed problem&lt;/p&gt;
-
-&lt;p&gt;Rows of transformed X (PCA’d X) are just eigenvectors of &lt;script type=&quot;math/tex&quot;&gt;C_1&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Corresponding eigenvalues are just those of &lt;script type=&quot;math/tex&quot;&gt;C_2&lt;/script&gt;, scaled by &lt;script type=&quot;math/tex&quot;&gt;I/M&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;ntroduced by Pearson (1901)
-and Hotelling (1933) to
-describe the variation in a set
-of multivariate data in terms of
-a set of uncorrelated variables.
-PCA looks for a single lower
-dimensional subspace that
-captures most of the variation
-in the data.
-Specifically, we aim to
-minimize the error introduced
-by projecting the data into this
-linear subspace.&lt;/p&gt;
-
-&lt;p&gt;Use spectral analysis of the covariance matrix C of the
-data
-For any integer p, the error-minimizing p-dimensional
-subspace is the one spanned by the first p eigenvectors
-of the covariance matrix&lt;/p&gt;
-
-&lt;p&gt;Eigenfaces (PCA on face images)&lt;/p&gt;
-
-&lt;p&gt;M. Turk and A. Pentland, Face Recognition using Eigenfaces, CVPR 1991&lt;/p&gt;
-
-&lt;p&gt;https://www.stat.cmu.edu/~cshalizi/uADA/12/lectures/ch18.pdf&lt;/p&gt;
-
-&lt;p&gt;http://theory.stanford.edu/~tim/s17/l/l8.pdf&lt;/p&gt;
-
-&lt;h2 id=&quot;multi-dimensional-scaling-mds&quot;&gt;Multi-Dimensional Scaling (MDS)&lt;/h2&gt;
-
-&lt;p&gt;&lt;a name=&quot;nonlinear-dr-methods&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;non-linear-methods&quot;&gt;Non-Linear Methods&lt;/h2&gt;
-
-&lt;p&gt;Many data sets contain essential nonlinear structures and unfortunately these structures are invisible to linear methods like PCA [1].&lt;/p&gt;
-
-&lt;p&gt;For example, Euclidean distance between points cannot disentangle or capture the structure of manifolds like the “swiss roll.” Instead, we need geodesic distance: distance directly on the manifold.&lt;/p&gt;
-
-&lt;p&gt;Furthermore, PCA cares about large distances. The goal is to maximize variance, and variance comes from things that are far apart. If you care about small distances, PCA is the wrong tool to use.&lt;/p&gt;
-
-&lt;h2 id=&quot;creating-graphs-from-geometric-point-data&quot;&gt;Creating Graphs from Geometric Point Data&lt;/h2&gt;
-
-&lt;p&gt;Rely upon neighborhood relations. A graph can be constructed via (1) k-nearest neighbors or (2) &lt;script type=&quot;math/tex&quot;&gt;\epsilon&lt;/script&gt;-balls.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;isomap&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;isometric-feature-mapping-isomap&quot;&gt;Isometric Feature Mapping (ISOMAP)&lt;/h3&gt;
-
-&lt;p&gt;In the case of the swiss roll, Isometric Feature Mapping (ISOMAP) produces an unrolled, planar version of data that respects distances [5]. This is “isometric” unrolling.&lt;/p&gt;
-
-&lt;p&gt;The ISOMAP algorithm involves three main steps, as outlined by Guibas [1]:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;(1.) Form a nearest-neighbor graph &lt;script type=&quot;math/tex&quot;&gt;\mathcal{G}&lt;/script&gt; on the original data points, weighing the edges by their original distances &lt;script type=&quot;math/tex&quot;&gt;d_x(i,j)&lt;/script&gt;. One can build the NN-graph either (A) with a fixed radius/threshold &lt;script type=&quot;math/tex&quot;&gt;\epsilon&lt;/script&gt;, or by using a (B) fixed # of neighbors.&lt;/li&gt;
-  &lt;li&gt;(2.) Estimate the geodesic distances &lt;script type=&quot;math/tex&quot;&gt;d_{\mathcal{G}}(i,j)&lt;/script&gt; between all pairs of points on the sampled manifold by computing their shortest path distances in the graph &lt;script type=&quot;math/tex&quot;&gt;\mathcal{G}&lt;/script&gt;. This can be done with classic graph algorithms for all-pairs shortest-path algorithm (APSP)s: Floyd/Warshall’s algorithm or Dijkstra’s algorithm. Initially, all pairs given distance &lt;script type=&quot;math/tex&quot;&gt;\infty&lt;/script&gt;, except for neighbors, which are connected.&lt;/li&gt;
-  &lt;li&gt;(3.) Construct an embedding of the data in &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;-dimensional Euclidean space that best preserves the inter-point distances &lt;script type=&quot;math/tex&quot;&gt;d_{\mathcal{G}}(i,j)&lt;/script&gt;. This is performed via Multi-Dimensional Scaling (MDS).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ISOMAP actually comes with recovery guarantees that discovered structure equal to actual structure of the manifold, especially as the graph point density increases. MDS and ISOMAP both converge, but ISOMAP gets there more quickly.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;lle&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;locally-linear-embedding-lle&quot;&gt;Locally Linear Embedding (LLE)&lt;/h3&gt;
-
-&lt;p&gt;LLE is a method that learns linear weights that locally reconstruct points in order to map points to a lower dimension [1,4]. The method requires solving two successive optimization problems and requires a connectivity graph. Almost all methods start with the nearest neihgbor graph, since it’s the only thing that we can trust.&lt;/p&gt;
-
-&lt;p&gt;In the &lt;strong&gt;first step of LLE&lt;/strong&gt;, we find weights that reconstruct each data point from its neighbors:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-\underset{w}{\mbox{minimize }} &amp; \| x_i - \sum\limits_{j \in N(i)} w_{ij}x_j \|^2 \\
-\mbox{subject to} &amp; \sum\limits_j w_{ij} = 1
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;We can use linear least squares with Lagrange multipliers to obtain optimal linear combinations.&lt;/p&gt;
-
-&lt;p&gt;In the &lt;strong&gt;second step of LLE&lt;/strong&gt;, We then &lt;strong&gt;fix these weights&lt;/strong&gt; &lt;script type=&quot;math/tex&quot;&gt;w_{ij}&lt;/script&gt; while optimizing for &lt;script type=&quot;math/tex&quot;&gt;x_i^{\prime}&lt;/script&gt;. We try to find low-dimensional coordinates:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{array}{ll}
-\underset{x_1^{\prime}, \dots, x_n^{\prime}}{\mbox{minimize }} \sum\limits_i \| x_i^{\prime} - \sum\limits_{j \in N(i)} w_{ij}x_j^{\prime} \|^2
-\end{array}&lt;/script&gt;
-
-&lt;p&gt;This is a sparse eigenvalue problem that requires constraints in order to prevent degenerate solutions:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;(1.) The coordinates &lt;script type=&quot;math/tex&quot;&gt;x_i^{\prime}&lt;/script&gt; can be translated by a constant
-displacement without affecting the cost. We can remove this degree of freedom by requiring the coordinates to be centered on the origin.&lt;/li&gt;
-  &lt;li&gt;(2.) We constrain the embedding vectors to have unit covariance.
-The optimization problem becomes:&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{array}{ll}
-\underset{x_1^{\prime}, \dots, x_n^{\prime}}{\mbox{minimize }} &amp; \sum\limits_i \| x_i^{\prime} - \sum\limits_{j \in N(i)} w_{ij}x_j^{\prime} \|^2 \\
-\mbox{subject to} &amp; \sum\limits_i x_i^{\prime} = 0 \\
-&amp; \frac{1}{n} \sum\limits_i x_i^{\prime}x_i^{\prime T} = I
-\end{array} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;These weights &lt;script type=&quot;math/tex&quot;&gt;w_{ij}&lt;/script&gt; capture the local shape. As Roweis and Saul point out, “&lt;em&gt;LLE illustrates a general principle of manifold learning…that overlapping
-local neighborhoods – collectively analyzed – can provide information about global
-geometry&lt;/em&gt;”” [4].&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;sne&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;stochastic-neighbor-embedding-sne&quot;&gt;Stochastic Neighbor Embedding (SNE)&lt;/h3&gt;
-
-&lt;p&gt;The Stochastic Neighbor Embedding (SNE) converts high-dimensional points to low-dimensional points by preserving distances. The method takes a probabilistic point of view: high-dimensional Euclidean point distances are converted into conditional probabilities that represent similarities [2,3].&lt;/p&gt;
-
-&lt;p&gt;Similarity of datapoints in &lt;strong&gt;high himension&lt;/strong&gt;: The conditional probability is given by&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p_{j \mid i} = \frac{\mbox{exp }\big( - \frac{\|x_i - x_j\|^2}{2 \sigma_i^2}\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \frac{\|x_i - x_k\|^2}{2 \sigma_i^2} \big)}&lt;/script&gt;
-
-&lt;p&gt;Similarity of datapoints in &lt;strong&gt;the low dimension&lt;/strong&gt;:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;q_{j \mid i} = \frac{\mbox{exp }\big( - \|y_i - y_j\|^2\big) }{ \sum\limits_{k \neq i} \mbox{exp }\big( - \|y_i - y_k\|^2 \big)}&lt;/script&gt;
-
-&lt;p&gt;If similarities between &lt;script type=&quot;math/tex&quot;&gt;x_i,x_j&lt;/script&gt; are correctly mapped to similarities between &lt;script type=&quot;math/tex&quot;&gt;y_i,y_j&lt;/script&gt; by SNE, then the conditional probabilities should be equal: &lt;script type=&quot;math/tex&quot;&gt;q_{j \mid i} = p_{j \mid i}&lt;/script&gt;.&lt;/p&gt;
-
-&lt;p&gt;SNE seeks minimize the following cost function using gradient descent, which measures the dissimilarity between the two distributions (Kullback-Leibler divergence):&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;C = \sum\limits_i KL(P_i || Q_i) = \sum\limits_i \sum\limits_j p_{j \mid i} \mbox{ log } \frac{p_{j \mid i}}{q_{j \mid i}}&lt;/script&gt;
-
-&lt;p&gt;This is known as asymetric SNE. The gradient turns out to be analytically simple:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial C}{\partial y_i} = 2 \sum\limits_j (p_{j \mid i} - q_{j \mid i} - p_{i \mid j} - q_{i \mid j} )(y_i - y_j)&lt;/script&gt;
-
-&lt;p&gt;However, the Kullback-Leibler divergence is not symmetric, so a formulation with a joint distribution can be made.&lt;/p&gt;
-
-&lt;p&gt;&lt;a name=&quot;t-sne&quot;&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;t-sne&quot;&gt;t-SNE&lt;/h3&gt;
-
-&lt;p&gt;An improvement to SNE is t-Distributed Stochastic Neighbor Embedding (t-SNE). t-SNE employs a Gaussian in the high-dimension, but a t-Student distribution in low-dim. The t-Student distribution has longer tails than a Gaussian and is thus happier to have points far away than a Gaussian. The motivation for doing so is that in low-D, you have have less freedom than you would in the high-dimension to put many things closeby. This is because there is not much space around (crowded easily), so we penalize having points far away less.&lt;/p&gt;
-
-&lt;p&gt;The joint distribution in the low-distribution is:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;q_{ij} = \frac{ (1+ \| y_i −y_j \|^2)^{−1} }{ \sum\limits_{k \neq l} (1+ \|y_k −y_l\|^2)^{−1} }&lt;/script&gt;
-
-&lt;h3 id=&quot;mnist-examples&quot;&gt;MNIST examples&lt;/h3&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;p&gt;[1] Leonidas Guibas. &lt;em&gt;Multi-Dimensional Scaling, Non-Linear Dimensionality Reduction&lt;/em&gt;. Class lectures of CS233: Geometric and Topological Data Analysis, taught at Stanford University in 18 April 2018.&lt;/p&gt;
-
-&lt;p&gt;[2] Geoffrey Hinton and Sam Roweis. &lt;em&gt;Stochastic Neighbor Embedding&lt;/em&gt;. Advances in Neural Information Processing Systems (NIPS) 2003, pages 857–864. &lt;a href=&quot;http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf&quot;&gt;http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[3] L.J.P. van der Maaten and G.E. Hinton. &lt;em&gt;Visualizing High-Dimensional Data Using t-SNE&lt;/em&gt;. Journal of Machine Learning Research 9 (Nov):2579-2605, 2008.&lt;/p&gt;
-
-&lt;p&gt;[4] Sam T. Roweis and Lawrence K. Saul. &lt;em&gt;Nonlinear Dimensionality Reduction by Locally Linear Embedding&lt;/em&gt;. Science Magazine, Vol. 290,  22 Dec. 2000.&lt;/p&gt;
-
-&lt;p&gt;[5] J. B. Tenenbaum, V. de Silva and J. C. Langford. &lt;em&gt;A Global Geometric Framework for Nonlinear Dimensionality Reduction&lt;/em&gt;. Science 290 (5500): 2319-2323, 22 December 2000. &lt;a href=&quot;http://web.mit.edu/cocosci/Papers/sci_reprint.pdf&quot;&gt;PDF&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[6] Laurenz Wiskott. &lt;em&gt;Principal Component Analysis&lt;/em&gt;. 11 March 2004. &lt;a href=&quot;https://pdfs.semanticscholar.org/d657/68e1dad46bbdb5cfb17eb19eb07cc0f5947c.pdf&quot;&gt;Online PDF&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;[7] Karl Pearson. &lt;em&gt;On Lines and Planes of Closest Fit to Systems of Points in Space&lt;/em&gt;. 1901. Philosophical Magazine. 2 (11): 559–572.&lt;/p&gt;
-
-&lt;p&gt;[8] H Hotelling. &lt;em&gt;Analysis of a complex of statistical variables into principal components&lt;/em&gt;. 1933. Journal of Educational Psychology, 24, 417–441, and 498–520.
-Hotelling, H (1936). “Relations between two sets of variates”. Biometrika. 28 (3/4): 321–377. doi:10.2307/2333955. JSTOR 2333955.&lt;/p&gt;</content><author><name></name></author><summary type="html">PCA, geodesic distances, ISOMAP, LLE, SNE, t-SNE</summary></entry></feed>
+&lt;p&gt;https://www.mathworks.com/matlabcentral/fileexchange/6110-toolbox-fast-marching&lt;/p&gt;</content><author><name></name></author><summary type="html">PointNet, SPGN, SPLATNet, Dynamic Graph Learning</summary></entry></feed>
