@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/lie-groups/">
+  <link rel="canonical" href="http://localhost:4000/lie-groups/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -110,6 +110,17 @@
 
 <script type="math/tex; mode=display">y_w = {}^{w}T_{b} y_b</script>
 
+<h2 id="what-is-a-group">What is a <em>group</em>?</h2>
+<p>A group is a set <script type="math/tex">G</script>, with an operation of (binary) multiplication <script type="math/tex">\circ</script> on elements of <script type="math/tex">G</script> which is:</p>
+<ul>
+  <li>closed: If <script type="math/tex">g_1, g_2 \in G</script> then also <script type="math/tex">g_1 \circ g_2 \in G</script>;</li>
+  <li>associative: <script type="math/tex">(g_1 \circ g_2) \circ g_3 = g_1 \circ (g_2 \circ g_3)</script>, for all <script type="math/tex">g_1, g_2, g_3 \in G</script>;</li>
+  <li>unit element <script type="math/tex">e</script>: <script type="math/tex">e \circ g = g \circ e = g</script>, for all <script type="math/tex">g \in G</script>;</li>
+  <li>invertible: For every element <script type="math/tex">g \in G</script>, there exists an element <script type="math/tex">g^{−1} \in G</script> such that <script type="math/tex">g \circ g^{−1} = g^{−1} \circ g = e</script>.</li>
+</ul>
+
+<p>More details can be found in [5].</p>
+
 <p><a name="liegroups"></a></p>
 
 <h2 id="lie-groups">Lie Groups</h2>
@@ -164,12 +175,12 @@ Let’s move from the body frame <script type="math/tex">b</script> to a target 
 <h3 id="so3">SO(3)</h3>
 
 <p>There are several well-known parameterizations of <script type="math/tex">R \in SO(3)</script>:</p>
-<ul>
-  <li>(1.) <script type="math/tex">R \in \mathbf{R}^{3 \times 3}</script> full rotation matrix, 9 parameters – there must be 6 constraints</li>
-  <li>(2.) Euler angles, e.g. <script type="math/tex">(\phi, \theta, \psi)</script>, so 3 parameters</li>
-  <li>(3.) Angle-Axis parameters <script type="math/tex">(\vec{a}, \phi)</script>, which is 4 parameters and 1 constraint (unit length)</li>
-  <li>(4.) Quaternions (<script type="math/tex">q_0,q_1,q_2,q_3)</script>, 4 parameters and 1 constraint (unit length)</li>
-</ul>
+<ol>
+  <li><script type="math/tex">R \in \mathbf{R}^{3 \times 3}</script> full rotation matrix, 9 parameters – there must be 6 constraints</li>
+  <li>Euler angles, e.g. <script type="math/tex">(\phi, \theta, \psi)</script>, so 3 parameters</li>
+  <li>Angle-Axis parameters <script type="math/tex">(\vec{a}, \phi)</script>, which is 4 parameters and 1 constraint (unit length)</li>
+  <li>Quaternions (<script type="math/tex">q_0,q_1,q_2,q_3)</script>, 4 parameters and 1 constraint (unit length)</li>
+</ol>
 
 <p>There are only 3 degrees of freedom in describing a rotation. But this object doesn’t live in 3D space. It is a 3D manifold, embedded in a 4-D Euclidean space.</p>
 
@@ -235,7 +246,7 @@ T = \begin{bmatrix} x_w \\ y_w \\ 1 \end{bmatrix} = \begin{bmatrix}
 
 <h3 id="se3">SE(3)</h3>
 
-<p>The real space <script type="math/tex">SE(3)</script> is a 6-dimensional manifold. Its dimensions is exactly the number of degrees of freedom of a free-floating rigid body in space [3]. <script type="math/tex">SE(3)</script> can be parameterized with a <script type="math/tex">4 \times 4</script> matrix as follows:</p>
+<p>The set of rigid body motions, or special Euclidean transformations, is a (Lie) group, the so-called special Euclidean group, typically denoted as SE(3). The real space <script type="math/tex">SE(3)</script> is a 6-dimensional manifold. Its dimensions is exactly the number of degrees of freedom of a free-floating rigid body in space [3]. <script type="math/tex">SE(3)</script> can be parameterized with a <script type="math/tex">4 \times 4</script> matrix as follows:</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{bmatrix}
@@ -294,7 +305,7 @@ I & -p \\
 
 <script type="math/tex; mode=display">\Omega^T = (R^T \dot{R} )^T = \dot{R}^TR  = -R^T \dot{R}  = -\Omega</script>
 
-<p>Skew-symmetric! $\Omega^T = -\Omega$</p>
+<p>Skew-symmetric! <script type="math/tex">\Omega^T = -\Omega</script></p>
 
 <p>In fact,</p>
 
@@ -322,9 +333,9 @@ I & -p \\
 \Omega = \bar{\omega}^{\hat{}}
 \end{aligned}</script>
 
-<p>\item In terms of frames, we have Poisson’s kinematic equation</p>
+<p>In terms of frames, we have Poisson’s kinematic equation.</p>
 
-<p>\item The intrinsic equation is (where <script type="math/tex">\vec{\omega}_b</script> in the body frame is $\Omega_b$):</p>
+<p>The intrinsic equation is (where <script type="math/tex">\vec{\omega}_b</script> in the body frame is <script type="math/tex">\Omega_b</script>):</p>
 
 <script type="math/tex; mode=display">{}^{^w}\dot{R}_b =  {}^{^w}R_b \Omega_b</script>
 
@@ -360,6 +371,27 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 
 <p>The 3x3 matrix will not be recognizable of a rotation</p>
 
+<h2 id="the-exponential-map">The Exponential Map</h2>
+
+<p>The matrix exponential</p>
+
+<script type="math/tex; mode=display">e^{ \hat{\omega}t} = I + \hat{\omega}t + \frac{ (\hat{\omega}t)^2}{2!} + \cdots + \frac{ (\hat{\omega}t)^n}{n!} + \cdots</script>
+
+<p>defines a map from the space <script type="math/tex">so(3)</script> to <script type="math/tex">SO(3)</script>, which we often call the <em>exponential map</em> [5].</p>
+
+<p>For any rotation matrix <script type="math/tex">R \in SO(3)</script>, there exists a <script type="math/tex">\omega \in \mathbf{R}^3, \|\omega\|=1</script> and <script type="math/tex">t \in \mathbf{R}</script> such that <script type="math/tex">R = e^{ \hat{\omega}t}</script>. This theorem is quite powerful: it means that any rotation matrix can be realized by rotating around some fixed axis by a certain angle. This map is not one-to-one.</p>
+
+<h2 id="twists">Twists</h2>
+
+<p>A <script type="math/tex">4 \times 4</script> matrix of the form <script type="math/tex">\hat{\xi}</script> is called a twist. The set of all twists is denoted as <script type="math/tex">se(3)</script> [4,5]:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+se(3) = \Bigg\{ \hat{\xi} = \begin{bmatrix} \hat{\omega} & v \\ 0 & 0 \end{bmatrix} \mid \hat{\xi} \in so(3), v \in \mathbf{R}^3 \Bigg\} \subset \mathbf{R}^{4 \times 4} %]]></script>
+
+<p><script type="math/tex">se(3)</script> is called the tangent space (or Lie algebra) of the matrix group <script type="math/tex">SE(3)</script>.</p>
+
+<p>Why do we care about twists? It turns out that a rigid body can be moved from one position to any other by a movement consisting of (1) a rotation about a straight line (2) followed by a translation parallel to that line. This type of motion is <em>screw motion</em>, and its infinitesimal version is called a <em>twist</em>. The beauty of a twist is that it describes the instantaneous velocity of a rigid body in terms of its <strong>linear and angular components</strong> [5]. It is the matrix exponential that maps a twist into its corresponding screw motion.</p>
+
 <h2 id="references">References</h2>
 
 <p>[1] Frank Dellaert. Lecture Presentations of MM 8803: Mobile Manipulation, taught at the Georgia Institute of Technology, Fall 2018.</p>
@@ -368,21 +400,20 @@ R_{t + \delta t}^T R_{t + \delta t} \neq I \\
 
 <p>[3] Steven M. LaValle. <em>Planning Algorithms</em>. Cambridge University Press, 2006, New York, NY, USA.</p>
 
+<p>[4] Murray, R.M., Li, Z., Sastry, S.S., Sastry, S.S.: A mathematical introduction to robotic manipulation. CRC press (1994). <a href="https://www.cds.caltech.edu/~murray/books/MLS/pdf/mls94-complete.pdf">PDF</a>.</p>
+
+<p>[5] Ma, Yi and Soatto, Stefano and Kosecka, Jana and Sastry, S. Shankar: An Invitation to 3-D Vision: From Images to Geometric Models. Springer Verlag (2003). <a href="https://www.eecis.udel.edu/~cer/arv/readings/old_mkss.pdf">PDF</a>.</p>
+
 <p><strong>Rigid Body Kinematics and Filtering</strong></p>
 
 <p>Kinematics with Euler Angles</p>
 
-<p>\begin{equation}
-\dot{R} = f(R, \vec{w}), (\dot{\phi}, \dot{\theta}, \dot{\psi}) = f(\phi, \theta, \psi, \vec{\omega})
-\end{equation}</p>
+<script type="math/tex; mode=display">\dot{R} = f(R, \vec{w}), (\dot{\phi}, \dot{\theta}, \dot{\psi}) = f(\phi, \theta, \psi, \vec{\omega})</script>
 
-<p>\item</p>
+<script type="math/tex; mode=display">% <![CDATA[
+\vec{\omega} = \begin{bmatrix} w_x \\ w_y \\ w_z \end{bmatrix} = \begin{bmatrix} 1 & 0 & -\mbox{sin} \theta \\ 0 & \mbox{cos} \phi & \mbox{sin} \phi \mbox{cos} \phi \\ 0 & -\mbox{sin} \phi & \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix} %]]></script>
 
-<p>\begin{equation}
-\vec{\omega} = \begin{bmatrix} w_x \ w_y \ w_z \end{bmatrix} = \begin{bmatrix} 1 &amp; 0 &amp; -\mbox{sin} \theta \ 0 &amp; \mbox{cos} \phi &amp; \mbox{sin} \phi \mbox{cos} \phi \ 0 &amp; -\mbox{sin} \phi &amp; \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}
-\end{equation}</p>
-
-<p>\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \ \dot{\theta} \ \dot{\psi} \end{bmatrix}$</p>
+<p>We want to invert this matrix and solve for <script type="math/tex">\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}</script></p>
 
   </article>
 

@@ -48,6 +48,27 @@ applications to large-scale mapping of urban structures. IJRR, 25(5/6),
 . Folkesson and H. I. Christensen. Robust SLAM. ISAV 2004.
 
 
+## Bundler
+
+Extract focal lengths from Exif tags, call SIFT on the image
+set focal constraints, 
+
+## SLAM Code
+
+http://www.robots.ox.ac.uk/~vgg/hzbook/code/
+http://ceres-solver.org/
+http://www.cs.cornell.edu/~snavely/bundler/
+https://github.com/snavely/bundler_sfm
+http://wp.doc.ic.ac.uk/thefutureofslam/wp-content/uploads/sites/93/2015/12/slides_ajd.pdf
+http://wp.doc.ic.ac.uk/thefutureofslam/wp-content/uploads/sites/93/2015/12/kerl_etal_iccv2015_futureofslam_talk.pdf
+https://github.com/tum-vision/lsd_slam
+https://vision.in.tum.de/research/vslam/lsdslam
+
+
+## LSD SLAM
+
+http://16623.courses.cs.cmu.edu/slides/Lecture_19.pdf
+
 ## Deep Learning + SLAM
 
 
@@ -60,6 +81,15 @@ core idea of optimizing variable in latent space is similar
 - Prior for depth map. code slam
 
 
+
+https://github.com/raulmur/ORB_SLAM2
+
+https://github.com/tum-vision/lsd_slam
+
+
+https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial1.pdf
+
+https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial2.pdf
 
 
 

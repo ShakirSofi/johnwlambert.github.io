@@ -29,6 +29,15 @@ $$
 y_w = {}^{w}T_{b} y_b
 $$
 
+## What is a *group*?
+A group is a set $$G$$, with an operation of (binary) multiplication $$\circ$$ on elements of $$G$$ which is:
+* closed: If $$g_1, g_2 \in G$$ then also $$g_1 \circ g_2 \in G$$;
+* associative: $$(g_1 \circ g_2) \circ g_3 = g_1 \circ (g_2 \circ g_3)$$, for all $$g_1, g_2, g_3 \in G$$;
+* unit element $$e$$: $$e \circ g = g \circ e = g$$, for all $$g \in G$$;
+* invertible: For every element $$g \in G$$, there exists an element $$g^{−1} \in G$$ such that $$g \circ g^{−1} = g^{−1} \circ g = e$$.
+
+More details can be found in [5].
+
 <a name='liegroups'></a>
 
 ## Lie Groups
@@ -82,10 +91,10 @@ $$
 ### SO(3)
 
 There are several well-known parameterizations of $$R \in SO(3)$$:
-- (1.) $$R \in \mathbf{R}^{3 \times 3}$$ full rotation matrix, 9 parameters -- there must be 6 constraints
-- (2.) Euler angles, e.g. $$(\phi, \theta, \psi)$$, so 3 parameters
-- (3.) Angle-Axis parameters $$(\vec{a}, \phi)$$, which is 4 parameters and 1 constraint (unit length)
-- (4.) Quaternions ($$q_0,q_1,q_2,q_3)$$, 4 parameters and 1 constraint (unit length)
+1. $$R \in \mathbf{R}^{3 \times 3}$$ full rotation matrix, 9 parameters -- there must be 6 constraints
+2. Euler angles, e.g. $$(\phi, \theta, \psi)$$, so 3 parameters
+3. Angle-Axis parameters $$(\vec{a}, \phi)$$, which is 4 parameters and 1 constraint (unit length)
+4. Quaternions ($$q_0,q_1,q_2,q_3)$$, 4 parameters and 1 constraint (unit length)
 
 There are only 3 degrees of freedom in describing a rotation. But this object doesn't live in 3D space. It is a 3D manifold, embedded in a 4-D Euclidean space.
 
@@ -158,7 +167,7 @@ By adding an extra dimension to the input points and transformation matrix $$T$$
 
 ### SE(3)
 
-The real space $$SE(3)$$ is a 6-dimensional manifold. Its dimensions is exactly the number of degrees of freedom of a free-floating rigid body in space [3]. $$SE(3)$$ can be parameterized with a $$4 \times 4$$ matrix as follows:
+The set of rigid body motions, or special Euclidean transformations, is a (Lie) group, the so-called special Euclidean group, typically denoted as SE(3). The real space $$SE(3)$$ is a 6-dimensional manifold. Its dimensions is exactly the number of degrees of freedom of a free-floating rigid body in space [3]. $$SE(3)$$ can be parameterized with a $$4 \times 4$$ matrix as follows:
 
 $$
 \begin{bmatrix}
@@ -229,9 +238,7 @@ $$
 \Omega^T = (R^T \dot{R} )^T = \dot{R}^TR  = -R^T \dot{R}  = -\Omega
 $$
 
-
-Skew-symmetric! $\Omega^T = -\Omega$
-
+Skew-symmetric! $$\Omega^T = -\Omega$$
 
 In fact, 
 
@@ -267,9 +274,9 @@ $$
 \end{aligned}
 $$
 
-\item In terms of frames, we have Poisson's kinematic equation
+In terms of frames, we have Poisson's kinematic equation.
 
-\item The intrinsic equation is (where $$\vec{\omega}_b$$ in the body frame is $\Omega_b$):
+The intrinsic equation is (where $$\vec{\omega}_b$$ in the body frame is $$\Omega_b$$):
 
 $$
 {}^{^w}\dot{R}_b =  {}^{^w}R_b \Omega_b
@@ -283,7 +290,6 @@ $$
 $$
 
 Take vector on aircraft, put it into the coordinate frame of the world
-
 
 
 $$
@@ -322,6 +328,32 @@ $$
 
 The 3x3 matrix will not be recognizable of a rotation
 
+## The Exponential Map
+
+The matrix exponential 
+
+$$
+e^{ \hat{\omega}t} = I + \hat{\omega}t + \frac{ (\hat{\omega}t)^2}{2!} + \cdots + \frac{ (\hat{\omega}t)^n}{n!} + \cdots
+$$
+
+defines a map from the space $$so(3)$$ to $$SO(3)$$, which we often call the *exponential map* [5].
+
+For any rotation matrix $$R \in SO(3)$$, there exists a $$\omega \in \mathbf{R}^3, \|\omega\|=1$$ and $$t \in \mathbf{R}$$ such that $$R = e^{ \hat{\omega}t}$$. This theorem is quite powerful: it means that any rotation matrix can be realized by rotating around some fixed axis by a certain angle. This map is not one-to-one.
+
+## Twists
+
+A $$4 \times 4$$ matrix of the form $$\hat{\xi}$$ is called a twist. The set of all twists is denoted as $$se(3)$$ [4,5]:
+
+$$
+se(3) = \Bigg\{ \hat{\xi} = \begin{bmatrix} \hat{\omega} & v \\ 0 & 0 \end{bmatrix} \mid \hat{\xi} \in so(3), v \in \mathbf{R}^3 \Bigg\} \subset \mathbf{R}^{4 \times 4}
+$$
+
+$$se(3)$$ is called the tangent space (or Lie algebra) of the matrix group $$SE(3)$$.
+
+Why do we care about twists? It turns out that a rigid body can be moved from one position to any other by a movement consisting of (1) a rotation about a straight line (2) followed by a translation parallel to that line. This type of motion is *screw motion*, and its infinitesimal version is called a *twist*. The beauty of a twist is that it describes the instantaneous velocity of a rigid body in terms of its **linear and angular components** [5]. It is the matrix exponential that maps a twist into its corresponding screw motion.
+
+
+
 ## References
 
 [1] Frank Dellaert. Lecture Presentations of MM 8803: Mobile Manipulation, taught at the Georgia Institute of Technology, Fall 2018.
@@ -330,8 +362,9 @@ The 3x3 matrix will not be recognizable of a rotation
 
 [3] Steven M. LaValle. *Planning Algorithms*. Cambridge University Press, 2006, New York, NY, USA. 
 
+[4] Murray, R.M., Li, Z., Sastry, S.S., Sastry, S.S.: A mathematical introduction to robotic manipulation. CRC press (1994). [PDF](https://www.cds.caltech.edu/~murray/books/MLS/pdf/mls94-complete.pdf).
 
-
+[5] Ma, Yi and Soatto, Stefano and Kosecka, Jana and Sastry, S. Shankar: An Invitation to 3-D Vision: From Images to Geometric Models. Springer Verlag (2003). [PDF](https://www.eecis.udel.edu/~cer/arv/readings/old_mkss.pdf).
 
 
 
@@ -344,14 +377,14 @@ Kinematics with Euler Angles
 
 
 
-\begin{equation}
+$$
 \dot{R} = f(R, \vec{w}), (\dot{\phi}, \dot{\theta}, \dot{\psi}) = f(\phi, \theta, \psi, \vec{\omega})
-\end{equation}
+$$
 
-\item 
 
-\begin{equation}
+
+$$
 \vec{\omega} = \begin{bmatrix} w_x \\ w_y \\ w_z \end{bmatrix} = \begin{bmatrix} 1 & 0 & -\mbox{sin} \theta \\ 0 & \mbox{cos} \phi & \mbox{sin} \phi \mbox{cos} \phi \\ 0 & -\mbox{sin} \phi & \mbox{cos} \phi \mbox{cos} \theta \end{bmatrix} \begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}
-\end{equation}
+$$
 
-\item We want to invert this matrix and solve for $\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}$
+We want to invert this matrix and solve for $$\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}$$
