@@ -196,6 +196,74 @@ $$ \sum\limits_{i,j} (A - LU) = 2.80 \times 10^{-12} $$
 
 ## Cholesky
 
+Suppose we wish to find an LU decomposition for a special type of matrix -- one that is symmetric positive definite. In a $$4 \times 4$$ version, we would see
+
+$$
+\begin{bmatrix} A_{11} & A_{12} & A_{13} & A_{14} \\ A_{21} & A_{22} & A_{23} & A_{24} \\ A_{31} & A_{32} & A_{33} & A_{34} \\ A_{41} & A_{42} & A_{43} & A_{44} \end{bmatrix} = \begin{bmatrix} g_{11} & 0 & 0 & 0 \\ g_{21} & g_{22} & 0 & 0 \\ g_{31} & g_{32} & g_{33} & g_{34} \\ g_{41} & g_{42} & g_{43} & g_{44} \end{bmatrix} \begin{bmatrix} g_{11} & g_{21} & g_{31} & g_{41} \\ 0 & g_{22} & g_{32} & g_{42} \\ 0 & 0 & g_{33} & g_{43} \\ 0 & 0 & 0 & g_{44} \end{bmatrix}
+$$
+
+This gives us a set of $$4^2=16$$ equations. Note that the equations we obtain from the bottom triangle of the matrix $$A$$, are identical to the equations we obtain from the upper triangle of $$A$$ (since $$A$$ is symmetric). For simplicity, we will work with the equations from the bottom triangle of $$A$$.
+
+When we solve the constraints, we note (with one-indexed matrices), we have the following definitions for each term:
+
+$$
+g_{ij} = \frac{a_{ij} - \sum\limits_{k=1}^{j-1} g_{ik}g_{jk} }{g_{jj}}
+$$
+
+When $$j=i$$, $$a_{jj} = g_{jj} g_{jj} + \sum\limits_{k=1}^{j-1}g_{jk}^2$$, implying
+
+$$
+g_{jj} = \sqrt{a_{jj} - \sum\limits_{k=1}^{j-1}g_{jk}^2}
+$$
+
+```python
+def Cholesky(A):
+    """ 
+    Only operate on bottom triangle of the matrix A,
+    since A is symmetric (get same constraints
+    from upper and lower triangle of A).
+    """
+    n,_ = A.shape
+    G = np.zeros((n,n))
+
+    # populate lower triangular part
+    for i in range(n):
+        for j in range(n):
+            if j > i:
+                continue
+            k_sum = 0
+            if j==i: # diagonal element
+                for k in range(j):
+                    k_sum += (G[j,k]**2)
+                G[j,j] = np.sqrt(A[j,j] - k_sum)
+            else:
+                for k in range(j):
+                    k_sum += G[i,k]*G[j,k]
+                G[i,j] = (A[i,j] - k_sum)/G[j,j]
+
+    return G
+```
+
+
+```python
+def Cholesky_demo():
+    n = 100
+    # generate a random n x n matrix
+    A = np.random.randn(n,n)
+
+    # construct a symmetric matrix using either
+    A = 0.5*(A+A.T)
+    #A = A.dot(A.T)
+
+    # make symmetric diagonally dominant matrix
+    A += n * np.eye(n)
+    w,v = np.linalg.eig(A)
+    G = Cholesky(A)
+
+    assert(np.allclose(np.linalg.cholesky(A),G))
+    assert( (G.dot(G.T) - A ).sum() < 1e-10 )
+```
+
 
 
 

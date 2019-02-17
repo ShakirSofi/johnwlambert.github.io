@@ -263,6 +263,66 @@ L = \begin{bmatrix}   1.&    0.&   0.&    0.&   0.&    0.&    0.&    0.&   0. & 
 
 <h2 id="cholesky">Cholesky</h2>
 
+<p>Suppose we wish to find an LU decomposition for a special type of matrix – one that is symmetric positive definite. In a <script type="math/tex">4 \times 4</script> version, we would see</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix} A_{11} & A_{12} & A_{13} & A_{14} \\ A_{21} & A_{22} & A_{23} & A_{24} \\ A_{31} & A_{32} & A_{33} & A_{34} \\ A_{41} & A_{42} & A_{43} & A_{44} \end{bmatrix} = \begin{bmatrix} g_{11} & 0 & 0 & 0 \\ g_{21} & g_{22} & 0 & 0 \\ g_{31} & g_{32} & g_{33} & g_{34} \\ g_{41} & g_{42} & g_{43} & g_{44} \end{bmatrix} \begin{bmatrix} g_{11} & g_{21} & g_{31} & g_{41} \\ 0 & g_{22} & g_{32} & g_{42} \\ 0 & 0 & g_{33} & g_{43} \\ 0 & 0 & 0 & g_{44} \end{bmatrix} %]]></script>
+
+<p>This gives us a set of <script type="math/tex">4^2=16</script> equations. Note that the equations we obtain from the bottom triangle of the matrix <script type="math/tex">A</script>, are identical to the equations we obtain from the upper triangle of <script type="math/tex">A</script> (since <script type="math/tex">A</script> is symmetric). For simplicity, we will work with the equations from the bottom triangle of <script type="math/tex">A</script>.</p>
+
+<p>When we solve the constraints, we note (with one-indexed matrices), we have the following definitions for each term:</p>
+
+<script type="math/tex; mode=display">g_{ij} = \frac{a_{ij} - \sum\limits_{k=1}^{j-1} g_{ik}g_{jk} }{g_{jj}}</script>
+
+<p>When <script type="math/tex">j=i</script>, <script type="math/tex">a_{jj} = g_{jj} g_{jj} + \sum\limits_{k=1}^{j-1}g_{jk}^2</script>, implying</p>
+
+<script type="math/tex; mode=display">g_{jj} = \sqrt{a_{jj} - \sum\limits_{k=1}^{j-1}g_{jk}^2}</script>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="s">""" 
+    Only operate on bottom triangle of the matrix A,
+    since A is symmetric (get same constraints
+    from upper and lower triangle of A).
+    """</span>
+    <span class="n">n</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+
+    <span class="c"># populate lower triangular part</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">k_sum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="n">i</span><span class="p">:</span> <span class="c"># diagonal element</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+                    <span class="n">k_sum</span> <span class="o">+=</span> <span class="p">(</span><span class="n">G</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">G</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">k_sum</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+                    <span class="n">k_sum</span> <span class="o">+=</span> <span class="n">G</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">G</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">G</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">k_sum</span><span class="p">)</span><span class="o">/</span><span class="n">G</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">G</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Cholesky_demo</span><span class="p">():</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="c"># generate a random n x n matrix</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="c"># construct a symmetric matrix using either</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="o">+</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="c">#A = A.dot(A.T)</span>
+
+    <span class="c"># make symmetric diagonally dominant matrix</span>
+    <span class="n">A</span> <span class="o">+=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">w</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">Cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">),</span><span class="n">G</span><span class="p">))</span>
+    <span class="k">assert</span><span class="p">(</span> <span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span> <span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-10</span> <span class="p">)</span>
+</code></pre></div></div>
+
 
   </article>
 

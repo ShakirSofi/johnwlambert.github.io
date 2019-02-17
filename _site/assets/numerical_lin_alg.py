@@ -188,80 +188,52 @@ def LU_demo():
 	pdb.set_trace()
 
 
-
-def Cholesky_darve(A,ims):
-	""" """
-	for j in range(m):
-		for i in range(j,m):
-			for k in range(j):
-				A[i,j] = A[i,j] - A[i,k] * A[j,k]
-		# The usual equation is
-		# A[i,j] = A[i,j] - A[i,k] * A[k,j]
-		# But we use the symmetry of A to only access the lower
-		# triangular part of A.
-		record_snapshot(A, ims)
-		piv = math.sqrt(A[j,j])
-		for i in range(j,m):
-			A[i,j] = A[i,j] / piv
-
-
 def Cholesky(A):
 	""" 
-	Only operate on half of the matrix G.
-	A is symmetric.
+	Only operate on bottom triangle of the matrix A,
+	since A is symmetric (get same constraints
+	from upper and lower triangle of A).
 	"""
 	n,_ = A.shape
-	pdb.set_trace()
 	G = np.zeros((n,n))
-	for j in range(n):
-		
-		# find diagonal element
-		k_sum = 0
-		for k in range(j-1):
-			k_sum += (G[j,k]**2)
-		G[j,j] = np.sqrt(A[j,j] - k_sum)
 
-		for i in range(j+1,n):
+	# populate lower triangular part
+	for i in range(n):
+		for j in range(n):
+			if j > i:
+				continue
 			k_sum = 0
-			for k in range(j-1):
-				k_sum += G[i,k]*G[j,k]
-			G[i,j] = (A[i,j] - k_sum)/G[j,j]
+			if j==i: # diagonal element
+				for k in range(j):
+					k_sum += (G[j,k]**2)
+				G[j,j] = np.sqrt(A[j,j] - k_sum)
+			else:
+				for k in range(j):
+					k_sum += G[i,k]*G[j,k]
+				G[i,j] = (A[i,j] - k_sum)/G[j,j]
 
 	return G
 
 
-	# the following won't work, because sometimes
-	# j > k, and sometimes k > j
-	# for i in range(n):
-	# 	for j in range(n):
-	# 		k_sum = 0
-	# 		if i==j:
-
-	# 		else:
-	# 			
-	# return G
-
-	# error on Haesun's slide -- should be divide by g_ii
-	# slide 5, lecture 6 for g_{ij} expression
-
-
 def Cholesky_demo():
 
-	n = 3
-	# generate a random n x n matrix
-	A = np.random.randn(n,n)
+	for i in range(100):
+		print('on i', i)
+		n = 100
+		# generate a random n x n matrix
+		A = np.random.randn(n,n)
 
-	# construct a symmetric matrix using either
-	A = 0.5*(A+A.T)
-	#A = A.dot(A.T)
+		# construct a symmetric matrix using either
+		A = 0.5*(A+A.T)
+		#A = A.dot(A.T)
 
-	# make symmetric diagonally dominant matrix
-	A += n * np.eye(n)
-	w,v = np.linalg.eig(A)
-	G = Cholesky(A)
-	pdb.set_trace()
+		# make symmetric diagonally dominant matrix
+		A += n * np.eye(n)
+		w,v = np.linalg.eig(A)
+		G = Cholesky(A)
 
-
+		assert(np.allclose(np.linalg.cholesky(A),G))
+		assert( (G.dot(G.T) - A ).sum() < 1e-10 )
 
 
 
