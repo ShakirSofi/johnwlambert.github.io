@@ -31,7 +31,7 @@ n = 100000
 A = np.random.randint(-100,100,(n,n))
 np.linalg.qr(A)
 ```
-This should hang indefinitely and you will mostly like have to kill the Terminal window to prevent your computer from freezing up. However, for smaller matrices, direct methods are an easy and efficient approach. We will explain backsubstituion and then focus on 3 direct methods in this tutorial.
+This should hang indefinitely and you will mostly like have to kill the Terminal window to prevent your computer from freezing up. However, for smaller matrices, direct methods are an easy and efficient approach. We will explain backsubstitution and then focus on 3 direct methods in this tutorial.
 
 <a name='back-substitution'></a>
 
