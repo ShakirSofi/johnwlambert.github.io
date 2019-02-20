@@ -12,7 +12,7 @@
 
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://johnwlambert.github.io/direct-methods/">
+  <link rel="canonical" href="http://localhost:4000/direct-methods/">
 
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="/assets/css/academicons.css"/>
@@ -91,14 +91,51 @@
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#sfmpipeline">Back Substitution</a></li>
-  <li><a href="#costfunctions">LU Factorization</a></li>
-  <li><a href="#bundleadjustment">Cholesky Factorization</a></li>
+  <li><a href="#back-substitution">Back Substitution</a></li>
+  <li><a href="#lu">LU Factorization</a></li>
+  <li><a href="#cholesky">Cholesky Factorization</a></li>
+  <li><a href="#qr">QR Factorization</a></li>
 </ul>
 
-<p><a name="sfmpipeline"></a></p>
+<p>Suppose we wish to solve a problem <script type="math/tex">Ax=b</script>, where <script type="math/tex">A,b</script> are known. Each row of <script type="math/tex">A</script> and <script type="math/tex">b</script> represents a linear equation, so the problem represents a system of linear equations. This is one of the most well-studied problems in mathematics. It turns out that there are <em>direct methods</em> and <em>iterative methods</em> to solve this type of problem. Iterative methods are best when <script type="math/tex">A</script> is sparse and very large.</p>
+
+<p>The problem <script type="math/tex">Ax=b</script> is easy in two particular cases:</p>
+
+<ol>
+  <li>When <script type="math/tex">A</script> is diagonal.</li>
+  <li>When <script type="math/tex">A</script> is triangular.</li>
+</ol>
+
+<p>We will focus on the case when <script type="math/tex">A</script> is triangular. Direct methods focus on creating a triangular decomposition of the matrix <script type="math/tex">A</script> such that the system can be quickly and easily solved in <script type="math/tex">n^2</script> steps by a process called <em>back-substitution</em>, which we will describe in detail. Examples of such factorizations are the LU, Cholesky, and QR factorizations.</p>
+
+<p>However, direct methods (i.e. computing such factorizations) are too computationally costly to solve on a desktop machine when <script type="math/tex">A</script> has tens or hundreds of thousands of rows. You can verify this yourself quite easily</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+<span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</code></pre></div></div>
+<p>This should hang indefinitely and you will mostly like have to kill the Terminal window to prevent your computer from freezing up. However, for smaller matrices, direct methods are an easy and efficient approach. We will explain backsubstituion and then focus on 3 direct methods in this tutorial.</p>
+
+<p><a name="back-substitution"></a></p>
 
 <h2 id="back-substitution-for-triangular-matrices">Back Substitution for Triangular Matrices</h2>
+
+<p>Consider the system <script type="math/tex">Ax=b</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} b_1 \\ b_2 \\ b_3 \end{bmatrix} %]]></script>
+
+<p>In general, the <script type="math/tex">k</script>-th equation is</p>
+
+<script type="math/tex; mode=display">0+ \cdots + 0 + a_{kk}x_k + a_{k,k+1}x_{k+1} +···+a_{k,n}x_n =b_k</script>
+
+<p>Thus, by rearranging terms we can always solve for <script type="math/tex">x_k</script> as follows:</p>
+
+<script type="math/tex; mode=display">x_k=(b_k− \sum\limits_{j=k+1}^{n}a_{kj}x_j)/a_{kk}</script>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">back_substitution</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
 	<span class="s">""" """</span>
@@ -121,6 +158,8 @@
 
 	<span class="n">x_est</span> <span class="o">=</span> <span class="n">back_substitution</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
 </code></pre></div></div>
+
+<p><a name="lu"></a></p>
 
 <h2 id="lu-decomposition">LU Decomposition</h2>
 <p>In the LU Decomposition/Factorization, we seek to find two matrices <script type="math/tex">L,U</script> such that <script type="math/tex">A = L * U</script>, and where <script type="math/tex">L</script> is unit lower triangular (1’s along the diagonal), and where <script type="math/tex">U</script> is upper triangular.</p>
@@ -261,6 +300,7 @@ L = \begin{bmatrix}   1.&    0.&   0.&    0.&   0.&    0.&    0.&    0.&   0. & 
 
 <script type="math/tex; mode=display">\sum\limits_{i,j} (A - LU) = 2.80 \times 10^{-12}</script>
 
+<p><a name="cholesky"></a></p>
 <h2 id="cholesky">Cholesky</h2>
 
 <p>Suppose we wish to find an LU decomposition for a special type of matrix – one that is symmetric positive definite. In a <script type="math/tex">4 \times 4</script> version, we would see</p>
@@ -305,6 +345,7 @@ L = \begin{bmatrix}   1.&    0.&   0.&    0.&   0.&    0.&    0.&    0.&   0. & 
     <span class="k">return</span> <span class="n">G</span>
 </code></pre></div></div>
 
+<p>Below we show a simple code example that generates a symmetric positive definite matrix <script type="math/tex">A</script> and factorizes it into <script type="math/tex">GG^T</script>:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">Cholesky_demo</span><span class="p">():</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="c"># generate a random n x n matrix</span>
@@ -322,6 +363,155 @@ L = \begin{bmatrix}   1.&    0.&   0.&    0.&   0.&    0.&    0.&    0.&   0. & 
     <span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">),</span><span class="n">G</span><span class="p">))</span>
     <span class="k">assert</span><span class="p">(</span> <span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span> <span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-10</span> <span class="p">)</span>
 </code></pre></div></div>
+
+<p><a name="qr"></a></p>
+<h2 id="the-qr-factorization">The QR Factorization</h2>
+
+<p>The QR Factorization is a matrix factorization especially useful for solving least-squares problems. In this section, I will show you how to compute in Python what you could obtain with a library like Numpy, if you were to call <code class="highlighter-rouge">Q, R = np.linalg.qr(A)</code>.</p>
+
+<p>Although there are multiple ways to form a QR decomposition, we will use Householder triangularization in this example.  A Householder matrix <script type="math/tex">P</script> takes on the form:</p>
+
+<script type="math/tex; mode=display">P = I_n - \frac{2vv^T}{v^Tv}</script>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">householder</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="s">"""     
+        Args:
+        -   A: A n-d numpy array of shape (n,n) 
+
+        Returns:
+        -   P: A n-d numpy array of shape (n,n), representing 
+                a Householder matrix
+    """</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">A</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">e1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">e1</span> <span class="o">+</span> <span class="n">x</span>
+    <span class="c"># divide by 2-norm squared</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">P</span>
+</code></pre></div></div>
+
+<p>The QR decomposition consists of iteratively multiplying Householder matrices to upper-triangularize a matrix <script type="math/tex">A</script> into <script type="math/tex">R</script>.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">qr_decomposition</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="s">""" 
+    Form the QR decomposition of A by using
+    Householder matrices.
+    """</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">A</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+
+        <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="c"># modify lower-right block</span>
+        <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">:,</span><span class="n">i</span><span class="p">:]</span> <span class="o">=</span> <span class="n">householder</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">:,</span><span class="n">i</span><span class="p">:])</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'On iter {i}'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="nb">round</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+    <span class="n">Q_T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">Q_T</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Q_T</span><span class="p">)</span>
+
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Q_T</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span>
+</code></pre></div></div>
+
+<p>Here is a simple code example, generating a random matrix <script type="math/tex">A</script> which we will factorize:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">qr_demo</span><span class="p">():</span>
+    <span class="s">""" """</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+
+    <span class="n">Q</span><span class="p">,</span><span class="n">R</span> <span class="o">=</span> <span class="n">qr_decomposition</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">QR</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Sum: '</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">QR</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span>
+    <span class="k">assert</span><span class="p">(</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">QR</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-10</span> <span class="p">)</span>
+</code></pre></div></div>
+<p>Suppose we randomly generated a matrix <script type="math/tex">A</script>, as follows:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+A = \begin{bmatrix}
+  6  & 6  & -77 & 59 \\
+ -13 & 20 & -81 &  1 \\
+ -33 & -35 & -65 & -74 \\
+  98 & 92 & 42 &  2 \\
+\end{bmatrix} %]]></script>
+
+<p>After iteration 0, all matrix entries have changed, but the first column is upper triangular:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+P_0 A = \begin{bmatrix}
+ -104.4 & -95.3 & -65.6 & -28.5 \\
+    0.  &  31.9 & -82.3 &  11.3 \\
+    0. &   -4.7 & -68.4 & -47.8 \\
+    0.  &   2.1 &  52.1 & -75.7 \\
+\end{bmatrix} %]]></script>
+
+<p>After iteration 1, the first two columns are upper triangular and the first row is unmodified:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+P_1 P_0 A = \begin{bmatrix}
+-104.4 & -95.3 & -65.6 & -28.5 \\
+   0 &   -32.3 &  67.9 & -13.3 \\
+    0 &    0. &  -79.4 & -46.  \\
+    0 &   0.  &  57. &  -76.5 \\
+\end{bmatrix} %]]></script>
+
+<p>After iteration 3, the first three columns are upper triangular, making the matrix upper triangular (this is <script type="math/tex">R</script>):</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+P_2 P_1 P_0 A = \begin{bmatrix}
+-104.4 &  -95.3 &  -65.6 &  -28.5 \\
+    0 &   -32.3 &   67.9 &  -13.3 \\
+    0 &     0 &    97.8 &   -7.2 \\
+    0 &     0 &    0 &   -89 \\
+ \end{bmatrix} %]]></script>
+
+<p>We obtain an orthogonal matrix <script type="math/tex">Q=(P_2 P_1 P_0)^T</script> and an upper triangular matrix <script type="math/tex">R=Q^TA</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+Q = \begin{bmatrix}
+-0.05 & -0.01 & -0.81 & -0.57 \\
+  0.12 & -0.98 & -0.06 &  0.10 \\
+  0.31 & 0.15 & -0.55 &  0.75 \\
+ -0.93 & -0.07 & -0.14  0.30 \\
+\end{bmatrix},  R= 
+\begin{bmatrix}
+-104.4 & -95.3 & -65.6 & -28.5 \\
+   0 &  -32.3 &  67.9 & -13.3 \\
+    0 &    0  &  97.8 &  -7.2 \\
+    0 &    0  &  0 &  -89. 
+\end{bmatrix} %]]></script>
+
+<p>Indeed, we have found a factorization <script type="math/tex">A=QR</script>, up to machine precision:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+QR= \begin{bmatrix}
+  6. &  6. & -77. & 59. \\
+ -13. & 20. & -81. &  1. \\
+ -33. & -35. & -65. & -74. \\
+  98. & 92. & 42. &  2.
+ \end{bmatrix},
+   A= \begin{bmatrix}
+   6 &  6 & -77 & 59 \\
+ -13 & 20 & -81 &  1 \\
+ -33 & -35 & -65 & -74 \\
+  98 & 92 & 42 &  2 \\
+\end{bmatrix} %]]></script>
+
+<p>The summed absolute difference of the matrices is:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">QR</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span> <span class="o">=</span> <span class="mf">2.025e-13</span>
+</code></pre></div></div>
+
+<p>You can find the Python code <a href="/assets/qr_decomposition.py">here</a>.</p>
+
+<p>We verify that <script type="math/tex">Q</script> is orthogonal meaning <script type="math/tex">det(Q) = \pm 1</script> and <script type="math/tex">Q^TQ=QQ^T=I</script></p>
+
+<p>We showed an example above for a <script type="math/tex">n \times n</script> matrix, but this holds for <script type="math/tex">m \times n</script> matrices as well. In general, we need <script type="math/tex">n</script> Householder matrices (assuming <script type="math/tex">m>n</script>). Only when <script type="math/tex">m=n</script>, we need only <script type="math/tex">n-1</script> of them. However, in a typical LS problem, we have <script type="math/tex">m>n</script>.</p>
+
+<h2 id="references">References</h2>
+<p>[1] Lloyd Trefethen and David Bau. Numerical Linear Algebra, SIAM, 2007.</p>
 
 
   </article>

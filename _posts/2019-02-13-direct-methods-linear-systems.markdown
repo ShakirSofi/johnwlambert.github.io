@@ -9,13 +9,55 @@ mathjax: true
 
 ---
 Table of Contents:
-- [Back Substitution](#sfmpipeline)
-- [LU Factorization](#costfunctions)
-- [Cholesky Factorization](#bundleadjustment)
+- [Back Substitution](#back-substitution)
+- [LU Factorization](#lu)
+- [Cholesky Factorization](#cholesky)
+- [QR Factorization](#qr)
 
-<a name='sfmpipeline'></a>
+
+Suppose we wish to solve a problem $$Ax=b$$, where $$A,b$$ are known. Each row of $$A$$ and $$b$$ represents a linear equation, so the problem represents a system of linear equations. This is one of the most well-studied problems in mathematics. It turns out that there are *direct methods* and *iterative methods* to solve this type of problem. Iterative methods are best when $$A$$ is sparse and very large. 
+
+The problem $$Ax=b$$ is easy in two particular cases:
+
+1. When $$A$$ is diagonal.
+2. When $$A$$ is triangular.
+
+We will focus on the case when $$A$$ is triangular. Direct methods focus on creating a triangular decomposition of the matrix $$A$$ such that the system can be quickly and easily solved in $$n^2$$ steps by a process called *back-substitution*, which we will describe in detail. Examples of such factorizations are the LU, Cholesky, and QR factorizations.
+
+However, direct methods (i.e. computing such factorizations) are too computationally costly to solve on a desktop machine when $$A$$ has tens or hundreds of thousands of rows. You can verify this yourself quite easily
+```python
+import numpy as np
+n = 100000
+A = np.random.randint(-100,100,(n,n))
+np.linalg.qr(A)
+```
+This should hang indefinitely and you will mostly like have to kill the Terminal window to prevent your computer from freezing up. However, for smaller matrices, direct methods are an easy and efficient approach. We will explain backsubstituion and then focus on 3 direct methods in this tutorial.
+
+<a name='back-substitution'></a>
 
 ## Back Substitution for Triangular Matrices
+
+Consider the system $$Ax=b$$:
+
+$$
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} = \begin{bmatrix} b_1 \\ b_2 \\ b_3 \end{bmatrix}
+$$
+
+In general, the $$k$$-th equation is
+
+$$
+0+ \cdots + 0 + a_{kk}x_k + a_{k,k+1}x_{k+1} +···+a_{k,n}x_n =b_k
+$$
+
+Thus, by rearranging terms we can always solve for $$x_k$$ as follows:
+
+$$
+x_k=(b_k− \sum\limits_{j=k+1}^{n}a_{kj}x_j)/a_{kk} 
+$$
 
 ```python
 def back_substitution(A,b):
@@ -42,6 +84,7 @@ def back_substitution_demo():
 	x_est = back_substitution(A,b)
 ```
 
+<a name='lu'></a>
 
 ## LU Decomposition
 In the LU Decomposition/Factorization, we seek to find two matrices $$L,U$$ such that $$A = L * U$$, and where $$L$$ is unit lower triangular (1's along the diagonal), and where $$U$$ is upper triangular.
@@ -193,7 +236,7 @@ There is a very small amount of numerical error introduced in the process:
 $$ \sum\limits_{i,j} (A - LU) = 2.80 \times 10^{-12} $$
 
 
-
+<a name='cholesky'></a>
 ## Cholesky
 
 Suppose we wish to find an LU decomposition for a special type of matrix -- one that is symmetric positive definite. In a $$4 \times 4$$ version, we would see
@@ -244,7 +287,7 @@ def Cholesky(A):
     return G
 ```
 
-
+Below we show a simple code example that generates a symmetric positive definite matrix $$A$$ and factorizes it into $$GG^T$$:
 ```python
 def Cholesky_demo():
     n = 100
@@ -267,13 +310,171 @@ def Cholesky_demo():
 
 
 
+<a name='qr'></a>
+## The QR Factorization
+
+The QR Factorization is a matrix factorization especially useful for solving least-squares problems. In this section, I will show you how to compute in Python what you could obtain with a library like Numpy, if you were to call `Q, R = np.linalg.qr(A)`.
+
+Although there are multiple ways to form a QR decomposition, we will use Householder triangularization in this example.  A Householder matrix $$P$$ takes on the form:
+
+$$
+P = I_n - \frac{2vv^T}{v^Tv}
+$$
+
+```python
+def householder(A):
+    """     
+        Args:
+        -   A: A n-d numpy array of shape (n,n) 
+
+        Returns:
+        -   P: A n-d numpy array of shape (n,n), representing 
+                a Householder matrix
+    """
+    n, _ = A.shape
+    x = A[:,0].reshape(n,1)
+    e1 = np.zeros((n,1))
+    e1[0] = 1.
+    v = np.sign(x[0]) * np.linalg.norm(x) * e1 + x
+    # divide by 2-norm squared
+    P = np.eye(n) - 2 * v.dot(v.T)/v.T.dot(v)
+    return P
+```
 
 
+The QR decomposition consists of iteratively multiplying Householder matrices to upper-triangularize a matrix $$A$$ into $$R$$.
+```python
+def qr_decomposition(A):
+    """ 
+    Form the QR decomposition of A by using
+    Householder matrices.
+    """
+    n, _ = A.shape
+    P = np.zeros((n-1,n,n))
+    R = A
+    for i in range(n-1):
+
+        P[i] = np.eye(n)
+        # modify lower-right block
+        P[i,i:,i:] = householder(R[i:,i:])
+        print(f'On iter {i}', np.round(P[i].dot(R), 1))
+        R = P[i].dot(R)
+
+    Q_T = np.eye(n)
+    for i in range(n-1):
+        Q_T = P[i].dot(Q_T)
+
+    Q = Q_T.T
+    return Q, R
+```
+
+Here is a simple code example, generating a random matrix $$A$$ which we will factorize:
+```python
+def qr_demo():
+    """ """
+    n = 4
+    A = np.random.randint(-100,100,(n,n))
+
+    Q,R = qr_decomposition(A)
+    QR = Q.dot(R)
+    print('Sum: ', np.absolute(A - QR).sum())
+    assert( (A - QR).sum() < 1e-10 )
+```
+Suppose we randomly generated a matrix $$A$$, as follows:
+
+$$
+A = \begin{bmatrix}
+  6  & 6  & -77 & 59 \\
+ -13 & 20 & -81 &  1 \\
+ -33 & -35 & -65 & -74 \\
+  98 & 92 & 42 &  2 \\
+\end{bmatrix}
+$$
+
+After iteration 0, all matrix entries have changed, but the first column is upper triangular:
+
+$$
+P_0 A = \begin{bmatrix}
+ -104.4 & -95.3 & -65.6 & -28.5 \\
+    0.  &  31.9 & -82.3 &  11.3 \\
+    0. &   -4.7 & -68.4 & -47.8 \\
+    0.  &   2.1 &  52.1 & -75.7 \\
+\end{bmatrix}
+$$
 
 
+After iteration 1, the first two columns are upper triangular and the first row is unmodified:
+
+$$
+P_1 P_0 A = \begin{bmatrix}
+-104.4 & -95.3 & -65.6 & -28.5 \\
+   0 &   -32.3 &  67.9 & -13.3 \\
+    0 &    0. &  -79.4 & -46.  \\
+    0 &   0.  &  57. &  -76.5 \\
+\end{bmatrix}
+$$
+
+After iteration 3, the first three columns are upper triangular, making the matrix upper triangular (this is $$R$$):
+
+$$
+P_2 P_1 P_0 A = \begin{bmatrix}
+-104.4 &  -95.3 &  -65.6 &  -28.5 \\
+    0 &   -32.3 &   67.9 &  -13.3 \\
+    0 &     0 &    97.8 &   -7.2 \\
+    0 &     0 &    0 &   -89 \\
+ \end{bmatrix}
+$$
+
+We obtain an orthogonal matrix $$Q=(P_2 P_1 P_0)^T$$ and an upper triangular matrix $$R=Q^TA$$:
+
+$$
+Q = \begin{bmatrix}
+-0.05 & -0.01 & -0.81 & -0.57 \\
+  0.12 & -0.98 & -0.06 &  0.10 \\
+  0.31 & 0.15 & -0.55 &  0.75 \\
+ -0.93 & -0.07 & -0.14  0.30 \\
+\end{bmatrix},  R= 
+\begin{bmatrix}
+-104.4 & -95.3 & -65.6 & -28.5 \\
+   0 &  -32.3 &  67.9 & -13.3 \\
+    0 &    0  &  97.8 &  -7.2 \\
+    0 &    0  &  0 &  -89. 
+\end{bmatrix}
+$$
 
 
+Indeed, we have found a factorization $$A=QR$$, up to machine precision:
 
+$$
+QR= \begin{bmatrix}
+  6. &  6. & -77. & 59. \\
+ -13. & 20. & -81. &  1. \\
+ -33. & -35. & -65. & -74. \\
+  98. & 92. & 42. &  2.
+ \end{bmatrix},
+   A= \begin{bmatrix}
+   6 &  6 & -77 & 59 \\
+ -13 & 20 & -81 &  1 \\
+ -33 & -35 & -65 & -74 \\
+  98 & 92 & 42 &  2 \\
+\end{bmatrix}
+$$
+
+The summed absolute difference of the matrices is:
+```python
+np.absolute(A - QR).sum()) = 2.025e-13
+```
+
+You can find the Python code [here](/assets/qr_decomposition.py).
+
+We verify that $$Q$$ is orthogonal meaning $$det(Q) = \pm 1$$ and $$Q^TQ=QQ^T=I$$
+
+
+We showed an example above for a $$n \times n$$ matrix, but this holds for $$m \times n$$ matrices as well. In general, we need $$n$$ Householder matrices (assuming $$m>n$$). Only when $$m=n$$, we need only $$n-1$$ of them. However, in a typical LS problem, we have $$m>n$$.
+
+
+## References
+[1] Lloyd Trefethen and David Bau. Numerical Linear Algebra, SIAM, 2007.
 
 
 

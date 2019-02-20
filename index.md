@@ -50,6 +50,15 @@ I enjoy creating teaching materials for topics related to computer vision, a fie
     <div class="module-header">Module 2: Numerical Linear Algebra </div>
     
     <div class="materials-item">
+      <a href="direct-methods/">
+         Direct Methods for Solving Systems of Linear Equations
+      </a>
+      <div class="kw">
+        backsubstitution and the LU, Cholesky, QR factorizations
+      </div>
+    </div>
+
+    <div class="materials-item">
       <a href="conjugate-gradients/">
          Conjugate Gradients
       </a>
