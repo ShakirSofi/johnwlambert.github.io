@@ -118,8 +118,9 @@ https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7
 [2] Stefano Ermon. 
 
 
+http://videolectures.net/mlss06tw_roweis_mlpgm/?q=sam%20roweis
 
 
-
+https://www.cc.gatech.edu/~bboots3/STR-Spring2018/readings/graphical_model_Jordan.pdf
 
 

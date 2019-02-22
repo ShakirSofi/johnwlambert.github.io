@@ -30,3 +30,5 @@ View the complete course: http://ocw.mit.edu/6-046JS15
 Instructor: Srinivas Devadas
 
 https://www.youtube.com/watch?v=VYZGlgzr_As&t=129s
+
+[3] http://www.cs.cornell.edu/rdz/papers/bvz-iccv99.pdf

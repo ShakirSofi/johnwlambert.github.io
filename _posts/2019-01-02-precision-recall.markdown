@@ -187,10 +187,16 @@ def voc_eval(detpath,
 ```
 
 
+
+
 ## References
 
 [1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. [https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py](https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py).
 
+https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldid=793358396#Average_precision
+
+
+https://www.youtube.com/watch?v=yjCMEjoc_ZI
 
 
 

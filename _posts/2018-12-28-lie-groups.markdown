@@ -151,7 +151,7 @@ You have probably noticed that each rotation matrix $$\in \mathbf{R}^{3 \times 3
 
 ### SE(2)
 
-The real space $$SE(2)$$ are $$3 \times 3$$ matrices, moving a point in homogenous coordinates to a new frame. It is important to remember that this represents a rotation followed by a translation (not the other way around).
+The real space $$SE(2)$$ are $$3 \times 3$$ matrices, moving a point in homogenous coordinates to a new frame. It is important to remember that this represents a rotation followed by a translation (not the other way around).  A rigid body which translates and rotates on a 2D plane has 3 DOF, e.g. a ground robot.
 
 $$
 T = \begin{bmatrix} x_w \\ y_w \\ 1 \end{bmatrix} = \begin{bmatrix}
@@ -352,6 +352,10 @@ $$se(3)$$ is called the tangent space (or Lie algebra) of the matrix group $$SE(
 
 Why do we care about twists? It turns out that a rigid body can be moved from one position to any other by a movement consisting of (1) a rotation about a straight line (2) followed by a translation parallel to that line. This type of motion is *screw motion*, and its infinitesimal version is called a *twist*. The beauty of a twist is that it describes the instantaneous velocity of a rigid body in terms of its **linear and angular components** [5]. It is the matrix exponential that maps a twist into its corresponding screw motion.
 
+## Conclusion
+
+A *holonomic robot* is one which is able to move instantaneously in
+any direction in the space of its degrees of freedom. Otherwise a robot is called *non-holonomic*.
 
 
 ## References
