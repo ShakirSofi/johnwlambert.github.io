@@ -197,7 +197,7 @@ $$
 \frac{x^Ty}{||y||^2}
 $$
 is just a scalar coefficient.
-### The Gram Schmidt Procedure
+### The Gram-Schmidt Procedure
 
 Suppose we have a set of \\(k\\) vectors
 $$
@@ -261,8 +261,10 @@ def unit_circle_gs():
   a2 = np.array([2.,1.9])
   plot_2d_vectors(a1,a2,'r','b')
 
+  # q1 is just normalized a1
   q1 = a1 / np.linalg.norm(a1)
 
+  # subtract the projection of a2 onto q1, from a2
   q2_tilde = a2 - (a2.T.dot(q1)) * (q1)
   q2 = q2_tilde / np.linalg.norm(q2_tilde)
 
@@ -273,8 +275,8 @@ def unit_circle_gs():
   plt.show()
 ```
 
-A general algorithm is found here:
-```
+A simple implementation of classical Gram-Schmidt (CGS) algorithm can be found here. We create $$n$$ orthonormal vectors $$q_k$$:
+```python
 def classical_gs(A):
   """ 
   Classical Gram Schmidt (MGS). R will always be square.

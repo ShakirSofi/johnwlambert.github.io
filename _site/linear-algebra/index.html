@@ -243,7 +243,7 @@ equivalent to computing \( cos(\theta) = \frac{adj}{hyp} \), where the adjacent 
 <p>where 
 <script type="math/tex">\frac{x^Ty}{||y||^2}</script>
 is just a scalar coefficient.</p>
-<h3 id="the-gram-schmidt-procedure">The Gram Schmidt Procedure</h3>
+<h3 id="the-gram-schmidt-procedure">The Gram-Schmidt Procedure</h3>
 
 <p>Suppose we have a set of \(k\) vectors
 <script type="math/tex">\{a_1, \dots, a_k\}</script>
@@ -299,8 +299,10 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
   <span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.9</span><span class="p">])</span>
   <span class="n">plot_2d_vectors</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">a2</span><span class="p">,</span><span class="s">'r'</span><span class="p">,</span><span class="s">'b'</span><span class="p">)</span>
 
+  <span class="c"># q1 is just normalized a1</span>
   <span class="n">q1</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
 
+  <span class="c"># subtract the projection of a2 onto q1, from a2</span>
   <span class="n">q2_tilde</span> <span class="o">=</span> <span class="n">a2</span> <span class="o">-</span> <span class="p">(</span><span class="n">a2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">q1</span><span class="p">)</span>
   <span class="n">q2</span> <span class="o">=</span> <span class="n">q2_tilde</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q2_tilde</span><span class="p">)</span>
 
@@ -311,9 +313,9 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
   <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p>A general algorithm is found here:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def classical_gs(A):
-  """ 
+<p>A simple implementation of classical Gram-Schmidt (CGS) algorithm can be found here. We create <script type="math/tex">n</script> orthonormal vectors <script type="math/tex">q_k</script>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">classical_gs</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+  <span class="s">""" 
   Classical Gram Schmidt (MGS). R will always be square.
   "A" must be full rank.
 
@@ -323,18 +325,18 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
     Returns:
     - Q: Orthogonal matrix of shape (m,n)
     - R: Upper triangular matrix of shape (n,n)
-  """
-  m,n = A.shape
-  Q = np.zeros((m,m))
-  R = np.zeros((n,n))
-  for k in range(n):
-    for i in range(k):
-      R[i,k] = Q[:,i].T.dot(A[:,k])
-      A[:,k] -= R[i,k] * Q[:,i]
-    R[k,k] = np.linalg.norm(A[:,k])
-    Q[:,k] = A[:,k] / R[k,k]
+  """</span>
+  <span class="n">m</span><span class="p">,</span><span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+  <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span><span class="n">m</span><span class="p">))</span>
+  <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+      <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[:,</span><span class="n">k</span><span class="p">])</span>
+      <span class="n">A</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="o">-=</span> <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">R</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">[:,</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">Q</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="o">/</span> <span class="n">R</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
 
-  return Q,R
+  <span class="k">return</span> <span class="n">Q</span><span class="p">,</span><span class="n">R</span>
 </code></pre></div></div>
 
 <h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
