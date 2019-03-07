@@ -17,6 +17,17 @@ permalink: /publications/
 
 
 {% include paper.html
+authors="Ming-Fang Chang*, <b>John Lambert*</b>, Patsorn Sangkloy*, Jagjeet Singh* [*co-first authors], Andrew Hartnett, De Wang, Peter Carr, Simon Lucey, Deva Ramanan, James Hays"
+title="To Appear"
+venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+location="Long Beach, California"
+date="June 2019"
+award="Oral"
+image="http://cvpr2019.thecvf.com/images/CVPRLogo.png"
+%}
+
+
+{% include paper.html
 authors=" <b>John Lambert</b>, Ozan Sener, Silvio Savarese"
 title="Deep Learning under Privileged Information Using Heteroscedastic Dropout"
 venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
