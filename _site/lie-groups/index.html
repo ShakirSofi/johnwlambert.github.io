@@ -231,7 +231,7 @@ R_{roll} = R_R (\phi) = \begin{bmatrix}
 
 <h3 id="se2">SE(2)</h3>
 
-<p>The real space <script type="math/tex">SE(2)</script> are <script type="math/tex">3 \times 3</script> matrices, moving a point in homogenous coordinates to a new frame. It is important to remember that this represents a rotation followed by a translation (not the other way around).</p>
+<p>The real space <script type="math/tex">SE(2)</script> are <script type="math/tex">3 \times 3</script> matrices, moving a point in homogenous coordinates to a new frame. It is important to remember that this represents a rotation followed by a translation (not the other way around).  A rigid body which translates and rotates on a 2D plane has 3 DOF, e.g. a ground robot.</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 T = \begin{bmatrix} x_w \\ y_w \\ 1 \end{bmatrix} = \begin{bmatrix}
@@ -391,6 +391,11 @@ se(3) = \Bigg\{ \hat{\xi} = \begin{bmatrix} \hat{\omega} & v \\ 0 & 0 \end{bmatr
 <p><script type="math/tex">se(3)</script> is called the tangent space (or Lie algebra) of the matrix group <script type="math/tex">SE(3)</script>.</p>
 
 <p>Why do we care about twists? It turns out that a rigid body can be moved from one position to any other by a movement consisting of (1) a rotation about a straight line (2) followed by a translation parallel to that line. This type of motion is <em>screw motion</em>, and its infinitesimal version is called a <em>twist</em>. The beauty of a twist is that it describes the instantaneous velocity of a rigid body in terms of its <strong>linear and angular components</strong> [5]. It is the matrix exponential that maps a twist into its corresponding screw motion.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>A <em>holonomic robot</em> is one which is able to move instantaneously in
+any direction in the space of its degrees of freedom. Otherwise a robot is called <em>non-holonomic</em>.</p>
 
 <h2 id="references">References</h2>
 

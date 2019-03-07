@@ -59,7 +59,7 @@ I enjoy creating teaching materials for topics related to computer vision, a fie
     </div>
 
     <div class="materials-item">
-      <a href="conjugate-gradients/">
+      <a href="cg-orthomin/">
          Conjugate Gradients
       </a>
       <div class="kw">
@@ -144,15 +144,6 @@ I enjoy creating teaching materials for topics related to computer vision, a fie
       </a>
       <div class="kw">
           simple derivations and code examples 
-      </div>
-    </div>
-
-    <div class="materials-item">
-      <a href="sfm/">
-        Structure From Motion
-      </a>
-      <div class="kw">
-          Deriving bundle adjustment
       </div>
     </div>
 

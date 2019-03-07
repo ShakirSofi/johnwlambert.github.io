@@ -101,7 +101,7 @@
 
 <h2 id="factor-graphs-for-robot-vision">Factor Graphs for Robot Vision</h2>
 
-<p>A factor graph is a probabilistic graphical model, theory which represents the marriage of graph theory with probability.</p>
+<p>A factor graph is a probabilistic graphical model, theory which represents the marriage of graph theory with probability. It was developed by Frank Kschischang in 2001 [3].</p>
 
 <p>To use factor graphs for computer vision in robotics, we will need another tool: numerical linear algebra. These problems can be reformulated as very large least-squares problems. In fact, the size of the matrix that would not need be to inverted to solve the system of equations makes these problems solvable only by iterative methods, rather than direct methods.</p>
 
@@ -171,7 +171,7 @@ X^{MAP} &= \mbox{arg }\underset{X}{\mbox{max }} \phi(X) & \mbox{Maximum likeliho
 
 <p>Along the way, we decided to maximize the log-likelihood instead of the likelihood because the argument that maximizes the log of a function also maximizes the function itself.</p>
 
-<h2 id="factor-graph-variable-elimanation">Factor Graph Variable Elimanation</h2>
+<h2 id="factor-graph-variable-elimination">Factor Graph Variable Elimination</h2>
 
 <p>If you’re wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.</p>
 
@@ -184,6 +184,12 @@ X^{MAP} &= \mbox{arg }\underset{X}{\mbox{max }} \phi(X) & \mbox{Maximum likeliho
 <p>[1] Frank Dellaert and Michael Kaess. <em>Factor Graphs for Robot Perception</em>. Foundations and Trends in Robotics, Vol. 6, No. 1-2 (2017) 1–139. <a href="https://www.ri.cmu.edu/wp-content/uploads/2018/05/Dellaert17fnt.pdf">PDF</a>.</p>
 
 <p>[2] Stefano Ermon.</p>
+
+<p>[3]. Frank Kschischang, Brendan Frey, Hans-Andrea Loeliger. Factor graphs and the sum-product algorithm. IEEE Transactions on information theory 47 (2), 498-519. <a href="http://www.cs.utoronto.ca/~radford/csc2506/factor.pdf">PDF</a>.</p>
+
+<p>http://videolectures.net/mlss06tw_roweis_mlpgm/?q=sam%20roweis</p>
+
+<p>https://www.cc.gatech.edu/~bboots3/STR-Spring2018/readings/graphical_model_Jordan.pdf</p>
 
 
   </article>

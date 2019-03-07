@@ -15,4 +15,8 @@ Table of Contents:
 
 <a name='sfmpipeline'></a>
 
-## Back Substitution for Triangular Matrices
+## VAE
+
+## References
+
+[1] https://arxiv.org/pdf/1606.05908.pdf

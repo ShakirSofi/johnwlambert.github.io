@@ -143,6 +143,7 @@ a_k &= \frac{ r_k^T (Ar_k) }{ (Ar_k)^T (Ar_k)} & \mbox{ remove multiplication by
  a_k &= \frac{\langle r_k, Ar_k \rangle}{\langle Ar_k, Ar_k \rangle} & \mbox{write as standard 2-inner products}
 \end{aligned}
 $$
+
 To minimize the 2-norm, we use standard 2-inner-product. This gives the Orthomin(1) method -- from orthogonal projections. The purpose is to minimize the residual and the method seems to work for a general $$A$$ matrix.
 
 ### Steepest Descent
@@ -184,9 +185,89 @@ $$
 
 Our recurrence is between two vectors, $$e_k$$ and a scaled $$r_k$$.  In order to minimize $$\|e_{k+1}\|_A$$ given $$e_k$$, we can simply project $$e_k$$ onto $$r_k$$.
 
+We recall that the projection of a vector $$x$$ onto a vector $$y$$ is given by $$P_y(x) = \frac{x^Ty}{y^Ty}y$$. Thus, we can compute the scaling $$a$$ in $$(ar_k)$$ as:
+
+$$
+        a_k = \frac{\langle e_k, r_k \rangle_A}{\langle r_k, r_k \rangle_A} = \frac{\langle e_k, Ar_k\rangle }{\langle r_k, Ar_k\rangle } = \frac{\langle A^He_k, r_k\rangle }{\langle r_k, Ar_k\rangle } = \frac{\langle A e_k, r_k\rangle }{\langle r_k, Ar_k\rangle } = \frac{\langle r_k, r_k\rangle }{\langle r_k, Ar_k\rangle }
+$$
+
+We used the fact that $$A=A^H$$ (since $$A$$ is Hermitian) and the fact that $$e_k = A^{-1}r_k$$, so $$Ae_k = r_k$$. Note that now everything is expressed in terms of $$r_k$$, not $$e_k$$, since $$r_k$$ is computable even when $$e_k$$ isn't. This method is called steepest descent and as we will see, it corresponds to a Krylov subspace method. Steepest descent requires that $$A=A^H$$, and that $$A$$ is positive definite for the norm definition.
+
+### Another Perspective on Steepest Descent
+
+Another way to consider Steepest Descent is to consider that the algorithm at each step performs a gradient descent step with optimal step size. Consider the following objective function:
+
+$$
+V(x) = x^HAx - 2b^Hx
+$$
+
+Then we can find the stationarity condition by finding the derivative and set to zero:
+
+$$
+\begin{aligned}
+\nabla V = 2Ax - 2b = 0 \\
+Ax = b
+\end{aligned}
+$$
+
+Our step is
+$$
+x_{k+1} = x_k - a_k \frac{1}{2}\nabla V(x_k)
+$$
+
+At each step, we go as deep as you can, then we change to another direction.
+
+### Steepest Descent is a Krylov Subspace Method
+
+Recall that a Krylov Subspace method builds solutions in the subpace
+ 
+$$
+ \mathcal{K}_k = \mbox{span} \{ \vec{b}, A \vec{b}, A^2 \vec{b}, \cdots \}
+$$
+
+In Steepest Descent, our iterative solutions are formed from the recurrence relation:
+
+$$
+\vec{x}_{k+1} = \vec{x}_k + a_k( \vec{b} - A\vec{x}_k)
+$$
+
+One can prove via induction that Steepest Descent is a Krylov Subspace method. To show a brief example, suppose $$\vec{x}_0 = 0$$. This implies
+
+$$
+\begin{aligned}
+\vec{x}_1 &= x_0 + a_k (b-Ax_0) \\
+\vec{x}_1 &= 0 + a_k (b-A \cdot 0) \\
+\vec{x}_1 &= a_k b \\
+\vec{x}_1 & \in \mbox{span} \{ \vec{b} \} \\
+\end{aligned}
+$$
+
+Consider $$\vec{x}_2$$.
+
+$$
+\begin{aligned}
+\vec{x}_2 &= x_1 + a_k (b-Ax_1) \\
+\vec{x}_2 &= (a_k b) + a_k \Big(b-A(a_k b)\Big) & \mbox{since } \vec{x}_1 &= a_k b \\
+\vec{x}_2 &= a_kb + a_kb - a_k Aa_k b\\
+\vec{x}_2 &= (2 a_k) b - (a_k^2) Ab \\
+\vec{x_2} & \in \mbox{span} \Bigg\{ \vec{b}, A \vec{b} \Bigg\}
+\end{aligned}
+$$
+
+
+If you consider $$x_{k+1}$$, it is not hard to show that if $$x_k$$ was in a Krylov subspace, then so is $$x_{k+1}$$. If $$x_0$$ is non-zero, we simply start with a shifted $$\vec{b}$$. As we recall, with an $$n$$-dimensional problem, we only need to do $$n$$-steps, then we span the whole space and are guaranteed to find the solution.
+
 ### Orthomin(2)
 
+We now seek an improvement on Orthomin(1). Orthomin(1) fails to converge if $$0$$ is in the numerical range of $$A$$. In Orthomin(1), we had a single orthogonality condition: $$ r_{k+1} \perp A r_k $$. Our step was in the direction of the residual $$r_k$$. For the sake of generality, so we will call our descent direction $$p_k$$, and for Orthomin(1), it just so happens that $$p_k = r_k$$.
 
+In Orthomin(2), we will now require two orthogonality conditions. We must be orthogonal to the *previous two* descent directions.
+
+$$
+r_{k+1} \perp A p_k, Ap_{k-1}
+$$
+
+The question is, can we find some descent direction $$p_k$$ such that we can accomplish this double orthogonality condition? As we showed previously, one of the orthogonality conditions is easy. If we want $$r_{k+1} \perp A p_k$$, this is doable if we just pick a good scalar value $$a_k$$. A slightly less trivial requirement is to have orthogonality to the previous descent direction.
 
 
 

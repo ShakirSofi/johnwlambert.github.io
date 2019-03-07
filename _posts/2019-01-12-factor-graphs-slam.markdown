@@ -18,7 +18,7 @@ Table of Contents:
 
 ## Factor Graphs for Robot Vision
 
-A factor graph is a probabilistic graphical model, theory which represents the marriage of graph theory with probability.
+A factor graph is a probabilistic graphical model, theory which represents the marriage of graph theory with probability. It was developed by Frank Kschischang in 2001 [3].
 
 To use factor graphs for computer vision in robotics, we will need another tool: numerical linear algebra. These problems can be reformulated as very large least-squares problems. In fact, the size of the matrix that would not need be to inverted to solve the system of equations makes these problems solvable only by iterative methods, rather than direct methods.
 
@@ -99,7 +99,7 @@ We've reduce the problem to minimization of a sum of nonlinear least-squares.
 Along the way, we decided to maximize the log-likelihood instead of the likelihood because the argument that maximizes the log of a function also maximizes the function itself.
 
 
-## Factor Graph Variable Elimanation
+## Factor Graph Variable Elimination
 
 If you're wondering about the variable elimination part, we choose subsets of variables connected by factors and start combining them by taking the product of their factors and marginalizing out variables.
 
@@ -116,6 +116,8 @@ https://d1b10bmlvqabco.cloudfront.net/attach/jl1qtqdkuye2rp/jl1r1s4npvog2/jmtgs7
 [1] Frank Dellaert and Michael Kaess. *Factor Graphs for Robot Perception*. Foundations and Trends in Robotics, Vol. 6, No. 1-2 (2017) 1–139. [PDF](https://www.ri.cmu.edu/wp-content/uploads/2018/05/Dellaert17fnt.pdf).
 
 [2] Stefano Ermon. 
+
+[3]. Frank Kschischang, Brendan Frey, Hans-Andrea Loeliger. Factor graphs and the sum-product algorithm. IEEE Transactions on information theory 47 (2), 498-519. [PDF](http://www.cs.utoronto.ca/~radford/csc2506/factor.pdf).
 
 
 http://videolectures.net/mlss06tw_roweis_mlpgm/?q=sam%20roweis

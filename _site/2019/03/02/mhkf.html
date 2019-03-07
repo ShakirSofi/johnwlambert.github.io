@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Mhkf</title>
+  <meta name="description" content="">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/2019/03/02/mhkf.html">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Mhkf</h1>
+    <p class="meta">Mar 2, 2019</p>
+  </header>
+
+  <article class="post-content">
+  
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Copyright John Lambert</span>
+
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span> 
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pdb</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">import</span> <span class="nn">itertools</span>    
+
+<span class="k">def</span> <span class="nf">generate_whitened_noise</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span><span class="n">dim</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">sqrtm</span><span class="p">(</span><span class="n">cov</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">dim</span><span class="p">))</span> <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">MultiHypothesisKalmanFilter</span><span class="p">():</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_timesteps</span><span class="p">):</span>
+		<span class="s">"""
+		State and measurement dimension = 2
+		Args:
+		-	num_timesteps: integer denoting number of timesteps for which to run the tracker
+
+		Returns:
+		-	None
+		"""</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">num_timesteps</span> <span class="o">=</span> <span class="n">num_timesteps</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span> <span class="o">=</span> <span class="mi">3</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span> <span class="c"># essentially, 3 block diagonal identity mats I_{2 x 2}</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">1.</span>
+
+		<span class="c"># TODO: make these uniform later</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.25</span><span class="p">,</span><span class="mf">0.25</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">true_states</span> <span class="o">=</span> <span class="p">[</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">measurements</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="c"># true measurement association</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Ctrue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span> <span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Ctrue</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Ctrue</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">Ctrue</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">possible_permutations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_perms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">generate_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="s">""" 
+		Run simulation of the dynamics and measurement models
+		for some number of timesteps before the filter is actually executed.
+
+		Returns:
+		-	true_states: 
+		-	measurements: 
+		"""</span>
+		<span class="n">x_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># initial state</span>
+		<span class="n">y_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">measurements</span> <span class="o">+=</span> <span class="p">[</span><span class="n">y_t</span><span class="p">]</span>
+
+		<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_timesteps</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+			<span class="n">x_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">add_noise</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">true_states</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x_t</span><span class="p">]</span>
+			<span class="n">y_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">x_t</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">measurements</span> <span class="o">+=</span> <span class="p">[</span><span class="n">y_t</span><span class="p">]</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">measurements</span>
+
+
+	<span class="k">def</span> <span class="nf">h</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_t</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+		<span class="s">""" 
+		Measurement model for generating measurements y. 
+		Args:
+		-	x_t:
+		-	add_noise:
+		Returns:
+		-	
+		"""</span>
+		<span class="n">y_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ctrue</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span> <span class="n">x_t</span> <span class="p">)</span>
+		<span class="k">if</span> <span class="n">add_noise</span><span class="p">:</span>
+			<span class="n">y_t</span> <span class="o">+=</span> <span class="n">generate_whitened_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">y_t</span>
+
+
+	<span class="k">def</span> <span class="nf">get_initial_state_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="s">""" 
+		Returns:
+		-	mu:
+		-	cov:
+		"""</span>
+		<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+		<span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+		<span class="c"># loop over the hypotheses (which are true targets initially)</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="p">):</span>
+			<span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+			<span class="n">cov</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span>
+
+
+	<span class="k">def</span> <span class="nf">numpy_perms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+		<span class="s">"""
+		Python equivalent of Matlab's "perms([1,2,3])"
+		Args:
+		-	n: integer representing total number of indices that can be permuted (e.g. num targets)
+		Returns:
+		-	
+		"""</span>
+		<span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+		<span class="n">permut</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+		<span class="n">permut_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">permut</span><span class="p">:</span>
+			<span class="n">permut_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">permut_array</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">p</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">permut_array</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+	<span class="k">def</span> <span class="nf">generate_permutation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perm_vec</span><span class="p">):</span>
+		<span class="s">"""
+		Args:
+		-	perm_vec: NumPy n-d array of dim () and dtype '', e.g. 
+		Returns:
+		-	permutation matrix
+		"""</span>
+		<span class="n">Ci</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+		<span class="n">Ci</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">perm_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">perm_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+		<span class="n">Ci</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">perm_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">perm_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+		<span class="n">Ci</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">perm_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">perm_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">Ci</span>
+
+
+	<span class="k">def</span> <span class="nf">generate_permutation_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="s">"""
+		Returns:
+		-	perm_mats: Python list of 6x6 permutation matrices, with dtype 'float64'
+		"""</span>
+		<span class="n">perm_mats</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">perm_vec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">possible_permutations</span><span class="p">:</span>
+			<span class="n">perm_mats</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_permutation_matrix</span><span class="p">(</span><span class="n">perm_vec</span><span class="p">)]</span>
+		<span class="k">return</span> <span class="n">perm_mats</span>
+
+
+
+	<span class="k">def</span> <span class="nf">dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_t</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">add_noise</span><span class="p">):</span>
+		<span class="s">""" 
+		x_{t+1}^i = x_t^i + u_t^i + w_t^i 
+
+		Q is our process noise
+
+		Args:
+		-	x_t: 
+		-	t: 
+		-	add_noise:
+		Returns:
+		-	
+		"""</span>
+		<span class="n">x_tplus1</span> <span class="o">=</span> <span class="n">x_t</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([[</span>	<span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">t</span><span class="p">),</span> 	<span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>	<span class="p">],</span>
+									<span class="p">[</span>	<span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.2</span><span class="o">*</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>	<span class="p">],</span>
+									<span class="p">[</span>	<span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">t</span><span class="p">),</span> 	<span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.2</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>	<span class="p">]</span> <span class="p">])</span>
+		<span class="c"># add white Gaussian noise</span>
+		<span class="k">if</span> <span class="n">add_noise</span><span class="p">:</span>
+			<span class="n">x_tplus1</span> <span class="o">+=</span> <span class="n">generate_whitened_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">x_tplus1</span>
+
+
+	<span class="k">def</span> <span class="nf">gauss_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="p">):</span>
+		<span class="s">"""
+		Args:
+		-	x: the point at which we evaluate
+		-	mu: the mean of the Gaussian
+		-	cov: the covariance of the Gaussian
+		Returns:
+		-	
+		"""</span>
+		<span class="n">n</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">exponent</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">cov</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">mu</span> <span class="p">)</span>
+		<span class="n">eta</span> <span class="o">=</span> <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">n</span><span class="o">/</span><span class="mf">2.</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="p">)</span>
+		<span class="k">return</span> <span class="n">eta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exponent</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">run_mhkf_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y_true</span><span class="p">):</span>
+		<span class="s">"""
+		keep only the first three most likely Gaussian components at each step
+		We multiply measurements from 3 original gaussian with 
+		6 possible permutation matrices. Then we take the top 3 scoring
+		out of the 18 generated.
+
+		Args:
+		-	
+		Returns:
+		-	
+		"""</span>
+		<span class="c"># predict </span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_targets</span><span class="p">):</span>
+			<span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">t</span><span class="p">,</span> <span class="n">add_noise</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+			<span class="n">cov</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span>
+
+
+		<span class="n">perm_mats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_permutation_matrices</span><span class="p">()</span>
+
+		<span class="c">#alphas = np.zeros((self.num_targets * len(self.possible_permutations)))</span>
+		<span class="n">alphas</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">hypothesis_idx_vec</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="c"># loop over hypotheses</span>
+		<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+			<span class="c"># loop over measurement associations</span>
+			<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">perm_mat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">perm_mats</span><span class="p">):</span>
+				<span class="c"># this is the expected measurement</span>
+				<span class="n">gauss_mu</span> <span class="o">=</span> <span class="n">perm_mat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">j</span><span class="p">,:])</span>
+				<span class="n">gauss_cov</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">+</span> <span class="n">perm_mat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">perm_mat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+				<span class="c"># these are the scores alpha_{ij}</span>
+				<span class="c"># # these scores are the probabilities p(y_t | y_{1:t-1} )</span>
+				<span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gauss_pdf</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">gauss_mu</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">gauss_cov</span><span class="p">)</span>
+				<span class="n">alphas</span> <span class="o">+=</span> <span class="p">[</span><span class="n">alpha</span><span class="p">]</span> <span class="c"># alpha_vec[ (j-1)*6+i ] = alpha</span>
+				<span class="n">hypothesis_idx_vec</span> <span class="o">+=</span> <span class="p">[</span><span class="n">j</span><span class="p">]</span>
+
+		<span class="c"># prune from 18 to 3</span>
+		<span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alphas</span><span class="p">)</span>
+		<span class="n">top3scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">alphas</span><span class="p">)</span> <span class="c"># by default, in ascending order</span>
+		<span class="n">top3_score_idxs</span> <span class="o">=</span> <span class="n">top3scores</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="c"># reverse, then take top 3 scores</span>
+
+		<span class="c"># update each hypothesis from among 18 choices</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+			<span class="n">k</span> <span class="o">=</span> <span class="n">top3_score_idxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+			<span class="n">perm_mat</span> <span class="o">=</span> <span class="n">perm_mats</span><span class="p">[</span><span class="n">k</span> <span class="o">%</span> <span class="mi">6</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+			<span class="n">hypothesis_idx</span> <span class="o">=</span> <span class="n">hypothesis_idx_vec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="c"># this is the trajectory we associated w it </span>
+
+			<span class="n">inv</span> <span class="o">=</span> <span class="n">perm_mat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov</span><span class="p">[</span><span class="n">hypothesis_idx</span><span class="p">])</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">perm_mat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span>
+			<span class="n">inv</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+			<span class="n">K</span> <span class="o">=</span> <span class="n">cov</span><span class="p">[</span><span class="n">hypothesis_idx</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">perm_mat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+			<span class="n">pred_meas</span> <span class="o">=</span> <span class="n">perm_mat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">hypothesis_idx</span><span class="p">])</span>
+			<span class="n">mu</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="n">hypothesis_idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">K</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span> <span class="n">y_true</span> <span class="o">-</span> <span class="n">pred_meas</span><span class="p">)</span>
+			<span class="n">cov</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">K</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">perm_mat</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov</span><span class="p">[</span><span class="n">hypothesis_idx</span><span class="p">])</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span>
+
+
+<span class="k">def</span> <span class="nf">run_MHKF_filter</span><span class="p">():</span>
+	<span class="n">num_timesteps</span> <span class="o">=</span> <span class="mi">50</span>
+	<span class="n">mhkf</span> <span class="o">=</span> <span class="n">MultiHypothesisKalmanFilter</span><span class="p">(</span><span class="n">num_timesteps</span><span class="p">)</span>
+	<span class="n">true_states</span><span class="p">,</span> <span class="n">true_meas</span> <span class="o">=</span> <span class="n">mhkf</span><span class="o">.</span><span class="n">generate_sequence</span><span class="p">()</span>
+
+	<span class="n">pred_states</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="n">pred_state</span><span class="p">,</span> <span class="n">pred_cov</span> <span class="o">=</span> <span class="n">mhkf</span><span class="o">.</span><span class="n">get_initial_state_estimate</span><span class="p">()</span>
+
+	<span class="c"># In Python 3, memory is overwritten in place</span>
+	<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_timesteps</span><span class="p">):</span>
+		<span class="n">y_true</span> <span class="o">=</span> <span class="n">true_meas</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+		<span class="n">pred_state</span><span class="p">,</span> <span class="n">pred_cov</span> <span class="o">=</span> <span class="n">mhkf</span><span class="o">.</span><span class="n">run_mhkf_step</span><span class="p">(</span><span class="n">pred_state</span><span class="p">,</span> <span class="n">pred_cov</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">y_true</span><span class="p">)</span>
+		<span class="c"># must perform deepcopy</span>
+		<span class="n">pred_states</span> <span class="o">+=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">pred_state</span><span class="p">)]</span>
+
+	<span class="n">pred_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pred_states</span><span class="p">)</span>
+	<span class="n">true_states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">true_states</span><span class="p">)</span>
+
+	<span class="c"># # Keep around 3 possible hypothesis of assignments</span>
+	<span class="c"># plt.plot(true_states[:,0],true_states[:,1], 'r', linestyle='solid')</span>
+	<span class="c"># plt.plot(true_states[:,2],true_states[:,3], 'g', linestyle='solid')</span>
+	<span class="c"># plt.plot(true_states[:,4],true_states[:,5], 'b', linestyle='solid')</span>
+	<span class="c"># # # plt.savefig('true.png')</span>
+
+	<span class="c"># # Hypothesis 0</span>
+	<span class="c"># plt.plot(pred_states[:,0,0], pred_states[:,0,1], 'r', linestyle='dashed')</span>
+	<span class="c"># plt.plot(pred_states[:,0,2], pred_states[:,0,3], 'g', linestyle='dashed')</span>
+	<span class="c"># plt.plot(pred_states[:,0,4], pred_states[:,0,5], 'b', linestyle='dashed')</span>
+	<span class="c"># # plt.savefig('pred.png')</span>
+
+	<span class="c"># # Hypothesis 1</span>
+	<span class="c"># plt.plot(pred_states[:,1,0], pred_states[:,1,1], 'r', linestyle='dashdot')</span>
+	<span class="c"># plt.plot(pred_states[:,1,2], pred_states[:,1,3], 'g', linestyle='dashdot')</span>
+	<span class="c"># plt.plot(pred_states[:,1,4], pred_states[:,1,5], 'b', linestyle='dashdot')</span>
+	<span class="c"># # plt.savefig('pred.png')</span>
+
+	<span class="c"># # Hypothesis 2</span>
+	<span class="c"># plt.plot(pred_states[:,2,0], pred_states[:,2,1], 'r', linestyle='dotted')</span>
+	<span class="c"># plt.plot(pred_states[:,2,2], pred_states[:,2,3], 'g', linestyle='dotted')</span>
+	<span class="c"># plt.plot(pred_states[:,2,4], pred_states[:,2,5], 'b', linestyle='dotted')</span>
+	<span class="c"># # plt.savefig('pred.png')</span>
+
+
+	<span class="c"># plt.show()</span>
+
+	<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_timesteps</span><span class="p">):</span>
+		<span class="c"># Keep around 3 possible hypothesis of assignments</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">true_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span><span class="n">true_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'+'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">true_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span><span class="n">true_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'+'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">true_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span><span class="n">true_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'+'</span><span class="p">)</span>
+		<span class="c"># # plt.savefig('true.png')</span>
+
+		<span class="c"># Hypothesis 0</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">)</span>
+		<span class="c"># plt.savefig('pred.png')</span>
+
+		<span class="c"># Hypothesis 1</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'*'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'*'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'*'</span><span class="p">)</span>
+		<span class="c"># plt.savefig('pred.png')</span>
+
+		<span class="c"># Hypothesis 2</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'p'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'p'</span><span class="p">)</span>
+		<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">pred_states</span><span class="p">[:</span><span class="n">t</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'p'</span><span class="p">)</span>
+		<span class="c"># plt.savefig('pred.png')</span>
+
+		<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">'mhkf/{}.png'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+		<span class="c"># plt.pause(0.01)</span>
+		<span class="c"># #plt.close()</span>
+		<span class="c"># plt.gcf.clear()</span>
+
+
+
+
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+	<span class="n">run_MHKF_filter</span><span class="p">()</span>
+
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+	<span class="n">main</span><span class="p">()</span>
+</code></pre></div></div>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

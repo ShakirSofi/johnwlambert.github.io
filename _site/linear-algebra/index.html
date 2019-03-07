@@ -277,34 +277,64 @@ such that \(q_i \in \mathbb{R}^n\). We can do so by iteratively subtracting the 
   </div>
 </div>
 <p>In a few lines of Python, we can generate this plot:</p>
+
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.2</span><span class="p">])</span>
-<span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.9</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">plot_2d_vectors</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">,</span><span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">):</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">c1</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">c2</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span><span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<span class="n">q1</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">plot_circle_points</span><span class="p">():</span>
+  <span class="c"># generate n points along a circle</span>
+  <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+  <span class="n">radius</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="n">circ_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">radius</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+  <span class="n">circ_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">radius</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">circ_x</span><span class="p">,</span><span class="n">circ_y</span><span class="p">,</span> <span class="s">'y--'</span><span class="p">)</span>
 
-<span class="n">q2_tilde</span> <span class="o">=</span> <span class="n">a2</span> <span class="o">-</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">q1</span><span class="p">)</span>
-<span class="n">q2</span> <span class="o">=</span> <span class="n">q2_tilde</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q2_tilde</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">unit_circle_gs</span><span class="p">():</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">a1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span><span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.2</span><span class="p">])</span>
+  <span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.9</span><span class="p">])</span>
+  <span class="n">plot_2d_vectors</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">a2</span><span class="p">,</span><span class="s">'r'</span><span class="p">,</span><span class="s">'b'</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'m'</span><span class="p">,</span> <span class="n">head_width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">length_includes_head</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+  <span class="n">q1</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+  <span class="n">q2_tilde</span> <span class="o">=</span> <span class="n">a2</span> <span class="o">-</span> <span class="p">(</span><span class="n">a2</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+  <span class="n">q2</span> <span class="o">=</span> <span class="n">q2_tilde</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q2_tilde</span><span class="p">)</span>
 
-<span class="c"># generate n points along a circle</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">radius</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">circ_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">radius</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
-<span class="n">circ_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">radius</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">circ_x</span><span class="p">,</span><span class="n">circ_y</span><span class="p">,</span> <span class="s">'y--'</span><span class="p">)</span>
+  <span class="n">plot_2d_vectors</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span><span class="n">q2</span><span class="p">,</span><span class="s">'g'</span><span class="p">,</span><span class="s">'m'</span><span class="p">)</span>
+  <span class="n">plot_circle_points</span><span class="p">()</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<p>A general algorithm is found here:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def classical_gs(A):
+  """ 
+  Classical Gram Schmidt (MGS). R will always be square.
+  "A" must be full rank.
+
+    Args:
+    - A: Numpy array of shape (m,n)
+
+    Returns:
+    - Q: Orthogonal matrix of shape (m,n)
+    - R: Upper triangular matrix of shape (n,n)
+  """
+  m,n = A.shape
+  Q = np.zeros((m,m))
+  R = np.zeros((n,n))
+  for k in range(n):
+    for i in range(k):
+      R[i,k] = Q[:,i].T.dot(A[:,k])
+      A[:,k] -= R[i,k] * Q[:,i]
+    R[k,k] = np.linalg.norm(A[:,k])
+    Q[:,k] = A[:,k] / R[k,k]
+
+  return Q,R
 </code></pre></div></div>
 
 <h2 id="solving-systems-of-equations">Solving Systems of Equations</h2>
@@ -400,13 +430,13 @@ A(-\frac{A^T \lambda}{2}) = y \\
 <script type="math/tex; mode=display">% <![CDATA[
 A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} \sigma_1 & & \\ & \ddots & \\ & & \sigma_r \end{bmatrix} \begin{bmatrix} v_1^T \\ \vdots \\ v_r^T \end{bmatrix} %]]></script>
 
-<p>where \(U\), \(V\) are orthogonal matrices, meaning \(U^TU = I\), \(UU^T=I\).</p>
+<p>where \(U\), \(V\) are orthogonal matrices, meaning \(U^TU = I\), \(UU^T=I\), and <script type="math/tex">\Sigma</script> is a diagonal matrix.</p>
 
-<p>Diagonal elements are sorted in non-increasing order:</p>
+<p>Diagonal elements are singular values. Singular values are always non-negative and are sorted in non-increasing order:</p>
 
 <script type="math/tex; mode=display">\sigma_1 \geq \sigma_2 \geq \dots \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0</script>
 
-<p>where <script type="math/tex">p = \min(m,n)</script>:</p>
+<p>where <script type="math/tex">p = \min(m,n)</script> and <script type="math/tex">rank(A)=r</script>, meaning this is a rank-revealing decomposition.</p>
 
 <p>We call \(V=\begin{bmatrix} v_1, \dots, v_r \end{bmatrix}\) the right/input singular vectors, because this is the first matrix to interact with an input vector \(x\) when we compute \(y=Ax\).</p>
 
