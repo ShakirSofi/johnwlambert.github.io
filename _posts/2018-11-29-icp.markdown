@@ -10,11 +10,8 @@ mathjax: true
 
 
 ## The 3D Registration Problem
-Given two shapes A and B which partially overlap
 
-Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B
-
-Assume A and B are positioned close to each other
+The *3D Registration Problem* is defined as follows: given two shapes $$A$$ and $$B$$ which partially overlap, use only rigid transforms to register $$B$$ against $$A$$ by minimizing a measure of distance between A and B. We assume $$A$$ and $$B$$ are positioned close to each other.
 
 $$
 \min\limits_T \delta(A, T(B))
@@ -100,18 +97,7 @@ $$
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-```
+```python
 def find_rigid_alignment(A, B):
 	"""
 	2-D or 3-D registration with known correspondences.
@@ -154,23 +140,26 @@ def find_rigid_alignment(A, B):
 	return R, -t.squeeze()
 ```
 
-Similar code named the *Umeyama Transform* after[4] ships with [Eigen](https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60) as [Umeyama](https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html). The Open3D library utilizes the Umeyama method also (source code [here](https://github.com/IntelVCL/Open3D/blob/master/src/Core/Registration/TransformationEstimation.cpp#L47)).
+Similar code named the *Umeyama Transform* after[4] ships with [Eigen](https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60) as [Umeyama](https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html). The Open3D library utilizes the Umeyama method also (source code [here](https://github.com/IntelVCL/Open3D/blob/master/src/Open3D/Registration/TransformationEstimation.cpp#L59)).
 
 ## Local Methods
 
 ### Iterated Closest Pair (ICP) [2]
 
-- Align the A points to their closest B neighbors, then repeat.
+- Align the $$A$$ points to their closest $$B$$ neighbors, then repeat.
 
 - Converges, if starting positions are "close enough".
 
 
 ## Variants
 
+Below we discuss two of many ICP variants: Exhaustive-Search ICP nad Generalized ICP.
+
 ### Exhaustive Search
 
+As mentioned above, ICP relies upon a strong assumption: the scans (point clouds) $$A$$ and $$B$$ are positioned close to each other. When it is clear that this assumption does not hold, one solution is to use more computation and to sample the space of possible initial alignments. Here is a short summary of the method:
+
 - Compare (ideally) all alignments
-- Sample the space of possible initial alignments.
 - Correspondence is determined by the alignment at which models are closest.
 - Provides optimal result
 - Can be unnecessarily slow
@@ -178,7 +167,7 @@ Similar code named the *Umeyama Transform* after[4] ships with [Eigen](https://e
 
 ## Generalized ICP
 
-[5]
+Segal *et al.* [5] introduce a method called *Generalized ICP* ...
 
 
 ## References
@@ -191,5 +180,5 @@ Similar code named the *Umeyama Transform* after[4] ships with [Eigen](https://e
 
 [4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. [https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf](https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf).
 
-[5] A. Segal, D. Haehnel, and S. Thrun. Generalized-ICP. In Robotics: Science and Systems (RSS), volume 2, page 435, 2009.
+[5] A. Segal, D. Haehnel, and S. Thrun. Generalized-ICP. In Robotics: Science and Systems (RSS), volume 2, page 435, 2009. [PDF](http://www.robots.ox.ac.uk/~avsegal/resources/papers/Generalized_ICP.pdf).
 

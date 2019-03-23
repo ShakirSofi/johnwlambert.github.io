@@ -17,6 +17,8 @@ Table of Contents:
 
 ## SLAM
 
+https://arxiv.org/pdf/1902.03747.pdf
+
 ## ORBSlam
 
 ## GraphSLAM
