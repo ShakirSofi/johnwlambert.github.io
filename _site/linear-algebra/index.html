@@ -448,15 +448,15 @@ A=U\Sigma V^T = \begin{bmatrix} u_1 & \dots & u_r \end{bmatrix} \begin{bmatrix} 
 
 <p>To find this decomposition for a matrix \(A\), we’ll need to compute the \(V\)’s.</p>
 
-<script type="math/tex; mode=display">A^TA = (V\Sigma U^T) (U \Sigma V^T)</script>
+<script type="math/tex; mode=display">A^TA = (V\Sigma^T U^T) (U \Sigma V^T) = V \Sigma^T \Sigma V^T</script>
 
-<p>This reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(v_i\)’s are simply the eigenvectors of \(A^TA\).</p>
+<p>If <script type="math/tex">\Sigma</script> is square, than this reduces to \(V \Sigma^2 V^T\). We need to find orthonormal eigenvectors, and the \(v_i\)’s are simply the eigenvectors of \(A^TA\).</p>
 
 <p>Now, we’ll need to compute the \(U\)’s.</p>
 
-<script type="math/tex; mode=display">AA^T = (U \Sigma V^T)(V\Sigma U^T) = U \Sigma^2 U^T</script>
+<script type="math/tex; mode=display">AA^T = (U \Sigma V^T)(V\Sigma^T U^T) = U \Sigma \Sigma^T U^T</script>
 
-<p>The \(u_i\)’s are the eigenvectors of \(AA^T\). Furthermore,  \(u_1, \dots u_r\) are an orthonormal basis for \(\mbox{range}(A)\).</p>
+<p>If <script type="math/tex">\Sigma</script> is square, we could write this as <script type="math/tex">U \Sigma^2 U^T</script>. We see that the \(u_i\)’s are the eigenvectors of \(AA^T\). Furthermore,  \(u_1, \dots u_r\) are an orthonormal basis for \(\mbox{range}(A)\).</p>
 
 <h3 id="how-can-we-interpret-the-svd-from-2">How Can We Interpret the SVD? (From [<a href="http://ee263.stanford.edu/lectures/svd-v2.pdf">2</a>])</h3>
 

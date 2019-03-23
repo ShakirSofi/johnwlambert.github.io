@@ -90,11 +90,8 @@
 
   <article class="post-content">
   <h2 id="the-3d-registration-problem">The 3D Registration Problem</h2>
-<p>Given two shapes A and B which partially overlap</p>
 
-<p>Goal: using only rigid transforms, register B against A by minimizing a measure of distance between A and B</p>
-
-<p>Assume A and B are positioned close to each other</p>
+<p>The <em>3D Registration Problem</em> is defined as follows: given two shapes <script type="math/tex">A</script> and <script type="math/tex">B</script> which partially overlap, use only rigid transforms to register <script type="math/tex">B</script> against <script type="math/tex">A</script> by minimizing a measure of distance between A and B. We assume <script type="math/tex">A</script> and <script type="math/tex">B</script> are positioned close to each other.</p>
 
 <script type="math/tex; mode=display">\min\limits_T \delta(A, T(B))</script>
 
@@ -147,8 +144,8 @@
 
 <script type="math/tex; mode=display">tr(RN)</script>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def find_rigid_alignment(A, B):
-	"""
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">find_rigid_alignment</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+	<span class="s">"""
 	2-D or 3-D registration with known correspondences.
 	Registration occurs in the zero centered coordinate system, and then
 	must be transported back.
@@ -160,36 +157,36 @@
 		Returns:
 		-	R: optimal rotation
 		-	t: optimal translation
-	"""
-	num_pts = A.shape[0]
-	dim = A.shape[1]
+	"""</span>
+	<span class="n">num_pts</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+	<span class="n">dim</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-	a_mean = np.mean(A, axis=0)
-	b_mean = np.mean(B, axis=0)
+	<span class="n">a_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+	<span class="n">b_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-	# Zero-center the point clouds
-	A -= a_mean
-	B -= b_mean
+	<span class="c"># Zero-center the point clouds</span>
+	<span class="n">A</span> <span class="o">-=</span> <span class="n">a_mean</span>
+	<span class="n">B</span> <span class="o">-=</span> <span class="n">b_mean</span>
 
-	N = np.zeros((dim, dim))
-	for i in range(num_pts):
-		N += A[i].reshape(dim,1).dot( B[i].reshape(1,dim) )
-	N = A.T.dot(B)
+	<span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pts</span><span class="p">):</span>
+		<span class="n">N</span> <span class="o">+=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span> <span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dim</span><span class="p">)</span> <span class="p">)</span>
+	<span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
-	U, D, V_T = np.linalg.svd(N)
-	S = np.eye(dim)
-	det = np.linalg.det(U) * np.linalg.det(V_T.T)
+	<span class="n">U</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">V_T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+	<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+	<span class="n">det</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">U</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">V_T</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 	
-	# Check for reflection case
-	if not np.isclose(det,1.):
-		S[dim-1,dim-1] = -1
+	<span class="c"># Check for reflection case</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">det</span><span class="p">,</span><span class="mf">1.</span><span class="p">):</span>
+		<span class="n">S</span><span class="p">[</span><span class="n">dim</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">dim</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-	R = U.dot(S).dot(V_T)
-	t = R.dot( b_mean.reshape(dim,1) ) - a_mean.reshape(dim,1)
-	return R, -t.squeeze()
+	<span class="n">R</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V_T</span><span class="p">)</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span> <span class="n">b_mean</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="n">a_mean</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="o">-</span><span class="n">t</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p>Similar code named the <em>Umeyama Transform</em> after[4] ships with <a href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60">Eigen</a> as <a href="https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html">Umeyama</a>. The Open3D library utilizes the Umeyama method also (source code <a href="https://github.com/IntelVCL/Open3D/blob/master/src/Core/Registration/TransformationEstimation.cpp#L47">here</a>).</p>
+<p>Similar code named the <em>Umeyama Transform</em> after[4] ships with <a href="https://eigen.tuxfamily.org/dox/group__Geometry__Module.html#gab3f5a82a24490b936f8694cf8fef8e60">Eigen</a> as <a href="https://eigen.tuxfamily.org/dox/Umeyama_8h_source.html">Umeyama</a>. The Open3D library utilizes the Umeyama method also (source code <a href="https://github.com/IntelVCL/Open3D/blob/master/src/Open3D/Registration/TransformationEstimation.cpp#L59">here</a>).</p>
 
 <h2 id="local-methods">Local Methods</h2>
 
@@ -197,7 +194,7 @@
 
 <ul>
   <li>
-    <p>Align the A points to their closest B neighbors, then repeat.</p>
+    <p>Align the <script type="math/tex">A</script> points to their closest <script type="math/tex">B</script> neighbors, then repeat.</p>
   </li>
   <li>
     <p>Converges, if starting positions are “close enough”.</p>
@@ -206,11 +203,14 @@
 
 <h2 id="variants">Variants</h2>
 
+<p>Below we discuss two of many ICP variants: Exhaustive-Search ICP nad Generalized ICP.</p>
+
 <h3 id="exhaustive-search">Exhaustive Search</h3>
+
+<p>As mentioned above, ICP relies upon a strong assumption: the scans (point clouds) <script type="math/tex">A</script> and <script type="math/tex">B</script> are positioned close to each other. When it is clear that this assumption does not hold, one solution is to use more computation and to sample the space of possible initial alignments. Here is a short summary of the method:</p>
 
 <ul>
   <li>Compare (ideally) all alignments</li>
-  <li>Sample the space of possible initial alignments.</li>
   <li>Correspondence is determined by the alignment at which models are closest.</li>
   <li>Provides optimal result</li>
   <li>Can be unnecessarily slow</li>
@@ -219,7 +219,7 @@
 
 <h2 id="generalized-icp">Generalized ICP</h2>
 
-<p>[5]</p>
+<p>Segal <em>et al.</em> [5] introduce a method called <em>Generalized ICP</em> …</p>
 
 <h2 id="references">References</h2>
 
@@ -231,7 +231,7 @@
 
 <p>[4] Jeff Phillips. Lecture 24: Iterative Closest Point and Earth Mover’s Distance. CPS296.2 Geometric Optimization. 10 April 2007. <a href="https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf">https://www2.cs.duke.edu/courses/spring07/cps296.2/scribe_notes/lecture24.pdf</a>.</p>
 
-<p>[5] A. Segal, D. Haehnel, and S. Thrun. Generalized-ICP. In Robotics: Science and Systems (RSS), volume 2, page 435, 2009.</p>
+<p>[5] A. Segal, D. Haehnel, and S. Thrun. Generalized-ICP. In Robotics: Science and Systems (RSS), volume 2, page 435, 2009. <a href="http://www.robots.ox.ac.uk/~avsegal/resources/papers/Generalized_ICP.pdf">PDF</a>.</p>
 
 
   </article>
