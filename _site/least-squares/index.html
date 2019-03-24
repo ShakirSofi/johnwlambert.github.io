@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Solving Least Squares with QR</title>
+  <meta name="description" content="QR decomposition, Modified Gram Schmidt (MGS)">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/least-squares/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Solving Least Squares with QR</h1>
+    <p class="meta">Oct 2, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#lstqr">Least Squares</a></li>
+  <li><a href="#qr-for-lstsqr">QR for Least Squares</a></li>
+  <li><a href="#mgs-for-qr">MGS for QR</a></li>
+  <li><a href="#qr-for-gmres">QR for GMRES</a></li>
+</ul>
+
+<p><a name="lstqr"></a></p>
+<h2 id="the-least-squares-problem">The Least-Squares Problem</h2>
+
+<p>The Least-Squares (LS) problem is one of the central problems in numerical linear algebra. I will describe why. Suppose we have a system of equations <script type="math/tex">Ax=b</script>, where <script type="math/tex">A \in \mathbf{R}^{m \times n}</script>, and <script type="math/tex">m \geq n</script>, meaning <script type="math/tex">A</script> is a long and thin matrix and <script type="math/tex">b \in \mathbf{R}^{m \times 1}</script>. We wish to find <script type="math/tex">x</script> such that <script type="math/tex">Ax=b</script>. In general, we can never expect such equality to hold if <script type="math/tex">m>n</script>! We can only expect to find a solution <script type="math/tex">x</script> such that <script type="math/tex">Ax \approx b</script>. Formally, the LS problem can be defined as</p>
+
+<script type="math/tex; mode=display">\mbox{arg }\underset{x}{\mbox{min}} \|Ax-b\|_2 \\</script>
+
+<h2 id="motivation-for-qr">Motivation for QR</h2>
+
+<p>The LS problem is simple to define. But how can we find a solution vector <script type="math/tex">x</script> in practice, i.e. numerically? Recall our LU decomposition from <a href="/direct-methods/">our previous tutorial</a>.</p>
+
+<p>Gaussian Elimination (G.E.) on non-square matrix – <script type="math/tex">(5 \times 5)(5 \times 3)</script> – elementary matrix is <script type="math/tex">(5 \times 5)</script></p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+    \begin{bmatrix} 1 & & & & \\ x & 1& & & \\ x & & 1& & \\ x & & & 1& \\ x & & & &1 \end{bmatrix} \begin{bmatrix} x x x \\ x x x \\ x x x \\ x x x \\ x x x \\ \end{bmatrix} \rightarrow \begin{bmatrix} x & x & x \\ 0 & x & x \\ 0 & 0 & x \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix}
+\end{equation} %]]></script>
+
+<p>Even if G.E. goes through on <script type="math/tex">A</script> here, i.e. G.E. doesn’t break down and we have <script type="math/tex">A=LU</script>, then we plug in</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+    &= \underset{x}{\mbox{min}} \|Ax-b\|_2 \\ 
+    &= \underset{x}{\mbox{min}} \|LUx-b\|_2         
+\end{aligned} %]]></script>
+
+<p>Cannot make the problem much simpler at this point. Need a different approach.</p>
+
+<p>A better way is to rely upon an orthogonal matrix <script type="math/tex">Q</script>. Assume <script type="math/tex">Q \in \mathbf{R}^{m \times m}</script> with <script type="math/tex">Q^TQ=I</script>. Then <script type="math/tex">Q</script> doesn’t change the norm of a vector. If you rotate or reflect a vector, then the vector’s length won’t change. Consider why:</p>
+
+<script type="math/tex; mode=display">\|Qy\|_2^2 = (Qy)^T (Qy) = y^TQ^T Qy  =  y^Ty =  \|y\|_2^2</script>
+
+<p>Consider how an orthogonal matrix can be useful in our traditional least squares problem:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+    &= \underset{x}{\mbox{min}} \|Ax-b\|_2 \\ 
+    &= \underset{x}{\mbox{min}} \|Q^T(Ax-b)\|_2 \\
+    &= \underset{x}{\mbox{min}} \| Q^T(QRx-b)\|_2 \\
+    &= \underset{x}{\mbox{min}} \|Rx-Q^Tb)\|_2
+\end{aligned} %]]></script>
+
+<p>Our goal is to find a <script type="math/tex">Q</script> s.t. <script type="math/tex">Q^TA = Q^TQR= R</script> is upper triangular.</p>
+
+<p><a name="qr-for-lstsqr"></a></p>
+<h3 id="qr-factorization-for-solving-least-squares-problems">QR Factorization for Solving Least Squares Problems</h3>
+
+<p>I’ll briefly review the QR decomposition, which <strong>exists for any matrix</strong>.  Given a matrix <script type="math/tex">A</script>, the goal is to find two matrices <script type="math/tex">Q,R</script> such that <script type="math/tex">Q</script> is orthogonal and  <script type="math/tex">R</script> is upper triangular. If <script type="math/tex">m \geq n</script>, then</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\underbrace{A}_{m \times n} =  \underbrace{Q}_{m \times m} \underbrace{\begin{bmatrix} R \\ 0 \end{bmatrix}}_{m \times n} = \begin{bmatrix} Q_1 & Q_2 \end{bmatrix} \underbrace{\begin{bmatrix} R \\ 0 \end{bmatrix}}_{m \times n} %]]></script>
+
+<p>We call this the <em>full QR</em> decomposition. No matter the structure of <script type="math/tex">A</script>, the matrix <script type="math/tex">R</script> will always be square. There is another form, called the <em>reduced QR</em> decomposition, of the form:</p>
+
+<script type="math/tex; mode=display">\underbrace{A}_{m \times n} = \underbrace{Q_1}_{m \times n} \mbox{ } \underbrace{R}_{n \times n}</script>
+
+<p>An important question at this point is <em>how can we actually compute the QR decomposition</em> (i.e. numerically)? <a href="/direct-methods/">We reviewed the Householder method</a> for doing so previously, and will now describe how to use the Gram-Schmidt (GS) to find matrices <script type="math/tex">Q,R</script>.</p>
+
+<p><a name="mgs-for-qr"></a></p>
+<h2 id="computing-qr-with-modified-gram-schmidt-mgs">Computing QR with Modified Gram Schmidt (MGS)</h2>
+
+<p>Computing the reduced QR decomposition of a matrix <script type="math/tex">A</script> with the Modified Gram Schmidt (MGS) algorithm requires looking at the matrix <script type="math/tex">A</script> with new eyes.</p>
+
+<p>When we view <script type="math/tex">A</script> as the product of two matrices, i.e. <script type="math/tex">A=Q_1 R</script>, then we can also view it as a sum of outer products of the columns of <script type="math/tex">Q_1</script> and the rows of <script type="math/tex">R</script>, i.e.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+A &= \begin{bmatrix} | & | & & | \\ q_1 & q_2 & \cdots & q_n \\  | & | & & |  \end{bmatrix}  \begin{bmatrix} - &  \tilde{r}_1^T & - \\ - & \tilde{r}_2^T & - \\ &  \vdots & \\ - & \tilde{r}_n^T & - \end{bmatrix} \\
+&=
+\begin{bmatrix} | \\ q_1 \\ | \end{bmatrix} \begin{bmatrix} - &  \tilde{r}_1^T  & - \end{bmatrix}
++ 
+\begin{bmatrix} | \\ q_2 \\ | \end{bmatrix} \begin{bmatrix} - &  \tilde{r}_2^T  & - \end{bmatrix}
++ \cdots + \begin{bmatrix} | \\ q_n \\ | \end{bmatrix} \begin{bmatrix} - &  \tilde{r}_n^T  & - \end{bmatrix}
+\end{aligned} %]]></script>
+
+<p>However, it turns out that each of these outer products has a very special structure, i.e. they each have more columns with all zeros. This is due to the fact that the rows of <script type="math/tex">R</script> have a large number of zero elements since the matrix is upper-triangular.
+Consider a small example for <script type="math/tex">m=5,n=3</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+\underbrace{A}_{5 \times 3} &= \underbrace{Q_1}_{5 \times 3} \underbrace{R}_{3 \times 3} \\
+ A &= \begin{bmatrix} a_1 & a_2 & a_3 \end{bmatrix} \\
+ A  &=  \begin{bmatrix} q_1 & q_2 & q_3 \end{bmatrix}  \begin{bmatrix} r_1^T \\ r_2^T \\ r_3^T \end{bmatrix} \\
+       &= \begin{bmatrix} q_1 & q_2 & q_3 \end{bmatrix} \begin{bmatrix} \times & \times & \times \\ 0 & \times & \times \\ 0 & 0 & \times \end{bmatrix} \\
+      &=  q_1r_1^T + q_2 r_2^T + q_3 r_3^T \\
+      A &= \begin{bmatrix}\times & \times & \times \\ \times & \times & \times \\ \times & \times & \times\\ \times & \times & \times \\ \times & \times & \times \end{bmatrix} +
+      \begin{bmatrix} 0 & \times & \times \\ 0 & \times & \times  \\ 0 & \times & \times  \\ 0 & \times & \times  \\ 0 & \times & \times  \end{bmatrix} +
+      \begin{bmatrix}  0 & 0 & \times \\  0 & 0 & \times \\  0 & 0 & \times \\  0 & 0 & \times \\  0 & 0 & \times \end{bmatrix}  \\
+\end{aligned} %]]></script>
+
+<p>where “<script type="math/tex">\times</script>” denotes a potentially non-zero matrix entry. Consider a very interesting fact: if the equivalence above holds, then by subtracting a full matrix <script type="math/tex">q_1r_1^T</script> we are guaranteed to obtain a matrix with at least one zero column. We call the embedded matrix <script type="math/tex">A^{(2)}</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+    \begin{bmatrix} | & \\ 0 & A^{(2)} \\ | & \end{bmatrix} &= A - \begin{bmatrix}\times & \times & \times \\ \times & \times & \times \\ \times & \times & \times\\ \times & \times & \times \\ \times & \times & \times \end{bmatrix} = \begin{bmatrix} 0 & \times & \times \\ 0 & \times & \times  \\ 0 & \times & \times  \\ 0 & \times & \times  \\ 0 & \times & \times  \end{bmatrix} +
+      \begin{bmatrix}  0 & 0 & \times \\  0 & 0 & \times \\  0 & 0 & \times \\  0 & 0 & \times \\  0 & 0 & \times \end{bmatrix} \\
+\end{aligned} %]]></script>
+
+<p>We can generalize the composition of <script type="math/tex">A^{(k)}</script>, which gives us the key to computing a column of <script type="math/tex">Q</script>, which we call <script type="math/tex">q_k</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+      A &= \sum\limits_{i=1}^n q_r r_i^T \\
+      A &= \sum\limits_{i=1}^{k-1} q_i r_i^T + \sum\limits_{i=k}^n q_i r_i^T \\
+      A - \sum\limits_{i=1}^{k-1} q_i r_i^T &= \sum\limits_{i=k}^n q_i r_i^T \\
+      \begin{bmatrix} 0 & A^{(k)} \end{bmatrix} e_k &= \sum\limits_{i=k}^n q_i r_i^T e_k \\
+      &= q_k r_k^T e_k + q_{k+1} r_{k+1}^T e_k + \cdots + qq_n r_n^T e_k \\
+      &= q_k r_{kk} 
+\end{aligned} %]]></script>
+
+<p>We multiply with <script type="math/tex">e_k</script> above simply because we wish to compare the <script type="math/tex">k</script>‘th column of both sides. For ease of notation, we will call the first column of <script type="math/tex">A^{(k)}</script> to be <script type="math/tex">z</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+      \underbrace{ A^{(k)} }_{m \times (n-k+1)} &= \begin{bmatrix} z & B \end{bmatrix} \\
+     z &=  q_k r_{kk} \\
+     q_k &= z / r_{kk} \\
+     r_{kk} &= \|z\|_2      
+\end{aligned} %]]></script>
+
+<p>where <script type="math/tex">B</script> has <script type="math/tex">(n-k)</script> columns. You will find <script type="math/tex">(k-1)</script> zero columns in <script type="math/tex">A - \sum\limits_{i=1}^{k-1} q_i r_i^T</script>.</p>
+
+<p>A second key observation allows us to compute the entire <script type="math/tex">k</script>‘th row <script type="math/tex">\tilde{r}^T</script> of <script type="math/tex">R</script> just by knowing <script type="math/tex">q</script>. Consider what would happen if we left multiply with <script type="math/tex">q_k^T</script>: since the columns of <script type="math/tex">Q</script> are all orthogonal to each other, their dot product will always equal zero, unless <script type="math/tex">i=k</script>, in which case <script type="math/tex">q_k^T q_k = 1</script>:</p>
+
+<p>\begin{equation}
+       q_k^T \begin{bmatrix} 0 &amp; A^{(k)} \end{bmatrix} = q_k^T \Bigg( \sum\limits_{i=k}^n q_i r_i^T \Bigg) = r_k^T
+\end{equation}</p>
+
+<p>Since a row of <script type="math/tex">R</script> is upper triangular, all elements <script type="math/tex">R_{ij}</script> where <script type="math/tex">% <![CDATA[
+j < i %]]></script> will equal zero:</p>
+
+<p>\begin{equation}
+       q_k^T \begin{bmatrix} 0 &amp; z &amp; B \end{bmatrix} = \begin{bmatrix} 0 &amp; \cdots &amp; 0 &amp; r_{kk} &amp; r_{k,k+1} \cdots &amp; r_{kn} \end{bmatrix}
+\end{equation}</p>
+
+<p>which is the <script type="math/tex">k</script>‘th row of <script type="math/tex">R</script>. When <script type="math/tex">k=1</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+A &= \sum\limits_{i=1}^n q_i r_i^T \\
+&= q_1r_1^T + \cdots + q_n r_n^T \\
+Ae_1 &= \Big( q_1 r_1^T + \cdots + q_n r_n^T \Big) e_1 & \mbox{take the first colum of both sides} \\
+Ae_1 &= q_1 r_{11} \\
+a_1 &= Ae_1 = q_1 r_{11} \\
+r_{11} &= \|a_1 \|_2 \\
+q_1 &= a_1 / r_{11} \\
+q_1^T A &= q_1^T (q_1 r_1^T + \cdots + q_n r_n^T) = r_1^T \\
+A - q_1 r_1^T &= \sum\limits_{i=2}^n q_i r_i^T
+\end{aligned} %]]></script>
+
+<p>We can use induction to prove the correctness of the algorithm. We know how to deal with this when <script type="math/tex">k=1</script></p>
+
+<p>\begin{equation}
+       a_1 = Ae_1 = \sum\limits_{i=1}^n q_i r_i^T e_1 = q_1 r_{11}
+\end{equation}</p>
+
+<p>\begin{equation}
+   q_1^T A = q_1^T ( \sum\limits_{i=1}^n q_i r_i^T) = r_1^T
+\end{equation}</p>
+
+<p>\begin{equation}
+ \begin{bmatrix} 0 &amp; A^{(2)} \end{bmatrix} = A - q_1 r_1^T = \sum\limits_{i=2}^n q_i r_i^T
+\end{equation}</p>
+
+<h2 id="why-is-this-identical-to-modified-gram-schmidt">Why is this identical to Modified Gram-Schmidt?</h2>
+
+<p>The Gram-Schmidt (GS) method has two forms: classical and modifed
+It is for  <script type="math/tex">\underbrace{A}_{m \times n}=\underbrace{Q_1}_{m \times n} \underbrace{R}_{n \times n}</script> when <script type="math/tex">rank(A)=n</script> (full rank case).</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+A = \begin{bmatrix} a_1 & \cdots & a_n \end{bmatrix} = Q_1R = \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ & r_{22} & \cdots & r_{2n} \\ & & \ddots & \vdots \\ & & & r_{nn} \end{bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">\begin{aligned}
+    a_1 = r_{11} q_1 \\
+    q_1 = \frac{a_1}{\|a_1\|_2}
+\end{aligned}</script>
+
+<p>GE for LU
+\begin{equation}
+    M_{n-1} \cdots M_1 \underbrace{A}_{n \times n} = U
+\end{equation}</p>
+
+<p>\item Householder for QR:
+\begin{equation}
+    H_n \cdots H_1 \underbrace{A}_{m \times n, m &gt; n} = \begin{bmatrix} R  \ 0 \end{bmatrix}
+\end{equation}</p>
+
+<p>\item Givens for QR:
+\begin{equation}
+G_{pq} \cdots G_{12} \underbrace{A}_{m \times n, m&gt;n} = \begin{bmatrix} R \ 0 \end{bmatrix}
+\end{equation}</p>
+
+<p>Gram Schmidt: Have to compute <script type="math/tex">Q_1,R</script> at the same time. Cannot skip computing <script type="math/tex">Q</script>. Assuming <script type="math/tex">rank(A)=n</script></p>
+
+<p>\begin{equation}
+        \underbrace{A}<em>{m \times n} = \underbrace{Q_1}</em>{m \times n} \underbrace{R}_{n \times n}
+\end{equation}</p>
+
+<p>Classical Gram Schmidt: compute column by column</p>
+
+<p>\begin{equation}
+        \begin{bmatrix} a_1 &amp; \cdots &amp; a_n \end{bmatrix} = \begin{bmatrix} q_1 &amp; \cdots &amp; q_n \end{bmatrix} \begin{bmatrix} r_{11} &amp; r_{12} &amp; \cdots &amp; r_{1n} \ &amp; &amp; &amp; \ &amp; &amp; &amp; r_{nn} \end{bmatrix}
+\end{equation}</p>
+
+<p>If you skip computing columns of $Q$, you cannot continue.</p>
+
+<p>Classical GS (CGS) can suffere from cancellation error. Nearly equal numbers (of same sign) involved in subtraction. If two vectors point in almost the same direction. $p_2$ could have very low precision</p>
+
+<p>Modifed Gram Schmidt is just order re-arrangement! Gram Schmidt is only for full-rank matrices.</p>
+
+<p><a name="qr-for-gmres"></a></p>
+<h2 id="qr-application-the-gmres-algorithm">QR Application: The GMRES Algorithm</h2>
+
+<p>The Generalized Minimum Residual (GMRES) algorithm, a classical iterative method for solving very large, sparse linear systems of equations relies heavily upon the QR decomposition. GMRES [1] was proposed by Usef Saad and Schultz in 1986, and has been cited <script type="math/tex">>10,000</script> times.</p>
+
+<p>The least squares optimization problem of interest in GMRES is</p>
+
+<script type="math/tex; mode=display">\underset{y}{\mbox{min}} \| \beta \xi_1 - H_{k+1,k} y \|</script>
+
+<p>We choose <script type="math/tex">y</script> such that the sum of squares is minimized. The following code computes the QR decomposition to solve the least squares problem.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">arnoldi_single_iter</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">k</span><span class="p">):</span>
+	<span class="s">""" 
+		Args:
+		-	A
+		-	Q
+		-	k
+
+		Returns:
+		-	h
+		-	q
+	"""</span>
+	<span class="n">q</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="p">[:,</span><span class="n">k</span><span class="p">])</span>
+	<span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+		<span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
+		<span class="n">q</span> <span class="o">-=</span> <span class="n">h</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+	<span class="n">h</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+	<span class="n">q</span> <span class="o">/=</span> <span class="n">h</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+	<span class="k">return</span> <span class="n">h</span><span class="p">,</span><span class="n">q</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">gmres</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">):</span>
+	<span class="s">""" 
+	Generalized Minimal Residual Algorithm.
+
+		Args:
+		-	A: must be square and nonsingular
+		-	b
+		-	x: initial guess for x
+
+	"""</span>
+	<span class="n">EPSILON</span> <span class="o">=</span> <span class="mf">1e-10</span>
+	<span class="n">n</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+	<span class="k">assert</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+	<span class="n">r</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+	<span class="n">q</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+	<span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">max_iters</span><span class="p">))</span>
+	<span class="n">Q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+	<span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+	<span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+	<span class="n">xi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># e_1 standard basis vector, xi will be updated</span>
+	<span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+
+	<span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">max_iters</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iters</span><span class="p">):</span>
+		<span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iters</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+		<span class="n">H</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">Q</span><span class="p">[:,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arnoldi_single_iter</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">Q</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+
+		<span class="c"># don't need to do this for 0,...,k since completed previously!</span>
+		<span class="n">c</span><span class="p">,</span><span class="n">s</span> <span class="o">=</span> <span class="n">givens_coeffs</span><span class="p">(</span><span class="n">H</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">],</span> <span class="n">H</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">])</span>
+		<span class="c"># kth rotation matrix</span>
+		<span class="n">F</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+		<span class="n">F</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+		<span class="n">F</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">s</span>
+		<span class="n">F</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+
+		<span class="c"># apply the rotation to both of these</span>
+		<span class="n">H</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">k</span><span class="p">,:</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,:</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">H</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span><span class="n">k</span><span class="p">])</span>
+		<span class="n">xi</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xi</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">EPSILON</span><span class="p">:</span>
+			<span class="c"># ????</span>
+			<span class="k">break</span>
+
+	<span class="c"># when terminated, solve the least squares problem</span>
+	<span class="c"># y must be (k,1)</span>
+	<span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">H</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">,:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">xi</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+	<span class="c"># Q_k will have dimensions (n,k)</span>
+	<span class="n">x_k</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">Q</span><span class="p">[:,:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">x_k</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">givens_coeffs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+	<span class="s">""" """</span>
+	<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+	<span class="n">s</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">c</span><span class="p">,</span><span class="n">s</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">arnoldi</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">k</span><span class="p">):</span>
+	<span class="s">""" 
+	Computes a basis of the (k+1)-Krylov subspace of A: the space
+	spanned by {b, Ab, ..., A^k b}.
+
+		Args:
+		-	A: Numpy array of shape (n,n)
+		-	b: 
+		-	k: dimension of Krylov subspace
+
+		Returns:
+		-	Q: Orthonormal basis for Krylov subspace
+		-	H: Upper Hessenberg matrix
+	"""</span>
+	<span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+	<span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
+	<span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
+
+	<span class="c"># Normalize the input vector</span>
+	<span class="c"># Use it as the first Krylov vector</span>
+	<span class="n">Q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+	<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+		<span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="p">])</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+			<span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
+			<span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span>
+
+		<span class="n">H</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+		<span class="n">Q</span><span class="p">[:,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">H</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+	<span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+	<span class="k">return</span> <span class="n">Q</span><span class="p">,</span><span class="n">H</span>
+</code></pre></div></div>
+
+<h2 id="references">References</h2>
+
+<p>[1.] Y Saad, MH Schultz. <em>GMRES: A generalized minimal residual algorithm for solving nonsymmetric linear systems}</em>.  SIAM Journal on scientific and statistical computing 7 (3), 856-869. <a href="https://epubs.siam.org/doi/pdf/10.1137/0907058">PDF</a>.</p>
+
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
