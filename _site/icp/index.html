@@ -203,11 +203,12 @@
 
 <h2 id="variants">Variants</h2>
 
-<p>Below we discuss two of many ICP variants: Exhaustive-Search ICP nad Generalized ICP.</p>
+<p>Below we discuss two of many ICP variants: Exhaustive-Search ICP and Generalized ICP.
+A discussion of more variants can be found in [7].</p>
 
 <h3 id="exhaustive-search">Exhaustive Search</h3>
 
-<p>As mentioned above, ICP relies upon a strong assumption: the scans (point clouds) <script type="math/tex">A</script> and <script type="math/tex">B</script> are positioned close to each other. When it is clear that this assumption does not hold, one solution is to use more computation and to sample the space of possible initial alignments. Here is a short summary of the method:</p>
+<p>As mentioned above, ICP relies upon a strong assumption: the scans (point clouds) <script type="math/tex">A</script> and <script type="math/tex">B</script> are positioned close to each other, i.e. we have a good initial alignment estimate. When it is clear that this assumption does not hold, one solution is to use more computation and to sample the space of possible initial alignments. Here is a short summary of several strengths and weaknesses of the Exhaustive Search method:</p>
 
 <ul>
   <li>Compare (ideally) all alignments</li>
@@ -216,6 +217,8 @@
   <li>Can be unnecessarily slow</li>
   <li>Does not generalize well to non-rigid deformations</li>
 </ul>
+
+<p>Chen <em>et al.</em> describe more details of a RANSAC-based DARCES (data-aligned rigidity-constrained exhaustive search) method in [6]. Their goal is to check all possible data alignments of two given 3D data sets in an efficient way. They employ RANSAC to ensure that the model fitting is not influenced my outliers (<em>robust estimation</em>).</p>
 
 <h2 id="generalized-icp">Generalized ICP</h2>
 
@@ -233,6 +236,9 @@
 
 <p>[5] A. Segal, D. Haehnel, and S. Thrun. Generalized-ICP. In Robotics: Science and Systems (RSS), volume 2, page 435, 2009. <a href="http://www.robots.ox.ac.uk/~avsegal/resources/papers/Generalized_ICP.pdf">PDF</a>.</p>
 
+<p>[6] Chen, C., Hung, Y., and Cheng, J. “RANSAC-Based DARCES: A New Approach to Fast Automatic Registration of Partially Overlapping Range Images,” Trans. PAMI, Vol. 21, No. 11, 1999.</p>
+
+<p>[7]. Szymon Rusinkiewicz and Marc Levoy. <em>Efficient Variants of the ICP Algorithm</em>. <a href="http://www.pcl-users.org/file/n4037867/Rusinkiewicz_Effcient_Variants_of_ICP.pdf">PDF</a>.</p>
 
   </article>
 
