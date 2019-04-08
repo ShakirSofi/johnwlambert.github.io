@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Solving Least Squares with QR</title>
+  <title>Solving Least-Squares with QR</title>
   <meta name="description" content="QR decomposition, Modified Gram Schmidt (MGS)">
    <link rel="stylesheet" href="/css/main.css">
 
@@ -84,17 +84,19 @@
         <div class="post">
 
   <header class="post-header">
-    <h1>Solving Least Squares with QR</h1>
+    <h1>Solving Least-Squares with QR</h1>
     <p class="meta">Oct 2, 2018</p>
   </header>
 
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#lstqr">Least Squares</a></li>
-  <li><a href="#qr-for-lstsqr">QR for Least Squares</a></li>
+  <li><a href="#lstqr">The Least-Squares Problem</a></li>
+  <li><a href="#qr-for-lstsqr">QR for Least-Squares</a></li>
+  <li><a href="#givens-for-qr">Givens for QR</a></li>
   <li><a href="#mgs-for-qr">MGS for QR</a></li>
   <li><a href="#qr-for-gmres">QR for GMRES</a></li>
+  <li><a href="#qr-w-col-pivoting">QR with Column-Pivoting</a></li>
 </ul>
 
 <p><a name="lstqr"></a></p>
@@ -155,10 +157,13 @@
 
 <p>An important question at this point is <em>how can we actually compute the QR decomposition</em> (i.e. numerically)? <a href="/direct-methods/">We reviewed the Householder method</a> for doing so previously, and will now describe how to use the Gram-Schmidt (GS) to find matrices <script type="math/tex">Q,R</script>.</p>
 
+<p><a name="givens-for-qr"></a></p>
+<h2 id="computing-qr-with-givens-rotations">Computing QR with Givens Rotations</h2>
+
 <p><a name="mgs-for-qr"></a></p>
 <h2 id="computing-qr-with-modified-gram-schmidt-mgs">Computing QR with Modified Gram Schmidt (MGS)</h2>
 
-<p>Computing the reduced QR decomposition of a matrix <script type="math/tex">A</script> with the Modified Gram Schmidt (MGS) algorithm requires looking at the matrix <script type="math/tex">A</script> with new eyes.</p>
+<p>Computing the reduced QR decomposition of a matrix <script type="math/tex">\underbrace{A}_{m \times n}=\underbrace{Q_1}_{m \times n} \underbrace{R}_{n \times n}</script> with the Modified Gram Schmidt (MGS) algorithm requires looking at the matrix <script type="math/tex">A</script> with new eyes.</p>
 
 <p>When we view <script type="math/tex">A</script> as the product of two matrices, i.e. <script type="math/tex">A=Q_1 R</script>, then we can also view it as a sum of outer products of the columns of <script type="math/tex">Q_1</script> and the rows of <script type="math/tex">R</script>, i.e.</p>
 
@@ -261,10 +266,11 @@ A - q_1 r_1^T &= \sum\limits_{i=2}^n q_i r_i^T
  \begin{bmatrix} 0 &amp; A^{(2)} \end{bmatrix} = A - q_1 r_1^T = \sum\limits_{i=2}^n q_i r_i^T
 \end{equation}</p>
 
-<h2 id="why-is-this-identical-to-modified-gram-schmidt">Why is this identical to Modified Gram-Schmidt?</h2>
+<h2 id="why-is-this-identical-to-modified-gram-schmidt-mgs">Why is this identical to Modified Gram-Schmidt (MGS)?</h2>
 
-<p>The Gram-Schmidt (GS) method has two forms: classical and modifed
-It is for  <script type="math/tex">\underbrace{A}_{m \times n}=\underbrace{Q_1}_{m \times n} \underbrace{R}_{n \times n}</script> when <script type="math/tex">rank(A)=n</script> (full rank case).</p>
+<p>We stated that the process above is the “MGS method for QR factorization”. It might not be clear why the process is equivalent to MGS.</p>
+
+<p>First, let’s review the Gram-Schmidt (GS) method, which has two forms: classical and modifed. Gram-Schmidt is only a viable way to obtain a QR factorization when A is full-rank, i.e. when <script type="math/tex">rank(A)=n</script>. This is because at some point in the algorithm we exploit linear independence, which, when violated, means we divide by a zero.</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 A = \begin{bmatrix} a_1 & \cdots & a_n \end{bmatrix} = Q_1R = \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ & r_{22} & \cdots & r_{2n} \\ & & \ddots & \vdots \\ & & & r_{nn} \end{bmatrix} %]]></script>
@@ -274,38 +280,28 @@ A = \begin{bmatrix} a_1 & \cdots & a_n \end{bmatrix} = Q_1R = \begin{bmatrix} q_
     q_1 = \frac{a_1}{\|a_1\|_2}
 \end{aligned}</script>
 
-<p>GE for LU
-\begin{equation}
-    M_{n-1} \cdots M_1 \underbrace{A}_{n \times n} = U
-\end{equation}</p>
+<h2 id="how-does-mgs-compare-with-the-givens-and-householder-methods-for-qr">How does MGS compare with the Givens and Householder methods for QR?</h2>
 
-<p>\item Householder for QR:
-\begin{equation}
-    H_n \cdots H_1 \underbrace{A}_{m \times n, m &gt; n} = \begin{bmatrix} R  \ 0 \end{bmatrix}
-\end{equation}</p>
+<p>MGS is certainly not the only method we’ve seen so far for finding a QR factorization. We discussed the Householder method (earlier)[/direct-methods/#qr], which finds a sequence of orthogonal matrices <script type="math/tex">H_n \cdots H_1</script> such that</p>
 
-<p>\item Givens for QR:
-\begin{equation}
-G_{pq} \cdots G_{12} \underbrace{A}_{m \times n, m&gt;n} = \begin{bmatrix} R \ 0 \end{bmatrix}
-\end{equation}</p>
+<script type="math/tex; mode=display">H_n \cdots H_1 \underbrace{A}_{m \times n, m > n} = \begin{bmatrix} R  \\ 0 \end{bmatrix}</script>
 
-<p>Gram Schmidt: Have to compute <script type="math/tex">Q_1,R</script> at the same time. Cannot skip computing <script type="math/tex">Q</script>. Assuming <script type="math/tex">rank(A)=n</script></p>
+<p>We have also seen the Givens rotations, which find another sequence of orthogonal matrices <script type="math/tex">G_{pq} \cdots G_{12}</script> such that</p>
 
-<p>\begin{equation}
-        \underbrace{A}<em>{m \times n} = \underbrace{Q_1}</em>{m \times n} \underbrace{R}_{n \times n}
-\end{equation}</p>
+<script type="math/tex; mode=display">G_{pq} \cdots G_{12} \underbrace{A}_{m \times n, m>n} = \begin{bmatrix} R \\ 0 \end{bmatrix}</script>
+
+<p>In these methods, it was possible to skip the computation of <script type="math/tex">Q</script> explicitly. However, in Gram-Schmidt this is not the case: we must compute <script type="math/tex">Q_1,R</script> at the same time and we cannot skip computing <script type="math/tex">Q</script>. In fact, if you skip computing columns of <script type="math/tex">Q</script>, you cannot continue.</p>
+
+<script type="math/tex; mode=display">\underbrace{A}_{m \times n} = \underbrace{Q_1}_{m \times n} \underbrace{R}_{n \times n}</script>
 
 <p>Classical Gram Schmidt: compute column by column</p>
 
-<p>\begin{equation}
-        \begin{bmatrix} a_1 &amp; \cdots &amp; a_n \end{bmatrix} = \begin{bmatrix} q_1 &amp; \cdots &amp; q_n \end{bmatrix} \begin{bmatrix} r_{11} &amp; r_{12} &amp; \cdots &amp; r_{1n} \ &amp; &amp; &amp; \ &amp; &amp; &amp; r_{nn} \end{bmatrix}
-\end{equation}</p>
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix} a_1 & \cdots & a_n \end{bmatrix} = \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ & & & \\ & & & r_{nn} \end{bmatrix} %]]></script>
 
-<p>If you skip computing columns of $Q$, you cannot continue.</p>
+<p>Classical GS (CGS) can suffer from cancellation error. Nearly equal numbers (of same sign) involved in subtraction. If two vectors point in almost the same direction. $p_2$ could have very low precision</p>
 
-<p>Classical GS (CGS) can suffere from cancellation error. Nearly equal numbers (of same sign) involved in subtraction. If two vectors point in almost the same direction. $p_2$ could have very low precision</p>
-
-<p>Modifed Gram Schmidt is just order re-arrangement! Gram Schmidt is only for full-rank matrices.</p>
+<p>Modifed Gram Schmidt is just order re-arrangement!</p>
 
 <p><a name="qr-for-gmres"></a></p>
 <h2 id="qr-application-the-gmres-algorithm">QR Application: The GMRES Algorithm</h2>
@@ -434,6 +430,269 @@ G_{pq} \cdots G_{12} \underbrace{A}_{m \times n, m&gt;n} = \begin{bmatrix} R \ 0
 	<span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
 	<span class="k">return</span> <span class="n">Q</span><span class="p">,</span><span class="n">H</span>
 </code></pre></div></div>
+
+<h2 id="rank-deficient-least-squares-problems">Rank-Deficient Least-Squares Problems</h2>
+<p>When we used the QR decomposition of a matrix <script type="math/tex">A</script> to solve a least-squares problem, we operated under the assumption that <script type="math/tex">A</script> was full-rank. This assumption can fall flat. In that case we revert to rank-revealing decompositions. Suitable choices are either the (1) SVD or its cheaper approximation, (2) QR with column-pivoting.</p>
+
+<p>You might ask, why is the rank-deficient case problematic?</p>
+
+<p>If matrix $A$ is rank-deficient, then it is no longer the case that space spanned by columns of $Q$ is the same space spanned by columns of $A$, i.e. does not hold that</p>
+
+<p>\begin{equation}
+        \mbox{span} { a_1, a_2, \cdots, a_k } =  \mbox{span} { q_1, q_2, \cdots, q_k }
+\end{equation}</p>
+
+<h3 id="svd-for-least-squares">SVD for Least-Squares</h3>
+
+<p>As stated above, we should use the SVD when we don’t know the rank of a matrix, or when the matrix is known to be rank-deficient.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+A &= U \Sigma V^T \\
+&= \begin{bmatrix} U_1 & U_2 \end{bmatrix} \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} V_1 & V_2 \end{bmatrix}^T
+\end{aligned} %]]></script>
+
+<script type="math/tex; mode=display">\mbox{arg} \underset{x}{\mbox{ arg }} \| Ax -b \|_2 \\</script>
+
+<p>We can write the SVD as</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+    A &= U \Sigma V^T \\
+      &= \begin{bmatrix} \underbrace{U_1}_{r} & \underbrace{U_2}_{m-r} \end{bmatrix} \begin{bmatrix} \underbrace{\Sigma_1}_{r \times r} & \underbrace{0}_{n-r} \\ 0 & 0 \end{bmatrix} \begin{bmatrix} \underbrace{V_1}_{r} & \underbrace{V_2}_{n-r} \end{bmatrix}^T
+\end{aligned} %]]></script>
+
+<p>\item Note that the range space of $A$ is completely spanned by $U_1$! Because everything in $U_2$ has rank 0 because of zero singular vectors
+\item Range space of $A^T$ is completely spanned by $V_1$!
+\item The null space of $A$ is spanned by $V_2$! We recall that nullspace is defined as $Null(A) = { x \mid Ax = 0 }$</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+A V_2 &= \begin{bmatrix} U_1 & U_2 \end{bmatrix} \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} V_1^T \\ V_2^T \end{bmatrix} V_2 \\
+A V_2 &= \begin{bmatrix} U_1 & U_2 \end{bmatrix} \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} 0 \\ I \end{bmatrix} \\
+A V_2 &= \begin{bmatrix} U_1 & U_2 \end{bmatrix}  0 \\
+AV_2 &= 0
+\end{aligned} %]]></script>
+
+<p>because $V_2 V_1 = 0$ (the zero matrix since must be orthogonal columns)</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+    A^T &= V \Sigma U^T \\
+     A^T &= \begin{bmatrix} \underbrace{V_1}_{r} & \underbrace{V_2}_{m-r} \end{bmatrix} \begin{bmatrix} \underbrace{\Sigma_1}_{r \times r} & \underbrace{0}_{n-r} \\ 0 & 0 \end{bmatrix} \begin{bmatrix} \underbrace{U_1}_{r} & \underbrace{U_2}_{n-r} \end{bmatrix}^T
+\end{aligned} %]]></script>
+
+<p>Null space of $A^T$ is spanned by $U_2$! Then in Least Squares, we have</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+        \|Ax-b\|_2 &= \|U \Sigma V^T x - b \|_2 \\
+        &= \|U^T(U \Sigma V^T x - b) \|_2 \\
+       &= \| \Sigma V^T x - U^Tb \|_2 \\
+        &= \| \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} V^T x - U^Tb \|_2 \\
+        &= \| \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} y \\ z \end{bmatrix} - \begin{bmatrix} c \\ d \end{bmatrix} \|_2 \\
+        &= \| \begin{bmatrix} \Sigma_1 y & 0 \\ 0 & 0 \end{bmatrix}  - \begin{bmatrix} c \\ d \end{bmatrix} \|_2 \\
+\end{aligned} %]]></script>
+
+<p>and <script type="math/tex">z</script> will not affect the solution. We search for <script type="math/tex">\underbrace{\Sigma_1}_{r \times r} \underbrace{y}_{r \times 1} = \underbrace{c}_{r \times 1}</script>.</p>
+
+<script type="math/tex; mode=display">V^Tx = \begin{bmatrix} V_1^T \\ V_2^T \end{bmatrix} x = \begin{bmatrix} y \\ z \end{bmatrix}</script>
+
+<p><script type="math/tex">U^Tb = \begin{bmatrix} U_1^Tb \\ U_2^Tb \end{bmatrix} = \begin{bmatrix} c \\ d \end{bmatrix}</script>
+    where $c,y $ have shape $r$, and $z,d$ have shape $n-r$.</p>
+
+<p>The mininimum norm solution is</p>
+
+<script type="math/tex; mode=display">V \begin{bmatrix} \Sigma_1^{-1}c \\ 0 \end{bmatrix}</script>
+
+<p>There are infinitely many solutions. If you put a non-zero element in the second part (instead of <script type="math/tex">0</script>), then it no longer has the smallest norm</p>
+
+<p>When you split up a matrix $Q$ along the rows, then you should keep in mind that the columns will still be orthogonal to each other, but they won’t have unit length norm any more (because not working with the full row)</p>
+
+<p>But we wanted to find a solution for <script type="math/tex">x</script>, not <script type="math/tex">y</script>! Thus, we do</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+       x_{LS} = V \begin{bmatrix} y \\ z \end{bmatrix} \\
+       x_{LS} = \begin{bmatrix} V_1 & V_2 \end{bmatrix} \begin{bmatrix} y \\ z \end{bmatrix} \\
+       &= V_1 y + V_2 z
+\end{aligned} %]]></script>
+
+<p>where <script type="math/tex">z</script> can be anything – it is a free variable!</p>
+
+<p>We recall that if <script type="math/tex">A</script> has dimension <script type="math/tex">(m \times n)</script>, with <script type="math/tex">m > n</script>, and <script type="math/tex">% <![CDATA[
+rank(a)< n %]]></script>, then $\exists$$ infinitely many solutions</p>
+
+<p>Meaning that <script type="math/tex">x^{\star} + y$ is a solution when $y \in null(A)$ because</script>A(x^{\star} + y) = Ax^{\star} + Ay = Ax^{\star}$$</p>
+
+<p><a name="qr-w-col-pivoting"></a></p>
+<h3 id="qr-with-column-pivoting">QR with Column-Pivoting</h3>
+
+<p>Computing the SVD of a matrix is an expensive operation. A cheaper alternative is <em>QR with column-pivoting</em>. Recall Guassian Elimination (G.E.) with complete pivoting (i.e. pivoting on both the rows and columns), which computes a decomposition:
+<script type="math/tex">P A \Pi = L U</script>. G.E. with only column pivoting would be defined as <script type="math/tex">A \Pi = LU</script></p>
+
+<p>Consider applying the pivoting idea to the full, non-reduced QR decomposition, i.e.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+A &= QR \\
+A \Pi &= QR \Pi \\
+\underbrace{A}_{m \times n} &=  \underbrace{Q}_{m \times m} \underbrace{\begin{bmatrix} R \\ 0 \end{bmatrix}}_{m \times n} \Pi \\
+\underbrace{A}_{m \times n} \underbrace{\Pi}_{n \times n} &= \underbrace{Q}_{m \times m} \begin{bmatrix} \underbrace{R_{11}}_{(r \times r)} & \underbrace{R_{12}}_{(n-r) \times r} \\ 0 & 0 \end{bmatrix}
+\end{aligned} %]]></script>
+
+<p>An immediate consequence of swapping the columns of an upper triangular matrix <script type="math/tex">R</script> is that the result has no upper-triangular guarantee. In our case, the we call the result <script type="math/tex">% <![CDATA[
+\begin{bmatrix} R_{11} & R_{12} \\ 0 & 0 \end{bmatrix} %]]></script>, where <script type="math/tex">r = rank(A)</script>, and <script type="math/tex">rank(R_{11}) = r</script>.</p>
+
+<p>Note that in the decomposition above, <script type="math/tex">Q</script> and <script type="math/tex">\Pi</script> are both orthogonal matrices. Thus, this decomposition has some similarities with the SVD decomposition <script type="math/tex">A=U \Sigma V^T</script>, which is composed of two orthogonal matrices <script type="math/tex">U,V</script>. Multiplying by <script type="math/tex">Q^T = Q^{-1}</script> and <script type="math/tex">V^T = V^{-1}</script>, we find:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+U^T A V = \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} %]]></script>
+
+<p>In our <em>QR with column-pivoting</em> decomposition, we also see two orthogonal matrices on the left, surrounding <script type="math/tex">A</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+Q^T A \Pi &= \begin{bmatrix} R_{11} & R_{12} \\ 0 & 0 \end{bmatrix} \\
+Q^T A \Pi \Pi^{T} &= \begin{bmatrix} R_{11} & R_{12} \\ 0 & 0 \end{bmatrix} \Pi^T & \mbox{since } \Pi \mbox{ is orthogonal, } P^{-1} = P^T \\
+A &= Q \begin{bmatrix} R_{11} & R_{12} \\ 0 & 0 \end{bmatrix} \Pi^T & \mbox{since } Q \mbox{ is orthogonal.}
+\end{aligned} %]]></script>
+
+<p>Note that <script type="math/tex">\Pi</script> is a very restrictive orthogonal transformation. It turns out we can also use this decomposition to solve least squares problems, just as we did with the SVD.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+& \mbox{arg }\underset{x}{\mbox{min}}   \| Ax -b \|_2 \\
+&= \mbox{arg }\underset{x}{\mbox{min}}  \| \Bigg( Q \begin{bmatrix} R_{11} & R_{12} \\ 0 & 0 \end{bmatrix} \Pi^T \Bigg) x - b \|_2 \\
+&= \mbox{arg }\underset{x}{\mbox{min}}  \| Q^T \Bigg( Q \begin{bmatrix} R_{11} & R_{12} \\ 0 & 0 \end{bmatrix} \Pi^T  x - b \Bigg)\|_2 \\
+&= \mbox{arg }\underset{x}{\mbox{min}} \| \begin{bmatrix}
+        R_{11} & R_{12} \\ 0 & 0 
+        \end{bmatrix}\Pi^Tx - Q^Tb\| \\
+\end{aligned} %]]></script>
+
+<p>At this point we’ll define new variables for ease of notation. Let <script type="math/tex">Q^Tb = \begin{bmatrix} c \\ d \end{bmatrix}</script> and let  <script type="math/tex">\Pi^T x = \begin{bmatrix} y \\ z \end{bmatrix}</script>.</p>
+
+<p>Substituting in these new variable definitions, we find</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+&= \mbox{arg }\underset{x}{\mbox{min}} \| \begin{bmatrix}
+        R_{11} & R_{12} \\ 0 & 0 
+        \end{bmatrix}\Pi^Tx - Q^Tb\| \\
+        &= \mbox{arg }\underset{x}{\mbox{min}} \| \begin{bmatrix}
+        R_{11} & R_{12} \\ 0 & 0 
+        \end{bmatrix} \begin{bmatrix} y \\ z \end{bmatrix} - \begin{bmatrix} c \\ d \end{bmatrix} \| \\
+&= \mbox{arg }\underset{x}{\mbox{min}} \| \begin{bmatrix}
+        R_{11}y + R_{12}z - c \\ -d
+        \end{bmatrix} \|_2 \\
+\end{aligned} %]]></script>
+
+<p>We can always solve this equation for <script type="math/tex">y</script>:</p>
+
+<p>\begin{equation}
+    R_{11}y  = c - R_{12}z
+\end{equation}</p>
+
+<p>which is just a vector with <script type="math/tex">r</script> components. We must prove that <script type="math/tex">y,z</script> exist such that</p>
+
+<p>\begin{equation}
+        R_{11}y + R_{12}z - c = 0
+\end{equation}</p>
+
+<p>The answer is this is possible. We can make</p>
+
+<script type="math/tex; mode=display">\|Ax-b\|_2^2 = \underbrace{ \|R_{11}y + R_{12}z - c \|_2^2 }_{\text{can make }0} + \|d\|_2^2</script>
+
+<p>Choose any <script type="math/tex">z</script> and</p>
+
+<script type="math/tex; mode=display">y_{ls} = R_{11}^{-1}(c-R_{12}z)</script>
+
+<p>When <script type="math/tex">z=0</script>, then <script type="math/tex">y_{ls}= R_{11}^{-1}c</script>. Thus we have a least-squares solution for <script type="math/tex">y</script>. However, our goal is to find a least-squares solution for <script type="math/tex">x</script>. We can connect <script type="math/tex">x</script> to <script type="math/tex">y</script> through the following expressions:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+\Pi^T x &= \begin{bmatrix} y \\ z \end{bmatrix} \\
+ x &= \Pi \begin{bmatrix} y \\ z
+\end{bmatrix} \\
+ x &= \Pi \begin{bmatrix} y_{ls} \\ z
+\end{bmatrix} \\
+      x_{ls} &= \Pi \begin{bmatrix}
+         R_{11}^{-1}(c-R_{12}z) \\ z
+         \end{bmatrix}
+\end{aligned} %]]></script>
+
+<p>The convention is to choose the <em>minimum norm</em> solution, which means that <script type="math/tex">\|x\|</script> is smallest. The norm of <script type="math/tex">x</script> can be computed as follows:</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+\|x\|_2 = \| \Pi \begin{bmatrix}
+         R_{11}^{-1}(c-R_{12}z) \\ z
+         \end{bmatrix} \|_2 \\
+          \|x\|_2 = \|  \begin{bmatrix}
+         R_{11}^{-1}(c-R_{12}z) \\ z
+         \end{bmatrix} \|_2
+\end{aligned}</script>
+
+<h2 id="using-householder-matrices-to-compute-qr-with-column-pivoting">Using Householder Matrices to Compute QR with Column Pivoting</h2>
+
+<p>Suppose we started with</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix}
+        x & x & x &x \\
+         x & x & x &x \\
+          x & x & x &x \\
+           x & x & x & x \\
+            x & x & x &x \\
+\end{bmatrix} %]]></script>
+
+<p>and with permutation annihilation:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+Q_2 Q_1 A \Pi_1 \Pi_2 = \begin{bmatrix}
+        x & x & x &x \\
+         0 & x & x &x \\
+          0 & 0 & x &x \\
+           0 & 0 & x &x \\
+            0 & 0 & x &x \\
+        \end{bmatrix} %]]></script>
+
+<p>Already obvious it has rank two. If the matrix was a a total of rank 2, then we know that we really have</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{bmatrix}
+        x & x & x &x \\
+         0 & x & x &x \\
+          0 & 0 & 0 &0 \\
+           0 & 0 & 0 &0 \\
+            0 & 0 & 0 &0 \\
+\end{bmatrix} %]]></script>
+
+<p>otherwise we would have rank 3! What should be the permutation criteria? SVD rotates all of the mass from left and right so that it is collapsed onto the diagonal:</p>
+
+<script type="math/tex; mode=display">\begin{aligned}
+        a = U \Sigma V^T \\
+        U^T A V = \Sigma \\
+        \cdots U_2^T U_1^T A V_1 V_2 \cdots = \mbox{diagonal matrix}
+\end{aligned}</script>
+
+<p>Suppose you do QR without pivoting, then first step of Householder, all of the norm of the entire first column is left in the <script type="math/tex">A_{11}</script> entry (top left entry)</p>
+
+<p><script type="math/tex">\Pi_1</script> moves the column with the largest <script type="math/tex">\ell_2</script> norm to the 1st column. If we do this, then no matter which column had the largest norm, then the resulting <script type="math/tex">A_{11}</script> element will be as large as possible!</p>
+
+<p>We want to move the mass to the left upper corner, so that if the rank is rank-deficient, this will be revealed in the bottom-left tailing side.</p>
+
+<h2 id="numerical-instability-of-the-normal-equations">Numerical Instability of the Normal Equations</h2>
+
+<p>A popular choice for solving least-squares problems is the use of the <em>Normal Equations</em>. Despite its ease of implementation, this method is not recommended due to its numerical instability. The method involves left multiplication with <script type="math/tex">A^T</script>, forming a square matrix that can (hopefully) be inverted:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+Ax &= b \\
+A^T A x &= A^Tb & \mbox{left multiply with } A^T \\
+x &= (A^TA)^{-1} A^Tb & \mbox{invert } (A^TA) \mbox{ and left multiply with } (A^TA)^{-1}\\
+\end{aligned} %]]></script>
+
+<p>By forming the product <script type="math/tex">A^TA</script>, we square the condition number of the problem matrix. Thus, using the QR decomposition yields a better least-squares estimate than the <em>Normal Equations</em> in terms of solution quality.</p>
 
 <h2 id="references">References</h2>
 
