@@ -6,7 +6,7 @@ layout: default
 
 ## Bio
 
-I am a Ph.D. student at Georgia Tech, advised by Professor [James Hays](https://www.cc.gatech.edu/~hays/). I completed my Bachelor's and Master's degrees in Computer Science at Stanford University in 2018, specializing in artificial intelligence.  
+I am a Ph.D. student at Georgia Tech, advised by Professors [James Hays](https://www.cc.gatech.edu/~hays/) and [Frank Dellaert](http://frank.dellaert.com/). I completed my Bachelor's and Master's degrees in Computer Science at Stanford University in 2018, specializing in artificial intelligence.  
 
 You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found here](http://github.com/johnwlambert/).
 
