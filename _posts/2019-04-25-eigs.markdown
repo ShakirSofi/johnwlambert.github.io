@@ -1,0 +1,106 @@
+---
+layout: post
+title:  "Computing Eigenvectors and Eigenvalues"
+permalink: /eigs/
+excerpt: "Power iteration, QR iteration, QR with shift, Jacobi iteration."
+mathjax: true
+date:   2019-04-25 11:01:00
+mathjax: true
+
+---
+
+## Why compute eigenvalues and eigenvectors? What are they?
+
+
+We'll discuss QR iteration and Jacobi iterations, which can be used to compute the complete symmetric eigenvalue decomposition $$A=Q \Lambda Q^T$$.
+
+$$
+A = Q \Lambda Q^T
+AQ = Q \Lambda
+Q \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} = \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & & \lambda_n \end{bmatrix}
+$$
+
+The Power Method is to compute a specific eigenvalue and corresponding eigenvector, not the entire eigenvalue decomposition
+
+## The QR Iteration
+
+
+
+## QR Iteration with Shift
+
+
+
+## Jacobi Iteration
+Better for parallelization than QR iteration. Slower than QR in practice (~5x slower), although theoretically we have to iterate infinitely many times for both algorithms.
+
+
+
+## The Power Method
+The basic power method computes the largest eigenvalue $$\lambda_1$$ and corresponding eigenvector $$v_1$$ such that $$|\lambda_1| \geq | \lambda_2| \geq \cdots \geq | \lambda_n| $$. It will only work for a specific type of matrix.
+
+Cannot have two shared largest eigenvalues -- one must be dominant, e.g. $$|\lambda_1|>|\lambda_2|$$.
+
+We must start with an initial guess $$q^{(0)}$$, which can be random. We wish to compute $$\lambda_1$$ of $$A \in \mathbf{R}^{n \times n}$$ and **we make the assumption** that $$A$$ has $$n$$ linearly independent eigenvectors. For symmetric matrices, we know this is the case, since a decomposition then exists $$A=Q \Lambda Q^T$$, where $$Q$$ contains the eigenvectors. Thus, we can write $$q^{(0)}$$ as a linear combination of all $$n$$ eigenvectors $$x_1, \cdots, x_n$$, since the eigenvectors can serve as a basis for $$A$$:
+
+$$
+\begin{aligned}
+& q^{(0)} &= \alpha v_1 + \cdots + \alpha_n v_n & \mbox{as linear combination of n linearly indepedent eigenvectors} \\
+z^{(1)} &= A q^{(0)} = A \alpha v_1 + \cdots + A \alpha_n v_n & \mbox{ multiply all terms by } A \\
+z^{(1)} &= A q^{(0)} = \alpha A v_1 + \cdots + \alpha_n A v_n & \alpha \mbox{ is a scalar, so we can place it in any place} \\
+& \alpha_1 x_1 + \cdots \\
+q^{(1)} & \mbox{normalize}
+\end{aligned}
+$$
+
+The only reason we normalize here is because the vector size may grow or shrink drastically, so we can keep it stable by constraining it to be a unit vector. Thus, we divide by its magnitude. We iterate over and over again. Normalization won't change the direction of the vector (only the magnitude), so for the sake of a convergence argument, we will ignore it:
+
+$$
+\begin{aligned}
+A (Aq^{(0)}) &= A \Big( \alpha_1 \lambda_1 x_1 + \alpha_2 \lambda_2 x_2 + \alpha_3 \lambda_3 x_3 + \cdots + \alpha_n \lambda_n x_n \Big) \\
+&= \alpha_1 \lambda_1^2 x_1 + \alpha_2 \lambda_2^2 x_2 + \cdots + \alpha_n \lambda_n^2 x_n \\
+A^{k} q^{(0)}&= \alpha_1 \lambda_1^k x_1 + \alpha_2 \lambda_2^k x_2 + \cdots + \alpha_n \lambda_n^k x_n \\ & \mbox{apply it k times} \\
+\frac{A^{k} q^{(0)} }{\lambda_1^k} &= \frac{\alpha_1 \lambda_1^k x_1 + \alpha_2 \lambda_2^k x_2 + \cdots + \alpha_n \lambda_n^k x_n}{\lambda_1^k} \\ & \mbox{apply it k times, play with length, divide both sides by} \lambda_1^k
+\end{aligned}
+$$
+
+
+Note that
+
+$$
+\Big|\frac{\lambda_i}{\lambda_1}\Big| < 1, \mbox{ for } i=2, \cdots, n
+$$
+
+Thus, in the limit:
+
+$$
+\underset{k \rightarrow \infty}{\mbox{lim}} \frac{A^k q^{(0)}}{\lambda_1^k} = \alpha_1 x_1
+$$
+
+where $$x_1$$ is our eigenvector, giving us the direction of the first leading eigenvector. However, if $$\alpha_1$$ is zero, then we will produce the zero vector as an eigenvector, so we start all over again with a different choice of $$q^{(0)}$$.
+
+Once we have the eigenvector, we can reclaim its eigenvalue since we can convert it into a quadratic form as follows:
+
+$$
+\begin{aligned}
+Ax &= \lambda x, x \neq 0 & \\
+x^TAx &= \lambda x^Tx & \mbox{left multiply by } x^T \\
+\frac{x^TAx}{x^Tx} &= \frac{\lambda x^Tx}{x^Tx} & \mbox{divide by scalar to get the Rayleigh quotient} \\
+\lambda &= \frac{x^TAx}{x^Tx} 
+\end{aligned}
+$$
+
+Theoretically, we must iterate infinitely many times, but numerically, we don't have to. We can halt when our eigenvalue, eigenvector pair satisfy the desired relationship sufficiently well:
+
+$$
+\begin{aligned}
+Ax^{(k)} &= \lambda^{(k)} x^{(k)} & \\
+| A x^{(k)} - \lambda^{(k)} x^{(k)}| &\leq \varepsilon & \mbox{rearrange terms}
+\end{aligned}
+$$
+
+where $$\varepsilon$$ is a desired tolerance.
+
+
+
+
+
