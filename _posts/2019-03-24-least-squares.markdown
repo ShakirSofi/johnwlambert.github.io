@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Solving Least Squares with QR"
+title:  "Solving Least-Squares with QR"
 permalink: /least-squares/
 excerpt: "QR decomposition, Modified Gram Schmidt (MGS)"
 mathjax: true
@@ -9,10 +9,13 @@ mathjax: true
 
 ---
 Table of Contents:
-- [Least Squares](#lstqr)
-- [QR for Least Squares](#qr-for-lstsqr)
+- [The Least-Squares Problem](#lstqr)
+- [QR for Least-Squares](#qr-for-lstsqr)
+- [Givens for QR](#givens-for-qr)
 - [MGS for QR](#mgs-for-qr)
 - [QR for GMRES](#qr-for-gmres)
+- [QR with Column-Pivoting](#qr-w-col-pivoting)
+
 
 
 <a name='lstqr'></a>
@@ -85,7 +88,7 @@ $$
 An important question at this point is *how can we actually compute the QR decomposition* (i.e. numerically)? [We reviewed the Householder method](/direct-methods/) for doing so previously, and will now describe how to use the Gram-Schmidt (GS) to find matrices $$Q,R$$.
 
 
-
+<a name='givens-for-qr'></a>
 ## Computing QR with Givens Rotations
 
 
@@ -417,8 +420,10 @@ If matrix $A$ is rank-deficient, then it is no longer the case that space spanne
 As stated above, we should use the SVD when we don't know the rank of a matrix, or when the matrix is known to be rank-deficient.
 
 $$
-A &= U \Sigma V^T
+\begin{aligned}
+A &= U \Sigma V^T \\
 &= \begin{bmatrix} U_1 & U_2 \end{bmatrix} \begin{bmatrix} \Sigma_1 & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} V_1 & V_2 \end{bmatrix}^T
+\end{aligned}
 $$
 
 $$
@@ -508,7 +513,7 @@ We recall that if $$A$$ has dimension $$(m \times n)$$, with $$m > n$$, and $$ra
 Meaning that $$x^{\star} + y$ is a solution when $y \in null(A)$ because $$A(x^{\star} + y) = Ax^{\star} + Ay = Ax^{\star}$$
 
 
-
+<a name='qr-w-col-pivoting'></a>
 ### QR with Column-Pivoting
 
 Computing the SVD of a matrix is an expensive operation. A cheaper alternative is *QR with column-pivoting*. Recall Guassian Elimination (G.E.) with complete pivoting (i.e. pivoting on both the rows and columns), which computes a decomposition:

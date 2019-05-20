@@ -11,19 +11,901 @@ mathjax: true
 
 ## Why compute eigenvalues and eigenvectors? What are they?
 
+It can be difficult to gain intuition about large 2-d arrays of numbers (matrices) by simply looking at their entries. By examining a matrix's *eigenvalues*, however, we can see a glimpse into the "heart" of the matrix. We'll discuss QR iteration and Jacobi iterations, which can be used to compute a full set of eigenvalues and eigenvectors for a matrix. We'll also discuss the Power Method, a method for computing a specific eigenvalue and corresponding eigenvector instead of the entire eigenvalue decomposition.
 
-We'll discuss QR iteration and Jacobi iterations, which can be used to compute the complete symmetric eigenvalue decomposition $$A=Q \Lambda Q^T$$.
+## What are eigenvalues and eigenvectors?
+
+In linear algebra, an eigenvector or characteristic vector of a linear transformation is a non-zero vector that changes by only a scalar factor when that linear transformation is applied to it:
 
 $$
-A = Q \Lambda Q^T
-AQ = Q \Lambda
-Q \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} = \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & & \lambda_n \end{bmatrix}
+\begin{aligned}
+Av &= \lambda v \\
+Av - \lambda v &= 0 & \mbox{rearrange terms} \\
+(A-I\lambda)v &= 0 & \mbox{factor terms} \\
+\end{aligned}
 $$
 
-The Power Method is to compute a specific eigenvalue and corresponding eigenvector, not the entire eigenvalue decomposition
+It turns out that the eigenvalue problem is related to polynomials, through the determinant of a matrix. Consider that if $$\exists v$$ such that the equation above holds, i.e. $$(A-I\lambda)v = 0$$, then the matrix $$A - \lambda I$$ must be singular because $$v$$ belongs to the nullspace of $$(A - \lambda I)$$. $$v \neq 0, v \in Null(A - \lambda I)$$. Since the nullspace is nonzero, then $$A - \lambda I$$ must be rank deficient (singular), otherwise zero would be the only vector in the nullspace. Singular matrices always have determinant zero, so we can find elements of the nullspace by searching for values of $$\lambda$$ that drive the determinant to zero. Since a determinant is a polynomial,  eigenvalues $$\lambda_i$$ are roots of the characteristic polynomial $$P_{A}(\lambda)$$ so we seek for values of $$\lambda$$ that will drive the polynomial to zero:
+    
+$$
+P_{A}(\lambda) = \mbox{det}(\lambda I - A)
+$$
+
+We arbitrarily set eigenvector length to be 1, i.e. $$\|v\|_2=1$$, because scaling an eigenvector doesn't change the eigenvalue-eigenvector relationship:
+
+$$
+\begin{aligned}
+Av &= \lambda v, v \neq 0 \\
+A (\alpha v) &= \lambda (\alpha v)
+\end{aligned}
+$$
+
+Having $$n$$ eigenvalues is not equivalent to $$n$$ *distinct* eigenvalues. If a matrix is already diagonal, then the diagonal elements are just the eigenvalues (by virtue of determinant).
+
+
+## Similarity Transformations
+
+*Similarity* transformations are a specific class of transformations $$T$$ that preserve a matrix's eigenvalues. The transformation must be performed on both the left and right-hand side, with $$T$$ and $$T^{-1}$$. The theorem states that if $$B = X^{-1}AX$$, then $$\lambda \{A\} = \lambda \{B\}$$. Then also $$X A X^{-1} = B$$. This is because for square matrices $$A,B \in \mathbf{R}^{n \times n}$$, we can break apart terms of the determinant $$\mbox{det}(AB) = \mbox{det}(A) \mbox{det}(B)$$. Observe:
+
+$$
+\begin{aligned}
+P_A(\lambda) &= \mbox{det}(\lambda I − A)\\
+P_B(\lambda) &= \mbox{det}(\lambda I − X^{−1}AX) \\
+			&= \mbox{det}(\lambda X^{-1}X − X^{−1}AX) \\
+			&= \mbox{det}\Big(X^{−1}(\lambda I − A)X\Big) \\
+			&= \mbox{det}(X^{−1}) \mbox{ det}(\lambda I − A) \mbox{ det}(X) & \mbox{can break apart terms of determinant} \\
+			&= \mbox{det}(X^{−1}) \mbox{ det}(X) \mbox{ det}(\lambda I − A) \\
+			&= \mbox{det}(X^{−1}X)  \mbox{ det}(\lambda I − A) \\
+			&= \mbox{det}(I)  \mbox{ det}(\lambda I − A) \\
+			&= 1 \cdot \mbox{det}(\lambda I − A) = P_A(\lambda)
+\end{aligned}
+$$
+
+
+## Relationship to the Schur Decomposition
+A related concept is the Schur Decomposition, which relies upon the Hermitian transpose, which involves taking the transpose of a matrix and then taking the complex conjugate of each entry, i.e.
+
+$$
+Q^H = (\overline{Q})^T = \overline{(Q^T)}
+$$
+
+The Schur Decomposition exists for any square matrix $$A \in \mathbf{C}^{n \times n}$$ (even if complex) $$\exists$$ unitary $$Q \in \mathbf{C}^{n \times n}$$, where $$Q^HQ = I$$ and upper triangular $$T \in \mathbf{C}^{n \times n}$$ s.t.
+
+$$
+\begin{aligned}
+Q^HAQ &= T = D + N \\
+A &= QTQ^H 
+\end{aligned}
+$$
+
+what are find along the diagonal are the eigenvalues of $$A$$. Note that the Schur decomposition provides a similarity transformation since $$Q^{-1} = Q^T$$.
+
+
+**Proof by Induction of Schur**
+
+ Prove by induction: 
+Let $$A \in \mathbf{C}^{n \times n}$$
+ (1) For any matrix of order $$\leq n-1$$, Schur Decomp exists.
+ (2) $$Ax = \lambda x$$, with $$\|x\|_2=1$$
+ Let  $$U^HU=I$$
+
+$$
+\underbrace{ U }_{n \times n} = \begin{bmatrix} \underbrace{x}_{1} & \underbrace{U_1}_{n-1} \end{bmatrix}
+$$
+where $$U^TU=I$$
+    \item There are $n$ linearly independent vectors, each is orthogonal to each other, each one has unit norm
+    \item We didn't say how to compute $U_1$ yet
+    \item We form $U^HAU$, and plug in the expression above, and multiply them all together as block-by-block multiplication
+
+$$
+\begin{aligned}
+U^HAU &= \begin{bmatrix}
+x^H \\ U_1^H
+\end{bmatrix} A \begin{bmatrix}
+x & U_1
+\end{bmatrix} \\
+&= \begin{bmatrix}
+x^H \\ U_1^H
+\end{bmatrix}  \begin{bmatrix}
+\lambda x & A U_1
+\end{bmatrix} \\
+&= \begin{bmatrix} 
+\lambda & x^H AU_1 \\
+0 & U_1^H A U_1
+\end{bmatrix} = \begin{bmatrix} \lambda & x^H A U_1 \\ 0 & \tilde{U_1} \tilde{T} \tilde{U_1}^H
+\end{bmatrix}
+\end{aligned}
+$$
+
+we know that $$\lambda U_1^Hx$$ since these must be orthogonal to each other
+we look at dimensions:
+    
+$$
+\underbrace{ U_1^H }_{(n-1)\times n} \underbrace{A}_{n \times n} \underbrace{U_1}_{n \times (n-1)}
+$$
+
+ending up with $$(n-1)\times (n-1)$$
+
+Assume the Schur decomposition for a particular part of the matrix now, assume we can make it upper triangular. Take Schur of lower-right-hand block. We can always write as 
+
+$$
+\begin{aligned}
+    Q^H A Q = T \\
+    A = Q T Q^H
+\end{aligned}
+$$
+    
+$$
+\tilde{U_1} \tilde{U_1}^H (U_1^H A U_1) \tilde{U_1} \tilde{U_1}^H = \tilde{U_1} T \tilde{U_1}^H
+$$
+
+    
+$$
+U^H A U =  \begin{bmatrix}
+\lambda & x^H A U_1 \\
+0 & \tilde{U_1} \tilde{T} \tilde{U_1}^H
+\end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & \tilde{U_1} \end{bmatrix} \begin{bmatrix}
+\lambda & x^H A U_1 \\
+0 & \tilde{T}
+\end{bmatrix} \begin{bmatrix} 1 & 0 \\ 0 & \tilde{U_1} \end{bmatrix}^H
+$$
+
+meaning that
+    
+$$
+A  = U \begin{bmatrix} 1 & 0 \\ 0 & \tilde{U_1} \end{bmatrix} \begin{bmatrix}
+\lambda & x^H A U_1 \\
+0 & \tilde{T}
+\end{bmatrix} \begin{bmatrix} 1 & 0 \\ 0 & \tilde{U_1} \end{bmatrix}^H U^H
+$$
+
+How are eigenvalues and Schur related? Eigenvalues of $$A$$ are the diagonal elements of $$T$$. But what are the eigenvectors? Columns of $$Q$$ in general are not eigenvectors. We usually call the columns of $$Q$$ *Schur vectors* instead. Suppose a column of $$Q$$ was an eigenvector. Then things break unless non-diagonal upper triangular entries were zero (if the matrix were $$T$$ diagonal).
+
+## Diagonalizability
+
+
+Schur vector = eigen vector when matrix is diagonalizable
+matrix is normal if $A^HA = AA^H$
+Consider the real cage: a symmetric matrix $A^T=A$, then of course $A^TA = AA^T$
+Compute the SVD of the following matrix
+    
+$$
+\begin{aligned}
+    A &= \begin{bmatrix}
+    2 & 0 \\
+    0 & -4 \\
+    0 & 0 \\
+    0 & 0 
+    \end{bmatrix} \\
+    E &= \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -1 &0 & 0 \\
+    0 &  0 & 1 & 0\\
+    0 & 0 & 0 & 1
+    \end{bmatrix} \\
+    \Pi E A P 
+    &=\Pi E \begin{bmatrix}
+    2 & 0 \\
+    0 & -4 \\ 
+    0 & 0 \\
+    0 & 0
+    \end{bmatrix} P
+\end{aligned}
+$$
+
+
+\subsection{Jordan Decomposition}
+\begin{itemize}
+    \item $X^{-1}AX = J$
+    \item Eigenvalues along the diagonal of $J_i$
+    \item superdiagonal has ones
+    \item A matrix is \textbf{defective} it has an eigenvalue of algebraic multiplicity $k$ iwth fewer thatn $k$ linearly independent eigenvectors
+    \item Geometric vs. Algebraic multiplicity!
+    \item geometric has to do with linear independence
+    
+
+[//]: # Commented for now --> Gershgorin
+[//]: # For a square matrix, you can guess where the eigenvalues lie
+[//]: # Gershgorin, centered around diagonal element, with radius of sum of nondiagonal elements in that row
+[//]: # Eigenvalues must be inside these circles' union (not necessarily one per circle)
+[//]: # circle because dealing with complex space
+[//]: # if You have a real and symmetric matrix, then you can use this to prove that all eigenvalues are real! Also, the schur decomposition becomes the eigenvalue decomposition! WHY??? HOW??
+
+
+## Real Schur Decomposition
+\begin{itemize}
+    \item Example of QR decomposition: if $A \in \mathbbm{R}^{m \times n}$
+    
+$$
+\begin{aligned}
+    A = Q \begin{bmatrix} R \\ 0 \end{bmatrix} \\
+    Q \in \mathbbm{R}^{m \times m}, R \in \mathbbm{R}^{n \times n}
+\end{aligned}
+$$
+
+Complex Schur: if $A \in \mathbbm{C}^{n \times n}$
+    
+$$
+\begin{aligned}
+    A = Q^H AQ = T \in \mathbbm{C}^{n \times n}
+\end{aligned}
+$$
+
+where $$T$$ is upper triangular
+Real Schur: $A \in \mathbbm{R}^{n \times n}$:
+    
+$$
+Q^T A Q = T
+$$
+
+this does NOT mean that $$Q \in \mathbf{R}^{n \times n}$$ and $T \in \mathbbm{R}^{n \times n}$
+Real Schur: $$A \in \mathbbm{R}^{n \times n}$$: $$\exists$$ orthogonal $$Q \in \mathbbm{R}^{n \times n}$$, $$Q^TQ= I$$ and block upper triangular $$T \in \mathbf{R}^{n \times n}$$ where $$T$$ is
+    
+$$
+Q^TAQ = T = \begin{bmatrix} R_{11} & & \\
+                        & R_{22} & \\
+                        & & R_{mm} \end{bmatrix} = 
+                        \begin{bmatrix}
+                        x & & & & & \\
+                          &x& & & & \\
+                          & &x&x& & \\
+                          & &x&x& & \\
+                          & & & &x&x\\
+                          & & & &x&x
+                        \end{bmatrix}
+$$
+
+where $R_{ii} \in \mathbbm{R}^{1 \times 1}$ or  $R_{ii} \in \mathbbm{R}^{2 \times 2}$ (blocks). where $Q = \mathbbm{R}^{n \times n}$ and $Q^TQ = I$. Real Schur Decomposition: might only be block diagonal.
+    Cannot be exactly upper trangular ($1 \times 1$ blocks would be exactly diagonal). Even when $A$ is real, it can have complex eigenvalues. The $(2 \times 2)$ blocks explain the $(2 \times 2)$ eigenvalues, that explain $\alpha + i \beta$ and $\alpha - i \beta$.
+
+However, if $$A$$ is symmetric, i.e. $$A=A^T$$, then $$Q^TAQ$$ is also symmetric, and we get diagonal $$T$$
+We get the eigenvalues: schur decomposition becomes the symmetric eigenvalue decomposition
+
+$$
+\begin{aligned}
+Q^TAQ &= D \\
+QQ^TAQ &= QD \\
+A \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} &= \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} d_{11} & & \\ & d_{ii} & \\ & & d_{nn} \end{bmatrix} \\
+A q_i = q_i \begin{bmatrix} 0 & \vdots & d_{ii} & \vdots & 0 \end{bmatrix}
+\end{aligned}
+$$
+    
+If $$A$$ is assumed to be symmetric, then 
+    
+$$
+\begin{aligned}
+(Q^TAQ)^T &= Q^TA^TQ \\
+          &= Q^TAQ & \mbox{since } A \mbox{ is symmetric } \\
+          R^T &= R \\
+          \begin{bmatrix} R_{11} & & \\ & R_{22} & \\ & & R_{mm} \end{bmatrix} &= \begin{bmatrix} R_{11}^T & & \\ & R_{22}^T & \\ & & R_{mm}^T \end{bmatrix}
+\end{aligned}
+$$
+
+where the upper triangular matrix equals the lower triangular matrix
+    
+Recall that if the roots are real, then they are equal to their complex conjugate
+
+$$
+(\lambda - \lambda_1)(\lambda - \lambda_2)
+$$
+
+where we have $$(1 + i)$$, then $$(1-i)$$. If real matrix exists, it either has all real eigenvalues, or else it has pairs of complex with complex conjugate.
+    
+Eigenvalues only for square matrices. You can only have \textit{generalized eigenvalues} for rectangular matrices
+
+    
+If itself and complex conjugate are identical, then must be real
+    
+$$
+\begin{aligned}
+A = A^H = (\overline{A})^T \in \mathbf{C}^{n \times n} \\
+Ax &= \lambda x, \|x\|_2^2 = 1 \leftrightarrow x^Hx = 1 \\
+x^HAx &= \lambda x^Hx = \lambda \\
+(x^HAx)^H &= x^HA^Hx = (\lambda)^H = \overline{\lambda} \\
+\lambda &= \overline{\lambda} \\
+& \lambda  \in \mathbf{R}^{1 \times 1}
+\end{aligned}
+$$
+    
+   Upper Hessenberg. allow one subdiagonal to be nonzero. 
+\end{itemize}
+\subsection{How can we compute eigenvalues?}
+\begin{itemize}
+    \item Recall that
+    
+    \begin{equation}
+        Q_{\square} \cdots Q_1 A = \begin{bmatrix} R \\ 0 \end{bmatrix} \\
+    \end{equation}
+    
+    Do a bunch of orthogonal transformations, hoping that $ \dots Q^TAQ = D$
+    \item If $Q^HAQ$ is triangular, than Schur decomposition computation cannot be done in a finite number of steps
+    \begin{equation}
+        Q^HAQ = T
+    \end{equation}
+    where $T$ is upper triangular
+    
+    \item However, if we want to do something less: allow to be upper hessenberg instead of upper triangular $T$
+    \begin{equation}
+        Q^{\prime H}A Q^{\prime}
+    \end{equation}
+    then this can be computed in a finite number of steps
+    \item From polynomial of degree, no closed form, finite number of steps: polynomial root finding is equivalent to finding eigenvalues
+    \begin{equation}
+        \lambda \{ A\} = \mbox{roots}\Big( \mbox{det}(\lambda I - A) = 0 \Big)
+    \end{equation}
+    
+    \item We won't iterate infinitely number of times; we have some termination criteria for when we know that we have a pretty good approximation of the eigenvalues
+    \item 
+    
+    You can't do it with just multiple similarity transformations in the usual way to get diagonal!
+    \begin{equation}
+    \begin{aligned}
+    H_1 \begin{bmatrix} 
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x 
+    \end{bmatrix} H_1^T 
+    \end{aligned}
+    \end{equation}
+    
+    On the left, you will combine the 5 rows
+    On the right, you will combine the 5 columns, filling back in the zero
+    \item Less ambitious: allow one subdiagonal to be nonzero.
+    \item 
+    
+    Find $P_1$ so that
+    
+    \begin{equation}
+        P_1 \begin{bmatrix} x \\ x \\ x \\ x \end{bmatrix} = \begin{bmatrix} x \\ 0 \\ 0 \\ 0 \end{bmatrix}
+    \end{equation}
+    \item 
+    \begin{equation}
+        H_1 = \begin{bmatrix}
+        1 & 0 & 0 & 0 & 0 \\
+        0 &   &   &   & \\
+        0 &   &   &   & \\
+        0 &   &   & P_1  & \\
+        0 &   &   &   & \\
+        \end{bmatrix} 
+    \end{equation}
+    \item 
+    
+    \begin{equation}
+     \begin{bmatrix}
+        1 & 0 & 0 & 0 & 0 \\
+        0 &   &   &   & \\
+        0 &   &   &   & \\
+        0 &   &   & P_1  & \\
+        0 &   &   &   & \\
+        \end{bmatrix}    \begin{bmatrix} 
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x 
+    \end{bmatrix} \begin{bmatrix}
+        1 & 0 & 0 & 0 & 0 \\
+        0 &   &   &   & \\
+        0 &   &   &   & \\
+        0 &   &   & P_1^T  & \\
+        0 &   &   &   & \\
+        \end{bmatrix}  = \begin{bmatrix} 
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    0 & x & x & x & x \\
+    0 & x & x & x & x \\
+    0 & x & x & x & x 
+    \end{bmatrix}
+    \end{equation}
+    \item Zeros introduced from the previous step stay as zeros
+    \item Householder matrix is symmetric, so $P_1$ is symmetric, so $H_1 = H_1^T$
+    \item When $A$ is symmetric, meaning $A=A^T$, we obtain a tridiagonal matrix:
+    
+    \begin{equation}
+     H_3 H_2 H_1   \begin{bmatrix} 
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x \\
+    x & x & x & x & x 
+    \end{bmatrix} H_1^T H_2^T H_3^T
+    = \begin{bmatrix} 
+    x & x & 0 & 0 & 0 \\
+    x & x & x & 0 & 0 \\
+    0 & x & x & x & 0 \\
+    0 & 0 & x & x & x \\
+    0 & 0 & 0 & x & x 
+    \end{bmatrix}
+    \end{equation}
+    \item
+    \begin{equation}
+        H_{n-2} \cdots H_1 A H_1^T \cdots H_{n-2} = tridiagonal 
+    \end{equation}
+    Then do infinitely many more $Q_i$ to do :
+    \begin{equation}
+     \cdots Q_1   H_{n-2} \cdots H_1 A H_1^T \cdots H_{n-2} Q_1^T \cdots = diagonal
+    \end{equation}
+    \item This is Hessenberg QR iteration
+    \item 
+    
+
+## The QR Algorithm
+
+ Iterate:
+1. $[Q,R] = qr(A)$, i.e. thus compute $A=QR$
+2. $A^{\prime} := RQ$
+3. $A = A^{\prime}$
+
+## QR Algorithm Explained
+
+Where is the similarity transformation? $$A, A^{\prime}$$ are similar
+
+$$
+\begin{aligned}
+A^{1} &= Q^{(1)} R^{(1)} \\
+ A^{2} &=  R^{(1)} Q^{(1)} \\
+  A^{2} &=   Q^{(2)} R^{(2)} \\
+  A^{3} &=   R^{(2)}  Q^{(2)} \\
+\end{aligned}
+$$
+
+Consider what's going on here: is $$A^{(1)}$ connected to $A^{(2)}$$ by a similarity transformation? yes!
+    
+$$
+\begin{aligned}
+A^{(2)} &= R^{(1)} Q^{(1)}
+        &= \Big( Q^{(1)}^T A^{(1)} \Big) Q^{(1)}
+\end{aligned}
+$$
+
+because
+
+$$
+\begin{aligned}
+A^{(1)} &= Q^{(1)} R^{(1)} \\
+(Q^{(1)})^T A^{(1)} &= (Q^{(1)})^T Q^{(1)} R^{(1)} \\
+(Q^{(1)})^T A^{(1)} &= R^{(1)} 
+\end{aligned}
+$$
+
+so we can substitute this in above! We will use Givens' rotations to get there!
+    
+Nonsymmetric matrix eigenvalue decomposition -> existence is difficult to talk about, we will not discuss this! So we just focus on the symmetric case only.
+
+$$
+G_{45} G_{23} \begin{bmatrix} c & s  & & & \\
+                             -s & c & & & \\
+                                &   & &I_3 & \\
+                                &   & &  & 
+                                \end{bmatrix}T
+$$
+
+get upper tri-diagonal
+
+    
+$$
+T^{\prime} = (\textrm{upper tria-diagonal}) G_{12}^T G_{23}^T \cdots G_{n-1,n}^T
+$$
+    
+$$
+\begin{aligned}
+T=  \begin{bmatrix}
+    x & x &  &   & \\
+    x & x & x &   & \\
+      & x & x & x &  \\
+      &   & x & x & x \\
+      &   &   & x & x \\
+\end{bmatrix} \\
+G_{12} T = \begin{bmatrix}
+    x & x & + &   & \\
+    0 & x & x &   & \\
+      & x & x & x &  \\
+      &   & x & x & x \\
+      &   &   & x & x \\
+\end{bmatrix} \\
+T^{\prime} = G_{45} G_{34} G_{23} G_{12}   G_{12} T = \begin{bmatrix}
+    x & x & + &   & \\
+    0 & x & x & +  & \\
+     0 & 0 & x & x & + \\
+      &   & 0 & x & x \\
+      &   &   & 0 & x \\
+\end{bmatrix} \\
+T^{\prime} = G_{45} G_{34} G_{23} G_{12}   G_{12} T G_{12}^T G_{23}^T G_{34}^T G_{45}^T \\
+=
+\begin{bmatrix}
+    x & x & + & +  & + \\
+    + & x & x & +  & + \\
+     0 & + & x & x & + \\
+      &   & + & x & x \\
+      &   &   & + & x \\
+\end{bmatrix} \\
+\end{aligned}
+$$
+
+But we know that $$T$$ is symmetric! so $$T^{\prime} = RQ = Q^TTQ$$. Tridiagonalize first, and then iterate
+    
+    
+   
+## The Shifted QR Algorithm
+
+Iterate:
+1. $$Q,R = qr(T - \lambda I)$$
+2. $$T = RQ + \lambda I$$
+
+## Justification for QR w/ Shift
+
+$$
+T^{(1)} - \lambda I = Q^{(1)} R^{(1)}
+$$
+   
+   \begin{figure}[!h]
+       \centering
+       \includegraphics[width=\linewidth]{qr_with_shift_derivation.jpg}
+       \caption{WHY DOES THIS HOLD TRUE?}
+       \label{fig:my_label}
+   \end{figure}
+   \item 
+   
+   
+   \begin{equation}
+       T - \lambda I = \cdots 
+   \end{equation}
+   \item We are not changing the eigenvalues: $T^{\prime}, T$ related by a similarity transformation
+   \item If we have a matrix $A$, and we don't know anything about if it is symmetric, then we can convert it to Upper Hessenberg matrix $H$.
+   \item Then we do 
+   \begin{equation}
+   \begin{aligned}
+       (Q,R) &\leftarrow qr(H-\lambda I) \\
+       H &\leftarrow RQ + \lambda I
+    \end{aligned}
+   \end{equation}
+   \item In terms of complexity:
+   Now this takes only $6n + 6(n-1)$, so  better than $O(n^3)$ just $O(n^2)$
+   \item 
+   \begin{equation}
+       6 \sum\limits_{i=2}^n i
+   \end{equation}
+   \item When the matrix is symmetric, since we can turn it into tridiagonal, it is even easier. We have to do this $(n-1)$ times. That takes $O(n)$ flops. We save a lot of computational complexity.
+\end{itemize}
+
+## Deflation
+\subsection{Deflation}
+\begin{itemize}
+\item 
+\begin{equation}
+\begin{aligned}
+A = \begin{bmatrix} A_{11}| & & A_{12} & \\
+                     ---   & -- & ------ &  \\
+                      \hspace{5mm} | & &  &  \\
+                       0 \hspace{3mm} | & & A_{22} &  \\
+                       \hspace{5mm} | & & &  \\
+                        \end{bmatrix}
+    \lambda \{A\} = \bigcup_{i=1}^4 \lambda \{ A_{ii} \}
+\end{aligned}
+\end{equation}
+You can just pad above the diagonal components, set everything below them to be zero
+\end{itemize}
+\subsection{Deflation: The Symmetric Case}
+\begin{itemize}
+    \item $A=A^T \in \mathbbm{R}^{n \times n}$
+
+In the middle of QR, check if anything in the off-diagonal became tiny -- means one eigenvalue is already computed
+    
+$$
+\begin{aligned}
+Av &= \lambda v (v \neq 0) \\
+Av - \lambda v &= 0 \\
+(A-\lambda I) v &= 0 \\
+\begin{bmatrix} 
+A_{11} - \lambda & & \\
+                & \ddots & \\
+                 & & a_{nn} - \lambda
+\end{bmatrix} v &= 0
+\end{aligned}
+$$
+    
+Start with $$H$$:
+    
+$$
+H =  \begin{bmatrix}
+x & x & x & x & x \\
++ & x & x & x & x \\
+  & + & x & x & x \\
+  &   & + & x & x \\
+  &   &   & + & x \\
+\end{bmatrix}
+$$
+    
+Shift: Then you will get singular with $H - \mu I$, meaning $\mu$ is an eigenvalue
+
+$$
+H - \mu I =  \begin{bmatrix}
+x & x & x & x & x \\
++ & x & x & x & x \\
+  & + & x & x & x \\
+  &   & + & x & x \\
+  &   &   & + & x \\
+\end{bmatrix}
+$$
+
+
+After 1 iteration, you will get
+
+    \begin{equation}
+        H^+ = RQ + \mu I = \begin{bmatrix}
+        x & x & x & x & x \\
+        x & x & x & x & x \\
+          & x & x & x & x \\
+          &   & x & x & x \\
+          &   &   & 0 & \mu \\
+        \end{bmatrix}
+    \end{equation}
+    
+You need to shift with a very good estimate of the eigenvalue (numerically the bottom row -- one value might be tiny, and other close to eigenvalue). Role of shift is important!  Note that $$H - \mu I = QR$$
+ If $$\mu \in \lambda\{H\}$$, then $$H-\mu I$$ is singular. This implies that
+    
+$$
+\begin{aligned}
+det(H - \mu I) = 0 \\
+\mbox{det}(R) = 0, \mbox{ because } \mbox{det}(Q)=1$
+\end{aligned}
+$$
+    
+    \item is $r_{nn}= 0$?? Yes, it turns out it is!
+    \item By Givens rotations, for 2-vector must get zero and non-zero element to preserve norm magnitude
+    \begin{equation}
+        \begin{bmatrix} c & s \\ -s & c \end{bmatrix} \begin{bmatrix} x & + \end{bmatrix} = \begin{bmatrix} + \\ 0 \end{bmatrix}
+    \end{equation}
+    \item All diagonal elements except for the last one must be nonzero! (because we shifted subdiagonal above into the diagonal), so all diagonal elements are now nonzero except for $r_{nn}$. In Hessenberg, assumption is that entire subdiagonal is nonzero --> otherwise you could have decoupled two blocks and that would have been good news
+    \item How do you extract the last row of a matrix? Multiply by $e_n^T$ on the left hand side
+    \begin{equation}
+    \begin{aligned}
+        e_n^T H^{\prime} &= e_n^T RQ + e_n^T \mu I \\
+                        &= \begin{bmatrix}0 & \cdots & 0\end{bmatrix} Q + \begin{bmatrix}0 & \cdots & 0 &  \mu \end{bmatrix} \\ &= \begin{bmatrix}0 & \cdots & 0 &  \mu \end{bmatrix}
+    \end{aligned}
+    \end{equation}
+    \item After one iteration of QR with shift, then that eigenvalue will appear as the last element $r_{nn}$. Rest of that row will be zero. From that point on, instead of dealing with the $n \times n$ problem, deal with an eigenvalue problem that is one less: $(n-1) \times (n-1)$.
+    \item As soon as you get down to a $(1 \times 1)$ block, that value is an eigenvalue
+    \item You can talk about all of these in terms of tridiagonal matrices (if matrix is symmetric) instead of Upper Hessenberg
+    \item This is the best algorithm for computing eigenvalues! Jacobi is easier to understand, of course. 
+    \item 
+    
+    \begin{equation}
+    \begin{aligned}
+        (Q,R) \leftarrow qr(H - \mu I) \\
+        H^{\prime} \leftarrow RQ + \mu I
+    \end{aligned}
+    \end{equation}
+    
+    \item If pretty close then, you will get
+    
+    \begin{equation}
+       H^{\prime} =  \begin{bmatrix}
+        x & x & x & x & x \\
+        x & x & x & x & x \\
+          & x & x & x & x \\
+          &   & x & x & x \\
+          &   &   & \varepsilon & \mu \\
+        \end{bmatrix}
+    \end{equation}
+    After one more iteration, you will get $\varepsilon^2$, then $\varepsilon^4$, so you only need to do a few iterations. Then it's time to decouple!
+    \item The
+    
+    
+    \item You can diagonalize in one step and get the SVD! With rotations on both side, cosine and sine of different angles. 
+    
+    \begin{equation}
+        \begin{bmatrix}
+        c_1 & - s_1 \\
+        s_1 & c_1
+        \end{bmatrix}
+        \begin{bmatrix}
+        a_{11} & a_{12} \\
+        a_{21} & a_{22}
+        \end{bmatrix}
+        \begin{bmatrix}
+        c_2 & - s_2 \\
+        s_2 & c_2
+        \end{bmatrix} = 
+        \begin{bmatrix}
+        x_1 & 0 \\
+        0 & x_2
+        \end{bmatrix}
+    \end{equation}
+    
+
+
+
+Consider symmetric $$A=A^T \in \mathbbm{R}^{n \times n}$$: initial tridiagonalization. To compute $UAU^T = M_{tridiagonal}$, then multiplying on left and right  is just the double the work of multiplying on left.
+    \item For non-symmetric case $A \in \mathbbm{R}^{n \times n}$: Start with moving to upper Hessenberg: $UAU^T=M_{upper\_hessenberg}$
+    \item Keep doing shifting and other steps etc.
+    \item If no element on th subdiagonal of $H$ is zero, and $H-\mu I$ is singular, then $(H_+)_{n, n-1}=0$
+
+We can decouple since
+
+$$
+ \lambda \{A\} = \big\cup \cdots 
+$$
+
+$$
+\begin{aligned}
+A &= A^T \in \mathbbm{R}^{n \times n} \\
+UAU^T &= T = Q^TDQ \\
+QUAU^TQ^T &= D
+\end{aligned}
+$$
+
+    \item In theory, have to do in infinitely many times. In practical algorithm, run in $2n$ or $3n$ iterations. Every eigenvalue requires 2 or 3 iterations to reveal. And we have $n$ eigenvalues
+    \item Each iteration takes only $O(n)$ flops
+    \item The role of shift is very important. With exact eigenvalue, would be revealed in a single iteration. But we can only get good estimates.
+    \item Two methods for estimation: (1) is $\lambda = T_{n,n}$
+    \begin{equation}
+       T = \begin{bmatrix}
+        x & x &  & & & \\
+        x & x & x& & & \\
+          & x & x&x& & \\
+          &   & x&x&x& \\
+          &   &  &x&x&x \\
+          & & & & x & \mathbf{x}\\
+        \end{bmatrix}
+    \end{equation}
+    \item (2) Other method is just using eigenvalue of last $(2 \times 2)$ submatrix (the Wilkinson shift). No foundational theoretical justification, largely experimental justification
+    \item When you accumulate orthogonal transformations, then it is $O(n^3)$, get eigenvectors
+    \item To get only $R$ factor (without accumulating orthogonal transformations), then it is just $O(n^2)$
+    \item 
+\end{itemize}
+\subsection{Jacobi Algorithm}
+\begin{itemize}
+    \item Jacobi algorithm is slower than QR w/ shift, but numerically better and easy to parallelize
+    \item 
+    
+    \begin{equation}
+    \begin{aligned}
+       A &=  \begin{bmatrix}
+        x & y \\
+        y & z
+        \end{bmatrix} \in \mathbbm{R}^{2 \times 2} \\
+   \begin{bmatrix}
+        c & -s \\
+        s & c
+        \end{bmatrix} \begin{bmatrix}
+        x & y \\
+        y & z
+        \end{bmatrix} \begin{bmatrix}
+        c & s \\
+        -s & c
+        \end{bmatrix} &= \begin{bmatrix} x & 0 \\ 0 & x \end{bmatrix} \\
+        G A G^T  &= ...
+    \end{aligned}
+    \end{equation}
+    \item 
+    
+    \begin{equation}
+        y(c^2 - s^2) + (x-z) cs = 0
+    \end{equation}
+    \item Becomes quadratic equation in tangent
+    \item Assume $y$ nonzero, otherwise we wouldn't have to do anything
+    \item choose any $2\times 2$ submatrix,
+    
+    \begin{equation}
+        \begin{bmatrix} 
+        \square & x & \square & x & x \\
+        x & x & x & x & x \\
+        \square & x & \square & x & x \\
+        x & x & x & x & x \\
+        x & x & x & x & x \\
+        \end{bmatrix}
+    \end{equation}
+    \item Find $(c,s)$ such that
+    \begin{equation}
+         \begin{bmatrix}
+        c & -s \\
+        s & c
+        \end{bmatrix} \begin{bmatrix}
+        a_{11} & a_{13} \\
+        a_{31} & a_{33}
+        \end{bmatrix} \begin{bmatrix}
+        c & s \\
+        -s & c
+        \end{bmatrix} &= \begin{bmatrix} x & 0 \\ 0 & x \end{bmatrix} \\
+    \end{equation}
+    \item embed it into $5 \times 5$ identity matrix, as follows:
+    \begin{equation}
+    \begin{aligned}
+     J_{13} A J_{13}^T &= \cdots \\
+        \begin{bmatrix}
+       c & & -s & & \\
+        & 1 & & & \\
+       s & & c & & \\
+        & & & 1 & \\
+        & & & & 1 \\
+        \end{bmatrix} \begin{bmatrix}
+       a_{11} & x & a_{13} & x & x \\
+       x & x & x & x & x \\
+       a_{31} & x & a_{33} & x & x \\
+       x & x & x & x & x \\
+       x & x & x & x & x\\
+        \end{bmatrix} &= \begin{bmatrix}
+       x & x & 0 & x & x \\
+       x & x & x & x & x \\
+       0 & x & x & x & x \\
+       x & x & x & x & x \\
+       x & x & x & x & x\\
+        \end{bmatrix}\\
+         J_{24}   J_{13} A J_{13}^T J_{24}^T &= \cdots \\
+         J_{24} \begin{bmatrix}
+       x & x & 0 & x & x \\
+       x & x & x & x & x \\
+       0 & x & x & x & x \\
+       x & x & x & x & x \\
+       x & x & x & x & x\\
+        \end{bmatrix} J_{24}^T &= \cdots \\
+    \end{aligned}
+    \end{equation}
+    
+    
+    \item Zeros introduced are not destroyed...
+    \item Don't purely count zeros. Instead, count mass of off-diagonal part. Thus, our measure of progress is defined as $\textit{off}$ of off-diagonal mass:
+    \begin{equation}
+      \Big(off(A) \Big)^2 = \sum\limits_{j=1}^n \sum\limits_{i=1, i \neq j}^n a_{ij}^2 = \|A\|_F^2 - \sum\limits_{i=1}^n a_{ii}^2
+    \end{equation}
+    \item Eventually want mass in off-diagonal part to be very small
+    \item Jacobi decreases $off(A)$ as you iterate, and then it can converge
+    \item Rotation does not change Frobenius norm, so must be zero-sum game between off-diagonal and diagonal
+    \item We chose rotation so that off-diagonal part gives all of its mass to on-diagonal part
+    \item $off(\cdot)$ never decreases:
+    
+    \begin{equation}
+    \begin{aligned}
+    B &= J_{23} A J_{23}^T \\
+    off^2(B) &\leq off^2(A)
+    \end{aligned}
+    \end{equation}
+    \item Classical Jacobi method. Eliminate largest value in off-diagonal team
+    \item not explicitly trying to add zeros, combined with someone else from off-team, just gets distributed across off-team
+    
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.5\linewidth]{jacobi_figure_choose_largest.jpg}
+        \caption{Caption}
+        \label{fig:my_label}
+    \end{figure}
+    \item At most,
+    \begin{equation}
+    \begin{aligned}
+        off^2(A^{(i+1)}) \leq \frac{n(n-1)-2}{n(n-1)} off^2(A^{(i)}) \\
+        off^2(A^{(i+1)}) \leq \alpha off^2(A^{(i)}) \\
+    \end{aligned}
+    \end{equation}
+    which will go to zero
+    \item This is a sequence
+    \begin{equation}
+        A^{(1)} \rightarrow A^{(2)} \rightarrow \cdots
+    \end{equation}
+    \item $\alpha$ comes from choosing the largest element every time
+    \item $|\alpha| < 1$
+    
+    \begin{equation}
+   \underset{i \rightarrow \infty}{\mbox{lim}} off^2(A^{(i)}) = 0
+   \end{equation}
+\end{itemize}
+
+
 
 ## The QR Iteration
+The roots of a polynomial $$Ax = \lambda x, det(\lambda I − A) = 0$$, can not be solved in finite number of steps if the polynomial order is bigger than 5.
 
+With QR iteration and Jacobi iterations, we can compute the complete symmetric eigenvalue decomposition $$A=Q \Lambda Q^T$$:
+
+$$
+\begin{aligned}
+A &= Q \Lambda Q^T \\
+AQ &= Q \Lambda \\
+A \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} &= \begin{bmatrix} q_1 & \cdots & q_n \end{bmatrix} \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ & & \lambda_n \end{bmatrix}
+\end{aligned}
+$$
 
 
 ## QR Iteration with Shift
@@ -44,11 +926,11 @@ We must start with an initial guess $$q^{(0)}$$, which can be random. We wish to
 
 $$
 \begin{aligned}
-& q^{(0)} &= \alpha v_1 + \cdots + \alpha_n v_n & \mbox{as linear combination of n linearly indepedent eigenvectors} \\
-z^{(1)} &= A q^{(0)} = A \alpha v_1 + \cdots + A \alpha_n v_n & \mbox{ multiply all terms by } A \\
-z^{(1)} &= A q^{(0)} = \alpha A v_1 + \cdots + \alpha_n A v_n & \alpha \mbox{ is a scalar, so we can place it in any place} \\
-& \alpha_1 x_1 + \cdots \\
-q^{(1)} & \mbox{normalize}
+q^{(0)} &= \alpha_1 x_1 + \cdots + \alpha_n x_n & \mbox{as linear combination of n linearly independent eigenvectors} \\
+z^{(1)} &= A q^{(0)} = A \alpha_1 x_1 + \cdots + A \alpha_n x_n & \mbox{ multiply all terms by } A \\
+z^{(1)} &= A q^{(0)} = \alpha_1 A x_1 + \cdots + \alpha_n A x_n & \alpha \mbox{ is a scalar, so we can place it in anywhere} \\
+z^{(1)} &= A q^{(0)} = \alpha_1 \lambda_1 x_1 + \cdots + \alpha_n \lambda_n x_n &  \mbox{ because each } x_i \mbox{ is an eigenvector} \\
+q^{(1)} &= A q^{(0)} / \|z^{(1)}\|_2 &  \mbox{normalize}
 \end{aligned}
 $$
 
@@ -57,9 +939,10 @@ The only reason we normalize here is because the vector size may grow or shrink 
 $$
 \begin{aligned}
 A (Aq^{(0)}) &= A \Big( \alpha_1 \lambda_1 x_1 + \alpha_2 \lambda_2 x_2 + \alpha_3 \lambda_3 x_3 + \cdots + \alpha_n \lambda_n x_n \Big) \\
-&= \alpha_1 \lambda_1^2 x_1 + \alpha_2 \lambda_2^2 x_2 + \cdots + \alpha_n \lambda_n^2 x_n \\
-A^{k} q^{(0)}&= \alpha_1 \lambda_1^k x_1 + \alpha_2 \lambda_2^k x_2 + \cdots + \alpha_n \lambda_n^k x_n \\ & \mbox{apply it k times} \\
-\frac{A^{k} q^{(0)} }{\lambda_1^k} &= \frac{\alpha_1 \lambda_1^k x_1 + \alpha_2 \lambda_2^k x_2 + \cdots + \alpha_n \lambda_n^k x_n}{\lambda_1^k} \\ & \mbox{apply it k times, play with length, divide both sides by} \lambda_1^k
+A (Aq^{(0)}) &=  \alpha_1 \lambda_1 Ax_1 + \alpha_2 \lambda_2 A x_2 + \cdots + \alpha_n \lambda_n A x_n & \mbox{reorder terms} \\
+A (Aq^{(0)}) &= \alpha_1 \lambda_1^2 x_1 + \alpha_2 \lambda_2^2 x_2 + \cdots + \alpha_n \lambda_n^2 x_n & \mbox{each } x_i \mbox{ is an eigenvector} \\
+A^{k} q^{(0)}&= \alpha_1 \lambda_1^k x_1 + \alpha_2 \lambda_2^k x_2 + \cdots + \alpha_n \lambda_n^k x_n  & \mbox{apply it k times} \\
+\frac{A^{k} q^{(0)} }{\lambda_1^k} &= \frac{\alpha_1 \lambda_1^k x_1 + \alpha_2 \lambda_2^k x_2 + \cdots + \alpha_n \lambda_n^k x_n}{\lambda_1^k}  & \mbox{play with length -- divide both sides by } \lambda_1^k
 \end{aligned}
 $$
 
@@ -70,7 +953,7 @@ $$
 \Big|\frac{\lambda_i}{\lambda_1}\Big| < 1, \mbox{ for } i=2, \cdots, n
 $$
 
-Thus, in the limit:
+Thus, in the limit, the left-hand side becomes:
 
 $$
 \underset{k \rightarrow \infty}{\mbox{lim}} \frac{A^k q^{(0)}}{\lambda_1^k} = \alpha_1 x_1

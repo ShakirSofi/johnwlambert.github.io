@@ -392,3 +392,159 @@ $$
 $$
 
 We want to invert this matrix and solve for $$\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}$$
+
+
+
+## As an aside: Quaternions
+
+
+```python
+import numpy as np
+
+# import quaternion
+
+
+EPSILON = 1e-10
+
+# make sure quaternions are normalized (to be unit quaternions)
+# unit quaternions are a way to compactly represent 3D rotations
+# while avoiding singularities or discontinuities (e.g. gimbal lock).
+
+
+def quat_mult(q1, q2):
+    """
+	Multiply two quaternions.
+
+		Args:
+		-	q1: NumPy n-d array, with dim (4 x 1)
+		-	q2: NumPy n-d array, with dim (4 x 1)
+
+	We recall that a cross product (u x v) is defined as 
+		(u_2 * v_3) - (u_3 * v_2)
+		(u_3 * v_1) - (u_1 * v_3)
+		(u_1 * v_2) - (u_2 * v_1)
+	"""
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+
+    # w = (w_1 * w_2) - < v_1, v_2 >
+    w = (w1 * w2) - (x1 * x2) - (y1 * y2) - (z1 * z2)
+
+    # v = w_1 * v_2 + w_2 * v_1 + (v_1 x v_2)
+    x = (w1 * x2) + (x1 * w2) + y1 * z2 - z1 * y2
+    y = (w1 * y2) + (y1 * w2) + z1 * x2 - x1 * z2
+    z = (w1 * z2) + (z1 * w2) + x1 * y2 - y1 * x2
+    return np.array([w, x, y, z])
+
+
+def quat_conjugate(q):
+    """
+		Args:
+		-	q: NumPy n-d array, with dim (4 x 1)
+
+	The conjugate of a quaternion is the same as the inverse, as long as the quaternion is unit-length
+	"""
+    w, x, y, z = q
+    return (w, -x, -y, -z)
+
+
+def quat_vec_mult(q1, v1):
+    """ 
+	quaternion-vector multiplication 
+	Apply a quaternion-rotation to a vector.
+		v' = q * v * q_conj
+
+		Args:
+		-	q1: 
+		-	v1:
+
+		Returns:
+		-	
+	"""
+    q2 = (0.0,) + v1
+    return q_mult(q_mult(q1, q2), q_conjugate(q1))[1:]
+
+
+def quat_normalize(q):
+    """
+	Normalize a quaternion.
+		Args:
+		-	q: NumPy n-d array, with dim (4 x 1) representing
+				(w,x,y,z)
+	"""
+    return q / np.linalg.norm(q)
+
+
+def quat2rotmat(q):
+    """
+	Convert a quaternion into a matrix.
+
+		Args:
+		-	q: NumPy n-d array, with dim (4 x 1), representing
+				(w,x,y,z)
+
+		Returns:
+		-	R: Numpy array of shape (3,3)
+	"""
+    if (np.linalg.norm(q) - 1.0) > EPSILON:
+        q /= np.linalg.norm(q)
+        # q = np.multiply(q, np.tile(1./np.linalg.norm(q),4))
+    w, x, y, z = q
+
+    x2 = x * x
+    y2 = y * y
+    z2 = z * z
+    xy = x * y
+    xz = x * z
+    yz = y * z
+    wx = w * x
+    wy = w * y
+    wz = w * z
+
+    return np.array(
+        [
+            [1.0 - 2.0 * (y2 + z2), 2.0 * (xy - wz), 2.0 * (xz + wy)],
+            [2.0 * (xy + wz), 1.0 - 2.0 * (x2 + z2), 2.0 * (yz - wx)],
+            [2.0 * (xz - wy), 2.0 * (yz + wx), 1.0 - 2.0 * (x2 + y2)],
+        ]
+    )
+
+
+def quat_normalization_unit_test(q_quat, q_arr):
+
+    # print( quaternion.quaternion_normalized(q_quat) )
+
+    print(quat_normalize(q_arr))
+
+
+def conjugate_unit_test(q_quat, q_arr):
+    """ Test Conjugate functionality """
+    print(q_quat.conjugate())
+    print(quat_conjugate(q_arr))
+
+
+def quat_2_rot_mat_unit_test(q_quat, q_arr):
+    """ Test quaternion-vector product functionality """
+    # print( quaternion.as_rotation_matrix(q_quat) )
+
+    print(quat2rotmat(q_arr))
+
+
+def unit_tests():
+    """ Check against the Numpy Quaternion add-on package """
+    q_quat = np.quaternion(4, 3, 2, 1)
+    q_arr = np.array([4, 3, 2, 1])
+
+    # q_quat = np.quaternion(	0.73029674, 0.54772256, 0.36514837, 0.18257419)
+    # q_arr = np.array([		0.73029674, 0.54772256, 0.36514837, 0.18257419])
+
+    # quat_normalization_unit_test(q_quat, q_arr)
+
+    # conjugate_unit_test(q_quat, q_arr)
+    quat_2_rot_mat_unit_test(q_quat, q_arr)
+
+
+if __name__ == "__main__":
+    unit_tests()
+```
+
