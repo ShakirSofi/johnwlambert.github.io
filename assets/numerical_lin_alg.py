@@ -11,20 +11,45 @@ import pdb
 
 
 
-# def QR_householder_demo():
+def house(x)
+    """Computes the Householder transformation for input vector x"""
+    sigma = dot(x[2:end],x[2:end])
+    v = copy(x)
+    v[1] = 1
+    if sigma == 0 && x[1] >= 0
+        beta = 0
+    elseif sigma == 0 && x[1] < 0
+        beta = -2
+    else
+        mu = sqrt(x[1]*x[1] + sigma)
+        if x[1] <= 0
+            v[1] = x[1] - mu
+        else
+            v[1] = -sigma / (x[1] + mu)
+        end            
 
-# 	# Initialize matrix
-# 	m = n = 32
-# 	Z = np.zeros( (m,n) )
-# 	for i in range(m):
-# 		for j in range(n):
-# 			A[i,j] = np.cos( (np.pi*i*j) / n)
+        beta = 2 * v[1] * v[1] / (sigma + v[1]*v[1])
+        v /= v[1]
+    end
 
-# 	# Apply sequence of Householder transformations
-# 	for k in range(n-1):
-# 		v,beta = house(A[k:,k])
-# 		A[k:,k:] = A[k:,k:] - beta * np.outer(v, v.dot(A[k:,k:]))
-# 		# record a snapshot of A
+    return (v, beta)
+
+
+
+def QR_householder_demo():
+
+	# Initialize matrix
+	m = n = 32
+	Z = np.zeros( (m,n) )
+	for i in range(m):
+		for j in range(n):
+			A[i,j] = np.cos( (np.pi*i*j) / n)
+
+	# Apply sequence of Householder transformations
+	for k in range(n-1):
+		v,beta = house(A[k:,k])
+		A[k:,k:] = A[k:,k:] - beta * np.outer(v, v.dot(A[k:,k:]))
+		# record a snapshot of A
 
 
 # def gram_schmidt_demo():
