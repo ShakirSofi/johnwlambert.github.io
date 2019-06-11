@@ -14,14 +14,14 @@ permalink: /collaborators/
 
 
 ## Past Collaborators
-* [Simon Lucey](https://www.simonlucey.com/)
+* [Simon Lucey](https://www.ri.cmu.edu/ri-faculty/simon-lucey/)
 * [Patsorn Sangkloy](https://www.cc.gatech.edu/~psangklo/)
 * [Allie Chang](https://alliecc.github.io/)
 * Jagjeet Singh
 * [Ersin Yumer](http://www.meyumer.com/)
 * [Silvio Savarese](http://cvgl.stanford.edu/silvio/)
 * [Alan Luo](http://alan.vision/)
-* [Assaf Hoogi](https://www.assafhoogi.com/)
+* [Assaf Hoogi](https://scholar.google.com/citations?hl=en&user=TXsC5ZkAAAAJ&view_op=list_works&sortby=pubdate)
 
 
 
