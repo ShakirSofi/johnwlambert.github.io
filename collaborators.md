@@ -6,15 +6,19 @@ permalink: /collaborators/
 
 
 ## Current Collaborators
-* [Patsorn Sangkloy](https://www.cc.gatech.edu/~psangklo/)
+* [Zhuang Liu](https://liuzhuang13.github.io/)
+* [Vladlen Koltun](http://vladlen.info/)
 * [James Hays](https://www.cc.gatech.edu/~hays/)
-* [Simon Lucey](https://www.simonlucey.com/)
-* Allie Chang
-* Jagjeet Singh
+* [Frank Dellaert](https://twitter.com/fdellaert?lang=en)
+* [Ozan Sener](http://ozansener.net/)
+
 
 ## Past Collaborators
+* [Simon Lucey](https://www.simonlucey.com/)
+* [Patsorn Sangkloy](https://www.cc.gatech.edu/~psangklo/)
+* [Allie Chang](https://alliecc.github.io/)
+* Jagjeet Singh
 * [Ersin Yumer](http://www.meyumer.com/)
-* [Ozan Sener](http://ozansener.net/)
 * [Silvio Savarese](http://cvgl.stanford.edu/silvio/)
 * [Alan Luo](http://alan.vision/)
 * [Assaf Hoogi](https://www.assafhoogi.com/)
