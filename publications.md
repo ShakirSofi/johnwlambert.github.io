@@ -18,14 +18,14 @@ permalink: /publications/
 
 {% include paper.html
 authors="Ming-Fang Chang*, <b>John Lambert*</b>, Patsorn Sangkloy*, Jagjeet Singh* [*co-first authors], Andrew Hartnett, De Wang, Peter Carr, Simon Lucey, Deva Ramanan, James Hays"
-title="To Appear"
+title="Argoverse: 3D Tracking and Forecasting with Rich Maps"
 venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
 location="Long Beach, California"
 date="June 2019"
 award="Oral"
-image="http://cvpr2019.thecvf.com/images/CVPRLogo.png"
+arxiv="http://openaccess.thecvf.com/content_CVPR_2019/papers/Chang_Argoverse_3D_Tracking_and_Forecasting_With_Rich_Maps_CVPR_2019_paper.pdf"
+image="/images/argoverse_log_example_video.gif"
 %}
-
 
 {% include paper.html
 authors=" <b>John Lambert</b>, Ozan Sener, Silvio Savarese"
