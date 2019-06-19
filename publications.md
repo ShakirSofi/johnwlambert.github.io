@@ -25,6 +25,9 @@ date="June 2019"
 award="Oral"
 arxiv="http://openaccess.thecvf.com/content_CVPR_2019/papers/Chang_Argoverse_3D_Tracking_and_Forecasting_With_Rich_Maps_CVPR_2019_paper.pdf"
 image="/images/argoverse_log_example_video.gif"
+project="https://www.argoverse.org/"
+data="https://www.argoverse.org/data.html"
+code="https://github.com/argoai/argoverse-api"
 %}
 
 {% include paper.html
