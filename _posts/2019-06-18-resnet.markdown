@@ -143,14 +143,42 @@ class Bottleneck(nn.Module):
 <a name='full-arch'></a>
 ## Putting it all together
 
-There are many official variations of the ResNet architecture, with varying number of layers and varying performance.
+There are many official variations of the ResNet architecture, with varying depth and varying performance.
 
+Every variation has a prefix layer, four main "layers", then an average pool, and a fully connected layer:
+
+```python
+        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3,
+                               bias=False)
+        self.bn1 = norm_layer(self.inplanes)
+        self.relu = nn.ReLU(inplace=True)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2,
+                                       dilate=replace_stride_with_dilation[0])
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2,
+                                       dilate=replace_stride_with_dilation[1])
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2,
+                                       dilate=replace_stride_with_dilation[2])
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * block.expansion, num_classes)
+```
+
+Depending upon the particular depth variation, each "layer" has a variable number of blocks.
 - ResNet18: BasicBlock, [2, 2, 2, 2]
 - ResNet34: BasicBlock, [3, 4, 6, 3],
 - ResNet50: Bottleneck, [3, 4, 6, 3]
 - ResNet101: Bottleneck, [3, 4, 23, 3]
 - ResNet152: Bottleneck, [3, 8, 36, 3]
 
+|                   |                     |            # repetitions               |
+| Architecture Name | Repeated sub-module | Layer 0  | Layer 1 | Layer 2 | Layer 3 |
+| ------------------|:-------------------:| --------:| -------:| -------:| -------:|
+| ResNet18          | BasicBlock          | 2        | 2       | 2       | 2       |
+| ResNet34          | BasicBlock          | 3        | 4       | 6       | 3       |
+| ResNet50          | Bottleneck          | 3        | 4       | 6       | 3       |
+| ResNet101         | Bottleneck          | 3        | 4       | 23      | 3       |
+| ResNet152         | Bottleneck          | 3        | 8       | 36      | 3       |
 
 
 inspired by the philosophy of VGG nets. The convolutional layers mostly have 3×3 filters and follow two simple design rules: 
