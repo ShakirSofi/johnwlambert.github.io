@@ -171,14 +171,14 @@ Depending upon the particular depth variation, each "layer" has a variable numbe
 - ResNet101: Bottleneck, [3, 4, 23, 3]
 - ResNet152: Bottleneck, [3, 8, 36, 3]
 
-|                   |                     |            # repetitions               |
-| Architecture Name | Repeated sub-module | Layer 0  | Layer 1 | Layer 2 | Layer 3 |
+| Architecture Name | Repeated sub-module | # repetitions in Layer 0  | # repetitions in Layer 1 | # repetitions in Layer 2 | # repetitions in Layer 3 |
 | ------------------|:-------------------:| --------:| -------:| -------:| -------:|
 | ResNet18          | BasicBlock          | 2        | 2       | 2       | 2       |
 | ResNet34          | BasicBlock          | 3        | 4       | 6       | 3       |
 | ResNet50          | Bottleneck          | 3        | 4       | 6       | 3       |
 | ResNet101         | Bottleneck          | 3        | 4       | 23      | 3       |
 | ResNet152         | Bottleneck          | 3        | 8       | 36      | 3       |
+
 
 
 inspired by the philosophy of VGG nets. The convolutional layers mostly have 3×3 filters and follow two simple design rules: 
