@@ -149,13 +149,119 @@ In this case, `0.9163, 0.5108, 0.2231, 0.` is printed, meaning the loss drops as
 
 
 
-(`CrossEntropyLoss` incorporates `LogSoftmax` inside of it).
+(`torch.nn.CrossEntropyLoss` incorporates `torch.nn.LogSoftmax` inside of it).
 
 
 ## Logistic Regression
 
+Consider a binary (two-class) classification problem. Here $$y$$ can take on the values $$\{0,1\}$$. A common real-world example is a spam classifier for email, where $$x$$ denotes features for an email, and $$y$$ is 1 if it is a piece of spam mail [2], and 0 otherwise. We call $$y$$ the label for the training example.
+
+Since we wish to train a model to output probabilities $$p$$ in the range $$[0,1]$$, where $$p>0.5$$ might indicate a prediction that $$y=1$$, we will use a function with that exact range (the sigmoid or logistic function):
+
+$$
+g(z) = \sigma(z) = \frac{1}{1 + e^{-z}}
+$$
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+g = lambda z: 1. / ( 1+ np.exp(-z))
+x = np.linspace(-10,10,100)
+y = g(x)
+plt.plot(x,y,'r-')
+plt.xlim([-10,10])
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+```
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/sigmoid_loss.png" width="65%">
+  <div class="figcaption">
+    The sigmoid function.
+  </div>
+</div>
+
+Note that $$g(z)$$ tends towards 1 as $$z \rightarrow \infty$$, and $$g(x)$$ tends toward 0 as $$z \rightarrow -\infty$$. 
+Our hypothesis class will be 
+
+$$
+h_{\theta}(x) = g(\theta^Tx) = \sigma(\theta^Tx) = \frac{1}{1 + e^{-\theta^Tx}}
+$$
+
+Since $$g(z)$$ is bounded between $$[0,1]$$, then $$h(x)$$ will also be bounded. In order to fit a model, we need to learn a set of weights $$\theta$$ from data. We can do so by identifying a set of probabilistic assumptions and ffiting the model via maximum likelihood estimation (MLE) [2]. Let us assume that two events are possible: either $$y=1$$, or $$y=0$$. The probability of the second event is equal to the complement of the probability of the first event, thus:
+
+$$
+\begin{aligned}
+P(y = 1 \mid x; \theta) = h_{\theta}(x) \\
+P(y = 0 \mid x; \theta) = 1 - h_{\theta}(x) 
+\end{aligned}
+$$
+
+A beautiful way to combine these two expressions is as follows:
+
+$$
+p(y \mid x; \theta) = \Big( h_{\theta}(x)\Big)^y \Big(1 - h_{\theta}(x)\Big)^{1-y}
+$$
+
+We note that as desired, if $$y=0$$, then $$p(y=0 \mid x; \theta) = h_{\theta}(x)^0 \Big(1 - h_{\theta}(x)\Big)^{1-0} = 1 \cdot (1 - h_{\theta}(x)) $$.
+
+Also, if $$y=1$$, then $$\Big( h_{\theta}(x)\Big)^1 \Big(1 - h_{\theta}(x)\Big)^{0} = h_{\theta}(x) \cdot 1$$, as desired.
+
+If we assume that $$m$$ training example were generated independently, then their joint probability is equal to the product of the probability of each independent event [2]. Let $$\vec{y}$$ denote a column vector with stacked $$y^{(i)}$$ entries, and let $$X$$ denote a matrix with stacked $$x^{(i)}$$ entries. Then the likelihood is:
+
+$$
+\begin{aligned}
+L(\theta) &= p(\vec{y} \mid X; \theta) \\
+		&= \prod_{i=1}^m p( y^{(i)} \mid x^{(i)}; \theta ) \\
+		&= \prod_{i=1}^m \big( h_{\theta}(x^{(i)}) \big)^{y^{(i)}} \Big( 1 - h_{\theta}(x^{(i)}) \Big)^{1 - y^{(i)}}
+\end{aligned}
+$$
+
+Maximizing the log-likelihood is easier, and we recall that the log of a product is a sum of logs:
+
+$$
+\begin{aligned}
+\ell(\theta) &= \log L(\theta) \\
+			&= \log \Bigg( \prod_{i=1}^m \big( h_{\theta}(x^{(i)}) \big)^{y^{(i)}} \Big( 1 - h_{\theta}(x^{(i)}) \Big)^{1 - y^{(i)}} \Bigg) \\
+			&= \sum_{i=1}^m \log \Bigg(  \big( h_{\theta}(x^{(i)}) \big)^{y^{(i)}} \Big( 1 - h_{\theta}(x^{(i)}) \Big)^{1 - y^{(i)}} \Bigg) & \mbox{log of a product is a sum of logs} \\
+			&= \sum_{i=1}^m \log  \big( h_{\theta}(x^{(i)}) \big)^{y^{(i)}} + \log \Big( 1 - h_{\theta}(x^{(i)}) \Big)^{1 - y^{(i)}} & \mbox{log of a product is a sum of logs} \\
+			&= \sum\limits_{i=1}^m y^{(i)} \log h_{\theta}(x^{(i)}) + (1-y^{(i)}) \log \big(1-h_{\theta}(x^{(i)})\big)  & \mbox{because } \log(M^k)  = k \cdot \log M
+\end{aligned}
+$$
+
+We can maximize the likelihood in this case by gradient ascent, equivalent to minimizing the negative log likelihood, $$-\ell(\theta)$$.
+
+$$
+NLL(\theta) = -\ell(\theta) = \sum\limits_{i=1}^m y^{(i)} \log h_{\theta}(x^{(i)}) + (1-y^{(i)}) \log \big(1-h_{\theta}(x^{(i)})\big)
+$$
+
+## The Sigmoid / Binary Cross Entropy (BCE) Loss
+
+As described in the TensorFlow [docs](https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits), the logistic regression loss (often called sigmoid loss or binary cross entropy loss) can be used to *measure the probability error in discrete classification tasks in which each class is independent and not mutually exclusive. For instance, one could perform multilabel classification where a picture can contain both an elephant and a dog at the same time.* In PyTorch, there are two options for this loss: one with the sigmoid output, and one with the sigmoid input.
+
+
+`torch.nn.BCELoss` accepts the sigmoid output $$h^{(i)}$$, not $$x^{(i)}$$, where $$h^{(i)} = h_{\theta}(x^{(i)}) = \sigma(\theta^T x^{(i)})$$:
+
+$$
+NLL_i(x^{(i)}, y^{(i)}) = - \Bigg[ y^{(i)} \log h^{(i)} + (1-y^{(i)}) \log \big(1-h^{(i)}\big) \Bigg]
+$$
+
+`torch.nn.BCEWithLogitsLoss` accepts as input $$\theta^Tx^{(i)}$$, and applies the sigmoid function to it.
+
+$$
+NLL_i(x^{(i)}, y^{(i)}) = - \Bigg[ y^{(i)} \log \sigma(\theta^Tx^{(i)}) + (1-y^{(i)}) \log \big(1-\sigma(\theta^Tx^{(i)})\big) \Bigg]
+$$
+
+Thus, `torch.nn.BCEWithLogitsLoss` combines a `Sigmoid` layer and the `BCELoss` in one single class.
+
+## Numerical Stability of the Sigmoid/BCE Loss
+
+https://www.tensorflow.org/api_docs/python/tf/nn/sigmoid_cross_entropy_with_logits
+
 ## Softmax Regression
 
+(Section 9.3 *Softmax Regression* of [2]).
 
 ## The Softmax Operation
 
@@ -181,10 +287,7 @@ Consider the Negative Log Likelihood (NLL) loss criterion.
 
 [1] Tsachy Weissman. Information Theory (EE 376, Stanford) Course Lectures. [PDF](http://web.stanford.edu/class/ee376a/files/2017-18/lecture_3.pdf).
 
-[2]
-
-
-
+[2] Andrew Ng. CS229 Lecture notes. [PDF](http://cs229.stanford.edu/notes/cs229-notes1.pdf).
 
 
 
