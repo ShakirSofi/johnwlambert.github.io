@@ -28,6 +28,7 @@ image="/images/argoverse_log_example_video.gif"
 project="https://www.argoverse.org/"
 data="https://www.argoverse.org/data.html"
 code="https://github.com/argoai/argoverse-api"
+video="https://youtu.be/0lybuew8Lik?t=2769"
 %}
 
 {% include paper.html
