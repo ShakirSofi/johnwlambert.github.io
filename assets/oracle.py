@@ -13,24 +13,24 @@ from matplotlib.axes import Axes
 
 import argoverse
 from argoverse.map_representation.map_api import ArgoverseMap
-from argoverse.utils.bfs import bfs_enumerate_paths
+from argoverse.utils.bfs import remove_duplicate_paths
 from argoverse.utils.manhattan_search import compute_point_cloud_bbox
 from argoverse.utils.mpl_plotting_utils import plot_lane_segment_patch
 
-BFS_MAX_DEPTH = 7
+DFS_MAX_DEPTH = 9
 MAX_LANE_ORIENTATION_DIFFERENCE = np.pi / 4
 OBS_NUM_WAYPTS = 20
 
 
 def get_traj_and_city_name_from_csv(csv_fpath: str) -> Tuple[np.ndarray, str]:
     """
-		Args:
-		-	csv_fpath
+        Args:
+        -   csv_fpath
 
-		Returns:
-		-	traj
-		-	city_name
-	"""
+        Returns:
+        -   traj
+        -   city_name
+    """
     with open(csv_fpath) as csvfile:
         data_reader = csv.DictReader(csvfile)
 
@@ -52,12 +52,12 @@ def get_traj_and_city_name_from_csv(csv_fpath: str) -> Tuple[np.ndarray, str]:
 
 def build_city_lane_graphs(am: ArgoverseMap) -> Mapping[str, Mapping[int, List[int]]]:
     """
-		Args:
-		-	am
+        Args:
+        -   am
 
-		Returns:
-		-	city_graph_dict
-	"""
+        Returns:
+        -   city_graph_dict
+    """
     city_lane_centerlines_dict = am.build_centerline_index()
 
     city_graph_dict = {}
@@ -100,12 +100,12 @@ def build_city_lane_graphs(am: ArgoverseMap) -> Mapping[str, Mapping[int, List[i
 
 def get_line_orientation(pt1: np.ndarray, pt2: np.ndarray) -> float:
     """
-		Args:
-		-	
+        Args:
+        -   
 
-		Returns:
-		-	theta, angle representing lane orientation
-	"""
+        Returns:
+        -   theta, angle representing lane orientation
+    """
     x1, y1 = pt1
     x2, y2 = pt2
     return np.arctan2(y2 - y1, x2 - x1)
@@ -113,15 +113,15 @@ def get_line_orientation(pt1: np.ndarray, pt2: np.ndarray) -> float:
 
 def lanes_travel_same_direction(lane_id_1, lane_id_2, am, city_name):
     """
-		Args:
-		-	lane_id_1
-		-	lane_id_2
-		-	am
-		-	city_name
+        Args:
+        -   lane_id_1
+        -   lane_id_2
+        -   am
+        -   city_name
 
-		Returns:
-		-	boolean representing 
-	"""
+        Returns:
+        -   boolean representing 
+    """
     centerline1 = am.get_lane_segment_centerline(lane_id_1, city_name)[:, :2]
     centerline2 = am.get_lane_segment_centerline(lane_id_2, city_name)[:, :2]
 
@@ -133,12 +133,12 @@ def lanes_travel_same_direction(lane_id_1, lane_id_2, am, city_name):
 
 def convert_str_lists_to_int_lists(paths: List[List[str]]) -> List[List[int]]:
     """
-		Args:
-		-	paths
+        Args:
+        -   paths
 
-		Returns:
-		-	paths
-	"""
+        Returns:
+        -   paths
+    """
     for i, path in enumerate(paths):
         path = [int(lane_id) for lane_id in path]
         paths[i] = path
@@ -150,13 +150,13 @@ def trim_paths_with_no_inliers(
     paths: List[List[int]], lane_vote_dict: Mapping[int, int]
 ):
     """
-		Args:
-		-	paths: list of paths. each path is represented by a list of lane IDs (integers)
-		-	lane_vote_dict
+        Args:
+        -   paths: list of paths. each path is represented by a list of lane IDs (integers)
+        -   lane_vote_dict
 
-		Returns:
-		-	paths
-	"""
+        Returns:
+        -   paths
+    """
     for i, path in enumerate(paths):
         del_ids = []
 
@@ -185,15 +185,15 @@ def draw_lane_ids(
     lane_ids: List[int], am: ArgoverseMap, ax: Axes, city_name: str
 ) -> None:
     """
-		Args:
-		-	lane_ids
-		-	am
-		-	ax
-		-	city_name
+        Args:
+        -   lane_ids
+        -   am
+        -   ax
+        -   city_name
 
-		Returns:
-		-	None
-	"""
+        Returns:
+        -   None
+    """
     for lane_id in lane_ids:
         centerline = am.get_lane_segment_centerline(int(lane_id), city_name)
         ax.text(centerline[2, 0], centerline[2, 1], f"s_{lane_id}")
@@ -202,37 +202,38 @@ def draw_lane_ids(
 
 def plot_all_nearby_lanes(am, ax, city_name, query_x, query_y):
     """
-		Args:
-		-	am
-		-	ax
-		-	city_name
-		-	query_x
-		-	query_y
+        Args:
+        -   am
+        -   ax
+        -   city_name
+        -   query_x
+        -   query_y
 
-		Returns:
-		-	
-	"""
+        Returns:
+        -   
+    """
     am.plot_nearby_halluc_lanes(
         ax, city_name, query_x, query_y, patch_color="y", radius=40
     )
 
     # for lane_id in paths[best_path_id]:
-    # 	polygon_3d = am.get_lane_segment_polygon(int(lane_id), city_name)
-    # 	plot_lane_segment_patch(polygon_3d[:,:2], ax, color=color)
+    #   polygon_3d = am.get_lane_segment_polygon(int(lane_id), city_name)
+    #   plot_lane_segment_patch(polygon_3d[:,:2], ax, color=color)
 
 
 def get_dict_key_with_max_value(dictionary: Mapping[Any, int]) -> List[Any]:
     """ 
-		Args:
-		-	dictionary:
+        Args:
+        -   dictionary:
 
-		Returns:
-		-	top_keys
-	"""
+        Returns:
+        -   top_keys
+    """
     max_val = max(dictionary.values())
 
     top_keys = []
     for key, value in dictionary.items():
+        print(key,value)
         if max_val == value:
             top_keys += [key]
 
@@ -241,12 +242,12 @@ def get_dict_key_with_max_value(dictionary: Mapping[Any, int]) -> List[Any]:
 
 def draw_traj(traj: np.ndarray, ax: Axes) -> None:
     """
-		Args:
-		-	
+        Args:
+        -   
 
-		Returns:
-		-	None
-	"""
+        Returns:
+        -   None
+    """
     lineX = traj[:, 0]
     lineY = traj[:, 1]
     ax.scatter(
@@ -271,6 +272,64 @@ def draw_traj(traj: np.ndarray, ax: Axes) -> None:
     ax.axis("equal")
 
 
+def remove_repeated_paths(paths):
+    """ 
+    """
+    num_paths = len(paths)
+    is_dup_arr = np.zeros(num_paths, dtype=bool)
+
+    for i,path in enumerate(paths):
+        if paths[i] in paths[:i]:
+            is_dup_arr[i] = True
+
+    del_indices = np.where(is_dup_arr)[0]
+    nondup_paths = [path for i, path in enumerate(paths) if i not in del_indices]
+    return nondup_paths
+
+
+def test_remove_repeated_paths_2():
+    """ """
+    paths = [
+        [1],
+        [1,3],
+        [1],
+        [1,2],
+        [1,3]
+    ]
+
+    nondup_paths = remove_repeated_paths(paths)
+    assert [[1], [1, 3], [1, 2]] == nondup_paths
+
+
+
+def test_remove_repeated_paths_1():
+    """ """
+    paths = [
+        [1],
+        [1],
+        [1],
+        [1]
+    ]
+
+    nondup_paths = remove_repeated_paths(paths)
+    assert nondup_paths == [[1]]
+
+
+
+def test_remove_repeated_paths_3():
+    """ """
+    paths = [
+        [1],
+        [1,2],
+        [1,3],
+        [1,4]
+    ]
+    nondup_paths = remove_repeated_paths(paths)
+    assert nondup_paths == [[1],[1,2],[1,3],[1,4]]
+
+
+
+
 def main(data_dir):
     """ 
             if start_id == 9629070: # 9628934: #9624710
@@ -283,9 +342,10 @@ def main(data_dir):
 
     for fname in fnames:
 
-        # very hard cases
-        if int(Path(fname).stem) not in [166633]:  # , 150381,11905, 136010, 49854, 27155]:
-            continue
+        # # very hard cases
+        # if int(Path(fname).stem) not in [
+        #     166633, 150381,11905, 136010, 49854, 27155]:
+        #     continue
 
         # # hard cases -- ,
         # [174545,119781, 210709, 139445, 11381, 175883, 122703,  166633]: #23333,,124414]:
@@ -307,13 +367,13 @@ def main(data_dir):
         paths = []
         # START BFS IN ANY PLAUSIBLE LANE ID!
         for start_id in plausible_start_ids:
-            more_paths = bfs_enumerate_paths(city_graph_dict[city_name], str(start_id), max_depth=BFS_MAX_DEPTH)
-            # print('\tFound ', len(more_paths), ' more paths.')
-            # print('\tAll paths:', len(paths))
-            paths.extend(more_paths)
+            paths.extend(
+                find_all_paths_from_src(city_graph_dict[city_name], str(start_id), max_depth=DFS_MAX_DEPTH)
+            )
 
         paths = convert_str_lists_to_int_lists(paths)
         paths = trim_paths_with_no_inliers(paths, lane_vote_dict)
+        paths = remove_repeated_paths(paths)
 
         path_votes_dict = defaultdict(int)
         for path_id, path in enumerate(paths):
@@ -323,12 +383,20 @@ def main(data_dir):
         # find which path has most inliers
         best_path_ids = get_dict_key_with_max_value(path_votes_dict)
 
+        # if they are all tied, take the shortest
+        best_path_lengths = [len(paths[id]) for id in best_path_ids]
+        min_best_path_length = min(best_path_lengths)
+        best_path_ids = [id for id in best_path_ids if len(paths[id]) == min_best_path_length]
+
         fig = plt.figure(figsize=(15, 15))
         plt.axis("off")
         ax = fig.add_subplot(111)
         plot_all_nearby_lanes(
             am, ax, city_name, np.mean(traj[:, 0]), np.mean(traj[:, 1])
         )
+
+        # if path ==  ['9629070', '9628934', '9624710']:
+        #     pdb.set_trace()
 
         colors = ["g", "b", "r", "m"]
         # then plot this path
@@ -346,6 +414,8 @@ def main(data_dir):
                 ax.text(
                     np.mean(polygon_3d[:, 0]), np.mean(polygon_3d[:, 1]), f"{lane_id}"
                 )
+            # just use one for now
+            break
 
         # draw_lane_ids(plausible_start_ids, am, ax, city_name)
 
@@ -369,6 +439,48 @@ def main(data_dir):
         plt.close("all")
 
 
+
+
+
+
+def find_all_paths_from_src(graph, start, max_depth=2, remove_duplicates=True):
+    """ 
+    from source only, iteratively
+
+    """
+    paths = []
+    stack = []
+    stack.append([start])
+
+    while len(stack) > 0:
+        path = stack.pop()
+        u = path[-1]
+
+        if u not in graph:
+            continue
+
+        for v in graph[u]:
+            if (v not in path) and (len(path) <= max_depth):
+                newpath = path + [v]
+                paths += [newpath]
+                stack.append(newpath)
+
+    # path = path + [start]
+    # if (not start in graph) or (len(path)+1 > max_depth):
+    #     return [path]
+
+    # paths = [path]
+    # for node in graph[start]:
+    #     if node not in path:
+    #         paths.extend( find_all_paths_from_src(graph, node, max_depth, path) )
+    if remove_duplicates:
+        paths = remove_duplicate_paths(paths)
+    return paths
+
+
+
+
+
 if __name__ == "__main__":
     """ """
     parser = argparse.ArgumentParser()
@@ -380,5 +492,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
     main(args.data_dir)
+
+
