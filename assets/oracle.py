@@ -233,7 +233,6 @@ def get_dict_key_with_max_value(dictionary: Mapping[Any, int]) -> List[Any]:
 
     top_keys = []
     for key, value in dictionary.items():
-        print(key,value)
         if max_val == value:
             top_keys += [key]
 
@@ -287,52 +286,35 @@ def remove_repeated_paths(paths):
     return nondup_paths
 
 
-def test_remove_repeated_paths_2():
-    """ """
-    paths = [
-        [1],
-        [1,3],
-        [1],
-        [1,2],
-        [1,3]
-    ]
+def find_all_paths_from_src(graph, start, max_depth=2, remove_duplicates=True):
+    """ 
+    from source only, iteratively
 
-    nondup_paths = remove_repeated_paths(paths)
-    assert [[1], [1, 3], [1, 2]] == nondup_paths
+    """
+    paths = []
+    stack = []
+    stack.append([start])
 
+    while len(stack) > 0:
+        path = stack.pop()
+        u = path[-1]
 
+        if u not in graph:
+            continue
 
-def test_remove_repeated_paths_1():
-    """ """
-    paths = [
-        [1],
-        [1],
-        [1],
-        [1]
-    ]
+        for v in graph[u]:
+            if (v not in path) and (len(path) <= max_depth):
+                newpath = path + [v]
+                paths += [newpath]
+                stack.append(newpath)
 
-    nondup_paths = remove_repeated_paths(paths)
-    assert nondup_paths == [[1]]
-
-
-
-def test_remove_repeated_paths_3():
-    """ """
-    paths = [
-        [1],
-        [1,2],
-        [1,3],
-        [1,4]
-    ]
-    nondup_paths = remove_repeated_paths(paths)
-    assert nondup_paths == [[1],[1,2],[1,3],[1,4]]
-
-
+    if remove_duplicates:
+        paths = remove_duplicate_paths(paths)
+    return paths
 
 
 def main(data_dir):
     """ 
-            if start_id == 9629070: # 9628934: #9624710
     """
     fnames = glob.glob(f"{data_dir}/*.csv")
     fnames = [Path(fname).name for fname in fnames]
@@ -395,9 +377,6 @@ def main(data_dir):
             am, ax, city_name, np.mean(traj[:, 0]), np.mean(traj[:, 1])
         )
 
-        # if path ==  ['9629070', '9628934', '9624710']:
-        #     pdb.set_trace()
-
         colors = ["g", "b", "r", "m"]
         # then plot this path
         for best_path_id in best_path_ids:
@@ -437,47 +416,6 @@ def main(data_dir):
 
         plt.savefig(f"/Users/johnlamb/Documents/argoverse-api/temp_files_oracle/{Path(fname).stem}.png")
         plt.close("all")
-
-
-
-
-
-
-def find_all_paths_from_src(graph, start, max_depth=2, remove_duplicates=True):
-    """ 
-    from source only, iteratively
-
-    """
-    paths = []
-    stack = []
-    stack.append([start])
-
-    while len(stack) > 0:
-        path = stack.pop()
-        u = path[-1]
-
-        if u not in graph:
-            continue
-
-        for v in graph[u]:
-            if (v not in path) and (len(path) <= max_depth):
-                newpath = path + [v]
-                paths += [newpath]
-                stack.append(newpath)
-
-    # path = path + [start]
-    # if (not start in graph) or (len(path)+1 > max_depth):
-    #     return [path]
-
-    # paths = [path]
-    # for node in graph[start]:
-    #     if node not in path:
-    #         paths.extend( find_all_paths_from_src(graph, node, max_depth, path) )
-    if remove_duplicates:
-        paths = remove_duplicate_paths(paths)
-    return paths
-
-
 
 
 
