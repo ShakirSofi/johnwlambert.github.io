@@ -21,25 +21,169 @@ The goal is to assign each pixel in the image a category label.
 
 ## How do we evaluate this task?
 
+There are five most common metrics: Intersection-over-Union (IoU), Mean Accuracy, Mean Intersection-over-Union, allAcc, frequency weighted IoU (fwIoU). We'll need basic tools from set theory to reason about discrete sets.
 
-1. Intersection-over-Union (IoU), also known as *Jaccard Index*
+### Intersection-over-Union (IoU), also known as *Jaccard Index*
+
+Consider two finite sample sets, $$A,B$$. The IoU is defined as the size of the intersection divided by the size of the union of the sample sets:
+
+$$
+IoU(A,B) = J(A,B) = \frac{|A \cap B|}{|A \cup B|} = \frac{|A \cap B|}{|A| + |B| - |A \cap B|}
+$$
 
 
 <div class="fig figcenter fighighlight">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Intersection_of_sets_A_and_B.svg/400px-Intersection_of_sets_A_and_B.svg.png" width="65%">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Intersection_of_sets_A_and_B.svg/400px-Intersection_of_sets_A_and_B.svg.png" width="25%">
   <div class="figcaption">
-   CAPTION GOES HERE
+   A graphical visualization of the intersection (light purple) and union (yellow, light purple, and orange combined) of two sets A,B. Source: [1].
   </div>
 </div>
 
+However, in segmentation, our predicted categories cannot be thrown into a big bag (set) and then compared with another big bag (set) of ground truth categories. Rather, these values must be compared at the exact corresponding spatial location, meaning we end up reasoning over many small sets (at each grid cell).
 
-https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Union_of_sets_A_and_B.svg/400px-Union_of_sets_A_and_B.svg.png
 
-2. Mean Intersection-over-Union (mIoU)
+### Mean Intersection-over-Union (mIoU)
 
-3. Mean Accuracy (mAcc)
+In a multi-class segmentation scenario, we wish to reason about the quality of our segmentation for each invididual class, and then coalesce these into a single representative number to summarize all of our information. We'll do this by computing intersection-over-union (IoU) for each class, and then averaging all IoUs into a mean IoU (mIoU).
 
-4. allAcc
+Consider a 2-class problem, over $$2x2$$ grayscale images.
+
+$$
+\begin{equation}
+\begin{array}{ll}
+y_{pred} = \begin{bmatrix} 
+0 & 0 \\ 1 & 0 
+\end{bmatrix}, & & y_{true} = \begin{bmatrix} 
+0 & 0 \\ 1 & 1 
+\end{bmatrix},
+\end{array}
+\end{equation}
+$$
+
+We will be reasoning about each matrix cell individually, so we can reshape (flatten) these arrays and the evaluation result won't change.
+
+$$
+\begin{equation}
+\begin{array}{ll}
+y_{pred} = \begin{bmatrix} 
+0 \\ 0 \\ 1 \\ 0 
+\end{bmatrix}, & & y_{true} = \begin{bmatrix} 
+0 \\ 0 \\ 1 \\ 1 
+\end{bmatrix},
+\end{array}
+\end{equation}
+$$
+
+Let's compare horizontally-corresponding cells. We can think of each cell in the two column vectors as set, denoted with $$\{ \cdot \}$$ notation:
+
+$$
+\definecolor{red}{RGB}{255,0,0}
+\definecolor{green}{RGB}{0,150,0}
+\begin{equation}
+\begin{array}{ll}
+y_{pred} = \begin{bmatrix} 
+\{0\} \\ \{0\} \\ \{1\} \\ \{0 \}
+\end{bmatrix}, & & y_{true} = \begin{bmatrix} 
+\{0\} \\ \{0\} \\ \{1\} \\ \{1\} 
+\end{bmatrix},  & & (y_{true} + y_{pred}) = \begin{bmatrix} 
+\color{green} \{0,0\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
+\end{bmatrix}, & & (y_{true} \cap y_{pred}) =
+\begin{bmatrix}
+\{0\} \cap \{0\} \\
+\{0\} \cap \{0\} \\
+\{1\} \cap \{1\} \\
+\{0\} \cap \{1\} \\
+\end{bmatrix} = 
+ \begin{bmatrix} 
+\color{red}  \{0\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
+\end{bmatrix},
+\end{array}
+\end{equation}
+$$
+
+To find the union of these two sets, we'll add $$y_{pred}$$ and $$y_{true}$$ and then subtract the intersection:
+
+$$
+\definecolor{red}{RGB}{255,0,0}
+\definecolor{green}{RGB}{0,150,0}
+\begin{equation}
+\begin{aligned}
+\begin{array}{ll}
+\big(y_{true} + y_{pred}\big) &- \big(y_{true} \cap y_{pred}\big) &= \big(y_{true} \cup y_{pred}\big)\\
+ \begin{bmatrix} 
+\color{green} \{0,0\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
+\end{bmatrix} &- \begin{bmatrix} 
+\color{red} \{0\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
+\end{bmatrix} &= \begin{bmatrix} 
+\{0\} \\ \{0\} \\ \{1\} \\ \{0,1 \}
+\end{bmatrix}
+\end{array}
+\end{aligned}
+\end{equation}
+$$
+
+
+**In Numpy:**
+
+We'll start with two tensors: a model `output` vector (predictions) and a `target` vector. They must be of the same size:
+```python
+assert output.shape == target.shape
+```
+We can arbitrarily flatten them both to 1d arrays, since this will preserve the cell correspondences.
+```python
+output = output.reshape(output.size).copy()
+target = target.reshape(target.size)
+```
+We seek to know the values in cells where `output` and `target` are identical (intersection values):
+```python
+intersection = output[np.where(output == target)[0]]
+```
+We'll use `np.histogram` to count the number of samples in each bin for each vector. `np.histogram` accepts as an input of the histogram bin edges. The bin edges must be in monotonically increasing order, and include the rightmost edge.
+
+```python
+area_intersection, _ = np.histogram(intersection, bins=np.arange(K+1))
+```
+
+```python
+area_output, _ = np.histogram(output, bins=np.arange(K+1))
+```
+
+```python
+area_target, _ = np.histogram(target, bins=np.arange(K+1))
+```
+
+```python
+area_union = area_output + area_target - area_intersection
+```
+
+Putting it all together:
+
+```python
+def intersectionAndUnion(output, target, K, ignore_index=255):
+    # 'K' classes, output and target sizes are N or N * L or N * H * W, each value in range 0 to K - 1.
+    assert (output.ndim in [1, 2, 3])
+    assert output.shape == target.shape
+    # flatten the tensors to 1d arrays
+    output = output.reshape(output.size).copy()
+    target = target.reshape(target.size)
+    output[np.where(target == ignore_index)[0]] = 255
+    intersection = output[np.where(output == target)[0]]
+    # contain the number of samples in each bin.
+    area_intersection, _ = np.histogram(intersection, bins=np.arange(K+1))
+    area_output, _ = np.histogram(output, bins=np.arange(K+1))
+    area_target, _ = np.histogram(target, bins=np.arange(K+1))
+    area_union = area_output + area_target - area_intersection
+    return area_intersection, area_union, area_target
+```
+
+
+
+
+## Mean Accuracy (mAcc)
+
+## allAcc
+
+## Frequency Weighted Intersection-over-Union (fwIoU)
 
 We often have a background label we'll ignore, so identify the locations in the label ("target") where the ground truth class was void/background/unlabeled (=255, in our case) and set each value of our predictions (model "output") to 255 also, to ignore these values.  
 
@@ -54,7 +198,13 @@ area_intersection will hold counts of correct predictions for each class.
 area_output will hold counts of predictions for each class.
 area_target will hold counts of how many pixels belong to each class in the ground truth.
 
+Consider
 
+$$
+\begin{bmatrix}
+
+\end{bmatrix}
+$$
 
 
 ```
@@ -225,4 +375,14 @@ class PSPNet(nn.Module):
 ```
 
 
+
+## Seperable vs. A Trous Convolutions
+
+DeepLab dataset and paper
+
+L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully con- nected crfs. IEEE transactions on pattern analysis and ma- chine intelligence, 40(4):834–848, 2018.
+
+## References
+
+[1]. Wikipedia. *Jaccard Index*. [Link](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Union_of_sets_A_and_B.svg/400px-Union_of_sets_A_and_B.svg.png).
 
