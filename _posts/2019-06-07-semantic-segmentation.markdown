@@ -17,11 +17,24 @@ Table of Contents:
 
 ## What is Semantic Segmentation?
 
-The goal is to assign each pixel in the image a category label.
+The goal is to assign each pixel in the image a category label. In otherwords, semantic segmentation is a pixel-wise classification problem (solving many tiny classification problems).
 
 ## How do we evaluate this task?
 
-There are five most common metrics: Intersection-over-Union (IoU), Mean Accuracy, Mean Intersection-over-Union, allAcc, frequency weighted IoU (fwIoU). We'll need basic tools from set theory to reason about discrete sets.
+There are five most common metrics: 1. Intersection-over-Union (IoU), 2. Mean Accuracy (mAcc), 3. Mean Intersection-over-Union (mIoU), 4. All Accuracy/Pixel Accuracy (allAcc),  5. frequency weighted IoU (fwIoU). More formally, consider two vectors, one containing predictions, and the other containing ground truth labels. Let $$n_{ij}$$ be the number of pixels of class $$i$$ predicted to
+belong to class $$j$$, where there are $$n_{cl}$$ different classes, and let $$t_i = \sum\limits_j n_{ij}$$ be the total number of pixels of class $$i$$. We compute [3]:
+
+$$
+\begin{aligned}
+mAcc &= \frac{1}{n_{cl}} \sum\limits_i \frac{ n_{ii} }{t_i} \\
+mIoU &= \frac{1}{n_{cl}} \sum\limits_i \frac{ n_{ii} }{t_i + \sum\limits_j n_{ji} - n_{ii} } \\
+allAcc &= \sum\limits_i \frac{ n_{ii} }{ \sum\limits_i t_i} \\
+fwIoU &= \big( \sum\limits_k t_k \big)^{-1} \sum\limits_i \frac{ t_i n_{ii} }{t_i + \sum\limits_j n_{ji} - n_{ii} } \\
+\end{aligned}
+$$
+
+
+We'll need basic tools from set theory to reason about discrete sets.
 
 ### Intersection-over-Union (IoU), also known as *Jaccard Index*
 
@@ -203,30 +216,23 @@ def intersectionAndUnion(output, target, K, ignore_index=255):
 
 ## Mean Accuracy (mAcc)
 
-## allAcc
+
+## All Accuracy (allAcc)
 
 ## Frequency Weighted Intersection-over-Union (fwIoU)
 
+
+
 We often have a background label we'll ignore, so identify the locations in the label ("target") where the ground truth class was void/background/unlabeled (=255, in our case) and set each value of our predictions (model "output") to 255 also, to ignore these values.  
 
-?? WONT THIS INFLATE THINGS?
 
-Flatten all arrays to 1d. We then find where the output equals the ground truth target:
-```python
-np.where(output == target)[0]
-```
+
 
 area_intersection will hold counts of correct predictions for each class.
 area_output will hold counts of predictions for each class.
 area_target will hold counts of how many pixels belong to each class in the ground truth.
 
-Consider
 
-$$
-\begin{bmatrix}
-
-\end{bmatrix}
-$$
 
 
 ```
@@ -398,7 +404,7 @@ class PSPNet(nn.Module):
 
 
 
-## Seperable vs. A Trous Convolutions
+## Separable vs. A Trous Convolutions
 
 DeepLab dataset and paper
 
@@ -410,6 +416,5 @@ L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Se
 
 [2]. Hengshuang Zhao. `semseg` repository. [Link](https://github.com/hszhao/semseg/blob/master/util/util.py).
 
-
-
+[3] Jonathan Long, Evan Shelhamer, Trevor Darrell. *Fully Convolutional Networks for Semantic Segmentation*. CVPR 2015. [PDF](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf).
 
