@@ -46,15 +46,15 @@ However, in segmentation, our predicted categories cannot be thrown into a big b
 
 In a multi-class segmentation scenario, we wish to reason about the quality of our segmentation for each invididual class, and then coalesce these into a single representative number to summarize all of our information. We'll do this by computing intersection-over-union (IoU) for each class, and then averaging all IoUs into a mean IoU (mIoU).
 
-Consider a 2-class problem, over $$2x2$$ grayscale images.
+Consider a 3-class problem, over $$2x2$$ grayscale images.
 
 $$
 \begin{equation}
 \begin{array}{ll}
 y_{pred} = \begin{bmatrix} 
-0 & 0 \\ 1 & 0 
+2 & 0 \\ 1 & 0 
 \end{bmatrix}, & & y_{true} = \begin{bmatrix} 
-0 & 0 \\ 1 & 1 
+2 & 0 \\ 1 & 1 
 \end{bmatrix},
 \end{array}
 \end{equation}
@@ -66,9 +66,9 @@ $$
 \begin{equation}
 \begin{array}{ll}
 y_{pred} = \begin{bmatrix} 
-0 \\ 0 \\ 1 \\ 0 
+2 \\ 0 \\ 1 \\ 0 
 \end{bmatrix}, & & y_{true} = \begin{bmatrix} 
-0 \\ 0 \\ 1 \\ 1 
+2 \\ 0 \\ 1 \\ 1 
 \end{bmatrix},
 \end{array}
 \end{equation}
@@ -82,20 +82,20 @@ $$
 \begin{equation}
 \begin{array}{ll}
 y_{pred} = \begin{bmatrix} 
-\{0\} \\ \{0\} \\ \{1\} \\ \{0 \}
+\{2\} \\ \{0\} \\ \{1\} \\ \{0 \}
 \end{bmatrix}, & & y_{true} = \begin{bmatrix} 
-\{0\} \\ \{0\} \\ \{1\} \\ \{1\} 
+\{2\} \\ \{0\} \\ \{1\} \\ \{1\} 
 \end{bmatrix},  & & (y_{true} + y_{pred}) = \begin{bmatrix} 
-\color{green} \{0,0\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
+\color{green} \{2,2\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
 \end{bmatrix}, & & (y_{true} \cap y_{pred}) =
 \begin{bmatrix}
-\{0\} \cap \{0\} \\
+\{2\} \cap \{2\} \\
 \{0\} \cap \{0\} \\
 \{1\} \cap \{1\} \\
 \{0\} \cap \{1\} \\
 \end{bmatrix} = 
  \begin{bmatrix} 
-\color{red}  \{0\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
+\color{red}  \{2\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
 \end{bmatrix},
 \end{array}
 \end{equation}
@@ -111,19 +111,21 @@ $$
 \begin{array}{ll}
 \big(y_{true} + y_{pred}\big) &- \big(y_{true} \cap y_{pred}\big) &= \big(y_{true} \cup y_{pred}\big)\\
  \begin{bmatrix} 
-\color{green} \{0,0\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
+\color{green} \{2,2\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
 \end{bmatrix} &- \begin{bmatrix} 
-\color{red} \{0\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
+\color{red} \{2\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
 \end{bmatrix} &= \begin{bmatrix} 
-\{0\} \\ \{0\} \\ \{1\} \\ \{0,1 \}
+\{2\} \\ \{0\} \\ \{1\} \\ \{0,1 \}
 \end{bmatrix}
 \end{array}
 \end{aligned}
 \end{equation}
 $$
 
+Now that we have computed intersection and union values enforcing the spatially corresponding locations, we can throw all values into a big bag and assess.
 
-**In Numpy:**
+
+**Implementation In Numpy [2]:**
 
 We'll start with two tensors: a model `output` vector (predictions) and a `target` vector. They must be of the same size:
 ```python
@@ -134,29 +136,49 @@ We can arbitrarily flatten them both to 1d arrays, since this will preserve the 
 output = output.reshape(output.size).copy()
 target = target.reshape(target.size)
 ```
+We end up with two column vectors:
+
+ `output = array([2, 0, 1, 0])` and `target = array([2, 0, 1, 1])`.
+
 We seek to know the values in cells where `output` and `target` are identical (intersection values):
 ```python
 intersection = output[np.where(output == target)[0]]
 ```
+Thus `intersection = array([2, 0, 1])`.
+
 We'll use `np.histogram` to count the number of samples in each bin for each vector. `np.histogram` accepts as an input of the histogram bin edges. The bin edges must be in monotonically increasing order, and include the rightmost edge.
+
+In a 3-class example, our three bins will be the ranges [0,1], [1,2], and [2,3], so our bin edges will be array([0, 1, 2, 3]):
 
 ```python
 area_intersection, _ = np.histogram(intersection, bins=np.arange(K+1))
 ```
+We find `intersection` values fall into 3 bins: `area_intersection = array([1, 1, 1])`
 
 ```python
 area_output, _ = np.histogram(output, bins=np.arange(K+1))
-```
-
-```python
 area_target, _ = np.histogram(target, bins=np.arange(K+1))
 ```
+Our bin counts for the two vectors are:
+
+`area_target = array([1, 2, 1])` and `area_output = array([2, 1, 1])`
 
 ```python
 area_union = area_output + area_target - area_intersection
 ```
 
-Putting it all together:
+Sure enough, our bin counts for `area_union` are `array([2, 2, 1])` for respective classes 0,1,2, just as we expected if we were to bin the following vector:
+
+$$
+\begin{bmatrix} 
+\{2\} \\ \{0\} \\ \{1\} \\ \{0,1 \}
+\end{bmatrix}
+$$
+
+Now that we have cardinality counts for intersection and union for each of the 3 classes, we can find the mIoU by computing `miou = np.mean(area_intersection / (area_union + 1e-10))`
+where $$1^{-10}$$ is used to prevent division by zero. Our mIoU would be 0.66, since our per-class IoUs are `array([0.5, 0.5, 1. ])`.
+
+Putting the code all together:
 
 ```python
 def intersectionAndUnion(output, target, K, ignore_index=255):
@@ -384,5 +406,10 @@ L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Se
 
 ## References
 
-[1]. Wikipedia. *Jaccard Index*. [Link](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Union_of_sets_A_and_B.svg/400px-Union_of_sets_A_and_B.svg.png).
+[1].  Wikipedia. *Jaccard Index*. [Link](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Union_of_sets_A_and_B.svg/400px-Union_of_sets_A_and_B.svg.png).
+
+[2]. Hengshuang Zhao. `semseg` repository. [Link](https://github.com/hszhao/semseg/blob/master/util/util.py).
+
+
+
 
