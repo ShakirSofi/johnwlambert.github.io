@@ -14,33 +14,39 @@ Table of Contents:
 - [Speedup](#nullspace)
 
 
-## Nearest Neighbor
-Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with [SIFT](https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)).
+## The Nearest Neighbor Problem
+Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with SIFT [1]) or computing Chamfer distances [2,3] for point set generation with deep networks.
 
 Brute force methods can be prohibitively slow and much faster ways exist of computing with a bit of linear algebra.
 
-We are interested in the quantity
+## Nearest Neighbor Computation
+
+Let $$\mathcal{A,B}$$ be sets. We are interested in the finding the nearest neighbor for each point in $$\mathcal{A}$$. Let $$a,b$$ be two points such that $$a \in \mathcal{A}$$, $$b \in \mathcal{B}$$. The nearest neighbor in $$\mathcal{B}$$ of a point $$a \in \mathcal{A}$$ is a point $$b \in \mathcal{B}$$, such that $$b = \mbox{arg} \underset{b \in \mathcal{B}}{\mbox{ min}} \|a-b\|_2$$. We can equivalently use the squared Euclidean distance $$\|a-b\|_2^2$$, since the square function is monotonically increasing for positive values, and distances are always positive. We will see that using the squared Euclidean distance to find the nearest neighbor will spare us some computation later.
 
 
-Since \\(a,b \in R^n\\) are vectors, we can expand the Mahalanobis distance. When \\(A=I\\), we are working in Euclidean space (computing \\(\ell_2\\) norms):
+The expression $$\|a-b\|_2^2$$ is equivalent to an inner product. It is equivalent to the Mahalonibis distance, $$(a-b)^TA(a-b)$$, when $$A=I$$, when working in Euclidean space (computing \\(\ell_2\\) norms):
+
+Let $$a,b$$ be vectors, i.e. \\(a,b \in R^n\\) are vectors:
 
 $$
-=(a-b)^TA(a-b)
+\begin{aligned}
+&= (a-b)^T(a-b) \\
+&= (a^T-b^T)(a-b) \\
+&= (a^T-b^T)(a-b) \\
+&= a^Ta -b^Ta - a^Tb + b^Tb 
+\end{aligned}
 $$
 
-$$
-=(a^T-b^T)A(a-b)
-$$
+Since $$-b^Ta$$ and  $$- a^Tb$$ are scalars (inner products), we can swap the order or arguments to find:
 
 $$
-=(a^TA-b^TA)(a-b)
+\begin{aligned}
+&= a^Ta -a^Tb - a^Tb + b^Tb \\
+&= a^Ta -2 a^Tb + b^Tb
+\end{aligned}
 $$
 
-$$
-=a^TAa-b^TAa - a^TAa + b^TAb
-$$
-
-Now we wish to compute these on entire datasets simultaneously. We can form matrices \\(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\\) that hold our high-dimensional points.
+Now we wish to compute these distances on all pairs of points in entire datasets simultaneously. We can form matrices \\(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\\) that hold our high-dimensional points.
 
 Consider \\(AB^T\\):
 
@@ -136,6 +142,13 @@ if __name__ == '__main__':
 
 Now consider the speedup we've achieved:
 
+## References
 
+1. David Lowe. Distinctive Image Features
+from Scale-Invariant Keypoints. IJCV, 2004. [PDF](https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf).
+
+2. H.  Fan,  H.  Su,  and  L.  J.  Guibas.   A  point  set  generationnetwork  for  3d  object  reconstruction  from  a  single  image. CVPR 2017. [PDF](https://arxiv.org/abs/1612.00603).
+
+3. A. Kurenkov, J. Ji, A. Garg, V. Mehta, J. Gwak, C. B. Choy, and  S.  Savarese.   Deformnet:  Free-form  deformation  network for 3d shape reconstruction from a single image. WACV 2018. [PDF](https://arxiv.org/abs/1708.04672).
 
 
