@@ -90,17 +90,23 @@
 
   <article class="post-content">
   <p>Table of Contents:</p>
+
 <ul>
-  <li><a href="#rank">Brute Force</a></li>
-  <li><a href="#fastaffinitymatrices">Fast Affinity Matrices</a></li>
-  <li><a href="#nullspace">Speedup</a></li>
+  <li><a href="#nn-problem">The Nearest Neighbor Problem</a></li>
+  <li><a href="#nn-computation">Nearest Neighbor Computation</a></li>
+  <li><a href="#brute-force">Brute Force Nearest Neighbors</a></li>
+  <li><a href="#vectorized-nn">Vectorized NN Derivation</a></li>
+  <li><a href="#vectorized-numpy">Implementation: Fast Affinity Matrix Computation</a></li>
+  <li><a href="#speedup">Speed Comparison</a></li>
 </ul>
 
+<p><a name="nn-problem"></a></p>
 <h2 id="the-nearest-neighbor-problem">The Nearest Neighbor Problem</h2>
-<p>Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with SIFT [1]) or computing Chamfer distances [2,3] for point set generation with deep networks.</p>
+<p>Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with SIFT [1]) or computing Chamfer distances [2,3] for point set generation with deep networks. It is a cheaper way of finding point-to-point correspondences than optimal bipartite matching, as the Earth Mover’s Distance requires.</p>
 
 <p>Brute force methods can be prohibitively slow and much faster ways exist of computing with a bit of linear algebra.</p>
 
+<p><a name="nn-computation"></a></p>
 <h2 id="nearest-neighbor-computation">Nearest Neighbor Computation</h2>
 
 <p>Let <script type="math/tex">\mathcal{A,B}</script> be sets. We are interested in the finding the nearest neighbor for each point in <script type="math/tex">\mathcal{A}</script>. Let <script type="math/tex">a,b</script> be two points such that <script type="math/tex">a \in \mathcal{A}</script>, <script type="math/tex">b \in \mathcal{B}</script>. The nearest neighbor in <script type="math/tex">\mathcal{B}</script> of a point <script type="math/tex">a \in \mathcal{A}</script> is a point <script type="math/tex">b \in \mathcal{B}</script>, such that <script type="math/tex">b = \mbox{arg} \underset{b \in \mathcal{B}}{\mbox{ min}} \|a-b\|_2</script>. We can equivalently use the squared Euclidean distance <script type="math/tex">\|a-b\|_2^2</script>, since the square function is monotonically increasing for positive values, and distances are always positive. We will see that using the squared Euclidean distance to find the nearest neighbor will spare us some computation later.</p>
@@ -111,7 +117,7 @@
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{aligned}
-&= (a-b)^T(a-b) \\
+\|a-b\|_2^2 &= (a-b)^T(a-b) \\
 &= (a^T-b^T)(a-b) \\
 &= (a^T-b^T)(a-b) \\
 &= a^Ta -b^Ta - a^Tb + b^Tb 
@@ -121,19 +127,14 @@
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{aligned}
-&= a^Ta -a^Tb - a^Tb + b^Tb \\
+\|a-b\|_2^2 &= a^Ta -a^Tb - a^Tb + b^Tb \\
 &= a^Ta -2 a^Tb + b^Tb
 \end{aligned} %]]></script>
 
-<p>Now we wish to compute these distances on all pairs of points in entire datasets simultaneously. We can form matrices \(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\) that hold our high-dimensional points.</p>
-
-<p>Consider \(AB^T\):</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix} %]]></script>
-
-<p><a name="extremaltrace"></a></p>
+<p><a name="brute-force"></a></p>
 <h2 id="brute-force-nearest-neighbors">Brute Force Nearest Neighbors</h2>
+
+<p>In the brute force regime, we would loop through all points <script type="math/tex">a_i \in \mathcal{A}</script>, and then loop through all points <script type="math/tex">b_j \in \mathcal{B}</script>, and find the distance <script type="math/tex">\|a_i - b_j\|</script> with <code class="highlighter-rouge">np.linalg.norm(A[i] - B[j])</code>. This can be done with a double for-loop in Python:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">naive_upper_triangular_compute_affinity_matrix</span><span class="p">(</span><span class="n">pts1</span><span class="p">,</span> <span class="n">pts2</span><span class="p">):</span>
     <span class="s">"""
@@ -160,12 +161,97 @@ AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \
     <span class="c">#affinity matrix contains the Mahalanobis distances</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">affinity_mat</span><span class="p">)</span>
 </code></pre></div></div>
+<p>However, this method will be brutally slow for thousands, tens of thousands, or millions of points, which are quite common point cloud sizes in computer vision or robotics. We need a better way.</p>
 
-<p><a name="fastaffinitymatrices"></a></p>
-<h2 id="fast-affinity-matrix-computation">Fast Affinity Matrix Computation</h2>
+<p><a name="vectorized-nn"></a></p>
+<h2 id="vectorized-nn-derivation">Vectorized NN Derivation</h2>
+
+<p>Now we wish to compute these distances on all pairs of points in entire datasets simultaneously. We can form matrices \(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\) that hold our high-dimensional points.</p>
+
+<p>We will see that nearest neighbor computation for all points boils down to only 3 required matrix products: <script type="math/tex">AA^T, BB^T, AB^T</script>.</p>
+
+<p>Our goal is to find <script type="math/tex">\|a_i - b_j\|_2^2 = a_i^Ta_i -2 a_i^Tb_j + b_j^Tb_j</script> for all <script type="math/tex">i,j</script>. We wish to build an affinity matrix <script type="math/tex">D</script> such that the <script type="math/tex">D_{ij}</script> entry contains the squared distance between <script type="math/tex">a_i, b_j</script>.</p>
+
+<p>Consider a sets <script type="math/tex">\mathcal{A,B}</script> with 3 points each. We form <script type="math/tex">AA^T, BB^T</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+AA^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ a_1^T & a_2^T & a_3^T \\ | & | & | \end{bmatrix}  =
+\begin{bmatrix}
+a_1^Ta_1 & a_1^T a_2 & a_1^T a_3 \\
+a_2^Ta_1 & a_2^T a_2 & a_2^T a_3 \\
+a_3^Ta_1 & a_3^T a_2 & a_3^T a_3
+\end{bmatrix} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+BB^T = \begin{bmatrix} - & b_1 & - \\ - & b_2 & - \\ - & b_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix} = \begin{bmatrix}
+b_1^T b_1 & b_1^T b_2 & b_1^T b_3 \\
+b_2^T b_1 & b_2^T b_2 & b_2^T b_3 \\
+b_3^T b_1 & b_3^T b_2 & b_3^T b_3
+\end{bmatrix} %]]></script>
+
+<p>We are interested only in the diagonal elements <script type="math/tex">a_i^Ta_i</script> and <script type="math/tex">b_i^Tb_i</script>. We will define <script type="math/tex">T_A</script> and <script type="math/tex">T_B</script> to contain tiled rows, where each row is a diagonal of <script type="math/tex">AA^T</script> or <script type="math/tex">BB^T</script>, respectively:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{array}{ll}
+T_A = \begin{bmatrix}
+a_1^Ta_1 & a_2^Ta_2 & a_3^Ta_3 \\
+a_1^Ta_1 & a_2^Ta_2 & a_3^Ta_3 \\
+a_1^Ta_1 & a_2^Ta_2 & a_3^Ta_3 
+\end{bmatrix}, & T_B = \begin{bmatrix}
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 
+\end{bmatrix}
+\end{array} %]]></script>
+
+<p>We now form <script type="math/tex">AB^T</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix} = \begin{bmatrix}
+b_1^Ta_1 & b_2^Ta_1 & b_3^Ta_1 \\
+b_1^Ta_2 & b_2^Ta_2 & b_3^Ta_2 \\
+b_1^Ta_3 & b_2^Ta_3 & b_3^Ta_3 
+\end{bmatrix} %]]></script>
+
+<p>Our desired affinity matrix <script type="math/tex">D \in \mathbf{R}^{3 \times 3}</script> will contain entries <script type="math/tex">D_{ij} = \|a_i - b_j\|_2^2</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+D = 
+\begin{bmatrix} 
+\| a_1 - b_1 \|_2^2 & \| a_1 - b_2 \|_2^2 & \|a_1 - b_3 \|_2^2 \\
+\| a_2 - b_1 \|_2^2 & \| a_2 - b_2 \|_2^2 & \|a_2 - b_3 \|_2^2 \\
+\| a_3 - b_1 \|_2^2 & \| a_3 - b_2 \|_2^2 & \|a_3 - b_3 \|_2^2
+\end{bmatrix} %]]></script>
+
+<p>In turns out that:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+D &= T_A^T + T_B - 2 AB^T \\
+D &= \begin{bmatrix}
+a_1^Ta_1 & a_1^Ta_1 & a_1^Ta_1 \\
+a_2^Ta_2 & a_2^Ta_2 & a_2^Ta_2 \\
+a_3^Ta_3 & a_3^Ta_3 & a_3^Ta_3 
+\end{bmatrix} + 
+\begin{bmatrix}
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 
+\end{bmatrix} - 2 \begin{bmatrix}
+b_1^Ta_1 & b_2^Ta_1 & b_3^Ta_1 \\
+b_1^Ta_2 & b_2^Ta_2 & b_3^Ta_2 \\
+b_1^Ta_3 & b_2^Ta_3 & b_3^Ta_3 
+\end{bmatrix}  
+\end{aligned} %]]></script>
+
+<p>Since as you can see above, <script type="math/tex">D_{ij} = \|a_i - b_j\|_2^2 = a_i^Ta_i -2 a_i^Tb_j + b_j^Tb_j</script> for all <script type="math/tex">i,j</script>.</p>
+
+<p><a name="vectorized-numpy"></a></p>
+<h2 id="implementation-fast-affinity-matrix-computation">Implementation: Fast Affinity Matrix Computation</h2>
+
+<p>The implementation requires just a few lines in Numpy:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-
 
 <span class="k">def</span> <span class="nf">fast_affinity_mat_compute</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span><span class="n">X2</span><span class="p">):</span>
     <span class="s">"""
@@ -184,7 +270,10 @@ AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \
     <span class="k">return</span> <span class="n">a_sqr</span> <span class="o">+</span> <span class="n">b_sqr</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ab_T</span>
 </code></pre></div></div>
 
-<p>We now demonstrate the</p>
+<p><a name="speedup"></a></p>
+<h2 id="speed-comparison">Speed Comparison</h2>
+
+<p>We now demonstrate the speedup of the vectorized approach over the brute force approach:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">unit_test_arr_arr</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span><span class="n">m2</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
   <span class="s">""" """</span>
