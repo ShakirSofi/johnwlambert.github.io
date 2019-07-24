@@ -24,7 +24,7 @@ Brute force methods can be prohibitively slow and much faster ways exist of comp
 Let $$\mathcal{A,B}$$ be sets. We are interested in the finding the nearest neighbor for each point in $$\mathcal{A}$$. Let $$a,b$$ be two points such that $$a \in \mathcal{A}$$, $$b \in \mathcal{B}$$. The nearest neighbor in $$\mathcal{B}$$ of a point $$a \in \mathcal{A}$$ is a point $$b \in \mathcal{B}$$, such that $$b = \mbox{arg} \underset{b \in \mathcal{B}}{\mbox{ min}} \|a-b\|_2$$. We can equivalently use the squared Euclidean distance $$\|a-b\|_2^2$$, since the square function is monotonically increasing for positive values, and distances are always positive. We will see that using the squared Euclidean distance to find the nearest neighbor will spare us some computation later.
 
 
-The expression $$\|a-b\|_2^2$$ is equivalent to an inner product. It is equivalent to the Mahalonibis distance, $$(a-b)^TA(a-b)$$, when $$A=I$$, when working in Euclidean space (computing \\(\ell_2\\) norms):
+The expression $$\|a-b\|_2^2$$ is equivalent to an inner product. It is equivalent to the Mahalanobis distance, $$(a-b)^TA(a-b)$$, when $$A=I$$, when working in Euclidean space (computing \\(\ell_2\\) norms):
 
 Let $$a,b$$ be vectors, i.e. \\(a,b \in R^n\\) are vectors:
 
