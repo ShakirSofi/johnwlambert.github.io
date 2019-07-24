@@ -9,16 +9,24 @@ mathjax: true
 
 ---
 Table of Contents:
-- [Brute Force](#rank)
-- [Fast Affinity Matrices](#fastaffinitymatrices)
-- [Speedup](#nullspace)
 
 
+- [The Nearest Neighbor Problem](#nn-problem)
+- [Nearest Neighbor Computation](#nn-computation)
+- [Brute Force Nearest Neighbors](#brute-force)
+- [Vectorized NN Derivation](#vectorized-nn)
+- [Implementation: Fast Affinity Matrix Computation](#vectorized-numpy)
+- [Speed Comparison](#speedup)
+
+
+
+<a name='nn-problem'></a>
 ## The Nearest Neighbor Problem
-Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with SIFT [1]) or computing Chamfer distances [2,3] for point set generation with deep networks.
+Finding closest points in a high-dimensional space is a re-occurring problem in computer vision, especially when performing feature matching (e.g. with SIFT [1]) or computing Chamfer distances [2,3] for point set generation with deep networks. It is a cheaper way of finding point-to-point correspondences than optimal bipartite matching, as the Earth Mover's Distance requires.
 
 Brute force methods can be prohibitively slow and much faster ways exist of computing with a bit of linear algebra.
 
+<a name='nn-computation'></a>
 ## Nearest Neighbor Computation
 
 Let $$\mathcal{A,B}$$ be sets. We are interested in the finding the nearest neighbor for each point in $$\mathcal{A}$$. Let $$a,b$$ be two points such that $$a \in \mathcal{A}$$, $$b \in \mathcal{B}$$. The nearest neighbor in $$\mathcal{B}$$ of a point $$a \in \mathcal{A}$$ is a point $$b \in \mathcal{B}$$, such that $$b = \mbox{arg} \underset{b \in \mathcal{B}}{\mbox{ min}} \|a-b\|_2$$. We can equivalently use the squared Euclidean distance $$\|a-b\|_2^2$$, since the square function is monotonically increasing for positive values, and distances are always positive. We will see that using the squared Euclidean distance to find the nearest neighbor will spare us some computation later.
@@ -30,7 +38,7 @@ Let $$a,b$$ be vectors, i.e. \\(a,b \in R^n\\) are vectors:
 
 $$
 \begin{aligned}
-&= (a-b)^T(a-b) \\
+\|a-b\|_2^2 &= (a-b)^T(a-b) \\
 &= (a^T-b^T)(a-b) \\
 &= (a^T-b^T)(a-b) \\
 &= a^Ta -b^Ta - a^Tb + b^Tb 
@@ -41,22 +49,16 @@ Since $$-b^Ta$$ and  $$- a^Tb$$ are scalars (inner products), we can swap the or
 
 $$
 \begin{aligned}
-&= a^Ta -a^Tb - a^Tb + b^Tb \\
+\|a-b\|_2^2 &= a^Ta -a^Tb - a^Tb + b^Tb \\
 &= a^Ta -2 a^Tb + b^Tb
 \end{aligned}
 $$
 
-Now we wish to compute these distances on all pairs of points in entire datasets simultaneously. We can form matrices \\(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\\) that hold our high-dimensional points.
 
-Consider \\(AB^T\\):
-
-$$
-AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix}  
-$$
-
-
-<a name='extremaltrace'></a>
+<a name='brute-force'></a>
 ## Brute Force Nearest Neighbors
+
+In the brute force regime, we would loop through all points $$a_i \in \mathcal{A}$$, and then loop through all points $$b_j \in \mathcal{B}$$, and find the distance $$\|a_i - b_j\|$$ with `np.linalg.norm(A[i] - B[j])`. This can be done with a double for-loop in Python:
 
 ```python
 def naive_upper_triangular_compute_affinity_matrix(pts1, pts2):
@@ -84,15 +86,105 @@ def naive_upper_triangular_compute_affinity_matrix(pts1, pts2):
     #affinity matrix contains the Mahalanobis distances
     return np.square(affinity_mat)
 ```
+However, this method will be brutally slow for thousands, tens of thousands, or millions of points, which are quite common point cloud sizes in computer vision or robotics. We need a better way.
 
-<a name='fastaffinitymatrices'></a>
-## Fast Affinity Matrix Computation
+<a name='vectorized-nn'></a>
+## Vectorized NN Derivation
+
+Now we wish to compute these distances on all pairs of points in entire datasets simultaneously. We can form matrices \\(A \in R^{m_1 \times n}, B \in R^{m_2 \times n}\\) that hold our high-dimensional points.
 
 
+We will see that nearest neighbor computation for all points boils down to only 3 required matrix products: $$AA^T, BB^T, AB^T$$.
+
+Our goal is to find $$\|a_i - b_j\|_2^2 = a_i^Ta_i -2 a_i^Tb_j + b_j^Tb_j$$ for all $$i,j$$. We wish to build an affinity matrix $$D$$ such that the $$D_{ij}$$ entry contains the squared distance between $$a_i, b_j$$.
+
+Consider a sets $$\mathcal{A,B}$$ with 3 points each. We form $$AA^T, BB^T$$:
+
+$$
+AA^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ a_1^T & a_2^T & a_3^T \\ | & | & | \end{bmatrix}  =
+\begin{bmatrix}
+a_1^Ta_1 & a_1^T a_2 & a_1^T a_3 \\
+a_2^Ta_1 & a_2^T a_2 & a_2^T a_3 \\
+a_3^Ta_1 & a_3^T a_2 & a_3^T a_3
+\end{bmatrix} 
+$$
+
+$$
+BB^T = \begin{bmatrix} - & b_1 & - \\ - & b_2 & - \\ - & b_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix} = \begin{bmatrix}
+b_1^T b_1 & b_1^T b_2 & b_1^T b_3 \\
+b_2^T b_1 & b_2^T b_2 & b_2^T b_3 \\
+b_3^T b_1 & b_3^T b_2 & b_3^T b_3
+\end{bmatrix}  
+$$
+
+We are interested only in the diagonal elements $$a_i^Ta_i$$ and $$b_i^Tb_i$$. We will define $$T_A$$ and $$T_B$$ to contain tiled rows, where each row is a diagonal of $$AA^T$$ or $$BB^T$$, respectively:
+
+$$
+\begin{array}{ll}
+T_A = \begin{bmatrix}
+a_1^Ta_1 & a_2^Ta_2 & a_3^Ta_3 \\
+a_1^Ta_1 & a_2^Ta_2 & a_3^Ta_3 \\
+a_1^Ta_1 & a_2^Ta_2 & a_3^Ta_3 
+\end{bmatrix}, & T_B = \begin{bmatrix}
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 
+\end{bmatrix}
+\end{array}
+$$
+
+We now form $$AB^T$$:
+
+$$
+AB^T = \begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ - & a_3 & - \end{bmatrix} \begin{bmatrix} | & | & | \\ b_1^T & b_2^T & b_3^T \\ | & | & | \end{bmatrix} = \begin{bmatrix}
+b_1^Ta_1 & b_2^Ta_1 & b_3^Ta_1 \\
+b_1^Ta_2 & b_2^Ta_2 & b_3^Ta_2 \\
+b_1^Ta_3 & b_2^Ta_3 & b_3^Ta_3 
+\end{bmatrix}  
+$$
+
+Our desired affinity matrix $$D \in \mathbf{R}^{3 \times 3}$$ will contain entries $$D_{ij} = \|a_i - b_j\|_2^2$$:
+
+$$
+D = 
+\begin{bmatrix} 
+\| a_1 - b_1 \|_2^2 & \| a_1 - b_2 \|_2^2 & \|a_1 - b_3 \|_2^2 \\
+\| a_2 - b_1 \|_2^2 & \| a_2 - b_2 \|_2^2 & \|a_2 - b_3 \|_2^2 \\
+\| a_3 - b_1 \|_2^2 & \| a_3 - b_2 \|_2^2 & \|a_3 - b_3 \|_2^2
+\end{bmatrix}
+$$
+
+In turns out that:
+
+$$
+\begin{aligned}
+D &= T_A^T + T_B - 2 AB^T \\
+D &= \begin{bmatrix}
+a_1^Ta_1 & a_1^Ta_1 & a_1^Ta_1 \\
+a_2^Ta_2 & a_2^Ta_2 & a_2^Ta_2 \\
+a_3^Ta_3 & a_3^Ta_3 & a_3^Ta_3 
+\end{bmatrix} + 
+\begin{bmatrix}
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 \\
+b_1^T b_1 & b_2^T b_2 & b_3^T b_3 
+\end{bmatrix} - 2 \begin{bmatrix}
+b_1^Ta_1 & b_2^Ta_1 & b_3^Ta_1 \\
+b_1^Ta_2 & b_2^Ta_2 & b_3^Ta_2 \\
+b_1^Ta_3 & b_2^Ta_3 & b_3^Ta_3 
+\end{bmatrix}  
+\end{aligned}
+$$
+
+Since as you can see above, $$D_{ij} = \|a_i - b_j\|_2^2 = a_i^Ta_i -2 a_i^Tb_j + b_j^Tb_j$$ for all $$i,j$$.
+
+<a name='vectorized-numpy'></a>
+## Implementation: Fast Affinity Matrix Computation
+
+The implementation requires just a few lines in Numpy:
 
 ```python
 import numpy as np
-
 
 def fast_affinity_mat_compute(X1,X2):
     """
@@ -111,8 +203,10 @@ def fast_affinity_mat_compute(X1,X2):
     return a_sqr + b_sqr - 2 * ab_T
 ```
 
+<a name='speedup'></a>
+## Speed Comparison
 
-We now demonstrate the 
+We now demonstrate the speedup of the vectorized approach over the brute force approach:
 
 ```python
 def unit_test_arr_arr(m1,m2,n):
