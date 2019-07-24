@@ -105,7 +105,7 @@
 
 <p>Let <script type="math/tex">\mathcal{A,B}</script> be sets. We are interested in the finding the nearest neighbor for each point in <script type="math/tex">\mathcal{A}</script>. Let <script type="math/tex">a,b</script> be two points such that <script type="math/tex">a \in \mathcal{A}</script>, <script type="math/tex">b \in \mathcal{B}</script>. The nearest neighbor in <script type="math/tex">\mathcal{B}</script> of a point <script type="math/tex">a \in \mathcal{A}</script> is a point <script type="math/tex">b \in \mathcal{B}</script>, such that <script type="math/tex">b = \mbox{arg} \underset{b \in \mathcal{B}}{\mbox{ min}} \|a-b\|_2</script>. We can equivalently use the squared Euclidean distance <script type="math/tex">\|a-b\|_2^2</script>, since the square function is monotonically increasing for positive values, and distances are always positive. We will see that using the squared Euclidean distance to find the nearest neighbor will spare us some computation later.</p>
 
-<p>The expression <script type="math/tex">\|a-b\|_2^2</script> is equivalent to an inner product. It is equivalent to the Mahalonibis distance, <script type="math/tex">(a-b)^TA(a-b)</script>, when <script type="math/tex">A=I</script>, when working in Euclidean space (computing \(\ell_2\) norms):</p>
+<p>The expression <script type="math/tex">\|a-b\|_2^2</script> is equivalent to an inner product. It is equivalent to the Mahalanobis distance, <script type="math/tex">(a-b)^TA(a-b)</script>, when <script type="math/tex">A=I</script>, when working in Euclidean space (computing \(\ell_2\) norms):</p>
 
 <p>Let <script type="math/tex">a,b</script> be vectors, i.e. \(a,b \in R^n\) are vectors:</p>
 
