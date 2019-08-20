@@ -284,7 +284,72 @@ The coarsest level highlighted in red is global pooling to generate a single bin
 
 e directly upsample the low-dimension feature maps to get the same size feature as the original feature map via bilinear interpolation
 
-Our pyramid pooling module is a four-level one with bin sizes of 1×1, 2×2, 3×3 and 6×6 respectively. 
+Our pyramid pooling module (PPM) is a four-level one with bin sizes of 1×1, 2×2, 3×3 and 6×6 respectively. 
+
+
+In short, the PPM utilizes `nn.AdaptiveAvgPool2d(bin)` to break an image into (bin x bin) subregions, and then pools all entries inside each subregion.
+
+For a $$1 \times 1$$ bin, we simply obtain the average pixel value for a 1-channel feature map:
+```python
+>>> import torch
+>>> pool = torch.nn.AdaptiveAvgPool2d(1)
+>>> x = torch.tensor([[1.,2.],[3.,4.]])
+>>> x = x.reshape(1,1,2,2)
+>>> x
+tensor([[[[1., 2.],
+          [3., 4.]]]])
+>>> x.shape
+torch.Size([1, 1, 2, 2])
+>>> pool(x)
+tensor([[[[2.5000]]]])
+>>> (1 + 2  + 3 + 4) / 4
+2.5
+```
+
+For an output size of $$3 \times 2$$, we'll find the following behavior:
+
+```python
+>>> import numpy as np
+>>> import torch
+>>> x = torch.from_numpy(np.array(range(48)))
+>>> x = x.type(torch.FloatTensor)
+>>> x
+tensor([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11., 12., 13.,
+        14., 15., 16., 17., 18., 19., 20., 21., 22., 23., 24., 25., 26., 27.,
+        28., 29., 30., 31., 32., 33., 34., 35., 36., 37., 38., 39., 40., 41.,
+        42., 43., 44., 45., 46., 47.])
+>>> x = x.reshape(6,8)
+>>> pool = torch.nn.AdaptiveAvgPool2d((3,2))
+
+>>> x.shape
+torch.Size([6, 8])
+>>> x = x.reshape(1,1,6,8)
+>>> x.shape
+torch.Size([1, 1, 6, 8])
+>>> pool(x)
+tensor([[[[ 5.5000,  9.5000],
+          [21.5000, 25.5000],
+          [37.5000, 41.5000]]]])
+>>> x
+tensor([[[[ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.],
+          [ 8.,  9., 10., 11., 12., 13., 14., 15.],
+          [16., 17., 18., 19., 20., 21., 22., 23.],
+          [24., 25., 26., 27., 28., 29., 30., 31.],
+          [32., 33., 34., 35., 36., 37., 38., 39.],
+          [40., 41., 42., 43., 44., 45., 46., 47.]]]])
+```
+
+We can easily verify the first three entries of the pooled feature map:
+
+```python
+>>> ( 0 + 1 + 2 + 3 + 8 + 9 + 10 + 11 ) / 8
+5.5
+>>> (16 + 17 + 18 + 19 + 24 + 25 + 26 + 27) / 8
+21.5
+>>> (32 + 33 + 34 + 35 + 40 + 41 + 42 + 43)/8
+37.5
+```
+
 
 ```python
 fea_dim = 2048
