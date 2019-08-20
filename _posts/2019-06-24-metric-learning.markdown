@@ -62,6 +62,13 @@ True
 ```
 
 
+http://cs231n.github.io/linear-classify/
+
+https://cedar.buffalo.edu/~srihari/CSE574/Chap4/4.1%20DiscFns.pdf
+
+http://grzegorz.chrupala.me/papers/ml4nlp/linear-classifiers.pdf
+
+
 
 
 ## Angular Softmax
