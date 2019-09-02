@@ -27,8 +27,8 @@ permalink: /collaborators/
 
 ## Office
 
-College of Computing Building (CCB) \\
-Room 309 (3rd Floor) \\
+Center for Machine Learning \\
+Coda Building, 11th Floor \\
 Georgia Institute of Technology \\
-801 Atlantic Drive NW, \\
-Atlanta, GA 30332
+756 West Peachtree Street \\
+Atlanta GA 30332
