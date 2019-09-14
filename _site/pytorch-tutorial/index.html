@@ -95,6 +95,49 @@
 
 <p>We will be focusing on CPU functionality in PyTorch, not GPU functionality, in this tutorial. We’ll be working with PyTorch 1.1.0, in these examples.</p>
 
+<p>Table of Contents:</p>
+<ul>
+  <li><a href="#tensors">PyTorch Tensors</a>
+    <ul>
+      <li><a href="#create-tensor">Creating a tensor</a></li>
+      <li><a href="#data-types">Data types in Pytorch and Casting</a></li>
+    </ul>
+  </li>
+  <li><a href="#tensor-ops">Operations on Tensors</a>
+    <ul>
+      <li><a href="#indexing">Tensor Indexing </a></li>
+      <li><a href="#reshaping">Reshaping tensors</a></li>
+      <li><a href="#arithmetic">Tensor Arithmetic</a></li>
+      <li><a href="#mat-mul">Matrix Multiplication vs. Elementwise Multiplication</a></li>
+      <li><a href="#transcendental">Other helpful transcendental functions </a></li>
+      <li><a href="#combining-tensors">Combining Tensors</a></li>
+      <li><a href="#logical-ops">Logical Operations</a></li>
+      <li><a href="#sorting-ops">Sorting Operations</a></li>
+    </ul>
+  </li>
+  <li><a href="#conv-layers">Conv Layers</a>
+    <ul>
+      <li><a href="#conv-weights">Weights for Convolutional layers</a></li>
+      <li><a href="#conv-groups">Groups in Conv Layers</a></li>
+      <li><a href="#conv-bias">Bias in Convolutional Layers</a></li>
+    </ul>
+  </li>
+  <li><a href="#maxpool">Max-Pooling layers</a></li>
+  <li><a href="#creating-model">Creating a Model</a>
+    <ul>
+      <li><a href="#custommodule">Creating a Pytorch Module, Weight Initialization</a></li>
+      <li><a href="#forward">Executing a forward pass through the model</a></li>
+      <li><a href="#iterate-modules">Instantiate Models and iterating over their modules</a></li>
+      <li><a href="#sequential">Sequential Networks</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p><a name="tensors"></a></p>
+<h2 id="pytorch-tensors">PyTorch Tensors</h2>
+<p>PyTorch’s fundamental data structure is the <code class="highlighter-rouge">torch.Tensor</code>, an n-dimensional array. You may be more familiar with matrices, which are 2-dimensional tensors, or vectors, which are 1-dimensional tensors.</p>
+
+<p><a name="create-tensor"></a></p>
 <h3 id="creating-a-tensor">Creating a tensor</h3>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -111,6 +154,8 @@
 <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="c"># Prints "tensor([0, 1, 2, 3])"</span>
 </code></pre></div></div>
+
+<p><a name="data-types"></a></p>
 <h3 id="data-types-in-pytorch-and-casting">Data types in Pytorch and Casting</h3>
 <p>You’ll have a wide range of data types at your disposal, including:</p>
 
@@ -162,6 +207,8 @@
 <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">))</span> <span class="c"># Cast back to int-64, prints "tensor([0, 1, 2, 3])"</span>
 </code></pre></div></div>
 
+<p><a name="tensor-ops"></a>
+<a name="indexing"></a></p>
 <h3 id="tensor-indexing">Tensor Indexing</h3>
 <p>Tensors can be indexed using MATLAB/Numpy-style n-dimensional array indexing. An RGB image is a 3-dimensional array. For a 2 pixel by 2 pixel RGB image, in CHW order, the image tensor would have dimensions (3,2,2). In HWC order, the image tensor would have dimensions (2,2,3). In NCHW order, the image tensor would have shape (1,3,2,2). <em>N</em> represents the batch dimension (number of images present), <em>C</em> represents the number of channels, and <em>H,W</em> represent height and width.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="c"># Create an array of numbers [0,1,2,...,11]</span>
@@ -175,6 +222,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="c"># Prints "tensor([0, 4, 8])"</span>
 </code></pre></div></div>
 
+<p><a name="reshaping"></a></p>
 <h3 id="reshaping-tensors">Reshaping tensors</h3>
 <p>Above, we used <code class="highlighter-rouge">reshape()</code> to modify the shape of a tensor. Note that a reshape is valid only if we do not change the total number of elements in the tensor. For example, a (12,1)-shaped tensor can be reshaped to (3,2,2) since <script type="math/tex">12*1=3*2*2</script>. Here are a few other useful tensor-shaping operations:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c"># Prints "torch.Size([3, 2, 2])"</span>
@@ -183,7 +231,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c"># Prints "torch.Size([6, 2])"</span>
 <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c"># Reshape back to flat vector, prints "torch.Size([12])"</span>
 </code></pre></div></div>
-
+<p><a name="arithmetic"></a></p>
 <h3 id="tensor-arithmetic">Tensor Arithmetic</h3>
 <p>Typical Python or Numpy operators such as <em>+,-</em> can be used for arithmetic, or explicit PyTorch operators:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
@@ -195,6 +243,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="c"># Prints "tensor([-1,  0,  1])"</span>
 </code></pre></div></div>
 
+<p><a name="mat-mul"></a></p>
 <h2 id="matrix-multiplication-vs-elementwise-multiplication">Matrix Multiplication vs. Elementwise Multiplication</h2>
 <p>Note that the operator <script type="math/tex">*</script> will not perform matrix multiplication – rather, it will perform elementwise multiplication, such as in Numpy:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
@@ -209,6 +258,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">.</span><span class="n">t</span><span class="p">()))</span> <span class="c"># Identical to above, prints "tensor([[12]])"</span>
 </code></pre></div></div>
 
+<p><a name="transcendental"></a></p>
 <h3 id="other-helpful-transcendental-functions">Other helpful transcendental functions:</h3>
 <p>PyTorch supports cosine, sine, and exponential operations with <code class="highlighter-rouge">cos()</code>, <code class="highlighter-rouge">sin()</code>, <code class="highlighter-rouge">exp()</code>, just like Numpy. The function input must be a PyTorch tensor:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="c"># Prints float as "3.141592653589793"</span>
@@ -219,6 +269,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)))</span> <span class="c"># Prints Euler's number e as "tensor(2.7183)"</span>
 </code></pre></div></div>
 
+<p><a name="combining-tensors"></a></p>
 <h3 id="combining-tensors">Combining Tensors</h3>
 <p>Tensors can be combined along any dimension, as long as the dimensions align properly. <em>Concatenating</em> (<code class="highlighter-rouge">torch.cat()</code>) or <em>stacking</em> (<code class="highlighter-rouge">torch.stack()</code>) tensors are considered different operations in PyTorch. <code class="highlighter-rouge">torch.stack()</code> will combine a sequence of tensors along a new dimension, whereas <code class="highlighter-rouge">torch.cat()</code> will concatenates tensors along a default dimension <em>dim=0</em>:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
@@ -229,6 +280,7 @@
 <span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c">#  prints "torch.Size([2, 3])"</span>
 </code></pre></div></div>
 
+<p><a name="logical-ops"></a></p>
 <h3 id="logical-operations">Logical Operations</h3>
 <p>Logical operations like AND, OR, etc. can be computed on PyTorch tensors:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">])</span> <span class="c"># Create uint8/Byte tensor</span>
@@ -256,12 +308,15 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 <span class="k">print</span><span class="p">((</span><span class="n">x</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">())</span> <span class="c"># Prints "tensor([[2],[3]])"</span>
 </code></pre></div></div>
 
+<p><a name="sorting-ops"></a></p>
 <h3 id="sorting-operations">Sorting Operations</h3>
 <p>Indices to sort an array can be computed:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="c"># Prints "tensor([1, 2, 3, 0])", representing indices to sort x</span>
 </code></pre></div></div>
 
+<p><a name="conv-layers"></a>
+<a name="conv-weights"></a></p>
 <h3 id="weights-for-convolutional-layers">Weights for Convolutional layers</h3>
 <p>PyTorch convolutional layers require 4-dimensional inputs, in <em>NCHW</em> order. As mentioned above, <em>N</em> represents the batch dimension, <em>C</em> represents the channel dimension, <em>H</em> represents the image height (number of rows), and <em>W</em> represents the image width (number of columns).</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c"># Represents 3-channel image, each image has dims (2,2)</span>
@@ -285,6 +340,7 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 <span class="k">print</span><span class="p">(</span><span class="n">conv_1group</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="c"># Prints "tensor([[[[3.,3.],[3.,3.]],[[6.,6.],[6.,6.]],[[9.,9.],[9.,9.]]]],grad_fn=&lt;MkldnnConvolutionBackward&gt;)"</span>
 </code></pre></div></div>
 
+<p><a name="conv-groups"></a></p>
 <h3 id="groups-in-conv-layers">Groups in Conv Layers</h3>
 <p>Convolutional filters can be applied along a single channel, instead of over all channels, when groups is set to the number of channels.</p>
 
@@ -304,8 +360,9 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 <span class="k">print</span><span class="p">(</span><span class="n">conv_3groups</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="c"># Prints "tensor([[[[1.,1.],[1.,1.]],[[2.,2.],[2.,2.]],[[3.,3.],[3.,3.]]]], grad_fn=&lt;MkldnnConvolutionBackward&gt;)</span>
 </code></pre></div></div>
 
-<h3 id="bias-in-convolutional-layers-initialized-randomly">Bias in Convolutional Layers (initialized randomly)</h3>
-<p>Above, we set the bias to false in our conv layers. A bias will add an offset to the dot product result – below is an example when <em>bias=5</em> for each of 3 filters.</p>
+<p><a name="conv-bias"></a></p>
+<h3 id="bias-in-convolutional-layers">Bias in Convolutional Layers</h3>
+<p>Above, we set the bias to false in our conv layers. A bias will add an offset to the dot product result – below is an example when <em>bias=5</em> for each of 3 filters. Bias is initialized randomly when the layer is constructed with <code class="highlighter-rouge">bias=True</code>.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">conv_3groups</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">conv_3groups</span><span class="o">.</span><span class="n">bias</span><span class="p">)</span> <span class="c"># Prints "Parameter containing:tensor([0.0452, 0.9189, 0.7354], requires_grad=True)"</span>
 <span class="k">print</span><span class="p">(</span><span class="n">conv_3groups</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c"># One bias term to add for each of 3 filters, prints "torch.Size([3])"</span>
@@ -316,6 +373,7 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 <span class="k">print</span><span class="p">(</span><span class="n">conv_3groups</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="c"># Prints "tensor([[[[6.,6.],[6.,6.]],[[7.,7.],[7.,7.]],[[8.,8.],[8.,8.]]]],grad_fn=&lt;MkldnnConvolutionBackward&gt;)"</span>
 </code></pre></div></div>
 
+<p><a name="maxpool"></a></p>
 <h3 id="max-pooling-layers">Max-Pooling layers</h3>
 <p>A 2d max-pooling layer will slide a small window over the 2d feature map slices (each channel viewed independently) and will output the largest value in the window:</p>
 
@@ -335,6 +393,8 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 <span class="k">print</span><span class="p">(</span><span class="n">maxpool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c"># Prints "torch.Size([1, 1, 5, 5])"</span>
 </code></pre></div></div>
 
+<p><a name="creating-model"></a>
+<a name="custommodule"></a></p>
 <h3 id="creating-a-pytorch-module-weight-initialization">Creating a Pytorch Module, Weight Initialization</h3>
 <p>To define a custom layer, you’ll define a class that inherits from <code class="highlighter-rouge">torch.nn.Module</code>. The class will require a constructor, which should be implemented with <code class="highlighter-rouge">__init__()</code> in Python.</p>
 
@@ -366,6 +426,7 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </code></pre></div></div>
 
+<p><a name="forward"></a></p>
 <h3 id="executing-a-forward-pass-through-the-model">Executing a forward pass through the model</h3>
 <p>The <code class="highlighter-rouge">forward()</code> function of a model can be executed on <code class="highlighter-rouge">x</code> as follows. With an input of all ones with shape 1x3x2x2, and a filter representing a 3x2x2 cube with numbers [0,1,2,3,…,10,11], the filter can only be applied in a single location, computing a single dot product of 
 <script type="math/tex">[1,1,1,1,...,1,1,1] \cdot [0,1,2,3,...,9,10,11] = 66</script></p>
@@ -374,6 +435,7 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 <span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="c"># Prints tensor([[[[66.]]]], grad_fn=&lt;MkldnnConvolutionBackward&gt;)</span>
 </code></pre></div></div>
 
+<p><a name="iterate-modules"></a></p>
 <h3 id="instantiate-models-and-iterating-over-their-modules">Instantiate Models and iterating over their modules</h3>
 <p>The modules and parameters of a model can be inspected by iterating over the relevant iterators, which may be useful for debugging:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
@@ -383,6 +445,7 @@ array indices. <code class="highlighter-rouge">.nonzero()</code> will return the
 	<span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="c"># Prints "conv.weight Parameter containing: tensor([[[[ 0.,  1.],[ 2.,  3.]],...[10., 11.]]]], requires_grad=True)"</span>
 </code></pre></div></div>
 
+<p><a name="sequential"></a></p>
 <h3 id="sequential-networks">Sequential Networks</h3>
 <p>A number of different operations can be stacked into a single, sequential network with <code class="highlighter-rouge">nn.Sequential()</code>. In <code class="highlighter-rouge">nn.Sequential</code>, the <code class="highlighter-rouge">nn.Module</code>’s stored inside are connected in a cascaded way. For example, to define a network that applied a convolution and then a max-pooling operation, we could pass these layers to <code class="highlighter-rouge">nn.Sequential()</code>.</p>
 

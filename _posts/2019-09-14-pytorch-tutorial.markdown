@@ -14,6 +14,36 @@ This tutorial will serve as a crash course for those of you not familiar with Py
 
 We will be focusing on CPU functionality in PyTorch, not GPU functionality, in this tutorial. We'll be working with PyTorch 1.1.0, in these examples.
 
+Table of Contents:
+- [PyTorch Tensors](#tensors)
+	- [Creating a tensor](#create-tensor)
+	- [Data types in Pytorch and Casting](#data-types)
+- [Operations on Tensors](#tensor-ops)
+	- [Tensor Indexing ](#indexing)
+	- [Reshaping tensors](#reshaping)
+	- [Tensor Arithmetic](#arithmetic)
+	- [Matrix Multiplication vs. Elementwise Multiplication](#mat-mul)
+	- [Other helpful transcendental functions ](#transcendental)
+	- [Combining Tensors](#combining-tensors)
+	- [Logical Operations](#logical-ops)
+	- [Sorting Operations](#sorting-ops)
+- [Conv Layers](#conv-layers)
+	- [Weights for Convolutional layers](#conv-weights)
+	- [Groups in Conv Layers](#conv-groups)
+	- [Bias in Convolutional Layers](#conv-bias)
+- [Max-Pooling layers](#maxpool)
+- [Creating a Model](#creating-model)
+	- [Creating a Pytorch Module, Weight Initialization](#custommodule)
+	- [Executing a forward pass through the model](#forward)
+	- [Instantiate Models and iterating over their modules](#iterate-modules)
+	- [Sequential Networks](#sequential)
+
+
+<a name='tensors'></a>
+## PyTorch Tensors
+PyTorch's fundamental data structure is the `torch.Tensor`, an n-dimensional array. You may be more familiar with matrices, which are 2-dimensional tensors, or vectors, which are 1-dimensional tensors.
+
+<a name='create-tensor'></a>
 ### Creating a tensor
 ```python
 import numpy as np
@@ -31,6 +61,8 @@ print(y) # Prints "[0 1 2 3]"
 x = torch.from_numpy(y)
 print(x) # Prints "tensor([0, 1, 2, 3])"
 ```
+
+<a name='data-types'></a>
 ### Data types in Pytorch and Casting
 You'll have a wide range of data types at your disposal, including:
 
@@ -54,6 +86,8 @@ print(x.type(torch.DoubleTensor)) # Prints "tensor([0., 1., 2., 3.], dtype=torch
 print(x.type(torch.LongTensor)) # Cast back to int-64, prints "tensor([0, 1, 2, 3])"
 ```
 
+<a name='tensor-ops'></a>
+<a name='indexing'></a>
 ### Tensor Indexing 
 Tensors can be indexed using MATLAB/Numpy-style n-dimensional array indexing. An RGB image is a 3-dimensional array. For a 2 pixel by 2 pixel RGB image, in CHW order, the image tensor would have dimensions (3,2,2). In HWC order, the image tensor would have dimensions (2,2,3). In NCHW order, the image tensor would have shape (1,3,2,2). *N* represents the batch dimension (number of images present), *C* represents the number of channels, and *H,W* represent height and width.
 ```python
@@ -68,6 +102,7 @@ print(x[2,:,:]) # Prints 2nd channel image, "tensor([[8, 9],[10, 11]])"
 print(x[:,0,0]) # Prints "tensor([0, 4, 8])"
 ```
 
+<a name='reshaping'></a>
 ### Reshaping tensors
  Above, we used `reshape()` to modify the shape of a tensor. Note that a reshape is valid only if we do not change the total number of elements in the tensor. For example, a (12,1)-shaped tensor can be reshaped to (3,2,2) since $$12*1=3*2*2$$. Here are a few other useful tensor-shaping operations:
 ```python
@@ -77,7 +112,7 @@ print(x.view(6,2).shape) # Prints "torch.Size([6, 2])"
 print(x.reshape(6,2).shape) # Prints "torch.Size([6, 2])"
 print(x.flatten().shape) # Reshape back to flat vector, prints "torch.Size([12])"
 ```
-
+<a name='arithmetic'></a>
 ### Tensor Arithmetic
 Typical Python or Numpy operators such as *+,-* can be used for arithmetic, or explicit PyTorch operators:
 ```python
@@ -90,6 +125,7 @@ print(x.sub(y)) # Prints "tensor([-1,  0,  1])"
 print(x - y) # Prints "tensor([-1,  0,  1])"
 ```
 
+<a name='mat-mul'></a>
 ## Matrix Multiplication vs. Elementwise Multiplication
 Note that the operator $$*$$ will not perform matrix multiplication -- rather, it will perform elementwise multiplication, such as in Numpy:
 ```python
@@ -105,7 +141,7 @@ print(torch.mm(x,y.t())) # Same dot product/inner product, prints "tensor([[12]]
 print(torch.matmul(x,y.t())) # Identical to above, prints "tensor([[12]])"
 ```
 
-
+<a name='transcendental'></a>
 ### Other helpful transcendental functions: 
 PyTorch supports cosine, sine, and exponential operations with `cos()`, `sin()`, `exp()`, just like Numpy. The function input must be a PyTorch tensor:
 ```python
@@ -117,6 +153,7 @@ print(torch.sin(torch.tensor(np.pi/2))) # Must use float as argument, prints "te
 print(torch.exp(torch.tensor(1.))) # Prints Euler's number e as "tensor(2.7183)"
 ```
 
+<a name='combining-tensors'></a>
 ### Combining Tensors
 Tensors can be combined along any dimension, as long as the dimensions align properly. *Concatenating* (`torch.cat()`) or *stacking* (`torch.stack()`) tensors are considered different operations in PyTorch. `torch.stack()` will combine a sequence of tensors along a new dimension, whereas `torch.cat()` will concatenates tensors along a default dimension *dim=0*:
 ```python
@@ -128,6 +165,7 @@ print(torch.stack([x,y]).shape) # prints torch.Size([2, 1, 3])
 print(torch.cat([x,y]).shape) #  prints "torch.Size([2, 3])"
 ```
 
+<a name='logical-ops'></a>
 ### Logical Operations
 Logical operations like AND, OR, etc. can be computed on PyTorch tensors:
 ```python
@@ -158,6 +196,7 @@ x = torch.tensor([0,1,3,3]) # At index i=2 and i=3, x[i]=3
 print((x == 3).nonzero()) # Prints "tensor([[2],[3]])"
 ```
 
+<a name='sorting-ops'></a>
 ### Sorting Operations
 Indices to sort an array can be computed:
 ```python
@@ -165,6 +204,8 @@ x = torch.tensor([3,0,1,2])
 print(torch.argsort(x)) # Prints "tensor([1, 2, 3, 0])", representing indices to sort x
 ```
 
+<a name='conv-layers'></a>
+<a name='conv-weights'></a>
 ### Weights for Convolutional layers
 PyTorch convolutional layers require 4-dimensional inputs, in *NCHW* order. As mentioned above, *N* represents the batch dimension, *C* represents the channel dimension, *H* represents the image height (number of rows), and *W* represents the image width (number of columns).
 ```python
@@ -189,6 +230,7 @@ conv_1group.weight = torch.nn.Parameter(w) # Initialize the layer weight
 print(conv_1group(x)) # Prints "tensor([[[[3.,3.],[3.,3.]],[[6.,6.],[6.,6.]],[[9.,9.],[9.,9.]]]],grad_fn=<MkldnnConvolutionBackward>)"
 ```
 
+<a name='conv-groups'></a>
 ### Groups in Conv Layers
 Convolutional filters can be applied along a single channel, instead of over all channels, when groups is set to the number of channels.
 
@@ -209,8 +251,9 @@ print(x.shape) # Prints "torch.Size([1, 3, 2, 2])"
 print(conv_3groups(x)) # Prints "tensor([[[[1.,1.],[1.,1.]],[[2.,2.],[2.,2.]],[[3.,3.],[3.,3.]]]], grad_fn=<MkldnnConvolutionBackward>)
 ```
 
-### Bias in Convolutional Layers (initialized randomly)
-Above, we set the bias to false in our conv layers. A bias will add an offset to the dot product result -- below is an example when *bias=5* for each of 3 filters.
+<a name='conv-bias'></a>
+### Bias in Convolutional Layers
+Above, we set the bias to false in our conv layers. A bias will add an offset to the dot product result -- below is an example when *bias=5* for each of 3 filters. Bias is initialized randomly when the layer is constructed with `bias=True`.
 ```python
 conv_3groups = torch.nn.Conv2d(in_channels=3, out_channels=3, kernel_size=1, groups=3, bias=True)
 print(conv_3groups.bias) # Prints "Parameter containing:tensor([0.0452, 0.9189, 0.7354], requires_grad=True)"
@@ -222,6 +265,7 @@ conv_3groups.bias = torch.nn.Parameter(b)
 print(conv_3groups(x)) # Prints "tensor([[[[6.,6.],[6.,6.]],[[7.,7.],[7.,7.]],[[8.,8.],[8.,8.]]]],grad_fn=<MkldnnConvolutionBackward>)"
 ```
 
+<a name='maxpool'></a>
 ### Max-Pooling layers
 A 2d max-pooling layer will slide a small window over the 2d feature map slices (each channel viewed independently) and will output the largest value in the window:
 
@@ -242,6 +286,8 @@ maxpool = torch.nn.MaxPool2d(kernel_size=2, stride=1, padding=1) # Try padding
 print(maxpool(x).shape) # Prints "torch.Size([1, 1, 5, 5])"
 ```
 
+<a name='creating-model'></a>
+<a name='custommodule'></a>
 ### Creating a Pytorch Module, Weight Initialization
 To define a custom layer, you'll define a class that inherits from `torch.nn.Module`. The class will require a constructor, which should be implemented with `__init__()` in Python.
 
@@ -250,8 +296,6 @@ Consider a simple layer that applies a single convolutional filter to a 3-channe
 Conv layer weights are randomly initialized by default, but can be explicitly specified in a number of ways. In order to initialize all weight values to a constant value, or to draw them from a specific type of distribution, `torch.nn.init()` may be used.
 
 To initialize weight values to a **specific** tensor, the tensor must be wrapped inside a PyTorch `Parameter`, meaning *a kind of Tensor that is to be considered a module parameter* (a special subclass of Tensor that will make the tensor appear in the module's `.parameters()`).
-
-
 
 
 ```python
@@ -277,6 +321,7 @@ class MyNewModule(nn.Module):
 		return self.conv(x)
 ```
 
+<a name='forward'></a>
 ### Executing a forward pass through the model
 The `forward()` function of a model can be executed on `x` as follows. With an input of all ones with shape 1x3x2x2, and a filter representing a 3x2x2 cube with numbers [0,1,2,3,...,10,11], the filter can only be applied in a single location, computing a single dot product of 
 $$[1,1,1,1,...,1,1,1] \cdot [0,1,2,3,...,9,10,11] = 66$$
@@ -286,7 +331,7 @@ x = torch.ones(1,3,2,2) # Fill input with all ones
 print(model(x)) # Prints tensor([[[[66.]]]], grad_fn=<MkldnnConvolutionBackward>)
 ```
 
-
+<a name='iterate-modules'></a>
 ### Instantiate Models and iterating over their modules
 The modules and parameters of a model can be inspected by iterating over the relevant iterators, which may be useful for debugging:
 ```python
@@ -297,6 +342,7 @@ for name, param in model.named_parameters(): # Iterate over parameters
 	print(name, param) # Prints "conv.weight Parameter containing: tensor([[[[ 0.,  1.],[ 2.,  3.]],...[10., 11.]]]], requires_grad=True)"
 ```
 
+<a name='sequential'></a>
 ### Sequential Networks
 A number of different operations can be stacked into a single, sequential network with `nn.Sequential()`. In `nn.Sequential`, the `nn.Module`'s stored inside are connected in a cascaded way. For example, to define a network that applied a convolution and then a max-pooling operation, we could pass these layers to `nn.Sequential()`. 
 

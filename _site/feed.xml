@@ -1,10 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-09-14T09:38:34-04:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://johnwlambert.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://johnwlambert.github.io/" rel="alternate" type="text/html" /><updated>2019-09-14T13:59:55-04:00</updated><id>http://johnwlambert.github.io/</id><title type="html">John Lambert</title><subtitle>Ph.D. Candidate in Computer Vision.
 </subtitle><entry><title type="html">PyTorch Tutorial</title><link href="http://johnwlambert.github.io/pytorch-tutorial/" rel="alternate" type="text/html" title="PyTorch Tutorial" /><published>2019-09-13T07:00:00-04:00</published><updated>2019-09-13T07:00:00-04:00</updated><id>http://johnwlambert.github.io/pytorch-tutorial</id><content type="html" xml:base="http://johnwlambert.github.io/pytorch-tutorial/">&lt;p&gt;This tutorial was contributed by John Lambert.&lt;/p&gt;
 
 &lt;p&gt;This tutorial will serve as a crash course for those of you not familiar with PyTorch. It is written in the spirit of &lt;a href=&quot;http://cs231n.github.io/python-numpy-tutorial/&quot;&gt;this Python/Numpy tutorial&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;We will be focusing on CPU functionality in PyTorch, not GPU functionality, in this tutorial. We’ll be working with PyTorch 1.1.0, in these examples.&lt;/p&gt;
 
+&lt;p&gt;Table of Contents:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#tensors&quot;&gt;PyTorch Tensors&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#create-tensor&quot;&gt;Creating a tensor&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#data-types&quot;&gt;Data types in Pytorch and Casting&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#tensor-ops&quot;&gt;Operations on Tensors&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#indexing&quot;&gt;Tensor Indexing &lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#reshaping&quot;&gt;Reshaping tensors&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#arithmetic&quot;&gt;Tensor Arithmetic&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#mat-mul&quot;&gt;Matrix Multiplication vs. Elementwise Multiplication&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#transcendental&quot;&gt;Other helpful transcendental functions &lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#combining-tensors&quot;&gt;Combining Tensors&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#logical-ops&quot;&gt;Logical Operations&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#sorting-ops&quot;&gt;Sorting Operations&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#conv-layers&quot;&gt;Conv Layers&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#conv-weights&quot;&gt;Weights for Convolutional layers&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#conv-groups&quot;&gt;Groups in Conv Layers&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#conv-bias&quot;&gt;Bias in Convolutional Layers&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#maxpool&quot;&gt;Max-Pooling layers&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#creating-model&quot;&gt;Creating a Model&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#custommodule&quot;&gt;Creating a Pytorch Module, Weight Initialization&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#forward&quot;&gt;Executing a forward pass through the model&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#iterate-modules&quot;&gt;Instantiate Models and iterating over their modules&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#sequential&quot;&gt;Sequential Networks&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a name=&quot;tensors&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&quot;pytorch-tensors&quot;&gt;PyTorch Tensors&lt;/h2&gt;
+&lt;p&gt;PyTorch’s fundamental data structure is the &lt;code class=&quot;highlighter-rouge&quot;&gt;torch.Tensor&lt;/code&gt;, an n-dimensional array. You may be more familiar with matrices, which are 2-dimensional tensors, or vectors, which are 1-dimensional tensors.&lt;/p&gt;
+
+&lt;p&gt;&lt;a name=&quot;create-tensor&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;creating-a-tensor&quot;&gt;Creating a tensor&lt;/h3&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;torch&lt;/span&gt;
@@ -21,6 +64,8 @@
 &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_numpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([0, 1, 2, 3])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a name=&quot;data-types&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;data-types-in-pytorch-and-casting&quot;&gt;Data types in Pytorch and Casting&lt;/h3&gt;
 &lt;p&gt;You’ll have a wide range of data types at your disposal, including:&lt;/p&gt;
 
@@ -72,6 +117,8 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LongTensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Cast back to int-64, prints &quot;tensor([0, 1, 2, 3])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;tensor-ops&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;indexing&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;tensor-indexing&quot;&gt;Tensor Indexing&lt;/h3&gt;
 &lt;p&gt;Tensors can be indexed using MATLAB/Numpy-style n-dimensional array indexing. An RGB image is a 3-dimensional array. For a 2 pixel by 2 pixel RGB image, in CHW order, the image tensor would have dimensions (3,2,2). In HWC order, the image tensor would have dimensions (2,2,3). In NCHW order, the image tensor would have shape (1,3,2,2). &lt;em&gt;N&lt;/em&gt; represents the batch dimension (number of images present), &lt;em&gt;C&lt;/em&gt; represents the number of channels, and &lt;em&gt;H,W&lt;/em&gt; represent height and width.&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arange&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Create an array of numbers [0,1,2,...,11]&lt;/span&gt;
@@ -85,6 +132,7 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([0, 4, 8])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;reshaping&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;reshaping-tensors&quot;&gt;Reshaping tensors&lt;/h3&gt;
 &lt;p&gt;Above, we used &lt;code class=&quot;highlighter-rouge&quot;&gt;reshape()&lt;/code&gt; to modify the shape of a tensor. Note that a reshape is valid only if we do not change the total number of elements in the tensor. For example, a (12,1)-shaped tensor can be reshaped to (3,2,2) since &lt;script type=&quot;math/tex&quot;&gt;12*1=3*2*2&lt;/script&gt;. Here are a few other useful tensor-shaping operations:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;squeeze&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;torch.Size([3, 2, 2])&quot;&lt;/span&gt;
@@ -93,7 +141,7 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;torch.Size([6, 2])&quot;&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;flatten&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Reshape back to flat vector, prints &quot;torch.Size([12])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
+&lt;p&gt;&lt;a name=&quot;arithmetic&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;tensor-arithmetic&quot;&gt;Tensor Arithmetic&lt;/h3&gt;
 &lt;p&gt;Typical Python or Numpy operators such as &lt;em&gt;+,-&lt;/em&gt; can be used for arithmetic, or explicit PyTorch operators:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
@@ -105,6 +153,7 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([-1,  0,  1])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;mat-mul&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&quot;matrix-multiplication-vs-elementwise-multiplication&quot;&gt;Matrix Multiplication vs. Elementwise Multiplication&lt;/h2&gt;
 &lt;p&gt;Note that the operator &lt;script type=&quot;math/tex&quot;&gt;*&lt;/script&gt; will not perform matrix multiplication – rather, it will perform elementwise multiplication, such as in Numpy:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
@@ -119,6 +168,7 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matmul&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Identical to above, prints &quot;tensor([[12]])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;transcendental&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;other-helpful-transcendental-functions&quot;&gt;Other helpful transcendental functions:&lt;/h3&gt;
 &lt;p&gt;PyTorch supports cosine, sine, and exponential operations with &lt;code class=&quot;highlighter-rouge&quot;&gt;cos()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;sin()&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;exp()&lt;/code&gt;, just like Numpy. The function input must be a PyTorch tensor:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints float as &quot;3.141592653589793&quot;&lt;/span&gt;
@@ -129,6 +179,7 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints Euler's number e as &quot;tensor(2.7183)&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;combining-tensors&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;combining-tensors&quot;&gt;Combining Tensors&lt;/h3&gt;
 &lt;p&gt;Tensors can be combined along any dimension, as long as the dimensions align properly. &lt;em&gt;Concatenating&lt;/em&gt; (&lt;code class=&quot;highlighter-rouge&quot;&gt;torch.cat()&lt;/code&gt;) or &lt;em&gt;stacking&lt;/em&gt; (&lt;code class=&quot;highlighter-rouge&quot;&gt;torch.stack()&lt;/code&gt;) tensors are considered different operations in PyTorch. &lt;code class=&quot;highlighter-rouge&quot;&gt;torch.stack()&lt;/code&gt; will combine a sequence of tensors along a new dimension, whereas &lt;code class=&quot;highlighter-rouge&quot;&gt;torch.cat()&lt;/code&gt; will concatenates tensors along a default dimension &lt;em&gt;dim=0&lt;/em&gt;:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])&lt;/span&gt;
@@ -139,6 +190,7 @@
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;#  prints &quot;torch.Size([2, 3])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;logical-ops&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;logical-operations&quot;&gt;Logical Operations&lt;/h3&gt;
 &lt;p&gt;Logical operations like AND, OR, etc. can be computed on PyTorch tensors:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Create uint8/Byte tensor&lt;/span&gt;
@@ -166,12 +218,15 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nonzero&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([[2],[3]])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;sorting-ops&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;sorting-operations&quot;&gt;Sorting Operations&lt;/h3&gt;
 &lt;p&gt;Indices to sort an array can be computed:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tensor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argsort&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([1, 2, 3, 0])&quot;, representing indices to sort x&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;conv-layers&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;conv-weights&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;weights-for-convolutional-layers&quot;&gt;Weights for Convolutional layers&lt;/h3&gt;
 &lt;p&gt;PyTorch convolutional layers require 4-dimensional inputs, in &lt;em&gt;NCHW&lt;/em&gt; order. As mentioned above, &lt;em&gt;N&lt;/em&gt; represents the batch dimension, &lt;em&gt;C&lt;/em&gt; represents the channel dimension, &lt;em&gt;H&lt;/em&gt; represents the image height (number of rows), and &lt;em&gt;W&lt;/em&gt; represents the image width (number of columns).&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ones&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Represents 3-channel image, each image has dims (2,2)&lt;/span&gt;
@@ -195,6 +250,7 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conv_1group&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([[[[3.,3.],[3.,3.]],[[6.,6.],[6.,6.]],[[9.,9.],[9.,9.]]]],grad_fn=&amp;lt;MkldnnConvolutionBackward&amp;gt;)&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;conv-groups&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;groups-in-conv-layers&quot;&gt;Groups in Conv Layers&lt;/h3&gt;
 &lt;p&gt;Convolutional filters can be applied along a single channel, instead of over all channels, when groups is set to the number of channels.&lt;/p&gt;
 
@@ -214,8 +270,9 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conv_3groups&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([[[[1.,1.],[1.,1.]],[[2.,2.],[2.,2.]],[[3.,3.],[3.,3.]]]], grad_fn=&amp;lt;MkldnnConvolutionBackward&amp;gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;bias-in-convolutional-layers-initialized-randomly&quot;&gt;Bias in Convolutional Layers (initialized randomly)&lt;/h3&gt;
-&lt;p&gt;Above, we set the bias to false in our conv layers. A bias will add an offset to the dot product result – below is an example when &lt;em&gt;bias=5&lt;/em&gt; for each of 3 filters.&lt;/p&gt;
+&lt;p&gt;&lt;a name=&quot;conv-bias&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;bias-in-convolutional-layers&quot;&gt;Bias in Convolutional Layers&lt;/h3&gt;
+&lt;p&gt;Above, we set the bias to false in our conv layers. A bias will add an offset to the dot product result – below is an example when &lt;em&gt;bias=5&lt;/em&gt; for each of 3 filters. Bias is initialized randomly when the layer is constructed with &lt;code class=&quot;highlighter-rouge&quot;&gt;bias=True&lt;/code&gt;.&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;conv_3groups&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;torch&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Conv2d&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;in_channels&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;out_channels&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kernel_size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;groups&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bias&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;True&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conv_3groups&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bias&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;Parameter containing:tensor([0.0452, 0.9189, 0.7354], requires_grad=True)&quot;&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conv_3groups&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bias&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# One bias term to add for each of 3 filters, prints &quot;torch.Size([3])&quot;&lt;/span&gt;
@@ -226,6 +283,7 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conv_3groups&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;tensor([[[[6.,6.],[6.,6.]],[[7.,7.],[7.,7.]],[[8.,8.],[8.,8.]]]],grad_fn=&amp;lt;MkldnnConvolutionBackward&amp;gt;)&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;maxpool&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;max-pooling-layers&quot;&gt;Max-Pooling layers&lt;/h3&gt;
 &lt;p&gt;A 2d max-pooling layer will slide a small window over the 2d feature map slices (each channel viewed independently) and will output the largest value in the window:&lt;/p&gt;
 
@@ -245,6 +303,8 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxpool&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;torch.Size([1, 1, 5, 5])&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;creating-model&quot;&gt;&lt;/a&gt;
+&lt;a name=&quot;custommodule&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;creating-a-pytorch-module-weight-initialization&quot;&gt;Creating a Pytorch Module, Weight Initialization&lt;/h3&gt;
 &lt;p&gt;To define a custom layer, you’ll define a class that inherits from &lt;code class=&quot;highlighter-rouge&quot;&gt;torch.nn.Module&lt;/code&gt;. The class will require a constructor, which should be implemented with &lt;code class=&quot;highlighter-rouge&quot;&gt;__init__()&lt;/code&gt; in Python.&lt;/p&gt;
 
@@ -276,6 +336,7 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;conv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;forward&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;executing-a-forward-pass-through-the-model&quot;&gt;Executing a forward pass through the model&lt;/h3&gt;
 &lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;forward()&lt;/code&gt; function of a model can be executed on &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; as follows. With an input of all ones with shape 1x3x2x2, and a filter representing a 3x2x2 cube with numbers [0,1,2,3,…,10,11], the filter can only be applied in a single location, computing a single dot product of 
 &lt;script type=&quot;math/tex&quot;&gt;[1,1,1,1,...,1,1,1] \cdot [0,1,2,3,...,9,10,11] = 66&lt;/script&gt;&lt;/p&gt;
@@ -284,6 +345,7 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints tensor([[[[66.]]]], grad_fn=&amp;lt;MkldnnConvolutionBackward&amp;gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;iterate-modules&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;instantiate-models-and-iterating-over-their-modules&quot;&gt;Instantiate Models and iterating over their modules&lt;/h3&gt;
 &lt;p&gt;The modules and parameters of a model can be inspected by iterating over the relevant iterators, which may be useful for debugging:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;modules&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
@@ -293,6 +355,7 @@ array indices. &lt;code class=&quot;highlighter-rouge&quot;&gt;.nonzero()&lt;/co
 	&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# Prints &quot;conv.weight Parameter containing: tensor([[[[ 0.,  1.],[ 2.,  3.]],...[10., 11.]]]], requires_grad=True)&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;p&gt;&lt;a name=&quot;sequential&quot;&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;h3 id=&quot;sequential-networks&quot;&gt;Sequential Networks&lt;/h3&gt;
 &lt;p&gt;A number of different operations can be stacked into a single, sequential network with &lt;code class=&quot;highlighter-rouge&quot;&gt;nn.Sequential()&lt;/code&gt;. In &lt;code class=&quot;highlighter-rouge&quot;&gt;nn.Sequential&lt;/code&gt;, the &lt;code class=&quot;highlighter-rouge&quot;&gt;nn.Module&lt;/code&gt;’s stored inside are connected in a cascaded way. For example, to define a network that applied a convolution and then a max-pooling operation, we could pass these layers to &lt;code class=&quot;highlighter-rouge&quot;&gt;nn.Sequential()&lt;/code&gt;.&lt;/p&gt;
 
