@@ -34,15 +34,15 @@ print(x) # Prints "tensor([0, 1, 2, 3])"
 ### Data types in Pytorch and Casting
 You'll have a wide range of data types at your disposal, including:
 
-| Data Type Name           | Code keywords                                     |
-|--------------------------|---------------------------------------------------|
-|32-bit floating point     |torch.float32 or torch.float), torch.FloatTensor   |
-|64-bit floating point     |torch.float64 or torch.double), torch.DoubleTensor |
-|8-bit integer (unsigned)  | torch.uint8, torch.ByteTensor                     |
-|8-bit integer (signed)    |torch.int8, torch.CharTensor                       |
-|32-bit integer (signed)   | torch.int32 or torch.int, torch.IntTensor         |
-|64-bit integer (signed)   |torch.int64 or torch.long, torch.LongTensor        |
-|Boolean                   | torch.bool, torch.BoolTensor                      |
+| Data Type Name           | Code keywords (all equivalent)                 |
+|--------------------------|------------------------------------------------|
+|32-bit floating point     |torch.float32, torch.float, torch.FloatTensor   |
+|64-bit floating point     |torch.float64, torch.double, torch.DoubleTensor |
+|8-bit integer (unsigned)  | torch.uint8, torch.ByteTensor                  |
+|8-bit integer (signed)    |torch.int8, torch.CharTensor                    |
+|32-bit integer (signed)   | torch.int32, torch.int, torch.IntTensor        |
+|64-bit integer (signed)   |torch.int64, torch.long, torch.LongTensor       |
+|Boolean                   | torch.bool, torch.BoolTensor                   |
     
 A tensor can be cast to any data type, with possible loss of precision:
 ```python
@@ -55,23 +55,21 @@ print(x.type(torch.LongTensor)) # Cast back to int-64, prints "tensor([0, 1, 2, 
 ```
 
 ### Tensor Indexing 
-Tensors can be indexed using MATLAB/Numpy-style n-dimensional array indexing.
+Tensors can be indexed using MATLAB/Numpy-style n-dimensional array indexing. An RGB image is a 3-dimensional array. For a 2 pixel by 2 pixel RGB image, in CHW order, the image tensor would have dimensions (3,2,2). In HWC order, the image tensor would have dimensions (2,2,3). In NCHW order, the image tensor would have shape (1,3,2,2). *N* represents the batch dimension (number of images present), *C* represents the number of channels, and *H,W* represent height and width.
 ```python
 x = torch.arange(4*3) # Create an array of numbers [0,1,2,...,11]
 print(x) # Prints "tensor([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])"
-# Form 3 grayscale images of shape (2,2), with CHW ordering, 
-# C=3 for channels, H=2 for height, W=2 for width
 x = x.reshape(3,2,2) # Reshape tensor from (12,) to (3,2,2)
-print(x[0,:,:]) # Prints "tensor([[0, 1], [2, 3]])"
-print(x[1,:,:]) # Prints "tensor([[4, 5], [6, 7]])"
-print(x[2,:,:]) # Prints "tensor([[8, 9],[10, 11]])"
+print(x[0,:,:]) # Prints 0th channel image, "tensor([[0, 1], [2, 3]])"
+print(x[1,:,:]) # Prints 1st channel image, "tensor([[4, 5], [6, 7]])"
+print(x[2,:,:]) # Prints 2nd channel image, "tensor([[8, 9],[10, 11]])"
 
-# Index instead to get all channels at (0,0) pixel for 0th row, 0th col.
+# Index instead to get ALL channels at (0,0) pixel for 0th row, 0th col.
 print(x[:,0,0]) # Prints "tensor([0, 4, 8])"
 ```
 
 ### Reshaping tensors
- Above, we used `reshape()` to modify the shape of a tensor (but not changing the total number of elements in the tensor). Here are a few other useful tensor-shaping operations:
+ Above, we used `reshape()` to modify the shape of a tensor. Note that a reshape is valid only if we do not change the total number of elements in the tensor. For example, a (12,1)-shaped tensor can be reshaped to (3,2,2) since $$12*1=3*2*2$$. Here are a few other useful tensor-shaping operations:
 ```python
 print(x.squeeze().shape) # Prints "torch.Size([3, 2, 2])"
 print(x.unsqueeze(0).shape) # Add batch dimension for NCHW, prints "torch.Size([1, 3, 2, 2])"
@@ -80,12 +78,11 @@ print(x.reshape(6,2).shape) # Prints "torch.Size([6, 2])"
 print(x.flatten().shape) # Reshape back to flat vector, prints "torch.Size([12])"
 ```
 
-### Tensor Arithmetic, Matrix Multiplication
-Normal Python or Numpy operators can be used for arithmetic, or explicit PyTorch operators:
+### Tensor Arithmetic
+Typical Python or Numpy operators such as *+,-* can be used for arithmetic, or explicit PyTorch operators:
 ```python
 x = torch.tensor([1,2,3])
 y = torch.tensor([2,2,2])
-print(torch.mul(x,y)) # Elementwise multiplication of arrays, prints "tensor([2, 4, 6])"
 print(torch.add(x,y)) # Prints "tensor([3, 4, 5])"
 print(x + y) #  Above is identical to using "+" op, prints "tensor([3, 4, 5])"
 print(x.add(y)) # Prints "tensor([3, 4, 5])"
@@ -93,8 +90,24 @@ print(x.sub(y)) # Prints "tensor([-1,  0,  1])"
 print(x - y) # Prints "tensor([-1,  0,  1])"
 ```
 
+## Matrix Multiplication vs. Elementwise Multiplication
+Note that the operator $$*$$ will not perform matrix multiplication -- rather, it will perform elementwise multiplication, such as in Numpy:
+```python
+x = torch.tensor([[1,2,3]])
+y = torch.tensor([[2,2,2]])
+print(x.shape) # Prints "torch.Size([1, 3])"
+print(x.t().shape) # Take matrix transpose, prints torch.Size([3, 1])
+print(y.shape) # Prints "torch.Size([1, 3])"
+print(torch.mul(x,y)) # Elementwise multiplication of arrays, prints "tensor([[2, 4, 6]])"
+print(x.t().mm(y).shape) # Outer product of (3,1) and (1,3), prints "torch.Size([3, 3])"
+print(x.mm(y.t())) # Dot product of (1,3) and (3,1), prints "tensor([[12]])"
+print(torch.mm(x,y.t())) # Same dot product/inner product, prints "tensor([[12]])""
+print(torch.matmul(x,y.t())) # Identical to above, prints "tensor([[12]])"
+```
+
+
 ### Other helpful transcendental functions: 
-PyTorch supports cosine, sine, and exponential operations with `cos()`, `sin()`, `exp()`, just like Numpy:
+PyTorch supports cosine, sine, and exponential operations with `cos()`, `sin()`, `exp()`, just like Numpy. The function input must be a PyTorch tensor:
 ```python
 print(np.pi) # Prints float as "3.141592653589793"
 # print(torch.cos(np.pi)) # Will crash with TypeError, since np.pi is a float, not tensor
@@ -105,14 +118,14 @@ print(torch.exp(torch.tensor(1.))) # Prints Euler's number e as "tensor(2.7183)"
 ```
 
 ### Combining Tensors
-Tensors can be combined along any dimension, as long as the dimensions align properly. *Concatenating* (`torch.cat()`) or *stacking* (`torch.stack()`) tensors are considered different operations in PyTorch:
+Tensors can be combined along any dimension, as long as the dimensions align properly. *Concatenating* (`torch.cat()`) or *stacking* (`torch.stack()`) tensors are considered different operations in PyTorch. `torch.stack()` will combine a sequence of tensors along a new dimension, whereas `torch.cat()` will concatenates tensors along a default dimension *dim=0*:
 ```python
 x = torch.tensor([[1,2,3]])
 y = torch.tensor([[2,2,2]])
 print(x.shape) # Prints torch.Size([1, 3]), x is a row vector
 print(y.shape) # Prints torch.Size([1, 3]), y is a row vector
-print(torch.stack([x,y]).shape) # Concatenates sequence of tensors along a new dimension, prints torch.Size([2, 1, 3])
-print(torch.cat([x,y]).shape) # Concatenates tensor along default dim=0, prints "torch.Size([2, 3])"
+print(torch.stack([x,y]).shape) # prints torch.Size([2, 1, 3])
+print(torch.cat([x,y]).shape) #  prints "torch.Size([2, 3])"
 ```
 
 ### Logical Operations
@@ -127,8 +140,7 @@ print(x | y) # Logical or op., prints "tensor([1, 1, 1], dtype=torch.uint8)""
 x = torch.tensor([0,1,2])
 y = torch.tensor([2,3,4])
 cond = (x > 1) & (y > 1) # Create a condition with logical `AND`
-print(cond)
-print(torch.where(cond, x, y))
+print(cond) # Condition valid only at last index, prints "tensor([0, 0, 1], dtype=torch.uint8)"
 ```
 
 ### More logical operations. 
@@ -136,7 +148,7 @@ print(torch.where(cond, x, y))
 ```python
 x = torch.tensor([0,1,2]) # Only at 1st index is element > 0 and < 2
 y = torch.tensor([6,5,4])
-print(torch.where(=(x > 0) & (x < 2), x, y)) # Prints "tensor([6, 1, 4])"
+print(torch.where((x > 0) & (x < 2), x, y)) # Prints "tensor([6, 1, 4])"
 ```
 
 Logical operations can be combined with `tensor.nonzero()` to retrieve relevant
@@ -154,7 +166,7 @@ print(torch.argsort(x)) # Prints "tensor([1, 2, 3, 0])", representing indices to
 ```
 
 ### Weights for Convolutional layers
-PyTorch convolutional layers require 4-dimensional inputs, in *NCHW* order. *N* represents the batch dimension, *C* represents the channel dimension, *H* represents the image height (number of rows), and *W* represents the image width (number of columns).
+PyTorch convolutional layers require 4-dimensional inputs, in *NCHW* order. As mentioned above, *N* represents the batch dimension, *C* represents the channel dimension, *H* represents the image height (number of rows), and *W* represents the image width (number of columns).
 ```python
 x = torch.ones(12).reshape(1,3,2,2) # Represents 3-channel image, each image has dims (2,2)
 x = x.float() # Convert to float32 since Conv2d cannot accept `Long` type
@@ -192,6 +204,8 @@ print(conv_3groups.weight) # Prints "Parameter containing: tensor([[[[1.]]],[[[2
 
 # Input split into 3 groups, and conv layer split into 3 groups (along channel dim.)
 # Each pixel in channel 0 multiplied with 1, each pixel in channel 1 multiplied with 2, etc.
+print(x) # prints "tensor([[[[1.,1.],[1.,1.]],[[1.,1.],[1.,1.]],[[1.,1.],[1.,1.]]]])"
+print(x.shape) # Prints "torch.Size([1, 3, 2, 2])"
 print(conv_3groups(x)) # Prints "tensor([[[[1.,1.],[1.,1.]],[[2.,2.],[2.,2.]],[[3.,3.],[3.,3.]]]], grad_fn=<MkldnnConvolutionBackward>)
 ```
 
@@ -201,8 +215,9 @@ Above, we set the bias to false in our conv layers. A bias will add an offset to
 conv_3groups = torch.nn.Conv2d(in_channels=3, out_channels=3, kernel_size=1, groups=3, bias=True)
 print(conv_3groups.bias) # Prints "Parameter containing:tensor([0.0452, 0.9189, 0.7354], requires_grad=True)"
 print(conv_3groups.bias.shape) # One bias term to add for each of 3 filters, prints "torch.Size([3])"
+w = torch.tensor([1.,2.,3.]).float().reshape(3,1,1,1) # Conv weight w as above
 conv_3groups.weight = torch.nn.Parameter(w)
-b = torch.ones(3) * 5 # Fill w/ 5's -- will add 5 to result of each 1x1 convolution
+b = torch.ones(3) * 5 # Fill b w/ 5's -- will add 5 to result of each 1x1 convolution
 conv_3groups.bias = torch.nn.Parameter(b)
 print(conv_3groups(x)) # Prints "tensor([[[[6.,6.],[6.,6.]],[[7.,7.],[7.,7.]],[[8.,8.],[8.,8.]]]],grad_fn=<MkldnnConvolutionBackward>)"
 ```
@@ -210,19 +225,21 @@ print(conv_3groups(x)) # Prints "tensor([[[[6.,6.],[6.,6.]],[[7.,7.],[7.,7.]],[[
 ### Max-Pooling layers
 A 2d max-pooling layer will slide a small window over the 2d feature map slices (each channel viewed independently) and will output the largest value in the window:
 
-For example, a max-pooling layer with kernel_size=2 will slide a 2x2 window over the 2d feature maps. With stride=2, this window will be shifted over by 2 pixels along any axis before the subsequent computation. With stride=1, this window will be placed at every possible position (shifted over by 1 pixel at a time).
+For example, a max-pooling layer with kernel_size=2 will slide a 2x2 window over the 2d feature maps. With stride=2, this window will be shifted over by 2 pixels along any axis before the subsequent computation. With stride=1, this window will be placed at every possible position (shifted over by 1 pixel at a time). With kernel size $$>1$$, in order to preserve the input size, one must pad the input using the `padding` argument to the convolution op.
+
+For a 4x4 image, a max-pooling kernel of $$2x2$$ and stride 2 will output the max in each 2x2 quadrant of the image:
 ```python
 x = torch.tensor([[1.,2.,3.,4.],[1.,2.,3.,4.],[1.,2.,3.,4.],[1.,2.,3.,4.]]).reshape(1,1,4,4) # 1-channel, 4x4 image
 maxpool = torch.nn.MaxPool2d(kernel_size=2, stride=2) # Slide `kernel` every 2 pixels
-print(maxpool(x)) # Take max in each 2x2 quadrant of 4x4 image, prints "tensor([[[[2., 4.],[2., 4.]]]])"
+print(maxpool(x)) #  prints "tensor([[[[2., 4.],[2., 4.]]]])"
 
-# With kernel size 4, stride 1, and padding
 maxpool = torch.nn.MaxPool2d(kernel_size=2, stride=1) # Step one pixel at a time, taking max in 2x2 cell
 print(maxpool(x).shape) # Get back 3x3 image since no padding, prints "torch.Size([1, 1, 3, 3])"
 print(maxpool(x)) # Now prints "tensor([[[[2., 3., 4.],[2., 3., 4.],[2., 3., 4.]]]])"
 
-maxpool = torch.nn.MaxPool2d(kernel_size=2, stride=1, padding=1) # Pad to preserve the input size
-print(maxpool(x).shape) # Even kernel w/ padding kernel_size//2 will make size increase by 1, prints "torch.Size([1, 1, 5, 5])"
+maxpool = torch.nn.MaxPool2d(kernel_size=2, stride=1, padding=1) # Try padding
+# Even kernel w/ padding kernel_size//2 will make size increase by 1,
+print(maxpool(x).shape) # Prints "torch.Size([1, 1, 5, 5])"
 ```
 
 ### Creating a Pytorch Module, Weight Initialization
@@ -230,9 +247,9 @@ To define a custom layer, you'll define a class that inherits from `torch.nn.Mod
 
 Consider a simple layer that applies a single convolutional filter to a 3-channel input. For *kernel_size=2*, a filter (a cube of shape 3x2x2) will be slided over the input at default *stride=1*.
 
-Conv layer weights are randomly initialized by default, but can be explicitly specified in a number of ways. In order to initialize all weight values to a constant value, or to draw them from a specific type of distribution, `torch.nn.init` weights may be used.
+Conv layer weights are randomly initialized by default, but can be explicitly specified in a number of ways. In order to initialize all weight values to a constant value, or to draw them from a specific type of distribution, `torch.nn.init()` may be used.
 
-To initialize weight values to a specific tensor, the tensor must be wrapped inside a PyTorch `Parameter`, meaning *a kind of Tensor that is to be considered a module parameter* (a special subclass of Tensor that will make the tensor appear in the module's `parameters()`).
+To initialize weight values to a **specific** tensor, the tensor must be wrapped inside a PyTorch `Parameter`, meaning *a kind of Tensor that is to be considered a module parameter* (a special subclass of Tensor that will make the tensor appear in the module's `.parameters()`).
 
 
 
@@ -260,11 +277,19 @@ class MyNewModule(nn.Module):
 		return self.conv(x)
 ```
 
-### Instantiate Models and iterating over their modules
-The modules and parameters of a model can be inspected by iterating over the relevant iterators:
+### Executing a forward pass through the model
+The `forward()` function of a model can be executed on `x` as follows. With an input of all ones with shape 1x3x2x2, and a filter representing a 3x2x2 cube with numbers [0,1,2,3,...,10,11], the filter can only be applied in a single location, computing a single dot product of 
+$$[1,1,1,1,...,1,1,1] \cdot [0,1,2,3,...,9,10,11] = 66$$
 ```python
 model = MyNewModule() 
+x = torch.ones(1,3,2,2) # Fill input with all ones
+print(model(x)) # Prints tensor([[[[66.]]]], grad_fn=<MkldnnConvolutionBackward>)
+```
 
+
+### Instantiate Models and iterating over their modules
+The modules and parameters of a model can be inspected by iterating over the relevant iterators, which may be useful for debugging:
+```python
 for m in model.modules():
 	print(m) # Prints "MyNewModule( (conv): Conv2d(3, 1, kernel_size=(2, 2), stride=(1, 1), bias=False)), ..."
 
@@ -273,14 +298,14 @@ for name, param in model.named_parameters(): # Iterate over parameters
 ```
 
 ### Sequential Networks
-A number of different operations can be stacked into a single, sequential network with `nn.Sequential()`. For example, to define a network that applied a convolution and then a max-pooling operation, we could pass these layers to `nn.Sequential()`.
+A number of different operations can be stacked into a single, sequential network with `nn.Sequential()`. In `nn.Sequential`, the `nn.Module`'s stored inside are connected in a cascaded way. For example, to define a network that applied a convolution and then a max-pooling operation, we could pass these layers to `nn.Sequential()`. 
 
-For a single-channel input, with 1x1 convolution with filter weights all equal to 2, the operation will double every pixel's value. In this case, the dot product is over a 1-dimensional input, so the dot product involves only multiplication, not sum.), After subsequent max-pooling of *kernel_size* 2x2 at *stride=2*, a 1x1x2x2 tensor will be reduced to a single number, 1x1x1x1, as follows:
+For a single-channel input, with 1x1 convolution with filter weights all equal to 2, the operation will double every pixel's value. In this case, the dot product is over a 1-dimensional input, so the dot product involves only multiplication, not sum. After subsequent max-pooling of *kernel_size* 2x2 at *stride=2*, a 1x1x2x2 tensor will be reduced to a single number, 1x1x1x1, as follows:
 ```python
 conv = torch.nn.Conv2d(in_channels=1, out_channels=1, kernel_size=1, bias=False)
 nn.init.constant_(conv.weight, 2.)
 maxpool = torch.nn.MaxPool2d(kernel_size=2, stride=2)
-net = nn.Sequential(conv,maxpool) # 
+net = nn.Sequential(conv,maxpool)
 
 x = torch.tensor([[1.,2.],[3.,1.]]).reshape(1,1,2,2)
 print(net(x)) # Prints "tensor([[[[6.]]]], grad_fn=<MaxPool2DWithIndicesBackward>)"
