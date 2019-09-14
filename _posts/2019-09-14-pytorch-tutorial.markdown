@@ -12,7 +12,7 @@ This tutorial was contributed by John Lambert.
 
 This tutorial will serve as a crash course for those of you not familiar with PyTorch. It is written in the spirit of [this Python/Numpy tutorial](http://cs231n.github.io/python-numpy-tutorial/).
 
-We will be focusing on CPU functionality in PyTorch, not GPU functionality, in this tutorial.
+We will be focusing on CPU functionality in PyTorch, not GPU functionality, in this tutorial. We'll be working with PyTorch 1.1.0, in these examples.
 
 ### Creating a tensor
 ```python
