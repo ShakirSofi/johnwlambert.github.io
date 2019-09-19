@@ -168,9 +168,21 @@ I enjoy creating teaching materials for topics related to computer vision, a fie
       </div>
     </div>
 
-    <div class="module-header">Module 7: Geometric Data Analysis </div>
 
-    <div class="module-header">Module 8: Message Passing Interface (MPI) </div>
+    <div class="module-header">Module 7: Convolutional Neural Networks </div>
+
+    <div class="materials-item">
+      <a href="pytorch-tutorial/">
+        PyTorch Tutorial
+      </a>
+      <div class="kw">
+          PyTorch tensor operations, initializing CONV layers, groups, custom modules
+      </div>
+    </div>
+
+    <div class="module-header">Module 8: Geometric Data Analysis </div>
+
+    <div class="module-header">Module 9: Message Passing Interface (MPI) </div>
  
   </div>
 </div>

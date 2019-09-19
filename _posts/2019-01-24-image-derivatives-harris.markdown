@@ -276,3 +276,7 @@ I should have explained that above -- $$\odot$$ is the Hadamard product (element
 [1] Richard Szeliski. Computer Vision: Algorithms and Applications. [PDF](http://szeliski.org/Book/drafts/SzeliskiBook_20100903_draft.pdf).
 
 [2] Fei-Fei Li. [PDF](http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf).
+
+[3] Chris Harris and Mike Stephens. A Combined Edge and Corner Detector. [PDF](http://www.bmva.org/bmvc/1988/avc-88-023.pdf).
+
+
