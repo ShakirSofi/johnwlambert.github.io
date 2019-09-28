@@ -422,5 +422,5 @@ References:
 (1) Eric Darve, Stanford University.
 
 
-
+https://atmos.washington.edu/~dennis/MatrixCalculus.pdf
 
