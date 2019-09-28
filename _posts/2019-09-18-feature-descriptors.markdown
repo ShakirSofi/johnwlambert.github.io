@@ -2,7 +2,7 @@
 layout: post
 title:  "Feature Descriptors"
 permalink: /feature-descriptors/
-excerpt: "SIFT, SURF, LIFT"
+excerpt: "SIFT, SURF, LIFT, SuperPoint, D2Net"
 mathjax: true
 date:   2019-09-10 11:00:00
 mathjax: true
@@ -10,10 +10,14 @@ mathjax: true
 ---
 Table of Contents:
 - [Master Theorem](#state-estimation)
+- [Moravec Interest Operator]()
+- [SIFT]()
+- [SURF]()
+- [Ratio Test]()
 
 <a name='state-estimation'></a>
 
-
+## Local Image Features
 
 
 Chapter 4 of the textbook focuses on points, patches, edges, lines
@@ -28,13 +32,13 @@ High Level Idea
 (2) the ability to find potential correspondences between these salient points across different images (in order to track them), and 
 (3) the ability to identify and discard incorrect correspondences
 
-
 Timeline -- most central parts of computer vision research
 Question: why might these be useful?
 Main idea is we wish to match features
 Why? Image stitching, camera calibration, image registration, Image database retrieval, structure from motion, by understanding 2d projections of 3d points, and we understand the geometry of projection very well, and by understanding which 2d points correspond to identical 3d points, we can actually solve for 3d points, giving a 3d point cloud as structure, in a least-squares sense 
-Moravec Operator
-defines a corner to be a point with low self-similarity.
+
+## Moravec Operator
+Hans Moravec [1] defines a corner to be a point with low self-similarity.
 The algorithm tests each pixel in the image to see if a corner is present, by considering how similar a patch centered on the pixel is to nearby, largely overlapping patches. 
 The similarity is measured by taking the sum of squared differences (SSD) between the corresponding pixels of two patches. 
 A lower number indicates more similarity.
@@ -44,7 +48,8 @@ if this number is high, then the variation along all shifts is either equal to i
 Measure intensity variation at (x,y) by shifting a small window (3x3 or 5x5) by one pixel in each of the eight principle directions (horizontally, vertically, and four diagonals).
 The “cornerness” of a pixel is the minimum intensity variation found over the eight shift directions:
 • Use a window surrounding each pixel as its own matching template • Tests local autocorrelation of the image: – SSD = Sum of Squared Differences • Good matches in any direction • Flat image region • Good matches in only one direction • Linear feature or edge • No good matches in any direction • Distinctive point feature • Corner point
-Hans Moravec Stanford Cart, 1960
+
+### Hans Moravec's *Stanford Cart*, 1960
 Looks like an absolute piece of junk. Car battery, 4, bicycle wheels
 The Stanford Cart used a single black and white camera with a 1-Hz frame rate. It could follow an unbroken white line on a road for about 15 meters before breaking trac
 developed the first stereo vision system for a mobile robot. Using a modified Cart, he obtained stereo images by moving a black and white video camera side to side to create a stereo baseline. Like human eye
@@ -61,14 +66,17 @@ Flat region: no change in all directions
 Edge: no change along the edge direction
 Corner: significant change in all directions. shifting a window in any directionshould give a large change in intensity. Should easily recognize the point bylooking through a small window
 
+### Repeatability 
 
 Why repeatable?
 Add that there is no way to get a match if you don’t repeat the Keypoint in other image. Not optional to be repeatable. Most important property.
-If you see the same image content/same pattern, you must fire in the same location
+If you see the same image content/same pattern, you must fire in the same location. Want it to be repeatable! Can’t have a match if your keypoints aren’t even in repeatable locations
 
 
-Deep Keypoints
-TILDE -- want it to be repeatable! Can’t have a match if your keypoints aren’t even in repeatable locations
+## Deep Keypoints
+
+### TILDE 
+
 1. Find webcam images (same point of view, different seasons, different times of day)
 2. Identify in these images a set of locations that we think can be found consistently over the different imaging conditions.
 3. To collect a training set of positive samples, we first detect keypoints independently in each image of this dataset using SIFT
@@ -94,7 +102,6 @@ Estimate some statistics of the patch. Then search for other patches with simila
 Histogram of grayscale values
 
 Can treat histograms as vectors, think of 2d vectors, and find similarity betwen two vectors by distance between them , L2 norm
-Joint Histogram: less lossy (good), more bins. High dimensional. But more computationally slow.
 How do images change?
 a transformation could take the form of 
 scene illumination, blur in video
@@ -102,7 +109,8 @@ scene illumination, blur in video
  Camera viewpoint changes could take the form of scale changes or a rotation.
 Want a feature vector that is not too large, because longer vectors will mean more computation when matching and finding nearest neighbors
 Many of these lack a strong mathematical formulation like we saw on Monday, but are somewhat ad-hoc
-[Lowe, SIFT, 1999]
+
+### [Lowe, SIFT, 1999]
 Use image gradient
 change in the value of a quantity (as temperature, pressure, or concentration) with change in a given variable and especially per unit on a linear scale.
 Sobel
@@ -115,7 +123,8 @@ Template matching infeasible becuase of variation in object rotation, scale, ill
 we used 8 orientation planes,
 Preliminary paper
 Store the SIFT keys for sample images and then identify matching keys from new images
-Lowe 2004 Scale-Invariant feature (SIFT)
+
+### Lowe 2004 Scale-Invariant feature (SIFT)
 53k citations, refined version. Now states: “perform reliable matching between different views of an object or scene”
 Can mix and match the detector: DOG for detecting blobs: 
 The input image is first convolved with the Gaussian function using  = p 2 to give an image A. This is then repeated a second time with a further incremental smoothing of  = p 2 to give a new image, B, which now has an effective smoothing of  = 2. The difference of Gaussian function is obtained by subtracting image B from A, resulting in a ratio of 2=p 2 = p 2 between the two Gaussians.
@@ -165,7 +174,7 @@ PLEASE DISCUSS WITH YOUR NEIGHBOR: WHAT ARE THE DISADVANTAGES OF THIS SIFT METHO
 SIFT: lossy summary of this data. Very good image descriptor
 SIFTNet
 
-Speeded Up Robust Features (SURF) Paper, integral image, box filters [Bay, ECCV’06], [Cornelis, CVGPU’08]
+## Speeded Up Robust Features (SURF) Paper, integral image, box filters [Bay, ECCV’06], [Cornelis, CVGPU’08]
 
 
 New detector and a new descriptor, fast approximations of Harris and SIFT ideas
@@ -185,8 +194,12 @@ uses box filters to approximate the derivatives and integrals used in SIFT
 box filter, which simply averages the pixel values in a K ×K window. This is equivalent to convolving the image with a kernel of all ones and then scaling
 Each element of the integral image contains the sum of all pixels located on the up-left region of the original image (in relation to the element's position). This allows to compute sum of rectangular areas in the image, at any position or scale, using only four lookups:
 Turns out if you wish to determine the sum of pixels in any rectangular portion of an image, there is a very efficient way to do it
+
+$$
 sum = A-B-C+D
 A - (C-D) - (B-D) - D = A-B-C+D
+$$
+
 Only have to build the integral image once for an input image
 Integral image gets bigger as you go down to the right
 Rectangle filters (Haar wavelet). coefficient 1 and -1, dot product with the pixels that lie underneath them. Get one real-valued thing back \sum (pixels in white area}) - sum (pixels in black area)
@@ -218,8 +231,10 @@ use 5 bins for (log r) and 12 bins for (theta).
 Stored prototype shapes. Capture global shape
 
 
-Deep Learned Feature Descriptors -- learn the weights/filters from data
- Learned Invariant Feature Transform (LIFT): 3 networks for detection, orientation, description. Trained separately
+## Deep Learned Feature Descriptors -- learn the weights/filters from data
+
+### Learned Invariant Feature Transform (LIFT)
+3 networks for detection, orientation, description. Trained separately
 For matching patches, not full images
 training the Descriptor first
 n used to train the Orientation Estimator
@@ -229,7 +244,8 @@ How does the soft argmax work? [12] from LIFT
 This allows us to tune the Orientation Estimator for the Descriptor, and the Detector for the other two components
 Correct matches recovered by each method are shown in green lines and the descriptor support regions with red circles
 River scene, two stuffed animals, two skulls disturbing
-SuperPoint -- build dataset, what is homographic adaptation
+
+### SuperPoint -- build dataset, what is homographic adaptation
 output a semi-dense grid of descriptors (e.g., one every 8 pixels)
 MagicPoint Net
 The notion of interest point detection is semantically ill-defined.
@@ -246,14 +262,13 @@ Move to a different viewpoint
 SuperPoint Net
 Take in unlabeled image and base detector
 Sample a random homography, warp images, apply detector, get point response, unwarp heatmaps, then aggregate all heatmaps, get interest point superset
-D2Net
+### D2Net
 Tensor viewed as descriptors and detector maps
 
 
 
 
-Matching
-
+## Matching
 
 Establish some preliminary feature matches between these images
 he feature descriptors have been designed so that Euclidean (vector magnitude) distances in feature space can be directly used for ranking potential matches
@@ -271,7 +286,7 @@ For extremely large databases (millions of images or more), even more efficient 
 KD trees, divide the multidimensional feature space along alternating axis-aligned hyperplanes, choosing the threshold along each axis so as to maximize some criterion
 
 
-SIFT Descriptor Nearest Neighbor Distance Ratio:
+## SIFT Descriptor Nearest Neighbor Distance Ratio:
 If you have many closeby features, then this is a bad feature!
 will likely be a number of other false matches within similar distances due to the (high dimensionality of the feature space -- Many high dimensional vector distances tend to a constant.)
 PDF
@@ -322,6 +337,8 @@ result / np.sum( np.exp(y * 10))
 1.007140612556097
 ```
 
+LIFT [2] passes this subpixel keypoint localization to a STN.
+
 ## Spatial Transformer Network
 
 https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
@@ -331,7 +348,9 @@ https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
 
 ## References
 
-[1]. LIFT: Learned Invariant Feature Transform. [PDF](https://icwww.epfl.ch/~trulls/pdf/eccv16-lift.pdf).
+[1]. Moravec 
+
+[2]. LIFT: Learned Invariant Feature Transform. [PDF](https://icwww.epfl.ch/~trulls/pdf/eccv16-lift.pdf).
 
 
 
