@@ -308,10 +308,37 @@ Once we have some hypothetical (putative) matches, we can often use geometric al
 
 
 
+## Soft Argmax
+
+Given logits [0.1, 0.7, 0.05, 0.15], where the hard argmax would be 1, the soft argmax delivers 1.007 (as shown below). This float cannot be used as a hard index (i.e. integer), but fortunately the STN not need an integer to extract the patch.
+
+
+```python
+import numpy as np
+x = np.arange(4)
+y = np.array([0.1,0.7, 0.05, 0.15])
+result = np.sum( np.exp(y * 10) * x)
+result / np.sum( np.exp(y * 10))
+1.007140612556097
+```
+
+## Spatial Transformer Network
+
+https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
 
 
 
-Sandbox: 
+
+## References
+
+[1]. LIFT: Learned Invariant Feature Transform. [PDF](https://icwww.epfl.ch/~trulls/pdf/eccv16-lift.pdf).
+
+
+
+
+
+
+## Sandbox: 
 
 Laplacian of Gaussians (Lindeberg (1993; 1998b)/ Difference of Gaussians will skip since we are talking about descriptors
 Matching Local Self-Similarities across Images and Videos, Shechtman and Irani, 2007
