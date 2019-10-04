@@ -40,6 +40,9 @@ $$
 y = {\mathcal F} (x, {W_i }) + x
 $$
 
+Simply put, ResNets allow for paths where information can flow more directly.
+
+
 <a name='buildingblock'></a>
 ## The ResNet BuildingBlock (BasicBlock)
 

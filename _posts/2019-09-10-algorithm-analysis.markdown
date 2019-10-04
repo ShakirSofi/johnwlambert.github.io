@@ -111,8 +111,14 @@ While the left side is more intuitive, the right side is easier to apply and eva
 ### Closest Pair
 
 
+### QuickSort
+
+
 ### Fast Fourier Transform
 
+$$O(n \log n)$$
+
+Interpolation as solving system of equations for polynomial coefficients.
 
 
 ## Dynamic Programming
