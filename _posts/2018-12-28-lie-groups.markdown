@@ -178,6 +178,25 @@ $$
 \end{bmatrix}
 $$
 
+What is the inverse of an SE(3) object? Consider a transformation of a point in the body frame $$p_b$$ to a point in the world frame $$p_w$$. Both points $$p_b, p_w$$ must be in homogeneous coordinates. We can invert it as follows:
+
+$$
+\begin{aligned}
+p_w &= {}^{w}T_{b} p_b \\
+p_w &= \begin{bmatrix} {}^wR_b & | & {}^wt_b \end{bmatrix} p_b \\
+p_w &=  {}^wR_b p_b + {}^wt_b \\
+p_w - {}^wt_b &= {}^wR_b p_b \\
+({}^wR_b)^{-1} (p_w - {}^wt_b) &= ({}^wR_b)^{-1} {}^wR_b p_b \\
+({}^wR_b)^T (p_w - {}^wt_b) &= p_b \\
+({}^wR_b)^T p_w - ({}^wR_b)^T {}^wt_b &= p_b \\
+\begin{bmatrix} ({}^wR_b)^T & | & -({}^wR_b)^T {}^wt_b \end{bmatrix}p_w &= p_b \\
+p_b &= \begin{bmatrix} ({}^wR_b)^T & | & -({}^wR_b)^T{}^wt_b \end{bmatrix}p_w \\
+p_b &= {}^{w}T_{b}^{-1} p_w
+\end{aligned}
+$$
+
+Thus if $$T = \begin{bmatrix}R & t \\ 0 & 1\end{bmatrix}$$, then $$T^{-1} = \begin{bmatrix} R^T & -R^Tt \\ 0 & 1 \end{bmatrix}$$. You can find my simple implementation of an object-oriented SE(3) class [in Python here](https://github.com/argoai/argoverse-api/blob/master/argoverse/utils/se3.py#L47).
+
 <a name='conjugation'></a>
 
 ## Conjugation in Group Theory

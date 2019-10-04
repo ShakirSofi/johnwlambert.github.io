@@ -15,6 +15,11 @@ Table of Contents:
 
 <a name='sfmpipeline'></a>
 
+
+## Epipolar Geometry
+
+1993 Luong non-linear least squares
+
 ## A Basic Structure-from-Motion (SFM) Pipeline
 
 As described in [1], there are generally four steps to the algorithm:
@@ -87,6 +92,6 @@ Those who use generic optimization routines to solve SfM problems will find the 
 
 [3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. *Building Rome in a Day*. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. [https://grail.cs.washington.edu/rome/rome_paper.pdf](https://grail.cs.washington.edu/rome/rome_paper.pdf).
 
-
+[4] Luong. 1993. [PDF](https://hal.inria.fr/file/index/docid/74777/filename/RR-1894.pdf) 
 
 
