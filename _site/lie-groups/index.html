@@ -256,6 +256,26 @@ T = \begin{bmatrix} x_w \\ y_w \\ 1 \end{bmatrix} = \begin{bmatrix}
 0 & 0 & 0 & 1
 \end{bmatrix} %]]></script>
 
+<p>What is the inverse of an SE(3) object? Consider a transformation of a point in the body frame <script type="math/tex">p_b</script> to a point in the world frame <script type="math/tex">p_w</script>. Both points <script type="math/tex">p_b, p_w</script> must be in homogeneous coordinates. We can invert it as follows:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+p_w &= {}^{w}T_{b} p_b \\
+p_w &= \begin{bmatrix} {}^wR_b & | & {}^wt_b \end{bmatrix} p_b \\
+p_w &=  {}^wR_b p_b + {}^wt_b \\
+p_w - {}^wt_b &= {}^wR_b p_b \\
+({}^wR_b)^{-1} (p_w - {}^wt_b) &= ({}^wR_b)^{-1} {}^wR_b p_b \\
+({}^wR_b)^T (p_w - {}^wt_b) &= p_b \\
+({}^wR_b)^T p_w - ({}^wR_b)^T {}^wt_b &= p_b \\
+\begin{bmatrix} ({}^wR_b)^T & | & -({}^wR_b)^T {}^wt_b \end{bmatrix}p_w &= p_b \\
+p_b &= \begin{bmatrix} ({}^wR_b)^T & | & -({}^wR_b)^T{}^wt_b \end{bmatrix}p_w \\
+p_b &= {}^{w}T_{b}^{-1} p_w
+\end{aligned} %]]></script>
+
+<p>Thus if <script type="math/tex">% <![CDATA[
+T = \begin{bmatrix}R & t \\ 0 & 1\end{bmatrix} %]]></script>, then <script type="math/tex">% <![CDATA[
+T^{-1} = \begin{bmatrix} R^T & -R^Tt \\ 0 & 1 \end{bmatrix} %]]></script>. You can find my simple implementation of an object-oriented SE(3) class <a href="https://github.com/argoai/argoverse-api/blob/master/argoverse/utils/se3.py#L47">in Python here</a>.</p>
+
 <p><a name="conjugation"></a></p>
 
 <h2 id="conjugation-in-group-theory">Conjugation in Group Theory</h2>
@@ -420,11 +440,167 @@ any direction in the space of its degrees of freedom. Otherwise a robot is calle
 
 <p>We want to invert this matrix and solve for <script type="math/tex">\begin{bmatrix} \dot{\phi} \\ \dot{\theta} \\ \dot{\psi} \end{bmatrix}</script></p>
 
+<h2 id="as-an-aside-quaternions">As an aside: Quaternions</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c"># import quaternion</span>
+
+
+<span class="n">EPSILON</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+<span class="c"># make sure quaternions are normalized (to be unit quaternions)</span>
+<span class="c"># unit quaternions are a way to compactly represent 3D rotations</span>
+<span class="c"># while avoiding singularities or discontinuities (e.g. gimbal lock).</span>
+
+
+<span class="k">def</span> <span class="nf">quat_mult</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">):</span>
+    <span class="s">"""
+	Multiply two quaternions.
+
+		Args:
+		-	q1: NumPy n-d array, with dim (4 x 1)
+		-	q2: NumPy n-d array, with dim (4 x 1)
+
+	We recall that a cross product (u x v) is defined as 
+		(u_2 * v_3) - (u_3 * v_2)
+		(u_3 * v_1) - (u_1 * v_3)
+		(u_1 * v_2) - (u_2 * v_1)
+	"""</span>
+    <span class="n">w1</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span> <span class="o">=</span> <span class="n">q1</span>
+    <span class="n">w2</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="n">q2</span>
+
+    <span class="c"># w = (w_1 * w_2) - &lt; v_1, v_2 &gt;</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">w1</span> <span class="o">*</span> <span class="n">w2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">x2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">*</span> <span class="n">y2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">z1</span> <span class="o">*</span> <span class="n">z2</span><span class="p">)</span>
+
+    <span class="c"># v = w_1 * v_2 + w_2 * v_1 + (v_1 x v_2)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">w1</span> <span class="o">*</span> <span class="n">x2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">y1</span> <span class="o">*</span> <span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span> <span class="o">*</span> <span class="n">y2</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">w1</span> <span class="o">*</span> <span class="n">y2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">*</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">z1</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="o">*</span> <span class="n">z2</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">w1</span> <span class="o">*</span> <span class="n">z2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">z1</span> <span class="o">*</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">x1</span> <span class="o">*</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span> <span class="o">*</span> <span class="n">x2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">w</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">quat_conjugate</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="s">"""
+		Args:
+		-	q: NumPy n-d array, with dim (4 x 1)
+
+	The conjugate of a quaternion is the same as the inverse, as long as the quaternion is unit-length
+	"""</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">q</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">z</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">quat_vec_mult</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span> <span class="n">v1</span><span class="p">):</span>
+    <span class="s">""" 
+	quaternion-vector multiplication 
+	Apply a quaternion-rotation to a vector.
+		v' = q * v * q_conj
+
+		Args:
+		-	q1: 
+		-	v1:
+
+		Returns:
+		-	
+	"""</span>
+    <span class="n">q2</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,)</span> <span class="o">+</span> <span class="n">v1</span>
+    <span class="k">return</span> <span class="n">q_mult</span><span class="p">(</span><span class="n">q_mult</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">),</span> <span class="n">q_conjugate</span><span class="p">(</span><span class="n">q1</span><span class="p">))[</span><span class="mi">1</span><span class="p">:]</span>
+
+
+<span class="k">def</span> <span class="nf">quat_normalize</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="s">"""
+	Normalize a quaternion.
+		Args:
+		-	q: NumPy n-d array, with dim (4 x 1) representing
+				(w,x,y,z)
+	"""</span>
+    <span class="k">return</span> <span class="n">q</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">quat2rotmat</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="s">"""
+	Convert a quaternion into a matrix.
+
+		Args:
+		-	q: NumPy n-d array, with dim (4 x 1), representing
+				(w,x,y,z)
+
+		Returns:
+		-	R: Numpy array of shape (3,3)
+	"""</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">EPSILON</span><span class="p">:</span>
+        <span class="n">q</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="c"># q = np.multiply(q, np.tile(1./np.linalg.norm(q),4))</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">q</span>
+
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="n">xz</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">z</span>
+    <span class="n">yz</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">z</span>
+    <span class="n">wx</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">x</span>
+    <span class="n">wy</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="n">wz</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">z</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span> <span class="o">+</span> <span class="n">z2</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">wz</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">xz</span> <span class="o">+</span> <span class="n">wy</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">xy</span> <span class="o">+</span> <span class="n">wz</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">+</span> <span class="n">z2</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">yz</span> <span class="o">-</span> <span class="n">wx</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">xz</span> <span class="o">-</span> <span class="n">wy</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">yz</span> <span class="o">+</span> <span class="n">wx</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">+</span> <span class="n">y2</span><span class="p">)],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">quat_normalization_unit_test</span><span class="p">(</span><span class="n">q_quat</span><span class="p">,</span> <span class="n">q_arr</span><span class="p">):</span>
+
+    <span class="c"># print( quaternion.quaternion_normalized(q_quat) )</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="n">quat_normalize</span><span class="p">(</span><span class="n">q_arr</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">conjugate_unit_test</span><span class="p">(</span><span class="n">q_quat</span><span class="p">,</span> <span class="n">q_arr</span><span class="p">):</span>
+    <span class="s">""" Test Conjugate functionality """</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">q_quat</span><span class="o">.</span><span class="n">conjugate</span><span class="p">())</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">quat_conjugate</span><span class="p">(</span><span class="n">q_arr</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">quat_2_rot_mat_unit_test</span><span class="p">(</span><span class="n">q_quat</span><span class="p">,</span> <span class="n">q_arr</span><span class="p">):</span>
+    <span class="s">""" Test quaternion-vector product functionality """</span>
+    <span class="c"># print( quaternion.as_rotation_matrix(q_quat) )</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="n">quat2rotmat</span><span class="p">(</span><span class="n">q_arr</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">unit_tests</span><span class="p">():</span>
+    <span class="s">""" Check against the Numpy Quaternion add-on package """</span>
+    <span class="n">q_quat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quaternion</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">q_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c"># q_quat = np.quaternion(	0.73029674, 0.54772256, 0.36514837, 0.18257419)</span>
+    <span class="c"># q_arr = np.array([		0.73029674, 0.54772256, 0.36514837, 0.18257419])</span>
+
+    <span class="c"># quat_normalization_unit_test(q_quat, q_arr)</span>
+
+    <span class="c"># conjugate_unit_test(q_quat, q_arr)</span>
+    <span class="n">quat_2_rot_mat_unit_test</span><span class="p">(</span><span class="n">q_quat</span><span class="p">,</span> <span class="n">q_arr</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">unit_tests</span><span class="p">()</span>
+</code></pre></div></div>
+
+
   </article>
 
   <!-- mathjax -->
   
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
   
   
   <!-- disqus comments -->
