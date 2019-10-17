@@ -99,6 +99,43 @@
   <li><a href="#bundleadjustment">Ellipse Analogy</a></li>
 </ul>
 
+<h2 id="the-autocorrelation-function">The Autocorrelation Function</h2>
+<p>Szeliski calls this function the “auto-correlation function”, defined as:</p>
+
+<script type="math/tex; mode=display">E_{AC} (\Delta \mathbf{u}) = \sum\limits_i w(\mathbf{x}_i) \bigg[I_0(x_i + \Delta\mathbf{u}) - I_0(\mathbf{x}_i) \bigg]^2</script>
+
+<p>Computationally, this is intractable. For every single patch, (for which there are width * height in the image, if we center at every possible pixel) we need compare its patch with all patches nearby it (shift_range_x * shift_range_y), and each comparison (requires patch_size_x * patch_size_y) subtraction computations.</p>
+
+<p>In total, we end up with something that is</p>
+
+<script type="math/tex; mode=display">O(window\_width^2 * shift\_range^2 * image\_width^2)</script>
+
+<p>For a 600 * 600 image, with 11x11 patches, and a shift range of 11 px in both x and y, we are looking at computational complexity of: <script type="math/tex">O(11^2 * 11^2 * 600^2) = 5.2</script> billion</p>
+
+<p>The auto-correlation function can alternatively be written as an error function <script type="math/tex">E</script>:
+<script type="math/tex">E(u,v) = \sum\limits_{x,y} w(x,y) \Bigg[ I(x+u,y+v) - I(x,y) \Bigg]^2</script>
+where <script type="math/tex">u</script> is the shift in the <script type="math/tex">x</script> direction, <script type="math/tex">v</script> is the shift in the <script type="math/tex">y</script> direction, <script type="math/tex">x,y</script> are pixel coordinates in the image <script type="math/tex">I</script>, <script type="math/tex">w(x,y)</script> is a window-ing function, and <script type="math/tex">I(x,y)</script> and <script type="math/tex">I(x+u,y+v)</script> represent intensities of pixels.</p>
+
+<p>The interpretation here is to loop over all pixels in the image, and the window function will zero out everythin that is not within our window/patch of choice. The function <script type="math/tex">E</script> determines how shifting the window on <script type="math/tex">x,y</script> by some amount <script type="math/tex">u,v</script> would change the pixel values by applying the windowing function on it. This implementation is of course much less efficient, since most of the pixels in the image will not fall within the window of interest. <script type="math/tex">E(u,v)</script> indicates how much the patch intensities differ as we move the window <script type="math/tex">w(x,y)</script> a bit <script type="math/tex">(u,v)</script>. For the Harris Corner Detector, we want a fast rate of change for both the <script type="math/tex">x</script> and <script type="math/tex">y</script> direction over a small shift to be a corner. Thus, it measurea a changes in appearance of the window.</p>
+
+<h2 id="deriving-an-efficient-approximation">Deriving an Efficient Approximation</h2>
+
+<p>Consider a first order approximation of the image function <script type="math/tex">I_0(\mathbf{x}_i + \Delta \mathbf{u}) \approx I_0(\mathbf{x}_i) + \nabla I_0(\mathbf{x}_i) \cdot \Delta \mathbf{u}</script>. Expanding terms, we will find a quadratic in <script type="math/tex">\Delta \mathbf{u}</script>:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+E_{AC} (\Delta \mathbf{u}) &=  \sum\limits_i w(\mathbf{x}_i) \bigg[I_0(x_i + \Delta\mathbf{u}) - I_0(\mathbf{x}_i) \bigg]^2 & \mbox{auto-correlation definition} \\
+E_{AC} (\Delta \mathbf{u}) &\approx   \sum\limits_i w(\mathbf{x}_i) \bigg[ I_0(\mathbf{x}_i) + \nabla I_0(\mathbf{x}_i) \cdot \Delta \mathbf{u} - I_0(\mathbf{x}_i) \bigg]^2 & \mbox{use approximation of image fn.} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \sum\limits_i w(\mathbf{x}_i) \big[  \nabla I_0(\mathbf{x}_i) \cdot \Delta \mathbf{u}) \big]^2 & I_0(\mathbf{x}_i)  - I_0(\mathbf{x}_i) \mbox{ cancels} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \sum\limits_i w(\mathbf{x}_i) \Big(  \Delta \mathbf{u}^T \Delta I_0(\mathbf{x}_i)^T  \nabla I_0(\mathbf{x}_i) \Delta \mathbf{u} \Big)  & \mbox{Expand squared terms} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T \Bigg( \sum\limits_i w(\mathbf{x}_i)    \Delta I_0(\mathbf{x}_i)^T  \nabla I_0(\mathbf{x}_i) \Bigg) \Delta \mathbf{u}  &\mbox{Pull out } \Delta \mathbf{u} \mbox{ since doesn't depend on } i \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T \Bigg( \sum\limits_i w(\mathbf{x}_i)    \begin{bmatrix} I_x & I_y \end{bmatrix}^T \begin{bmatrix} I_x \\ I_y \end{bmatrix} \Bigg) \Delta \mathbf{u} & \mbox{write out image gradient as partial derivatives} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T \Bigg( \sum\limits_i w(\mathbf{x}_i)    \begin{bmatrix} I_{xx} & I_{xy} \\ I_{yx} & I_{yy} \end{bmatrix} \Bigg) \Delta \mathbf{u} & \mbox{expand outer product of image gradients} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T     M  \Delta \mathbf{u} & \mbox{ Substitute auto-correlation/second-moment matrix}
+\end{aligned} %]]></script>
+
+<p>We now have a quadratic function. The auto-correlation/second-moment matrix is also known as the <a href="https://en.wikipedia.org/wiki/Structure_tensor">“structure tensor”</a>.</p>
+
 <h2 id="image-derivatives">Image Derivatives</h2>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    ksize = 7
@@ -307,11 +344,18 @@ Giving a cornerness function in the lecture slides:
 
 <p>[2] Fei-Fei Li. <a href="http://vision.stanford.edu/teaching/cs131_fall1617/lectures/lecture5_edges_cs131_2016.pdf">PDF</a>.</p>
 
+<p>[3] Chris Harris and Mike Stephens. A Combined Edge and Corner Detector. <a href="http://www.bmva.org/bmvc/1988/avc-88-023.pdf">PDF</a>.</p>
+
+
   </article>
 
   <!-- mathjax -->
   
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
   
   
   <!-- disqus comments -->

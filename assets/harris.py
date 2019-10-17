@@ -30,6 +30,18 @@ def compute_autocorrelation(I, patch, window_sz=3):
 
 
 
+def alt_window_function_impl():
+	"""
+	could loop over all (x,y) in the image, but then just have window function zero out everything
+	that isn't within the patch.
+
+	page 234 of http://szeliski.org/Book/drafts/SzeliskiBook_20100903_draft.pdf
+
+	"""
+	pass
+
+
+
 def main():
 	"""
 	Window should have odd size, like filter, to have anchor point.

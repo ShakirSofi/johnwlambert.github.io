@@ -17,6 +17,60 @@ Table of Contents:
 - [Ellipse Analogy](#bundleadjustment)
 
 
+
+## The Autocorrelation Function
+Szeliski calls this function the "auto-correlation function", defined as:
+
+$$
+E_{AC} (\Delta \mathbf{u}) = \sum\limits_i w(\mathbf{x}_i) \bigg[I_0(x_i + \Delta\mathbf{u}) - I_0(\mathbf{x}_i) \bigg]^2
+$$
+
+
+
+Computationally, this is intractable. For every single patch, (for which there are width * height in the image, if we center at every possible pixel) we need compare its patch with all patches nearby it (shift_range_x * shift_range_y), and each comparison (requires patch_size_x * patch_size_y) subtraction computations.
+
+In total, we end up with something that is 
+
+$$
+O(window\_width^2 * shift\_range^2 * image\_width^2)
+$$
+
+For a 600 * 600 image, with 11x11 patches, and a shift range of 11 px in both x and y, we are looking at computational complexity of: $$O(11^2 * 11^2 * 600^2) = 5.2$$ billion
+
+The auto-correlation function can alternatively be written as an error function $$E$$:
+$$
+E(u,v) = \sum\limits_{x,y} w(x,y) \Bigg[ I(x+u,y+v) - I(x,y) \Bigg]^2
+$$
+where $$u$$ is the shift in the $$x$$ direction, $$v$$ is the shift in the $$y$$ direction, $$x,y$$ are pixel coordinates in the image $$I$$, $$w(x,y)$$ is a window-ing function, and $$I(x,y)$$ and $$I(x+u,y+v)$$ represent intensities of pixels.
+
+The interpretation here is to loop over all pixels in the image, and the window function will zero out everythin that is not within our window/patch of choice. The function $$E$$ determines how shifting the window on $$x,y$$ by some amount $$u,v$$ would change the pixel values by applying the windowing function on it. This implementation is of course much less efficient, since most of the pixels in the image will not fall within the window of interest. $$E(u,v)$$ indicates how much the patch intensities differ as we move the window $$w(x,y)$$ a bit $$(u,v)$$. For the Harris Corner Detector, we want a fast rate of change for both the $$x$$ and $$y$$ direction over a small shift to be a corner. Thus, it measurea a changes in appearance of the window.
+
+
+## Deriving an Efficient Approximation
+
+
+Consider a first order approximation of the image function $$I_0(\mathbf{x}_i + \Delta \mathbf{u}) \approx I_0(\mathbf{x}_i) + \nabla I_0(\mathbf{x}_i) \cdot \Delta \mathbf{u}$$. Expanding terms, we will find a quadratic in $$\Delta \mathbf{u}$$:
+
+$$
+\begin{aligned}
+E_{AC} (\Delta \mathbf{u}) &=  \sum\limits_i w(\mathbf{x}_i) \bigg[I_0(x_i + \Delta\mathbf{u}) - I_0(\mathbf{x}_i) \bigg]^2 & \mbox{auto-correlation definition} \\
+E_{AC} (\Delta \mathbf{u}) &\approx   \sum\limits_i w(\mathbf{x}_i) \bigg[ I_0(\mathbf{x}_i) + \nabla I_0(\mathbf{x}_i) \cdot \Delta \mathbf{u} - I_0(\mathbf{x}_i) \bigg]^2 & \mbox{use approximation of image fn.} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \sum\limits_i w(\mathbf{x}_i) \big[  \nabla I_0(\mathbf{x}_i) \cdot \Delta \mathbf{u}) \big]^2 & I_0(\mathbf{x}_i)  - I_0(\mathbf{x}_i) \mbox{ cancels} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \sum\limits_i w(\mathbf{x}_i) \Big(  \Delta \mathbf{u}^T \Delta I_0(\mathbf{x}_i)^T  \nabla I_0(\mathbf{x}_i) \Delta \mathbf{u} \Big)  & \mbox{Expand squared terms} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T \Bigg( \sum\limits_i w(\mathbf{x}_i)    \Delta I_0(\mathbf{x}_i)^T  \nabla I_0(\mathbf{x}_i) \Bigg) \Delta \mathbf{u}  &\mbox{Pull out } \Delta \mathbf{u} \mbox{ since doesn't depend on } i \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T \Bigg( \sum\limits_i w(\mathbf{x}_i)    \begin{bmatrix} I_x & I_y \end{bmatrix}^T \begin{bmatrix} I_x \\ I_y \end{bmatrix} \Bigg) \Delta \mathbf{u} & \mbox{write out image gradient as partial derivatives} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T \Bigg( \sum\limits_i w(\mathbf{x}_i)    \begin{bmatrix} I_{xx} & I_{xy} \\ I_{yx} & I_{yy} \end{bmatrix} \Bigg) \Delta \mathbf{u} & \mbox{expand outer product of image gradients} \\
+E_{AC} (\Delta \mathbf{u}) &\approx  \Delta \mathbf{u}^T     M  \Delta \mathbf{u} & \mbox{ Substitute auto-correlation/second-moment matrix}
+\end{aligned}
+$$
+
+We now have a quadratic function. The auto-correlation/second-moment matrix is also known as the ["structure tensor"](https://en.wikipedia.org/wiki/Structure_tensor).
+
+
+
+
+
+
 ## Image Derivatives 
 
 ```
