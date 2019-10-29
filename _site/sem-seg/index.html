@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Modern Semantic Segmentation</title>
+  <meta name="description" content="IoU, PSPNet, ADE20K, COCO, Mapillary Vistas, CamVid ...">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/sem-seg/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Modern Semantic Segmentation</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#state-estimation">What is Semantic Segmentation?</a></li>
+  <li><a href="#dt-lds">How do we evaluate this task?</a></li>
+  <li><a href="#probability-review">PSPNet</a></li>
+</ul>
+
+<p><a name="state-estimation"></a></p>
+
+<h2 id="what-is-semantic-segmentation">What is Semantic Segmentation?</h2>
+
+<p>The goal is to assign each pixel in the image a category label. In otherwords, semantic segmentation is a pixel-wise classification problem (solving many tiny classification problems).</p>
+
+<h2 id="how-do-we-evaluate-this-task">How do we evaluate this task?</h2>
+
+<p>There are five most common metrics: 1. Intersection-over-Union (IoU), 2. Mean Accuracy (mAcc), 3. Mean Intersection-over-Union (mIoU), 4. All Accuracy/Pixel Accuracy (allAcc),  5. frequency weighted IoU (fwIoU). More formally, consider two vectors, one containing predictions, and the other containing ground truth labels. Let <script type="math/tex">n_{ij}</script> be the number of pixels of class <script type="math/tex">i</script> predicted to
+belong to class <script type="math/tex">j</script>, where there are <script type="math/tex">n_{cl}</script> different classes, and let <script type="math/tex">t_i = \sum\limits_j n_{ij}</script> be the total number of pixels of class <script type="math/tex">i</script>. We compute [3]:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{aligned}
+mAcc &= \frac{1}{n_{cl}} \sum\limits_i \frac{ n_{ii} }{t_i} \\
+mIoU &= \frac{1}{n_{cl}} \sum\limits_i \frac{ n_{ii} }{t_i + \sum\limits_j n_{ji} - n_{ii} } \\
+allAcc &= \sum\limits_i \frac{ n_{ii} }{ \sum\limits_i t_i} \\
+fwIoU &= \big( \sum\limits_k t_k \big)^{-1} \sum\limits_i \frac{ t_i n_{ii} }{t_i + \sum\limits_j n_{ji} - n_{ii} } \\
+\end{aligned} %]]></script>
+
+<p>We’ll need basic tools from set theory to reason about discrete sets.</p>
+
+<h3 id="intersection-over-union-iou-also-known-as-jaccard-index">Intersection-over-Union (IoU), also known as <em>Jaccard Index</em></h3>
+
+<p>Consider two finite sample sets, <script type="math/tex">A,B</script>. The IoU is defined as the size of the intersection divided by the size of the union of the sample sets:</p>
+
+<script type="math/tex; mode=display">IoU(A,B) = J(A,B) = \frac{|A \cap B|}{|A \cup B|} = \frac{|A \cap B|}{|A| + |B| - |A \cap B|}</script>
+
+<div class="fig figcenter fighighlight">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Intersection_of_sets_A_and_B.svg/400px-Intersection_of_sets_A_and_B.svg.png" width="25%" />
+  <div class="figcaption">
+   A graphical visualization of the intersection (light purple) and union (yellow, light purple, and orange combined) of two sets A,B. Source: [1].
+  </div>
+</div>
+
+<p>However, in segmentation, our predicted categories cannot be thrown into a big bag (set) and then compared with another big bag (set) of ground truth categories. Rather, these values must be compared at the exact corresponding spatial location, meaning we end up reasoning over many small sets (at each grid cell).</p>
+
+<h3 id="mean-intersection-over-union-miou">Mean Intersection-over-Union (mIoU)</h3>
+
+<p>In a multi-class segmentation scenario, we wish to reason about the quality of our segmentation for each invididual class, and then coalesce these into a single representative number to summarize all of our information. We’ll do this by computing intersection-over-union (IoU) for each class, and then averaging all IoUs into a mean IoU (mIoU).</p>
+
+<p>Consider a 3-class problem, over <script type="math/tex">2x2</script> grayscale images.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+\begin{array}{ll}
+y_{pred} = \begin{bmatrix} 
+2 & 0 \\ 1 & 0 
+\end{bmatrix}, & & y_{true} = \begin{bmatrix} 
+2 & 0 \\ 1 & 1 
+\end{bmatrix},
+\end{array}
+\end{equation} %]]></script>
+
+<p>We will be reasoning about each matrix cell individually, so we can reshape (flatten) these arrays and the evaluation result won’t change.</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}
+\begin{array}{ll}
+y_{pred} = \begin{bmatrix} 
+2 \\ 0 \\ 1 \\ 0 
+\end{bmatrix}, & & y_{true} = \begin{bmatrix} 
+2 \\ 0 \\ 1 \\ 1 
+\end{bmatrix},
+\end{array}
+\end{equation} %]]></script>
+
+<p>Let’s compare horizontally-corresponding cells. We can think of each cell in the two column vectors as set, denoted with <script type="math/tex">\{ \cdot \}</script> notation:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\definecolor{red}{RGB}{255,0,0}
+\definecolor{green}{RGB}{0,150,0}
+\begin{equation}
+\begin{array}{ll}
+y_{pred} = \begin{bmatrix} 
+\{2\} \\ \{0\} \\ \{1\} \\ \{0 \}
+\end{bmatrix}, & & y_{true} = \begin{bmatrix} 
+\{2\} \\ \{0\} \\ \{1\} \\ \{1\} 
+\end{bmatrix},  & & (y_{true} + y_{pred}) = \begin{bmatrix} 
+\color{green} \{2,2\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
+\end{bmatrix}, & & (y_{true} \cap y_{pred}) =
+\begin{bmatrix}
+\{2\} \cap \{2\} \\
+\{0\} \cap \{0\} \\
+\{1\} \cap \{1\} \\
+\{0\} \cap \{1\} \\
+\end{bmatrix} = 
+ \begin{bmatrix} 
+\color{red}  \{2\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
+\end{bmatrix},
+\end{array}
+\end{equation} %]]></script>
+
+<p>To find the union of these two sets, we’ll add <script type="math/tex">y_{pred}</script> and <script type="math/tex">y_{true}</script> and then subtract the intersection:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\definecolor{red}{RGB}{255,0,0}
+\definecolor{green}{RGB}{0,150,0}
+\begin{equation}
+\begin{aligned}
+\begin{array}{ll}
+\big(y_{true} + y_{pred}\big) &- \big(y_{true} \cap y_{pred}\big) &= \big(y_{true} \cup y_{pred}\big)\\
+ \begin{bmatrix} 
+\color{green} \{2,2\}  \\ \color{green} \{0,0\}  \\ \color{green} \{1,1\}  \\ \color{green} \{0,1\}  \\
+\end{bmatrix} &- \begin{bmatrix} 
+\color{red} \{2\}  \\ \color{red} \{0\}  \\  \color{red} \{1\}  \\ \color{red} \emptyset \\
+\end{bmatrix} &= \begin{bmatrix} 
+\{2\} \\ \{0\} \\ \{1\} \\ \{0,1 \}
+\end{bmatrix}
+\end{array}
+\end{aligned}
+\end{equation} %]]></script>
+
+<p>Now that we have computed intersection and union values enforcing the spatially corresponding locations, we can throw all values into a big bag and assess.</p>
+
+<p><strong>Implementation In Numpy [2]:</strong></p>
+
+<p>We’ll start with two tensors: a model <code class="highlighter-rouge">output</code> vector (predictions) and a <code class="highlighter-rouge">target</code> vector. They must be of the same size:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">assert</span> <span class="n">output</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target</span><span class="o">.</span><span class="n">shape</span>
+</code></pre></div></div>
+<p>We can arbitrarily flatten them both to 1d arrays, since this will preserve the cell correspondences.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+</code></pre></div></div>
+<p>We end up with two column vectors:</p>
+
+<p><code class="highlighter-rouge">output = array([2, 0, 1, 0])</code> and <code class="highlighter-rouge">target = array([2, 0, 1, 1])</code>.</p>
+
+<p>We seek to know the values in cells where <code class="highlighter-rouge">output</code> and <code class="highlighter-rouge">target</code> are identical (intersection values):</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">intersection</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">output</span> <span class="o">==</span> <span class="n">target</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+</code></pre></div></div>
+<p>Thus <code class="highlighter-rouge">intersection = array([2, 0, 1])</code>.</p>
+
+<p>We’ll use <code class="highlighter-rouge">np.histogram</code> to count the number of samples in each bin for each vector. <code class="highlighter-rouge">np.histogram</code> accepts as an input of the histogram bin edges. The bin edges must be in monotonically increasing order, and include the rightmost edge.</p>
+
+<p>In a 3-class example, our three bins will be the ranges [0,1], [1,2], and [2,3], so our bin edges will be array([0, 1, 2, 3]):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">area_intersection</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">intersection</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+<p>We find <code class="highlighter-rouge">intersection</code> values fall into 3 bins: <code class="highlighter-rouge">area_intersection = array([1, 1, 1])</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">area_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">area_target</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+<p>Our bin counts for the two vectors are:</p>
+
+<p><code class="highlighter-rouge">area_target = array([1, 2, 1])</code> and <code class="highlighter-rouge">area_output = array([2, 1, 1])</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">area_union</span> <span class="o">=</span> <span class="n">area_output</span> <span class="o">+</span> <span class="n">area_target</span> <span class="o">-</span> <span class="n">area_intersection</span>
+</code></pre></div></div>
+
+<p>Sure enough, our bin counts for <code class="highlighter-rouge">area_union</code> are <code class="highlighter-rouge">array([2, 2, 1])</code> for respective classes 0,1,2, just as we expected if we were to bin the following vector:</p>
+
+<script type="math/tex; mode=display">\begin{bmatrix} 
+\{2\} \\ \{0\} \\ \{1\} \\ \{0,1 \}
+\end{bmatrix}</script>
+
+<p>Now that we have cardinality counts for intersection and union for each of the 3 classes, we can find the mIoU by computing <code class="highlighter-rouge">miou = np.mean(area_intersection / (area_union + 1e-10))</code>
+where <script type="math/tex">1^{-10}</script> is used to prevent division by zero. Our mIoU would be 0.66, since our per-class IoUs are <code class="highlighter-rouge">array([0.5, 0.5, 1. ])</code>.</p>
+
+<p>Putting the code all together:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">intersectionAndUnion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">):</span>
+    <span class="c"># 'K' classes, output and target sizes are N or N * L or N * H * W, each value in range 0 to K - 1.</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">output</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c"># flatten the tensors to 1d arrays</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">ignore_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="n">intersection</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">output</span> <span class="o">==</span> <span class="n">target</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="c"># contain the number of samples in each bin.</span>
+    <span class="n">area_intersection</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">intersection</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">area_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">area_target</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">area_union</span> <span class="o">=</span> <span class="n">area_output</span> <span class="o">+</span> <span class="n">area_target</span> <span class="o">-</span> <span class="n">area_intersection</span>
+    <span class="k">return</span> <span class="n">area_intersection</span><span class="p">,</span> <span class="n">area_union</span><span class="p">,</span> <span class="n">area_target</span>
+</code></pre></div></div>
+
+<h2 id="mean-accuracy-macc">Mean Accuracy (mAcc)</h2>
+
+<h2 id="all-accuracy-allacc">All Accuracy (allAcc)</h2>
+
+<h2 id="frequency-weighted-intersection-over-union-fwiou">Frequency Weighted Intersection-over-Union (fwIoU)</h2>
+
+<p>We often have a background label we’ll ignore, so identify the locations in the label (“target”) where the ground truth class was void/background/unlabeled (=255, in our case) and set each value of our predictions (model “output”) to 255 also, to ignore these values.</p>
+
+<p>area_intersection will hold counts of correct predictions for each class.
+area_output will hold counts of predictions for each class.
+area_target will hold counts of how many pixels belong to each class in the ground truth.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    iou_class = intersection_meter.sum / (union_meter.sum + 1e-10)
+    accuracy_class = intersection_meter.sum / (target_meter.sum + 1e-10)
+    mIoU = np.mean(iou_class)
+    mAcc = np.mean(accuracy_class)
+    allAcc = sum(intersection_meter.sum) / (sum(target_meter.sum) + 1e-10)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">intersectionAndUnion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">):</span>
+    <span class="c"># 'K' classes, output and target sizes are N or N * L or N * H * W, each value in range 0 to K - 1.</span>
+    <span class="k">assert</span> <span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">output</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">target</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">ignore_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="n">intersection</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">output</span> <span class="o">==</span> <span class="n">target</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">area_intersection</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">intersection</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">area_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">area_target</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">area_union</span> <span class="o">=</span> <span class="n">area_output</span> <span class="o">+</span> <span class="n">area_target</span> <span class="o">-</span> <span class="n">area_intersection</span>
+    <span class="k">return</span> <span class="n">area_intersection</span><span class="p">,</span> <span class="n">area_union</span><span class="p">,</span> <span class="n">area_target</span>
+</code></pre></div></div>
+
+<h2 id="state-of-the-art-method-pyramid-scene-parsing-network-pspnet">State-of-the-Art Method: Pyramid Scene Parsing Network (PSPNet)</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span> <span class="nn">model.resnet</span> <span class="k">as</span> <span class="n">models</span>
+</code></pre></div></div>
+
+<h2 id="the-pyramid-pooling-module">The Pyramid Pooling Module</h2>
+
+<p>Effective global contextual prior…</p>
+
+<p>a hierarchical global prior, containing information with different scales and varying among different sub-regions.</p>
+
+<p>The pyramid pooling module fuses features under four different pyramid scales.</p>
+
+<p>The coarsest level highlighted in red is global pooling to generate a single bin output. The following pyramid level separates the feature map into different sub-regions and forms pooled representation for different locations. The output of different levels in the pyramid pooling module contains the feature map with varied sizes. To maintain the weight of global feature, we use 1×1 convolution layer after each pyramid level to reduce the dimension of context representation to 1/N of the original one if the level size of pyramid is N</p>
+
+<p>e directly upsample the low-dimension feature maps to get the same size feature as the original feature map via bilinear interpolation</p>
+
+<p>Our pyramid pooling module (PPM) is a four-level one with bin sizes of 1×1, 2×2, 3×3 and 6×6 respectively.</p>
+
+<p>In short, the PPM utilizes <code class="highlighter-rouge">nn.AdaptiveAvgPool2d(bin)</code> to break an image into (bin x bin) subregions, and then pools all entries inside each subregion.</p>
+
+<p>For a <script type="math/tex">1 \times 1</script> bin, we simply obtain the average pixel value for a 1-channel feature map:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">torch</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pool</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveAvgPool2d</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">],[</span><span class="mf">3.</span><span class="p">,</span><span class="mf">4.</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
+<span class="n">tensor</span><span class="p">([[[[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">]]]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">tensor</span><span class="p">([[[[</span><span class="mf">2.5000</span><span class="p">]]]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span>  <span class="o">+</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span>
+<span class="mf">2.5</span>
+</code></pre></div></div>
+
+<p>For an output size of <script type="math/tex">3 \times 2</script>, we’ll find the following behavior:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">torch</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">48</span><span class="p">)))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
+<span class="n">tensor</span><span class="p">([</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">6.</span><span class="p">,</span>  <span class="mf">7.</span><span class="p">,</span>  <span class="mf">8.</span><span class="p">,</span>  <span class="mf">9.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="mf">11.</span><span class="p">,</span> <span class="mf">12.</span><span class="p">,</span> <span class="mf">13.</span><span class="p">,</span>
+        <span class="mf">14.</span><span class="p">,</span> <span class="mf">15.</span><span class="p">,</span> <span class="mf">16.</span><span class="p">,</span> <span class="mf">17.</span><span class="p">,</span> <span class="mf">18.</span><span class="p">,</span> <span class="mf">19.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">21.</span><span class="p">,</span> <span class="mf">22.</span><span class="p">,</span> <span class="mf">23.</span><span class="p">,</span> <span class="mf">24.</span><span class="p">,</span> <span class="mf">25.</span><span class="p">,</span> <span class="mf">26.</span><span class="p">,</span> <span class="mf">27.</span><span class="p">,</span>
+        <span class="mf">28.</span><span class="p">,</span> <span class="mf">29.</span><span class="p">,</span> <span class="mf">30.</span><span class="p">,</span> <span class="mf">31.</span><span class="p">,</span> <span class="mf">32.</span><span class="p">,</span> <span class="mf">33.</span><span class="p">,</span> <span class="mf">34.</span><span class="p">,</span> <span class="mf">35.</span><span class="p">,</span> <span class="mf">36.</span><span class="p">,</span> <span class="mf">37.</span><span class="p">,</span> <span class="mf">38.</span><span class="p">,</span> <span class="mf">39.</span><span class="p">,</span> <span class="mf">40.</span><span class="p">,</span> <span class="mf">41.</span><span class="p">,</span>
+        <span class="mf">42.</span><span class="p">,</span> <span class="mf">43.</span><span class="p">,</span> <span class="mf">44.</span><span class="p">,</span> <span class="mf">45.</span><span class="p">,</span> <span class="mf">46.</span><span class="p">,</span> <span class="mf">47.</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pool</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveAvgPool2d</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">tensor</span><span class="p">([[[[</span> <span class="mf">5.5000</span><span class="p">,</span>  <span class="mf">9.5000</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">21.5000</span><span class="p">,</span> <span class="mf">25.5000</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">37.5000</span><span class="p">,</span> <span class="mf">41.5000</span><span class="p">]]]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
+<span class="n">tensor</span><span class="p">([[[[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">6.</span><span class="p">,</span>  <span class="mf">7.</span><span class="p">],</span>
+          <span class="p">[</span> <span class="mf">8.</span><span class="p">,</span>  <span class="mf">9.</span><span class="p">,</span> <span class="mf">10.</span><span class="p">,</span> <span class="mf">11.</span><span class="p">,</span> <span class="mf">12.</span><span class="p">,</span> <span class="mf">13.</span><span class="p">,</span> <span class="mf">14.</span><span class="p">,</span> <span class="mf">15.</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">16.</span><span class="p">,</span> <span class="mf">17.</span><span class="p">,</span> <span class="mf">18.</span><span class="p">,</span> <span class="mf">19.</span><span class="p">,</span> <span class="mf">20.</span><span class="p">,</span> <span class="mf">21.</span><span class="p">,</span> <span class="mf">22.</span><span class="p">,</span> <span class="mf">23.</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">24.</span><span class="p">,</span> <span class="mf">25.</span><span class="p">,</span> <span class="mf">26.</span><span class="p">,</span> <span class="mf">27.</span><span class="p">,</span> <span class="mf">28.</span><span class="p">,</span> <span class="mf">29.</span><span class="p">,</span> <span class="mf">30.</span><span class="p">,</span> <span class="mf">31.</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">32.</span><span class="p">,</span> <span class="mf">33.</span><span class="p">,</span> <span class="mf">34.</span><span class="p">,</span> <span class="mf">35.</span><span class="p">,</span> <span class="mf">36.</span><span class="p">,</span> <span class="mf">37.</span><span class="p">,</span> <span class="mf">38.</span><span class="p">,</span> <span class="mf">39.</span><span class="p">],</span>
+          <span class="p">[</span><span class="mf">40.</span><span class="p">,</span> <span class="mf">41.</span><span class="p">,</span> <span class="mf">42.</span><span class="p">,</span> <span class="mf">43.</span><span class="p">,</span> <span class="mf">44.</span><span class="p">,</span> <span class="mf">45.</span><span class="p">,</span> <span class="mf">46.</span><span class="p">,</span> <span class="mf">47.</span><span class="p">]]]])</span>
+</code></pre></div></div>
+
+<p>We can easily verify the first three entries of the pooled feature map:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="p">(</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">+</span> <span class="mi">9</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">+</span> <span class="mi">11</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">8</span>
+<span class="mf">5.5</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="mi">17</span> <span class="o">+</span> <span class="mi">18</span> <span class="o">+</span> <span class="mi">19</span> <span class="o">+</span> <span class="mi">24</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">+</span> <span class="mi">26</span> <span class="o">+</span> <span class="mi">27</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span>
+<span class="mf">21.5</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">(</span><span class="mi">32</span> <span class="o">+</span> <span class="mi">33</span> <span class="o">+</span> <span class="mi">34</span> <span class="o">+</span> <span class="mi">35</span> <span class="o">+</span> <span class="mi">40</span> <span class="o">+</span> <span class="mi">41</span> <span class="o">+</span> <span class="mi">42</span> <span class="o">+</span> <span class="mi">43</span><span class="p">)</span><span class="o">/</span><span class="mi">8</span>
+<span class="mf">37.5</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fea_dim</span> <span class="o">=</span> <span class="mi">2048</span>
+<span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">ppm</span> <span class="o">=</span> <span class="n">PPM</span><span class="p">(</span><span class="n">fea_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">fea_dim</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)),</span> <span class="n">bins</span><span class="p">,</span> <span class="n">BatchNorm</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PPM</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">,</span> <span class="n">reduction_dim</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">BatchNorm</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PPM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="nb">bin</span> <span class="ow">in</span> <span class="n">bins</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveAvgPool2d</span><span class="p">(</span><span class="nb">bin</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">reduction_dim</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">BatchNorm</span><span class="p">(</span><span class="n">reduction_dim</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x_size</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">mode</span><span class="o">=</span><span class="s">'bilinear'</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PSPNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zoom_factor</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">use_ppm</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">(</span><span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">BatchNorm</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PSPNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">layers</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">152</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="mi">2048</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="n">classes</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">zoom_factor</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zoom_factor</span> <span class="o">=</span> <span class="n">zoom_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_ppm</span> <span class="o">=</span> <span class="n">use_ppm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">BatchNorm</span> <span class="o">=</span> <span class="n">BatchNorm</span>
+
+        <span class="k">if</span> <span class="n">layers</span> <span class="o">==</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">resnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet50</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">pretrained</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">layers</span> <span class="o">==</span> <span class="mi">101</span><span class="p">:</span>
+            <span class="n">resnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet101</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">pretrained</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">resnet</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet152</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="n">pretrained</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer0</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">resnet</span><span class="o">.</span><span class="n">conv1</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">bn1</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">conv2</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">bn2</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">conv3</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">bn3</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">maxpool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer4</span> <span class="o">=</span> <span class="n">resnet</span><span class="o">.</span><span class="n">layer1</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">layer2</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">layer3</span><span class="p">,</span> <span class="n">resnet</span><span class="o">.</span><span class="n">layer4</span>
+
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s">'conv2'</span> <span class="ow">in</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">dilation</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">stride</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s">'downsample.0'</span> <span class="ow">in</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">stride</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer4</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s">'conv2'</span> <span class="ow">in</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">dilation</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">stride</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s">'downsample.0'</span> <span class="ow">in</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">stride</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">fea_dim</span> <span class="o">=</span> <span class="mi">2048</span>
+        <span class="k">if</span> <span class="n">use_ppm</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ppm</span> <span class="o">=</span> <span class="n">PPM</span><span class="p">(</span><span class="n">fea_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">fea_dim</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)),</span> <span class="n">bins</span><span class="p">,</span> <span class="n">BatchNorm</span><span class="p">)</span>
+            <span class="n">fea_dim</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">fea_dim</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+            <span class="n">BatchNorm</span><span class="p">(</span><span class="mi">512</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aux</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+                <span class="n">BatchNorm</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">x_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">x_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x_size</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_factor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x_size</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">8</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_factor</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer0</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x_tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer3</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer4</span><span class="p">(</span><span class="n">x_tmp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_ppm</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ppm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_factor</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s">'bilinear'</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="n">aux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aux</span><span class="p">(</span><span class="n">x_tmp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_factor</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">aux</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s">'bilinear'</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">main_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">aux_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="n">main_loss</span><span class="p">,</span> <span class="n">aux_loss</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span>
+</code></pre></div></div>
+<h2 id="deeplabv3">DeepLabv3</h2>
+
+<p>The Atrous Spatial Pyramid Pooling (ASPP) module, as implemented <a href="https://github.com/pytorch/vision/blob/master/torchvision/models/segmentation/deeplabv3.py#L64">here</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ASPP</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">atrous_rates</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ASPP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="n">out_channels</span> <span class="o">=</span> <span class="mi">256</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_channels</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()))</span>
+
+        <span class="n">rate1</span><span class="p">,</span> <span class="n">rate2</span><span class="p">,</span> <span class="n">rate3</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">atrous_rates</span><span class="p">)</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ASPPConv</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">rate1</span><span class="p">))</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ASPPConv</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">rate2</span><span class="p">))</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ASPPConv</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">rate3</span><span class="p">))</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ASPPPooling</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">convs</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_channels</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">conv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convs</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="separable-vs-a-trous-convolutions">Separable vs. A Trous Convolutions</h2>
+
+<p>DeepLab dataset and paper</p>
+
+<p>L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully con- nected crfs. IEEE transactions on pattern analysis and ma- chine intelligence, 40(4):834–848, 2018.</p>
+
+<h2 id="references">References</h2>
+
+<p>[1].  Wikipedia. <em>Jaccard Index</em>. <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Union_of_sets_A_and_B.svg/400px-Union_of_sets_A_and_B.svg.png">Link</a>.</p>
+
+<p>[2]. Hengshuang Zhao. <code class="highlighter-rouge">semseg</code> repository. <a href="https://github.com/hszhao/semseg/blob/master/util/util.py">Link</a>.</p>
+
+<p>[3] Jonathan Long, Evan Shelhamer, Trevor Darrell. <em>Fully Convolutional Networks for Semantic Segmentation</em>. CVPR 2015. <a href="https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf">PDF</a>.</p>
+
+<p>[4] Liang-Chieh Chen, George Papandreou, Florian Schroff, Hartwig Adam. Rethinking Atrous Convolution for Semantic Image Segmentation. <a href="https://arxiv.org/abs/1706.05587">PDF</a>.</p>
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+  
+  
+  <!-- disqus comments -->
+<!--   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
