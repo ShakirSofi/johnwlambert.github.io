@@ -466,12 +466,50 @@ class PSPNet(nn.Module):
         else:
             return x
 ```
+## DeepLabv3
 
+The Atrous Spatial Pyramid Pooling (ASPP) module, as implemented [here](https://github.com/pytorch/vision/blob/master/torchvision/models/segmentation/deeplabv3.py#L64).
+
+```python
+class ASPP(nn.Module):
+    def __init__(self, in_channels, atrous_rates):
+        super(ASPP, self).__init__()
+        out_channels = 256
+        modules = []
+        modules.append(nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, 1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()))
+
+        rate1, rate2, rate3 = tuple(atrous_rates)
+        modules.append(ASPPConv(in_channels, out_channels, rate1))
+        modules.append(ASPPConv(in_channels, out_channels, rate2))
+        modules.append(ASPPConv(in_channels, out_channels, rate3))
+        modules.append(ASPPPooling(in_channels, out_channels))
+
+        self.convs = nn.ModuleList(modules)
+
+        self.project = nn.Sequential(
+            nn.Conv2d(5 * out_channels, out_channels, 1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(),
+            nn.Dropout(0.5))
+
+    def forward(self, x):
+        res = []
+        for conv in self.convs:
+            res.append(conv(x))
+        res = torch.cat(res, dim=1)
+        return self.project(res)
+```
 
 
 ## Separable vs. A Trous Convolutions
 
 DeepLab dataset and paper
+
+
+
 
 L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully con- nected crfs. IEEE transactions on pattern analysis and ma- chine intelligence, 40(4):834–848, 2018.
 
@@ -483,3 +521,4 @@ L.-C. Chen, G. Papandreou, I. Kokkinos, K. Murphy, and A. L. Yuille. Deeplab: Se
 
 [3] Jonathan Long, Evan Shelhamer, Trevor Darrell. *Fully Convolutional Networks for Semantic Segmentation*. CVPR 2015. [PDF](https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf).
 
+[4] Liang-Chieh Chen, George Papandreou, Florian Schroff, Hartwig Adam. Rethinking Atrous Convolution for Semantic Image Segmentation. [PDF](https://arxiv.org/abs/1706.05587).

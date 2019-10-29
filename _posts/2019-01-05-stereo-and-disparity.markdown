@@ -136,6 +136,9 @@ $$
 
 ## References
 
+
+Computing the Stereo Matching Cost with a Convolutional Neural Network. Jure Zbontar  and Yann LeCun. [PDF](https://arxiv.org/pdf/1409.4326.pdf).
+
 [1] Richard Szeliski. 
 
 [2] James Hays. [PDF](https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf).
