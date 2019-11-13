@@ -53,3 +53,10 @@ K(x,z) = \phi(x)^T \phi(z)
 $$
 which contains all of the cross-product terms.
 
+
+## References
+
+[1]. Christopher J.C. Burges. A Tutorial on Support Vector Machines for Pattern Recognition. [PDF](https://www.di.ens.fr/~mallat/papiers/svmtutorial.pdf).
+
+
+
