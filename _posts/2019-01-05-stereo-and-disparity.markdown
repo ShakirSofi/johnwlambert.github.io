@@ -104,6 +104,17 @@ Unfortunately, just because we know
 The matching cost is the squared difference of intensity values at a given disparity.
 
 
+
+## SSD or SAD is only the beginning
+
+SSD/SAD suffers from... large "blobs" of disparities, can have areas of large error in textureless regions. fail in shadows
+
+MC-CNN can... show fine structures. succeed in shadows.
+
+Too small a window might not be able to distinguish unique features of an image, but too large a window would mean many patches would likely have many more things in common, leading to less helpful matches.
+
+
+
 ## Cost Volumes
 
 Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Scharstein et al. 2008)
