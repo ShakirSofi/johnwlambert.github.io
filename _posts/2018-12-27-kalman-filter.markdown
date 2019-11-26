@@ -50,3 +50,20 @@ y_t = Cx_t + Du_t + v_t, & v_t \sim \mathcal{N}(O, R)
 \end{equation}
 where $w_t, v_t$ are zero-mean white noise
 
+
+## Practical Example: Tracking 3D Bounding Boxes with Constant Velocity
+
+
+[A Baseline for 3D Multi-Object Tracking](https://github.com/xinshuoweng/AB3DMOT)
+
+
+## Practical Example: 3D Tracking with ICP
+
+
+
+[Argoverse Tracking Baseline](https://github.com/alliecc/argoverse_baselinetracker)
+
+
+
+
+

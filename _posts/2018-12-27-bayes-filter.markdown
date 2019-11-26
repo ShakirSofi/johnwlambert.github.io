@@ -122,6 +122,8 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
   </div>
 </div>
 
+## Bayes Estimator Derivation
+
 We'll now derive the recursion, which iterates upon the previous timesteps. The key insight is that **we can factor Bayes Rule via conditional independence.**
 
 Suppose we have observed a measurement $$y$$ for $$t-1$$ timesteps. In the **previous time step** we had posterior:
@@ -146,20 +148,31 @@ $$
 p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) p(y_{1:t-1} \mid x) p(x)}{\int\limits_x  p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}
 $$
 
-Rewrite it in terms of the posterior from the previous time step. We see the previous time step's posterior also included $$p(y_{1:t-1} \mid x) p(x)$$ (the unnormalized previous time step posterior)
-
+At this point, we may divide the numerator and denominator by any quantity of our choice, without changing the value of the expression. Suppose we choose (conveniently, as we'll see) to divide both by $$\int\limits_x p(y_{1:t-1}\mid x)p(x) dx $$:
 
 $$
-p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) \frac{p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }{ \frac{\int\limits_x p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }
+p(x \mid y_{1:t})  = \frac{ p(y_t \mid x) p(y_{1:t-1} \mid x) p(x)}{\int\limits_x  p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx} = \frac{ p(y_t \mid x) \frac{p(y_{1:t-1} \mid x) p(x)}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }{ \frac{\int\limits_x p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }
 $$
 
-Since constant w.r.t integral, can combine integrals, and see previous posterior in the denominator. Get:
+Now we will do a bit of simplification, which will allow us to rewrite this expression *in terms of the posterior from the previous time step*, i.e. $$p(x \mid y_{1:t-1})$$. We see the previous time step's posterior also included $$p(y_{1:t-1} \mid x) p(x)$$ (the unnormalized previous time step posterior). We can simplify as follows:
+
+$$
+p(x \mid y_{1:t}) = \frac{ p(y_t \mid x) p(x \mid y_{1:t-1}) }{ \frac{\int\limits_x p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) dx}{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} }
+$$
+
+We can now combine these integrals into a single integral (since constant w.r.t. integral):
+
+$$
+p(x \mid y_{1:t}) = \frac{ p(y_t \mid x) p(x \mid y_{1:t-1}) }{ \int\limits_x \frac{ p(y_t \mid x) p(y_{1:t-1} \mid x) p(x) }{ \int\limits_x p(y_{1:t-1}\mid x)p(x) dx} dx} = \frac{ p(y_t \mid x) p(x \mid y_{1:t-1}) }{ \int\limits_x p(y_t \mid x) \frac{  p(y_{1:t-1} \mid x) p(x) }{\int\limits_x p(y_{1:t-1}\mid x)p(x) dx} dx}
+$$
+
+When grouped differently, as shown on the far right, we see the previous posterior lurking in its unsimplified form in the denominator. We can use its simplified form to show:
 
 $$
 p(x \mid y_{1:t}) = \frac{p(y_t \mid x) p(x \mid y_{1:t-1})}{ \int\limits_x p(y_t \mid x) p(x \mid y_{1:t-1})dx} = f\Bigg(y_t, p(x \mid y_{1:t-1}) \Bigg)
 $$
 
-In the recursive Bayes Filter, the prior is just the posterior from the previous time step. Thus, we have the following loop: **Measure->Estimate->Measure->Estimate...**. We only got this from conditional independence of measurements, given the state. The graphical model is Naive Bayes.
+In the recursive Bayes Estimator, the prior is just the posterior from the previous time step. Thus, we have the following loop: **Measure->Estimate->Measure->Estimate...**. We only got this from conditional independence of measurements, given the state. The graphical model is Naive Bayes.
 
 <a name='pgm-bayes-filter'></a>
 

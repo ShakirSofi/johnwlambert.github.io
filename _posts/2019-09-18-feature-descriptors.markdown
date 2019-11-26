@@ -318,7 +318,7 @@ We can define this nearest neighbor distance ratio (Mikolajczyk and Schmid 2005)
 Once we have some hypothetical (putative) matches, we can often use geometric alignment (Section 6.1) to verify which matches are inliers and which ones are outliers.
 
 
-
+OpenCV's SIFT C++ implementation (optimized for SIMD instructions) can be found [here](https://github.com/opencv/opencv_contrib/blob/master/modules/xfeatures2d/src/sift.cpp). 
 
 
 

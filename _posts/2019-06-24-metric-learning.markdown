@@ -85,6 +85,105 @@ max-margin
 
 ## Contrastive Loss
 
+A contrastive loss includes bo
+
+Compute contrastive loss with push term for different class pairs and pull term for same-class pairs. Push term says if pair elements come from separate classes, push embeddings apart. Pull term says if pair elements come from the same class, pull embeddings together. Sum losses as contrastive loss*
+
+We could implement such a contrastive loss in Pytorch as follows
+
+
+		Contrastive loss also defined in:
+		-	"Dimensionality Reduction by Learning an Invariant Mapping" 
+				by Raia Hadsell, Sumit Chopra, Yann LeCun
+
+
+```python
+
+def contrastive_loss(y_c: torch.Tensor, pred_dists: torch.Tensor, margin: int = 1) -> torch.Tensor:
+    """
+        Compute the similarities in the separation loss by 
+        computing average pairwise similarities between points
+        in the embedding space.
+
+		element-wise square, element-wise maximum of two tensors.
+
+        Args:
+        -   y_c: Indicates if pairs share the same semantic class label or not
+        -   pred_dists: Distances in the embeddding space between pairs. 
+
+        Returns:
+        -   tensor representing contrastive loss value.
+    """
+    N = pred_dists.shape[0]
+
+    # corresponds to "d" in the paper. If same class, pull together.
+    # Zero loss if all same-class examples have zero distance between them.
+    pull_losses = y_c * torch.pow(pred_dists, 2)
+    # corresponds to "k" in the paper. If different class, push apart more than margin
+    # if semantically different examples have distances are in [0,margin], then there WILL be loss
+    zero = torch.zeros(N)
+    device = y_c.device
+    zero = zero.to(device)
+    clamped_dists = torch.max(margin - pred_dists, zero )
+    push_losses = (1 - y_c) * torch.pow(clamped_dists, 2)
+    return torch.mean(pull_losses + push_losses)
+
+```
+
+Consider 5 data points: 2 belong to the same class, and the rest belong to different classes. 
+
+```python
+
+def test_contrastive_loss1():
+    """
+    Should be no loss here (zero from pull term, and zero from push term)
+    """
+    # which pairs share the same semantic class label
+    y_c = torch.tensor([ 1., 0., 0., 0., 1.], dtype=torch.float32)
+
+    # distances between pairs
+    pred_dists = torch.tensor([0, 1.1, 1.1, 1.1, 0], dtype=torch.float32)
+
+    loss = contrastive_loss(y_c, pred_dists)
+    gt_loss = torch.tensor([0])
+
+    assert torch.allclose(loss, gt_loss)
+```
+
+```python
+def test_contrastive_loss2():
+    """ 
+    There should be more loss here (coming only from push term)
+    """
+    # which pairs share the same semantic class label
+    y_c = torch.tensor([ 1., 0., 0., 0., 1.], dtype=torch.float32)
+
+    # distances between pairs
+    pred_dists = torch.tensor([0, 0.2, 0.3, 0.1, 0], dtype=torch.float32)
+
+    loss = contrastive_loss(y_c, pred_dists)
+    gt_loss = torch.tensor([0.3880])
+
+    assert torch.allclose(loss, gt_loss, atol=1e-3)
+```
+
+```python
+def test_contrastive_loss3():
+    """
+    There should be the most loss here (some from pull term, and some from push term also)
+    """
+    # which pairs share the same semantic class label
+    y_c = torch.tensor([ 1., 0., 0., 0., 1.], dtype=torch.float32)
+
+    # distances between pairs
+    pred_dists = torch.tensor([2.0, 0.2, 0.3, 0.1, 4.0], dtype=torch.float32)
+
+    loss = contrastive_loss(y_c, pred_dists)
+    gt_loss = torch.tensor([4.3880])
+
+    assert torch.allclose(loss, gt_loss, atol=1e-3)
+
+```
 
 
 ## Triplet Loss
