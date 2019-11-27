@@ -45,6 +45,10 @@ It will take a fair amount of work to derive the analytical formulas of the Baye
 
 ## Kalman Filter Derivation
 
+
+
+
+
 ## Jointly Guassian Random Vectors
 
 
@@ -62,8 +66,8 @@ $$
 \end{array}
 $$
 
-\item Ultimately, we would like to compute $p(x \mid y)$, the Bayesian estimate of $X \mid Y$
-\item
+Ultimately, we would like to compute $$p(x \mid y)$$, the Bayesian estimate of $$X \mid Y$$
+
 \begin{equation}
 \begin{aligned}
 \mu_x = E[X] \\
@@ -74,14 +78,22 @@ $$
 \Sigma_{YX} = Cov(Y,X) = \Sigma_{XY}^T
 \end{aligned}
 \end{equation}
-\item Claim: The marginals are Gaussian:
+
+Claim: The marginals are Gaussian:
 \begin{equation}
 X \sim p(x) = \int_y p(x,y) dx = \mathcal{N}(\mu_x, \Sigma_x)
 \end{equation}
 \begin{equation}
 Y \sim p(y) = \int_x p(x,y)dx = \mathcal{N}(\mu_y, \Sigma_y)
 \end{equation}
-\item The Conditionals are also Gaussian:
+
+## Conditional Gaussian Multivariate Variables
+
+The Conditionals are also Gaussian [see here](https://stats.stackexchange.com/questions/30588/deriving-the-conditional-distributions-of-a-multivariate-normal-distribution):
+
+We will recognize the Schur complement [Boyd, A.5.5](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
+
+
 \begin{equation}
 X \mid Y \sim p(x \mid y) = \mathcal{N}(\mu_{x\mid y}, \Sigma_{x \mid y})
 \end{equation}
@@ -220,9 +232,9 @@ Determinant Identities:
 |A B| = |A| |B|
 \end{equation}
 
-\begin{equation}
+$$
 |\begin{bmatrix} A & 0 \\ 0 & B \end{bmatrix}| = |A| |B|
-\end{equation}
+$$
 
 
 $$
@@ -255,29 +267,25 @@ p(y) = \int_x p(x,y) dx \\
 \end{equation}
 
 
-
-
-We recall that a conditional multivariate Gaussian distribution $X \mid Y$ has a pdf parameterized as follows:
+We recall that a conditional multivariate Gaussian distribution $$X \mid Y$$ has a pdf parameterized as follows:
 
 \begin{equation}
 p(x \mid y) = \mathcal{N}(\mu_{x\mid y}, \Sigma_{x \mid y}) = \mathcal{N} \Bigg(\mu_x + \Sigma_{xy}\Sigma_{yy}^{-1}(y-\mu_y),  \Sigma_{xx} - \Sigma_{xy} \Sigma_{yy}^{-1}\Sigma_{yx} \Bigg)
 \end{equation}
 $\mu_x, \Sigma_x$ are the priors.
 
-if $\Sigma_y$ is small, then inverse is huge, reduce uncertainty a lot...
-\item Measurement reduces uncertainty in $X$ proportionally to $\Sigma_y^{-1}$
-\item Never do worse than your prior -- even crappy measurement is good
-\item Shrink error ellipsoid as you get a measurement
-\item We trust it by amount weighted by inverse of our confidence in the measurement
-\item Mostly keep prior if high amount of uncertainty (so add very little, because $\Sigma^{-1}$ is small)
-\item Not realistic to know the joint distribution:
+if $$\Sigma_y$$ is small, then inverse is huge, reduce uncertainty a lot...
+\item Measurement reduces uncertainty in $$X$$ proportionally to $$\Sigma_y^{-1}$$
 
-\begin{equation}
+Never do worse than your prior -- even crappy measurement is good. Shrink error ellipsoid as you get a measurement. We trust it by amount weighted by inverse of our confidence in the measurement. Mostly keep prior if high amount of uncertainty (so add very little, because $$\Sigma^{-1}$$ is small). Not realistic to know the joint distribution:
+
+$$
 \begin{array}{ll}
 \Sigma  = \begin{bmatrix} \Sigma_x & \Sigma_{xy} \\ \Sigma_{yx} & \Sigma_y  \end{bmatrix}, \mu = \begin{bmatrix} \mu_x \\ \mu_y \end{bmatrix}
 \end{array}
-\end{equation}
-\item Bayes Rule says
+$$
+
+Bayes Rule says:
 
 \begin{equation}
 p(x \mid y) = \frac{p(y \mid x) p(x)}{ \int_x p(y \mid x)p(x) dx}
@@ -297,13 +305,14 @@ p(y \mid x) = \mathcal{N}( \mu_{y \mid x}, \Sigma_{y \mid x})
 \begin{equation}
 (X,Y) \sim \mathcal{N}(\mu, \Sigma)
 \end{equation}
-\item Theorem: $(X,Y)$ are jointly Gaussian iff $\exists C,M$ and r.v. $V,N$ such that
+
+Theorem: $$(X,Y)$$ are jointly Gaussian iff $$\exists C,M$$ and r.v. $$V,N$$ such that
 \begin{equation}
 \begin{array}{ll}
 Y = CX + V, & X = MY + N
 \end{array}
 \end{equation}
-where $ C \in \mathbb{R}^{m \times n}$ and $M \in \mathbb{R}^{n \times m}$
+where $$ C \in \mathbb{R}^{m \times n}$$ and $$M \in \mathbb{R}^{n \times m}$$
 \begin{equation}
 \begin{aligned}
 V \sim \mathcal{N}(\mu_v, R) \\
@@ -312,22 +321,28 @@ Cov(X,V) = 0 \\
 Cov(Y,N) = 0
 \end{aligned}
 \end{equation}
-\item Gaussian property is deeply linked to linearity!
-\item Projection of vectors onto different directions (Gaussian random variable can be projected)
-\item Project $Y$ into the direction of $X$ (this is what $CX$ does)
-\item $V$ is the leftover part of $Y$ that is orthogonal to $X$
-\item Orthogonality of Gaussian R.V.s: covariance is zero. No way to use one to predict the other (can derive formally as inner product in vector space)
-\end{itemize}
-\subsection{Linear Control Systems}
-\begin{itemize}
-\item 
+
+Gaussian property is deeply linked to linearity!
+
+Projection of vectors onto different directions (Gaussian random variable can be projected)
+
+Project $$Y$$ into the direction of $X$ (this is what $CX$ does)
+
+$$V$$ is the leftover part of $Y$ that is orthogonal to $X$
+
+Orthogonality of Gaussian R.V.s: covariance is zero. No way to use one to predict the other (can derive formally as inner product in vector space)
+
+
+## Linear Control Systems
+
 \begin{equation}
 \begin{aligned}
 \dot{x} = Ax + Bu \\
 y = Cx + Du
 \end{aligned}
 \end{equation}
-\item We use the discrete-timve version in this class, not the continuous form
+
+We use the discrete-timve version in this class, not the continuous form
 
 \begin{equation}
 \begin{aligned}
@@ -416,14 +431,12 @@ where $\Sigma_x$ is the prior covaraince, and the other threee terms $C,C^T,R$ a
 \end{aligned}
 \end{equation}
 
-for $(X,Y)$ jointly Gaussian $\Sigma{xv} = 0$, we have
+for $$(X,Y)$$ jointly Gaussian $$\Sigma{xv} = 0$$, we have
 \begin{equation}
 \Sigma_{xy} = \Sigma_x C^T
 \end{equation}
-\end{itemize}
-\subsection{Bayes Rule for Jointly Gaussian Random Vectors}
-\begin{itemize}
-\item 
+
+## Bayes Rule for Jointly Gaussian Random Vectors
 
 \begin{equation}
 \mu_{x \mid y} = \mu_x + \Sigma_X C^T \Bigg( C \Sigma_x C^T + R)^{-1} (y - [C \mu_x + \mu_v] \Bigg)
@@ -442,43 +455,49 @@ with $V \sim \mathcal{N}(\mu_v, R)$ and $Cov(X,V) = 0$
 \item $Y=CX+V$ is guaranteed because these two variables are JOINTLY gaussian. Can see this as a projection
 \item We know prior: $(\mu_x, \Sigma_x)$
 \item From the measurement equation, we know $C, \mu_v, R$
-\end{itemize}
-\subsection{Kalman Filters}
-\begin{itemize}
-\item What is the connection between $Y=CX+V$ and $p(y \mid x)$
-\item $p(y \mid x) \sim \mathcal{N}(\mu_{y \mid x}, \Sigma_{y \mid x})$
-\item 
-\begin{equation}
+
+## Kalman Filters
+
+What is the connection between $$Y=CX+V$$ and $$p(y \mid x)$$?
+
+$$p(y \mid x) \sim \mathcal{N}(\mu_{y \mid x}, \Sigma_{y \mid x})$$
+
+$$
 \begin{aligned}
 \mu_{y \mid x } = \mathbb{E}[Y \mid X=x] \\= \mathbb{E}[CX + V \mid X=x] \\= \mathbb{E}[CX \mid X=x] + \mathbb{E}[V \mid X=x]  \\=  \mathbb{E}[CX \mid X=x] + \mathbb{E}[V ]  \\
 \mu_{y \mid x } = Cx + \mu_v
 \end{aligned}
-\end{equation}
+$$
+
 because uncorrelated means independent for Gaussians
-\item 
-\begin{equation}
+
+$$
 \begin{aligned}
 \Sigma_{Y \mid X} = \mathbb{E}\Bigg[ (Y-\mu_{y \mid x}) (Y-\mu_{y \mid x})^T \mid X=x \Bigg] \\
 = \mathbb{E}\Bigg[ (CX+V-\mu_{y \mid x}) (CX+V-\mu_{y \mid x})^T  \mid X=x \Bigg] \\
 = \mathbb{E}\Bigg[ (CX+V-Cx - \mu_v) (CX+V-CX - \mu_v )^T  \mid X=x \Bigg] \\
 = R
 \end{aligned}
-\end{equation}
+$$
 So measurement equation encodes the measurement likelihood
-\item When given $x$, so lock down in $p(y \mid x)$, all randomness comes from noise $V$
-\item Since $(X,Y) \sim \mathcal{N}(\mu, \Sigma)$, then $\exists M \in \mathbb{R}^{n \times n}, N \sim \mathcal{N}(\mu_N, \Sigma_N)$ s.t.
+
+When given $$x$$, so lock down in $$p(y \mid x)$$, all randomness comes from noise $$V$$
+
+Since $$(X,Y) \sim \mathcal{N}(\mu, \Sigma)$$, then $$\exists M \in \mathbb{R}^{n \times n}, N \sim \mathcal{N}(\mu_N, \Sigma_N)$$ s.t.
 \begin{equation}
 \begin{array}{ll}
 X = MY + N, & Cov(Y,N) = 0
 \end{array}
 \end{equation}
-\item We don't know these things though! But the equation is still valid. Linear in $Y$, with the following $M$
-\item Why not compute
+
+We don't know these things though! But the equation is still valid. Linear in $$Y$$, with the following $$M$$
+
+Why not compute
 \begin{equation}
 p(x \mid y) = \mathcal{N}\Big(  \mu_{x \mid y}, \Sigma_{x \mid y}\Big)
 \end{equation}
-\item where $M = \Sigma_x C^T (C \Sigma_x C^T + R)^{-1}$
-\item 
+where $M = \Sigma_x C^T (C \Sigma_x C^T + R)^{-1}$
+
 where $\mu+N$ is
 \begin{equation}
 \mu_N  = \mu_x - (\Sigma_x \cdots) (C \mu_x - \mu_v)
@@ -487,12 +506,13 @@ and
 \begin{equation}
 \Sigma_{x \mid y} = \Sigma_N
 \end{equation}
-\item and $\mu_{x \mid y} = My + \mu_N$
-\end{itemize}
-\subsection{Recursive Bayesian Estimation from Jointly Gaussian R.V.s with conditionally independent measurements, Treat Output as Input to next time step}
-\begin{itemize}
-\item  Naive Bayes model of measurements
-\item 
+and $\mu_{x \mid y} = My + \mu_N$
+
+
+## Recursive Bayesian Estimation from Jointly Gaussian R.V.s with conditionally independent measurements, Treat Output as Input to next time step
+
+Naive Bayes model of measurements
+
 \begin{equation}
 \mu_{x \mid y_{1:t} } = \mu_{x \mid y_{1:t-1} } + \Sigma_{x  \mid y_{1:t-1}} C^T (C \Sigma_{X \mid Y_{1:t-1}} C^T + R)^{-1} \Bigg( y_t - ( C \mu_{x \mid y_{1:t-1}} + \mu_v) \Bigg)
 \end{equation}
@@ -508,20 +528,21 @@ and
 (\Sigma_{x \mid Y_{1:t-1}} - \Sigma_{x \mid y_{1:t}}) \geq 0
 \end{equation}
 
-\item Measurements have to be conditionally independent
-\item Suppose each measurement has a corresponding equation
+Measurements have to be conditionally independent. Suppose each measurement has a corresponding equation:
 \begin{equation}
 Y_t = C_t X + V_t
 \end{equation}
-\item We can stack all of the measurements into one block, as follows
+
+We can stack all of the measurements into one block, as follows
 \begin{equation}
 \begin{bmatrix}
 Y_1 \\ \vdots \\ Y_t
 \end{bmatrix} = \begin{bmatrix} C_1 \\ \vdots \\ C_t  \end{bmatrix} X + \begin{bmatrix}  V_1 \\ \vdots \\ V_t \end{bmatrix}
 \end{equation}
-\item Being able to break up the measurements is special
-\item Consider two measurments at $Y_t, Y_{\tau}$
-\item We wish to compute
+
+Being able to break up the measurements is special
+
+Consider two measurments at $$Y_t, Y_{\tau}$$. We wish to compute
 \begin{equation}
 Cov(Y_t, Y_{\tau} \mid X)
 \end{equation}
@@ -558,9 +579,10 @@ Cov(Y_t, Y_{\tau} \mid X) = \mathbb{E}\Bigg[ ( V_t - \mu_{v_t})( V_{\tau} -   \m
 Uncorrelated measurement noise! 
 \item White noise: sequence of measurements $(v_1, v_2, \dots, v_t)$ s.t. $Cov(v_t, v_{\tau} = 0, \forall t \neq \tau$
 \end{itemize}
-\subsection{Gaussian White Noise Process}
-\begin{itemize}
-\item 
+
+## Gaussian White Noise Process
+
+
 \begin{equation}
 \begin{aligned}
 V_t \sim GWP(\mu_{v_t}, R_t) \\
@@ -568,8 +590,10 @@ V_t \sim \mathcal{N}( \mu_{v_t}, R_t) \\
 Cov(V_t, V_{\tau}) = 0
 \end{aligned}
 \end{equation}
-\item Flipping around -- white noise process, knowing all of the previous noise, won't help you predict anything in the future
-\item Otherwise, get Delta Dirac Function, with R at $t-\tau=0$. We hope coloring is very small, compared to the other dynamics in your process (coloring looks like a Laplacian distribution). We hope to put as much of the sensor into the state as possible
+
+Flipping around -- white noise process, knowing all of the previous noise, won't help you predict anything in the future
+
+Otherwise, get Delta Dirac Function, with R at $$t-\tau=0$$. We hope coloring is very small, compared to the other dynamics in your process (coloring looks like a Laplacian distribution). We hope to put as much of the sensor into the state as possible
 \item White noise: sucked out everything from the sensor measurement that relates to the thing that you are measuring
 \item White noise in measurment is essential to enforcing the conditional independence assumption!!! To use a linear estimator with a constant state...????
 \end{itemize}
@@ -624,7 +648,8 @@ p(y_t \mid x_{0:t},y_{1:t-1}) = p(y_t \mid x_t)
 \end{aligned}
 \end{equation}
 
-\item Predict Step:
+Predict Step:
+
 \begin{equation}
 \begin{aligned}
 \mu_{t \mid t-1} = A_{t-1} \mu_{t-1 \mid t-1} + B_{t-1} u_{t-1} \\
@@ -632,17 +657,19 @@ p(y_t \mid x_{0:t},y_{1:t-1}) = p(y_t \mid x_t)
 \end{aligned}
 \end{equation}
 
-\item Update Step:
-\begin{equation}
+Update Step:
+
+$$
 \begin{aligned}
-\mu_{t \mid t} = \mu_{t \mid t-1} + \Sigma_{t \mid t-1} C_t^T (C_t \Sigma_{t \mid t-1} C_t^T + R_t)^{-1} \Bigg( y_t - (C_t \mu_{t \mid t-1} + D_t u_{t}) \Bigg) \\
-\Sigma_{t \mid t} = \Sigma_{t \mid t-1}  - \Sigma_{t \mid t-1} C_t^T\Bigg(C_t \Sigma_{t \mid t-1} C_t^T + R_t \Bigg)^{-1} C_t \Sigma_{t \mid t-1}
+\mu_{t \mid t} &= \mu_{t \mid t-1} + \Sigma_{t \mid t-1} C_t^T (C_t \Sigma_{t \mid t-1} C_t^T + R_t)^{-1} \Bigg( y_t - (C_t \mu_{t \mid t-1} + D_t u_{t}) \Bigg) \\
+\Sigma_{t \mid t} &= \Sigma_{t \mid t-1}  - \Sigma_{t \mid t-1} C_t^T\Bigg(C_t \Sigma_{t \mid t-1} C_t^T + R_t \Bigg)^{-1} C_t \Sigma_{t \mid t-1}
 \end{aligned}
-\end{equation}
-\end{itemize}
-\section{April 26, 2018: Kalman Filter Continued}
-\begin{itemize}
-\item Find a model for $X_{t+1} = f(X_{0:t}, Y_{1:t})$ and find requirements on $f(\cdot)$ s.t. Markov
+$$
+
+## Kalman Filter Continued
+
+
+Find a model for $$X_{t+1} = f(X_{0:t}, Y_{1:t})$$ and find requirements on $$f(\cdot)$$ s.t. Markov
 \begin{equation}
 (X_{0:t+1},Y_{1:t}) \sim \mathcal{N}(\mu, \Sigma)
 \end{equation}
@@ -651,31 +678,39 @@ where
 (X,Y) \sim \mathcal{N} \
 \end{equation}
 where 
+
 \begin{equation}
 \begin{array}{ll}
 Y = CX + V, & Cov(X,V) = 0
 \end{array}
 \end{equation}
+
 We write equations to slice a vector into pieces
+
 \begin{equation}
 \begin{aligned}
 X_{t+1} = M(X_{0:t},Y_{1:t}) + W_t \\
 X_{t+1} = A_tX_t + \sum\limits_{\tau=0}^{t-1}\Phi_{\tau}X_{\tau} + \sum\limits_{\tau=0}^t \theta_{\tau} Y_{\tau}  + W_t
 \end{aligned}
 \end{equation}
+
 where we 
+
 \begin{equation}
 \begin{aligned}
 Cov(X_{\tau}, W_t) = 0, \forall \tau \leq t \\
 Cov(Y_{\tau}, W_t) = 0, \forall \tau \leq t \\
 \end{aligned}
 \end{equation}
+
 By Markov Property, the rest of the matrices must be zero!
 \begin{equation}
 \mathbb{E}\Bigg[ X_{t+1} \mid X_t, X_{0:t-1}, Y_{1:t}\Bigg] = \mathbb{E}[X_{t+1} \mid X_t]
 \end{equation}
-So all of the terms in the sum that involve $\Phi_{\tau}=0 \forall \tau \leq t-1$ and also $\Theta_{\tau} = 0, \forall \tau \leq t$
+
+So all of the terms in the sum that involve $$\Phi_{\tau}=0 \forall \tau \leq t-1$$ and also $$\Theta_{\tau} = 0, \forall \tau \leq t$$
 must equal zero
+
 \begin{equation}
 \begin{aligned}
 X_{t+1} = A_tX_t + W_t \\
@@ -826,39 +861,48 @@ In the Kalman Filter, need to be given initial $$\mu_{0 \mid 0}, \Sigma_{0 \mid 
 
 
 By the dynamics equation,
+
 \begin{equation}
 X_{t+1} = A_t x_t + B u_t + W_t
 \end{equation}
+
 By the measurement equation,
+
 \begin{equation}
 Y_t = C_t X_t + D_t u_t + V_t
 \end{equation}
-Almost always, $D_t = 0$ so that you don't mix up your actuators and your sensors
+
+Almost always, $$D_t = 0$$ so that you don't mix up your actuators and your sensors
 \item E.g. single integrator particle
 \item If you have a filter, you have to stop the filter somewhere, and the computation begins
 \item Manually discretize the dynamics, being aware that we ARE GOING AWAY FROM PHYSICS, INTO COMPUTATION
-\item dynamics: $\dot{x} = u$
-\item measurement: $y = x$
+\item dynamics: $$\dot{x} = u$$
+\item measurement: $$y = x$$
 \item First order Euler discretization. Assume rate of change is constant
+
 \begin{equation}
 x_{t+1} = x_t + \delta t u_t
 \end{equation}
-where $\delta t = 1$
-\item Works for relatively well behaved dynamics
-\item We introduce some noise:
+
+where $$\delta t = 1$$
+Works for relatively well behaved dynamics. We introduce some noise:
+
 \begin{equation}
 \begin{aligned}
 x_{t+1} = x_t + u_t \\
 y_t = x_t
 \end{aligned}
 \end{equation}
-\item Process noise
+
+Process noise
+
 \begin{equation}
 \begin{aligned}
 W_t \sim \mathcal{N}(0,1), process\_ noise \\
 V_t \sim \mathcal{N}(0,1), measurement\_ noise
 \end{aligned}
 \end{equation}
+
 \item I.C. $X_0 \sim \mathcal{N}(0,1)$
 \item Linear Gaussian System:
 \begin{equation}
@@ -949,9 +993,9 @@ Weng and Kitani introduce a simple baseline for 3d tracking using Kalman Filters
 
 A 3d bounding box detection $$D_t^i$$ is modeled as an 8-tuple $$(x, y, z, l, w, h, \theta, s)$$. These 8 parameters represent the 3D coordinate of the object center $$(x, y, z)$$, the object’s size $$(l, w, h)$$, heading angle $$\theta$$ and its confidence $$s$$. 
 
-The state of a tracked object trajectory is modeled as a 10-dimensional vector $$T = (x, y, z, \theta, l, w, h, v_x, v_y, v_z)$$
+The state of a tracked object trajectory is modeled as a 10-dimensional vector $$ \mathbf{x} = (x, y, z, \theta, l, w, h, v_x, v_y, v_z)$$
 
-A constant velocity model is used to propogate tracks from frame $$(t-1)$$ to frame $$t$$:
+A constant velocity model is used to propogate tracks from frame $$t$$ to frame $$(t+1)$$:
 
 $$
 \begin{aligned}
@@ -964,7 +1008,7 @@ $$
 The state transition matrix $$F \in \mathbb{R}^{n \times n}$$ is thus a $$10 \times 10$$ matrix that we use to accomplish this motion model:
 
 $$
-\begin{bmatrix} x + v_x \\ y + v_y \\ z + v_z \\ \theta \\ l \\ w \\ h \\ v_x \\ v_y \\ v_z \end{bmatrix} =
+\mathbf{x}_{t+1} = \begin{bmatrix} x + v_x \\ y + v_y \\ z + v_z \\ \theta \\ l \\ w \\ h \\ v_x \\ v_y \\ v_z \end{bmatrix} =
 \begin{bmatrix}
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\      
 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
@@ -978,13 +1022,13 @@ $$
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 
 \end{bmatrix} \begin{bmatrix}
 x \\ y \\ z \\ \theta \\ l \\ w \\ h \\ v_x \\ v_y \\ v_z
-\end{bmatrix} = FT
+\end{bmatrix} = F \mathbf{x}_t
 $$
     
-The measurement model is even simpler. We use a matrix $$H \in \mathbb{R}^{m \times n}$$ to model the observation of a 3d bounding box  from a 3d object's trajectory $$T$$. Here $$H$$ is $$7 \times 10$$ in shape:
+The measurement model is even simpler. We use a matrix $$H \in \mathbb{R}^{m \times n}$$ to model the observation of a 3d bounding box  from a 3d object's trajectory state $$\mathbf{x}_t$$. Here $$H$$ is $$7 \times 10$$ in shape:
 
 $$
-\begin{bmatrix}
+\mathbf{x}_{t+1} = \begin{bmatrix}
 x \\ y \\ z \\ \theta \\ l \\ w \\ h \\ 0 \\ 0 \\ 0
 \end{bmatrix} = \begin{bmatrix}
 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -996,7 +1040,7 @@ x \\ y \\ z \\ \theta \\ l \\ w \\ h \\ 0 \\ 0 \\ 0
 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0
 \end{bmatrix} \begin{bmatrix}
 x \\ y \\ z \\ \theta \\ l \\ w \\ h \\ v_x \\ v_y \\ v_z
-\end{bmatrix} = HT
+\end{bmatrix} = H \mathbf{x}_t
 $$
 
 <a name='3dtracking-icp'></a>
@@ -1009,4 +1053,5 @@ $$
 
 [1] Xinshuo Weng and Kris Kitani. A Baseline for 3D Multi-Object Tracking. [PDF](https://arxiv.org/pdf/1907.03961.pdf).
 
+[2] Boyd and Vandenberghe. Convex Optimization. [PDF](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
 
