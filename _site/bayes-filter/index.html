@@ -95,6 +95,7 @@
   <li><a href="#dt-lds">Discrete-time Linear Dynamical Systems</a></li>
   <li><a href="#probability-review">Probability Review: The Chain Rule, Marginalization, &amp; Bayes Rule</a></li>
   <li><a href="#bayes-estimation">Recursive Bayesian Estimation + Conditional Independence</a></li>
+  <li><a href="#bayes-estimator-derivation">Bayes Estimator Derivation</a></li>
   <li><a href="#pgm-bayes-filter">Graphical Model: The Structure of Variables in the Bayes Filter</a></li>
   <li><a href="#bayes-filter-deriv-predict">Derivation of the Bayes Filter: Predict Step</a></li>
   <li><a href="#bayes-filter-deriv-update">Derivation of the Bayes Filter: Update Step</a></li>
@@ -190,9 +191,10 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
   </div>
 </div>
 
+<p><a name="bayes-estimator-derivation"></a></p>
 <h2 id="bayes-estimator-derivation">Bayes Estimator Derivation</h2>
 
-<p>We’ll now derive the recursion, which iterates upon the previous timesteps. The key insight is that <strong>we can factor Bayes Rule via conditional independence.</strong></p>
+<p>We’ll now derive the estimator’s recursion, which iterates upon the previous timesteps. The key insight is that <strong>we can factor Bayes Rule via conditional independence.</strong></p>
 
 <p>Suppose we have observed a measurement <script type="math/tex">y</script> for <script type="math/tex">t-1</script> timesteps. In the <strong>previous time step</strong> we had posterior:</p>
 
@@ -230,7 +232,7 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
 
 <h2 id="graphical-model-the-structure-of-variables-in-the-bayes-filter">Graphical Model: The Structure of Variables in the Bayes Filter</h2>
 
-<p>Now consider a dynamic state <script type="math/tex">X_t</script>, instead of a static <script type="math/tex">X</script>. This system can be modeled as a Hidden Markov Model.</p>
+<p>Now consider a dynamic state <script type="math/tex">X_t</script>, instead of a static <script type="math/tex">X</script>. This system can be modeled as a Hidden Markov Model. The model is <em>hidden</em> because we can’t see the <script type="math/tex">X</script>’s correctly. Given only the measurements, we try to back out/predict what the state was.</p>
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/bayesian_filter_hmm.png" width="65%" />
@@ -249,11 +251,13 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
 
 <script type="math/tex; mode=display">p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t)</script>
 
+<p>What is the intution behind this last assumption? The measurement at any time step, given the state at that time step, is independent of everything else! Since the measurement is current, knowing the past (now inaccurate measurements) wouldn’t help.</p>
+
 <p><a name="bayes-filter-deriv-predict"></a></p>
 
 <h2 id="derivation-of-the-bayes-filter-predict-step">Derivation of the Bayes Filter: Predict Step</h2>
 
-<p>Suppose we start with our posterior from the previous timestep, which incorporates all measurements <script type="math/tex">y_1,\dots, y_{t-1}</script>: Via marginalization, we can rewrite the expression as:</p>
+<p>In the predict step, we will make an estimate about the current value of our state, given only the prior measurements. Suppose we start with our posterior from the previous timestep, which incorporates all measurements <script type="math/tex">y_1,\dots, y_{t-1}</script>. Via marginalization, we can rewrite the expression as:</p>
 
 <script type="math/tex; mode=display">p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t}, x_{t-1}  \mid y_{1:t-1})dx_{t-1}</script>
 
@@ -269,7 +273,7 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
 
 <h2 id="derivation-of-the-bayes-filter-update-step">Derivation of the Bayes Filter: Update Step</h2>
 
-<p>In what we call the update step, we simply express the posterior using Bayes’ Rule:</p>
+<p>In what we call the update step, we use the current measurement to estimate the current state. We simply express the posterior using Bayes’ Rule. Once again, we compute the denominator only by marginalization:</p>
 
 <script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{p(y_{1:t})} =  \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_{1:t} \mid x_{t}) p(x_{t}) dx_{t}}</script>
 
@@ -301,7 +305,7 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
 
 <script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1})   }{ p(y_{1:t-1})\int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}} = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}}</script>
 
-<p>This is the closed form expression for the <strong>Update Step</strong> of the Bayes’ Filter.</p>
+<p>This is the closed form expression for the <strong>Update Step</strong> of the Bayes’ Filter. Note that we use the result of our prediction to make the update:</p>
 
 <script type="math/tex; mode=display">p(x_{t} \mid y_{1:t}) = \frac{p(y_{t} \mid x_{t})p(x_{t} \mid y_{1:t-1})}{\int\limits_{x_{t}} p(y_{t} \mid x_{t}) p(x_{t} \mid y_{1:t-1}) dx_{t}}</script>
 
