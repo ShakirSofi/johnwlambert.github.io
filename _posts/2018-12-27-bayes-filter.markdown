@@ -13,6 +13,7 @@ Table of Contents:
 - [Discrete-time Linear Dynamical Systems](#dt-lds)
 - [Probability Review: The Chain Rule, Marginalization, & Bayes Rule](#probability-review)
 - [Recursive Bayesian Estimation + Conditional Independence](#bayes-estimation)
+- [Bayes Estimator Derivation](#bayes-estimator-derivation)
 - [Graphical Model: The Structure of Variables in the Bayes Filter](#pgm-bayes-filter)
 - [Derivation of the Bayes Filter: Predict Step](#bayes-filter-deriv-predict)
 - [Derivation of the Bayes Filter: Update Step](#bayes-filter-deriv-update)
@@ -122,9 +123,10 @@ Suppose we have sequence of measurements (Y_1,Y_2,..., Y_t), revealed. X is a st
   </div>
 </div>
 
+<a name='bayes-estimator-derivation'></a>
 ## Bayes Estimator Derivation
 
-We'll now derive the recursion, which iterates upon the previous timesteps. The key insight is that **we can factor Bayes Rule via conditional independence.**
+We'll now derive the estimator's recursion, which iterates upon the previous timesteps. The key insight is that **we can factor Bayes Rule via conditional independence.**
 
 Suppose we have observed a measurement $$y$$ for $$t-1$$ timesteps. In the **previous time step** we had posterior:
 
@@ -178,7 +180,7 @@ In the recursive Bayes Estimator, the prior is just the posterior from the previ
 
 ## Graphical Model: The Structure of Variables in the Bayes Filter
 
-Now consider a dynamic state $$X_t$$, instead of a static $$X$$. This system can be modeled as a Hidden Markov Model. 
+Now consider a dynamic state $$X_t$$, instead of a static $$X$$. This system can be modeled as a Hidden Markov Model. The model is *hidden* because we can't see the $$X$$'s correctly. Given only the measurements, we try to back out/predict what the state was.
 
 <div class="fig figcenter fighighlight">
   <img src="/assets/bayesian_filter_hmm.png" width="65%">
@@ -197,12 +199,13 @@ $$ p(x_t \mid x_{1:t-1}, y_{1:t-1}) = p(x_t \mid x_{t-1}) $$
 
 $$ p(y_t \mid x_{1:t}, y_{1:t-1}) = p(y_t \mid x_t) $$
 
+What is the intution behind this last assumption? The measurement at any time step, given the state at that time step, is independent of everything else! Since the measurement is current, knowing the past (now inaccurate measurements) wouldn't help.
 
 <a name='bayes-filter-deriv-predict'></a>
 
 ## Derivation of the Bayes Filter: Predict Step
 
-Suppose we start with our posterior from the previous timestep, which incorporates all measurements $$y_1,\dots, y_{t-1}$$: Via marginalization, we can rewrite the expression as:
+In the predict step, we will make an estimate about the current value of our state, given only the prior measurements. Suppose we start with our posterior from the previous timestep, which incorporates all measurements $$y_1,\dots, y_{t-1}$$. Via marginalization, we can rewrite the expression as:
 
 $$
 p(x_{t} \mid y_{1:t-1}) = \int_{x_{t-1}} p(x_{t}, x_{t-1}  \mid y_{1:t-1})dx_{t-1}
@@ -224,7 +227,7 @@ $$
 
 ## Derivation of the Bayes Filter: Update Step
 
-In what we call the update step, we simply express the posterior using Bayes' Rule:
+In what we call the update step, we use the current measurement to estimate the current state. We simply express the posterior using Bayes' Rule. Once again, we compute the denominator only by marginalization:
 
 $$
 p(x_{t} \mid y_{1:t}) = \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{p(y_{1:t})} =  \frac{p(y_{1:t} \mid x_{t}) p(x_{t})}{\int\limits_{x_{t}} p(y_{1:t} \mid x_{t}) p(x_{t}) dx_{t}}
@@ -272,7 +275,7 @@ $$
 p(x_{t} \mid y_{1:t}) = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) p(y_{1:t-1})   }{ p(y_{1:t-1})\int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}} = \frac{ p(y_t \mid x_t) p(x_t \mid y_{1:t-1}) }{ \int\limits_{x_{t}} p(y_t \mid x_t) p(x_t \mid y_{1:t-1})  dx_{t}}
 $$
 
-This is the closed form expression for the **Update Step** of the Bayes' Filter.
+This is the closed form expression for the **Update Step** of the Bayes' Filter. Note that we use the result of our prediction to make the update:
 
 $$
 p(x_{t} \mid y_{1:t}) = \frac{p(y_{t} \mid x_{t})p(x_{t} \mid y_{1:t-1})}{\int\limits_{x_{t}} p(y_{t} \mid x_{t}) p(x_{t} \mid y_{1:t-1}) dx_{t}}

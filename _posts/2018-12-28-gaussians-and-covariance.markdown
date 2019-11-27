@@ -31,7 +31,7 @@ $$
 \Bigg\{ -\frac{1}{2} (x - \mu_x)^T \Sigma_x^{-1} (x - \mu_x) \Bigg\}
 $$
 
-where $$n$$ is the dimension, i.e. $$X \in \mathbbm{R}^n$$
+where $$n$$ is the dimension, i.e. $$X \in \mathbb{R}^n$$
 
 And of course in the scalar case, we see
 
@@ -76,27 +76,24 @@ $$
 
 unit (identity) covariance, so each axis decouples, compute integral over each axis separately
 
-**How to generate any Gaussian R.V. from standard normal** $$X_s$?$
+**How to generate any Gaussian R.V. from standard normal** $$X_s$$?
 
 $$
 X = \Sigma_x^{1/2}X_s + \mu_x
 $$
 
-Can obtain by scaling by covariance matrix, and by translating by mean
-Very good for simulating
-With MATLAB, can generate scalar, unit variance, 0 mean Gaussian R.V. with \texttt{randn}
-Call \texttt{randn} $n$ times to populate $X_s$, and them multiply, then add
-And we can compute via Cholesky Decomposition (unique if positive definite)
+Can obtain by scaling by covariance matrix, and by translating by mean.
+Very good for simulating. With MATLAB or Python, can generate scalar, unit variance, 0 mean Gaussian R.V. with `numpy.random.randn`. Call `numpy.random.randn` $$n$$ times to populate $$X_s$$, and them multiply, then add. We can compute such a matrix square root via the Cholesky Decomposition (which will be unique if $$\Sigma_x$$ is positive definite):
 
 $$
-\Sigma = \Sigma_x^{1/2}(\Sigma_x^{1/2})^T
+\Sigma_x = \Sigma_x^{1/2}(\Sigma_x^{1/2})^T
 $$
 
 ## Matrix Square Roots
 
-\item There are other possible matrix square roots
-\item \textbf{How to transform any Gaussian R.V. to the standard normal} $X_s$?
-\item Do so via rearrangement:
+There are other possible matrix square roots
+**How to transform any Gaussian R.V. to the standard normal** $$X_s$$?
+We can do so via rearrangement of the expression exactly above:
 
 $$
 \begin{array}{ll}
@@ -107,7 +104,7 @@ $$
 Much easier to integrate over the form on the RHS, not LHS
 Comes from method of derived distributions
 Derived Distributions: Given $$X \sim p(x)$$, $$Y=f(X)$$, find $$p(y)$$
-Here $$X = X_s$$, and function $$f$$ is the linear distribution $$AX + b$$
+Here $$X = X_s$$, and function $$f$$ is the linear distribution $$AX + b$$.
 
 
 
