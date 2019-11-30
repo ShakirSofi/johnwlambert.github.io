@@ -85,15 +85,17 @@ max-margin
 
 ## Contrastive Loss
 
-The contrastive loss was proposed by Hadsell, Chopra, and LeCun in [2] for dimensionality reduction of high-dimensional points.
+The contrastive loss was proposed by Hadsell, Chopra, and LeCun in [2] for dimensionality reduction of high-dimensional points, a paper now cited over 1200 times. It involves a *push* term and a *pull term* which are summed together. Unlike conventional learning systems where the loss function is a sum over samples, the contrastive loss function runs over pairs of samples [2].
 
-Given a set of input vectors $$ \mathcal{I} = \{ \vec{X}_1, \dots, \vec{X}_P \}$$, where $$\vec{X}_i \in \mathbb{R}^D, \forall i = 1, \dots, n$$, find a parametric function $$G_W: \mathbb{R}^D \rightarrow \mathbb{R}^d$$ with $$d ≪ D$$,
+More formally, here is the problem and loss formulation, as described in [2]:
 
-Unlike conventional learning systems where the loss function is a sum
-over samples, the contrastive loss function here runs over pairs of samples [2].
+Given a set of input vectors $$ \mathcal{I} = \{ \vec{X}_1, \dots, \vec{X}_P \}$$, where $$\vec{X}_i \in \mathbb{R}^D, \forall i = 1, \dots, n$$, find a parametric function $$G_W: \mathbb{R}^D \rightarrow \mathbb{R}^d$$ with $$d ≪ D$$,.
 
-Here is the loss formulation, as described in [2]: Let $$\vec{X}_1, \vec{X}_2 \in I$$ be a pair of input vectors shown to the system. Let $$Y$$ be a binary label assigned to this pair. $$Y = 0$$ if $$\vec{X}_1$$ and $$\vec{X}_2$$ are deemed similar (i.e. from the same semantic class), and $$Y = 1$$ if they are deemed dissimilar (i.e. from different semantic classes). Define the parameterized distance function to be learned $$D_W$$ between $$\vec{X}_1, \vec{X}_2$$ as the Euclidean distance between the outputs of $$G_W$$. That is,
-$$D_W (\vec{X}_1, \vec{X}_2) = \|G_W (\vec{X}_1) − G_W (\vec{X}_2)\|_2$$ (1)
+
+Let $$\vec{X}_1, \vec{X}_2 \in \mathcal{I}$$ be a pair of input vectors shown to the system. Let $$Y$$ be a binary label assigned to this pair. $$Y = 0$$ if $$\vec{X}_1$$ and $$\vec{X}_2$$ are deemed similar (i.e. from the same semantic class), and $$Y = 1$$ if they are deemed dissimilar (i.e. from different semantic classes). We define the parameterized distance function to be learned $$D_W$$ between $$\vec{X}_1, \vec{X}_2$$ as the Euclidean distance between the outputs of $$G_W$$. That is,
+
+$$D_W (\vec{X}_1, \vec{X}_2) = \|G_W (\vec{X}_1) − G_W (\vec{X}_2)\|_2$$.
+
 To shorten notation, $$D_W (\vec{X}_1, \vec{X}_2$$) is written $$D_W$$. Then the loss function in its most general form is
 
 $$
@@ -106,42 +108,65 @@ $$
 
 
 where $$(Y, \vec{X}_1, \vec{X}_2)^i$$ is the $$i$$-th labeled sample pair, $$L_S$$ is the partial loss function for a pair of similar points, $$L_D$$ the
-partial loss function for a pair of dissimilar points, and $$P$$ the number of training pairs (which may be as large as the square of the number of samples.
+partial loss function for a pair of dissimilar points, and $$P$$ the number of training pairs (which may be as large as the square of the number of samples).
 
 
 The exact, full loss function is:
 
 $$
 L(W, Y, \vec{X}_1, \vec{X}_2) = (1 − Y ) \frac{1}{2} (D_W )^2 + (Y )
-\frac{1}{2} \{ \mbox{max}(0, m − D_W )\}
+\frac{1}{2} \{ \mbox{max}(0, m − D_W )\}^2
 $$
 
 
 Consider the loss function $$L_S(W, \vec{X}_1, \vec{X}_2)$$ associated
-with similar pairs. The data points in each pair should pulled together:
+with similar pairs. The embeddings for data points in each similar pair should pulled together:
 
 $$
 L_S(W, \vec{X}_1, \vec{X}_2) = \frac{1}{2}(D_W )^2
 $$
 
-Now consider the partial loss function $$L_D$$ associated with dissimilar pairs. The data points in each pair should be pushed apart:
+Now consider the partial loss function $$L_D$$ associated with dissimilar pairs. The embeddings for data points in each dissimilar pair should be pushed apart. However, instead of pushing clusters apart to infinity, the repulsion range is bounded by a distance margin $$m$$:
 
 $$
-L_D(W, \vec{X}_1, \vec{X}_2) = \frac{1}{2}(\mbox{max}\{0, m − D_W \})
+L_D(W, \vec{X}_1, \vec{X}_2) = \frac{1}{2}(\mbox{max}\{0, m − D_W \})^2
 $$
 
 We often use a a siamese network architecture, which consists of two
 copies of the function $$G_W$$ which share the same set of parameters $$W$$, and a cost module. A loss module whose input is the output of this architecture is placed on top of it.
 
-
-
-Compute contrastive loss with push term for different class pairs and pull term for same-class pairs. Push term says if pair elements come from separate classes, push embeddings apart. Pull term says if pair elements come from the same class, pull embeddings together. Sum losses as contrastive loss*
-
-We could implement such a contrastive loss in Pytorch as follows
-
-
+To implement a contrastive loss in Pytorch, we must first compute distances between embeddings. Note that this is not an affinity matrix
 
 ```python
+
+def paired_euclidean_distance(X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
+    """
+        Compute the distance in the semantic alignment loss (3) by 
+        computing average pairwise distances between *already paired*
+        points in the embedding space.
+
+        Note this is not computed between all possible pairs. Rather
+        Compare i'th vector of x vs. i'th vector of y (i == j always)
+
+        Args:
+        -   X: Pytorch tensor of shape (N,D) representing N embeddings of dim D
+        -   Y: Pytorch tensor of shape (N,D) representing N embeddings of dim D
+
+        Returns:
+        -   dists: Pytorch tensor of shape (N,) representing distances between 
+                fixed pairs
+    """
+    N, D = X.shape
+    assert Y.shape == X.shape
+    eps = 1e-08 * torch.ones((N,1))
+    # compare i'th vector of x vs. i'th vector of y (i == j always)
+    diff = torch.pow(X - Y, 2)
+
+    affinities = torch.sum(diff, dim=1, keepdim=True)
+    # clamp the affinities to be > 1e-8
+    affinities = torch.max(affinities, eps)
+    return torch.sqrt(affinities)
+
 
 def contrastive_loss(y_c: torch.Tensor, pred_dists: torch.Tensor, margin: int = 1) -> torch.Tensor:
     """
@@ -171,7 +196,7 @@ def contrastive_loss(y_c: torch.Tensor, pred_dists: torch.Tensor, margin: int = 
 
 ```
 
-Consider 5 pairs of points. For two of these pairs, the tuple of points $$(x_A,x_B)$$ pairs having elements belonging to the same class, and the rest have elements classes. Suppose the 2 data points that belong to the same semantic class have 0 distance between themselves, and all other points are at distance 1.1
+Consider 5 pairs of points. For two of these pairs, the tuple of points $$(\vec{X}_1,\vec{X}_2)$$ pairs having elements belonging to the same class, and the rest have elements classes. Suppose the 2 data points that belong to the same semantic class have 0 distance between themselves, and all other points are at distance 1.1
 
 ```python
 
