@@ -30,15 +30,22 @@ Humans have stereo vision with a baseline of 60 mm.
 Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the $$Z$$-axis. A figure is shown below:
 
 <div class="fig figcenter fighighlight">
-<<<<<<< HEAD
+  <img src="/assets/stereo_coordinate_systems_rehg_dellaert.jpg" width="90%">
+  <div class="figcaption">
+    Two cameras with optical centers O_L and O_R are separated by a baseline B. The z-axis extends towards the world, away from the camera.
+  </div>
+</div>
+
+Now, consider just the plane spanned by the $$x$$- and $$z$$-axes, with a constant $$y$$ value:
+<div class="fig figcenter fighighlight">
   <img src="/assets/stereo_vision_setup.jpg" width="50%">
-=======
-  <img src="/assets/stereo_vision_setup.png" width="50%">
->>>>>>> bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f
+
   <div class="figcaption">
     Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
   </div>
 </div>
+
+
 In this figure, the world point $$P=(x,z)$$ is projected into the left image as $$p_l$$ and into the right image as $$p_r$$.
 
 By defining right triangles we can find two similar triangles: with vertices at $$(0,0)-(0,z)-(x,z)$$ and $$(0,0)-(0,f)-(f,x_l)$$. Since they share the same angle $$\theta$$, then $$\mbox{tan}(\theta)= \frac{\mbox{opposite}}{\mbox{adjacent}}$$ for both, meaning:
