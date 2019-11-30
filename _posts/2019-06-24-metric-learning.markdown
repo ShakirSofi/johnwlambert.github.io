@@ -135,19 +135,12 @@ $$
 We often use a a siamese network architecture, which consists of two
 copies of the function $$G_W$$ which share the same set of parameters $$W$$, and a cost module. A loss module whose input is the output of this architecture is placed on top of it.
 
-To implement a contrastive loss in Pytorch, we must first compute distances between embeddings. Note that this is not an affinity matrix
+To implement a contrastive loss in Pytorch, we must first compute distances between embeddings. Note that this is *not an affinity matrix* of $$N^2$$ distances. Rather, given $$N$$ pairs, we compute $$N$$ distances, i.e. one distance $$D_i$$for each pair $$(X_i,Y_i)$$.
 
 ```python
 
 def paired_euclidean_distance(X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
     """
-        Compute the distance in the semantic alignment loss (3) by 
-        computing average pairwise distances between *already paired*
-        points in the embedding space.
-
-        Note this is not computed between all possible pairs. Rather
-        Compare i'th vector of x vs. i'th vector of y (i == j always)
-
         Args:
         -   X: Pytorch tensor of shape (N,D) representing N embeddings of dim D
         -   Y: Pytorch tensor of shape (N,D) representing N embeddings of dim D
@@ -255,17 +248,21 @@ def test_contrastive_loss3():
 
 ## Triplet Loss
 
+Schroff, Kalenichenko, and Philbin [4] use the Triplet Loss.
 
-https://github.com/lugiavn/generalization-dml
+Here, instead of a Siamese network, a "Triplet network" uses 3 copies of the same feedforward network (with shared parameters). Given 3 inputs $$x,x^+,x^-$$, the network will provide two distances -- between $$x,x^+$$ and $$x,x^-$$ [3].
+
+ are of the same class ($$x$$ and $$x^+$$), and the third ($$x^−$$) is of a different class
+
 
 Hard negative mining
 
 
 ## Which layer to fine-tune?
 
+Vo and Hays ...
 
-
-
+https://github.com/lugiavn/generalization-dml
 
 ## Additive Margin Softmax
 
@@ -275,4 +272,16 @@ Hard negative mining
 
 [2] Raia Hadsell, Sumit Chopra, Yann LeCun. Dimensionality Reduction by Learning an Invariant Mapping. CVPR 2006. [PDF](http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf).
 
-[3]
+[3] Elad Hoffer, Nir Ailon. Deep Metric Learning Using Triplet Network. 2014. [PDF](https://arxiv.org/pdf/1412.6622v1.pdf).
+
+
+[4] Florian Schroff, Dmitry Kalenichenko, and James Philbin. FaceNet: A unified embedding
+for face recognition and clustering. In IEEE Conference on Computer Vision and Pattern
+Recognition (CVPR), pages 815–823, 2015.
+
+
+
+
+
+
+
