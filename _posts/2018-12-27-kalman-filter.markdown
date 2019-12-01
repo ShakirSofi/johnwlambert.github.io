@@ -46,7 +46,7 @@ It will take a fair amount of work to derive the analytical formulas of the Baye
 ## Kalman Filter Derivation
 
 
-
+A key property of the Gaussian function: the product of two Gaussian functions is another Gaussian function.
 
 
 ## Jointly Guassian Random Vectors

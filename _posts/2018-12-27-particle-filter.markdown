@@ -9,13 +9,21 @@ mathjax: true
 
 ---
 Table of Contents:
-- [A Basic SfM Pipeline](#sfmpipeline)
-- [Cost Functions](#costfunctions)
-- [Bundle Adjustment](#bundleadjustment)
+- [Particle Filter Overview](#sfmpipeline)
+- [What's Wrong With the EKF?](#costfunctions)
+- [A Different Parameterization: Particles](#bundleadjustment)
+- [Verify Inverse Unscented Transform](#placeholder)
+- [Matrix Square Roots](#placeholder)
+- [UKF (Sigma Point Filter)](#placeholder)
+- [Choosing Lambda](#placeholder)
+- [PRO version of UKF](#placeholder)
+- [Predict Step](#placeholder)
+- [Sample Degeneracy](#placeholder)
+
 
 <a name='sfmpipeline'></a>
 
-## Particle Filter
+## Particle Filter Overview
 
 The **Particle Filter** is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. This is because it contains no assumptions about the form of the state distribution. It was published in 1995 [2,3] by Simon Julier, Jeffrey Uhlmann, and Hugh Durrant-Whyte at Oxford. It is often called the **"Unscented Kalman Filter" (UKF)** because the inventors thought "it didn't stink" like the EKF.
 
@@ -28,7 +36,7 @@ The main idea is to Represent a distribution $$p(x)$$ with a collection of sampl
 The Particle Filter addresses a number of problems with the EKF: 
 
 **Problem No. 1** The initial conditions (I.C.s)!
-*If your initial guess is wrong, the Kalman filter will tell you exactly the wrong thing. The linearization can be vastly different at different parts of the state space*. For example, the EKF could diverge if the residual $\| \mu_{0 \mid 0} - x \|$ on the initial condition is large. In fact, if $ \| \mu_{t \mid t} - x_t \|$ large at any time, then the EKF could diverge. This has to do with severity of non-linearity. This is the most commonly found problem.
+*If your initial guess is wrong, the Kalman filter will tell you exactly the wrong thing. The linearization can be vastly different at different parts of the state space*. For example, the EKF could diverge if the residual $$\| \mu_{0 \mid 0} - x \|$$ on the initial condition is large. In fact, if $$\| \mu_{t \mid t} - x_t \|$$ large at any time, then the EKF could diverge. This has to do with severity of non-linearity. This is the most commonly found problem.
 
 **Problem No. 2: Covariance**
 *In the EKF, the "covariance matrix" does not literally represent the covariance.* Unfortunately, the covariance matrix only literally captures the covariance in the Kalman Filter. In the EKF, it is just a matrix! We don't know what it means! If we treat it as confidence, then it is reasonable enough. And commonly true, as long as $\mu$ is tracking $x$ pretty well. However, this estimate tends to be overconfident since we are not incorporating linearization errors! Instead, $$\Sigma_{t \mid t}$$ incorporates only the noise errors $$Q_t, R_t$$. Thus, $$\Sigma_{t \mid t}$$  tends to be smaller than the true covariance matrix.
@@ -71,10 +79,10 @@ $$x^i = \mu + ( \sqrt{(n+\lambda) \Sigma } )_i, i = 1, \dots, n$$\\
 
 This is a matrix square root
 
-The index $i$ is the $$i$$'th column in the matrix square root
+The index $$i$$ is the $$i$$'th column in the matrix square root
 
 We also have a mirror image set:\\
-$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$\\
+$$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$$\\
 
 Those were the points. The weights themselves:
 
@@ -87,7 +95,7 @@ w^i = \frac{1}{2(n+\lambda)}, i \geq 1
 $$
 
 Each of these points plot points around the circle/ellipse
-Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.
+Break ellipse into major and minor axes. $$x_1, x_2, x_3, x_4$$ at the corners of the principal axes and the parameters.
 
 $$n \times n$$ matrix is $$\sqrt{(n+\lambda) \Sigma}$$
 
@@ -249,11 +257,11 @@ $$
 
 Now
 
-\begin{equation}
+$$
 \begin{aligned}
 \Sigma_{t+1 \mid t}^{XY} = \sum\limits_{i=0}^{2n} w^i (x_{t+1 \mid t}^i - \mu_{t+1 \mid t}) (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t})^T
 \end{aligned}
-\end{equation}
+$$
 
 We are doing a fitting operation. That is why we have more sigma points than we need. Smooth out the anomalies due to any one point getting weird.
 
@@ -268,7 +276,8 @@ We are doing a fitting operation. That is why we have more sigma points than we 
 \begin{equation}
 \mu_{t+1 \mid t+1 } = \mu_{t+1 \mid t } + \Sigma_{t+1 \mid t}^{XY} (\Sigma_{t+1 \mid t}^{YY})^{-1} (y_{t+1} - \hat{y}_{t+1 \mid t})
 \end{equation}
-where $y_{t+1}$ is the actual measurement.
+
+where $$y_{t+1}$$ is the actual measurement.
 
 ## Choosing Lambda
 
@@ -291,11 +300,13 @@ Why does size of ellipse matter? Blurring over a bigger neighborhood. (neighborh
 The smaller $$\lambda$$ is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)
 
 Interesting value of $$\lambda$$: $$\lambda=2$$. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
-\item Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
-\end{itemize}
-\subsection{PRO version of UKF}
-\begin{itemize}
-\item Other Form of UKF: 
+
+Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
+
+## PRO version of UKF
+
+
+Other Form of UKF: 
 
 \begin{equation}
 \lambda = \alpha^2 ( n + k) - n
@@ -314,7 +325,7 @@ $$
 w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)
 $$
 
-where $\beta$ is another parameter                       
+where $$\beta$$ is another parameter                       
 
 Hugh Durrant White, the original paper has this original form
 
@@ -337,7 +348,7 @@ Recall
 
 $$
 \begin{array}{lll}
-\mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, & x_i \sim p(x), & i=1,\dots, N, i.i.d
+\mu = \mathbb{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, & x_i \sim p(x), & i=1,\dots, N, i.i.d
 \end{array}
 $$
 
@@ -345,20 +356,20 @@ Then
 
 $$
 \begin{array}{ll}
-\Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, & x_i \sim p(x)
+\Sigma = \mathbb{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, & x_i \sim p(x)
 \end{array}
 $$
 
 Also,
 
 $$
-\mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)
+\mathbb{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)
 $$
 
 The Law of Large numbers states that
 
 $$
-\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]
+\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbb{E}[f(X)]
 $$
 
 as $$N \rightarrow \infty$$
@@ -386,25 +397,25 @@ We will use :
 
 $$q(x)$$ the proposal distribution, the particles are actually from here
 
-We want them to be from $p(x)$ the target distribution, we wish they were from here
+We want them to be from $$p(x)$$ the target distribution, we wish they were from here
 
 We use Particle Weights
 
 $$
-\mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx 
+\mathbb{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx 
 $$
 
 
 $$
-\mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]
+\mathbb{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbb{E}_q [ f(X) w(x) ]
 $$
 
-Given $\{x^1, \dots, x^N \}$
-New set: $\{ (x^1,w^1), \dots, (x^N,w^N) \}$ where $w^i = w(x^i)$
+Given $$\{x^1, \dots, x^N \}$$
+New set: $$\{ (x^1,w^1), \dots, (x^N,w^N) \}$ where $w^i = w(x^i)$$
 Now the expectation is
 
 $$
-\mathbbm{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i
+\mathbb{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i
 $$
 
 and $$w(x) = \frac{p(x)}{q(x)}$$
