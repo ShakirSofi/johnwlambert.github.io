@@ -29,6 +29,7 @@ project="https://www.argoverse.org/"
 data="https://www.argoverse.org/data.html"
 code="https://github.com/argoai/argoverse-api"
 video="https://youtu.be/0lybuew8Lik?t=2769"
+neurips19workshop="https://slideslive.com/38922111/machine-learning-for-autonomous-driving-2"
 %}
 
 {% include paper.html
