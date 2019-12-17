@@ -50,7 +50,7 @@ In an object detection system, we may require different amounts of overlap with 
 As we vary the value of this threshold, we can actually draw a curve -- a precision-recall curve.
 
 ## Accuracy Isn't Helpful
-Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object, predicting nothing, you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
+Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
 
 
 ## Information Retrieval (IR)
@@ -70,7 +70,7 @@ We can do the same for Recall @K.
 Suppose for a query (seeking 3 ground truth documents), we return 5 documents. Let $$\color{limegreen}\blacksquare$$ represent a relevant document (TP), and let $$\color{red}\blacksquare$$ represent an irrelevant document (false positive). Suppose our 5 documents are ranked as follows:
 
 $$
-\color{limegreen}\blacksquare \hspace{1mm} \color{red}\blacksquare \hspace{1mm} \color{limegreen}\blacksquare \hspace{1mm} \color{red}\blacksquare \hspace{1mm} \color{limegreen}\blacksquare
+\color{limegreen}1\blacksquare \hspace{1mm} \color{red}2\blacksquare \hspace{1mm} \color{limegreen}3\blacksquare \hspace{1mm} \color{red}4\blacksquare \hspace{1mm} \color{limegreen}5\blacksquare
 $$
 
 Our Prec@1 is 1/1, our Prec@2 is 1/2, Prec@3 is 2/3, our Prec@4 is 2/4, and our Prec@5 is 3/5. Our Recall@1 is 1/3, Recall@2 is 1/3, Recall@3 is 2/3, Recall@4 is 2/3, Recall@5 is 3/3.
@@ -82,18 +82,52 @@ plt.scatter(range(5), prec, 50, marker='.', c='r')
 plt.plot(range(5), recall, c='b', label='Recall'); 
 plt.scatter(range(5), recall, 50, marker='.', c='b')
 plt.xlabel('Rank'); plt.show()
+
+plt.plot(recall, prec, c='m')
+plt.scatter(recall, prec, 50, marker='.', c='m')
+plt.show()
 ```
-Recall can never go down.
+Recall can never go down (you can't subtract relevant documents you already found).
+
+How can we combine them into a single curve? Looking at two curves is challenging. We will wish to plot precision vs. recall. 
 
 
 ## Average Precision
 If we consider the rank position of each relevant document, $$K_1, K_2, \dots, K_R$$, then we can compute the Precision@K for each $$K_1, K_2, \dots, K_R$$. The average precision is the average of all P@K values. 
 
 
+One will often see metrics like Precision@0.5, meaning precision when Recall is 0.5.
 
+Generally we want to use fixed recall levels for this, e.g. 0.1, 0.2, 0.3
+
+On average, over thousands of queries, precision drops as recall increases. So we wish to preserve the decreasing monotonicity. Get an upper bound on the original recall-precision numbers. Standard way to interpolate to remove the "zig-zag" nature as:
+
+$$
+\hat{P}(R) = \underset{i}{\max} \{ P_i : R_i \geq R \}
+$$
+
+Alternatively, this is sometimes written as
+$$
+\hat{P}(r) = \underset{ \tilde{r} \geq r}{\max} p(\tilde{r})
+$$
+
+How does the monotonicity constraint work? Essentially, go to the $$R_i$$ value on the graph, and check the precision value here. Next, look as far as you would like to the right (larger values of $$R_i$$), and if precision ever gets bigger than $$P(R_i)$$, choose the bigger precision value.
+
+Historically, there were 11 standard levels of recall. In the [PASCAL VOC 2010 Paper](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf) [5], one will find the following equation
+
+$$
+AP = \frac{1}{11} \sum\limits_{R_i} \hat{P}(R_i)
+$$
+or equivalently
+
+$$
+AP = \frac{1}{11} \sum\limits_{r \in \{0,0.1,\dots,1} \hat{P}(r)
+$$
 
 
 ## Mean Average Precision
+
+Want a single number when tuning an algorithm. Mean average precision, is the average of precision values. Precision looks at a single threshold. Average precision looks at the entire ranking. 
 
 When performing the task of object detection, we would like to be discriminative not just about two classes
 
@@ -441,9 +475,10 @@ https://www.youtube.com/watch?v=yjCMEjoc_ZI
 
 [3] Victor Lavrenko Lecture, Univ. Edinburgh. [Evaluation 10: recall and precision over ranks.](https://www.youtube.com/watch?v=H7oAofuZjjE&list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&index=10)
 
-[4]
+[4] Victor Lavrenko Lecture, Univ. Edinburgh.[Evaluation 11: interpolated recall-precision plot](https://www.youtube.com/watch?v=yjCMEjoc_ZI&list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&index=11)
 
-[5]
+
+[5] PASCAL VOC [PDF](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf).
 
 
 
