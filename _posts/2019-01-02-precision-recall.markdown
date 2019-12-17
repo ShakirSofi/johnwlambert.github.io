@@ -16,7 +16,7 @@ Table of Contents:
 
 <a name='need-for-dr'></a>
 
-Average Precision is very common in two fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval.
+Average Precision is very common in two fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. We will be focused only on binary relevance.
 
 ## The Need for More Finely-Grained Measures of Accuracy
 
@@ -37,7 +37,7 @@ $$
 Precision measures your discriminative ability. If you claimed that all of the objects you saw were of a particular class, and you were usually wrong because they belonged to a different class, you would have low precision. Your judgments can't be considered *precise*. Precision is a proportion to measure, *How much junk did we give to the user?*
 
 $$
-\mbox{Precision} = \frac{tp}{tp+fp} = \frac{tp}{no. of predicted positives} 
+\mbox{Precision} = \frac{tp}{tp+fp} = \frac{tp}{\mbox{no. of predicted positives}}
 $$
 
 
@@ -56,9 +56,38 @@ Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm 
 ## Information Retrieval (IR)
 In IR, given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved.
 
+## Recall and Precision over Ranks
+In object detection, we generally have confidences associated with each prediction. In IR, we will be also be able to rank search results by confidence. While F-measure is one way of combining recall and precision, it cannot incorporate ranking or confidence information (at many different thresholds?) into its evaluation.
+
+You can compute precision and recall at each ranking. You can compute precision and recall at each ranking. Generally we try to plot these numbers.
+
+Precision @ K. We set a rank threshold @ K, and compute the % of relevant in the top K. We ignore all documents ranked lower than K. For example,
+
+
+
+We can do the same for Recall @K.
+
+Suppose for a query (seeking 3 ground truth documents), we return 5 documents. Let $$\color{limegreen}\blacksquare$$ represent a relevant document (TP), and let $$\color{red}\blacksquare$$ represent an irrelevant document (false positive). Suppose our 5 documents are ranked as follows:
+
+$$
+\color{limegreen}\blacksquare \hspace{1mm} \color{red}\blacksquare \hspace{1mm} \color{limegreen}\blacksquare \hspace{1mm} \color{red}\blacksquare \hspace{1mm} \color{limegreen}\blacksquare
+$$
+
+Our Prec@1 is 1/1, our Prec@2 is 1/2, Prec@3 is 2/3, our Prec@4 is 2/4, and our Prec@5 is 3/5. Our Recall@1 is 1/3, Recall@2 is 1/3, Recall@3 is 2/3, Recall@4 is 2/3, Recall@5 is 3/3.
+```python
+prec = [1/1, 1/2, 2/3, 2/4, 3/5]
+recall = [1/3, 1/3, 2/3, 2/3, 3/3]
+plt.plot(range(5), prec, c='r', label='Precision'); 
+plt.scatter(range(5), prec, 50, marker='.', c='r')
+plt.plot(range(5), recall, c='b', label='Recall'); 
+plt.scatter(range(5), recall, 50, marker='.', c='b')
+plt.xlabel('Rank'); plt.show()
+```
+Recall can never go down.
+
 
 ## Average Precision
-In object detection, we generally have confidences associated with each prediction. In IR, we will be also be able to rank search results by confidence. While F-measure is one way of combining recall and precision, it cannot incorporate ranking or confidence information (at many different thresholds?) into its evaluation.
+If we consider the rank position of each relevant document, $$K_1, K_2, \dots, K_R$$, then we can compute the Precision@K for each $$K_1, K_2, \dots, K_R$$. The average precision is the average of all P@K values. 
 
 
 
@@ -123,7 +152,7 @@ def voc_ap(rec, prec, use_07_metric=False):
 
 
 ## Object Detection Example
-In order to compute average precision, we first need to be able to count our true positives and false positives. To do so, we will compute overlap (i.e. IoU). Let ovmax be the maximum det-gt overlap observed thus far. Here is the pseudocode:
+In order to compute average precision, we first need to be able to count our true positives and false positives. To do so, we will compute overlap (i.e. IoU). Let ovmax be the maximum det-gt overlap observed thus far. In addition, if you have more than one detection for a single ground truth object, this must be considered an error (false positive). Here is the pseudocode:
 ```python
 sort detections from greatest to smallest confidence
 for each det in detections:
@@ -410,7 +439,7 @@ https://www.youtube.com/watch?v=yjCMEjoc_ZI
 
 [3] Victor Lavrenko Lecture, Univ. Edinburgh. [Why We Can't Use Accuracy](https://www.youtube.com/watch?v=mYW0PDnuPm0&list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&index=7)
 
-[3]
+[3] Victor Lavrenko Lecture, Univ. Edinburgh. [Evaluation 10: recall and precision over ranks.](https://www.youtube.com/watch?v=H7oAofuZjjE&list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&index=10)
 
 [4]
 
