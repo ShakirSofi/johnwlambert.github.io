@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Recall and Precision"
-permalink: /recall-precision/
+title:  "Precision and Recall"
+permalink: /precision-recall/
 excerpt: " "
 mathjax: true
 date:   2018-12-27 11:00:00
@@ -9,14 +9,24 @@ mathjax: true
 
 ---
 Table of Contents:
+
+- [Accuracy Isn't Helpful](#beyond-accuracy)
 - [Recall](#recall)
 - [Precision](#precision)
+- [Trading Off Between the Two](#pr-tradeoff)
+- [Precision and Recall over Ranks](#pr-at-rank-k)
+- [The Precision-Recall Curve](#pr-curve)
+- [Average Precision](#ap)
 - [Mean Average Precision (mAP)](#map)
+- [Precision@K and Recall@K Implementation](#pr-at-k-impl)
+- [AP Implementation](#ap-impl)
 
 
-<a name='need-for-dr'></a>
+## Why mAP?
+Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. 
 
-Average Precision is very common in two fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. We will be focused only on binary relevance.
+## Why is Object Detection evaluated as Information Retrieval?
+In Information Retrieval (IR), given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant, or it isn't).
 
 ## The Need for More Finely-Grained Measures of Accuracy
 
@@ -24,24 +34,29 @@ We'll suppose that we are performing binary classification: classifying objects 
 
 Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.
 
+<a name='beyond-accuracy'></a>
+## Why Isn't Accuracy Helpful?
+Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
+
+<a name='recall'></a>
 ### Recall
 
-Recall measures how many objects you missed. You can have very high recall by classifying everything as some class (at the expense of precision). It is a proportion to measure, *How much of the good stuff did we miss?*
+Recall measures how many objects you missed. You can have very high recall by classifying everything as some class (at the expense of precision). It is a proportion to measure, *How much of the good stuff did we miss?* or *"how complete the results are".*
 
 $$
 \mbox{Recall} = \frac{tp}{tp+fn} = \frac{tp}{\mbox{no. of actual positives}}
 $$
 
+<a name='precision'></a>
 ### Precision
 
-Precision measures your discriminative ability. If you claimed that all of the objects you saw were of a particular class, and you were usually wrong because they belonged to a different class, you would have low precision. Your judgments can't be considered *precise*. Precision is a proportion to measure, *How much junk did we give to the user?*
+Precision measures your discriminative ability. If you claimed that all of the objects you saw were of a particular class, and you were usually wrong because they belonged to a different class, you would have low precision. Your judgments can't be considered *precise*. Precision is a proportion to measure, *How much junk did we give to the user?* or *"how useful the search results are"*.
 
 $$
 \mbox{Precision} = \frac{tp}{tp+fp} = \frac{tp}{\mbox{no. of predicted positives}}
 $$
 
-
-
+<a name='pr-tradeoff'></a>
 ## Trading Off Between the Two
 Since these two metrics are complementary, we must always report them together. If we return only one of these two numbers, we can make either number arbitrarily high.
 
@@ -49,25 +64,17 @@ In an object detection system, we may require different amounts of overlap with 
 
 As we vary the value of this threshold, we can actually draw a curve -- a precision-recall curve.
 
-## Accuracy Isn't Helpful
-Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
+<a name='pr-at-rank-k'></a>
+## Precision and Recall over Ranks
+So far we have discussed set-based measures (precision and recall) which are computed with unordered sets of items. However, in information retrieval and object detection, we are more interested in evaluating *ranked* retrieval results. If we perform a Google search, we wish to only have to look at the first page of results. The dominant paradigm for object detection is to use anchor boxes, which are a huge, rigid set of default bounding boxes that will shifted and stretched slightly. Every single box will have a confidence associated with it, which can be used to as a ranking. While F-measure is one way of combining recall and precision, it cannot incorporate ranking or confidence information (at many different thresholds?) into its evaluation.
 
-
-## Information Retrieval (IR)
-In IR, given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved.
-
-## Recall and Precision over Ranks
-In object detection, we generally have confidences associated with each prediction. In IR, we will be also be able to rank search results by confidence. While F-measure is one way of combining recall and precision, it cannot incorporate ranking or confidence information (at many different thresholds?) into its evaluation.
-
-You can compute precision and recall at each ranking. You can compute precision and recall at each ranking. Generally we try to plot these numbers.
+You can compute precision and recall at each ranking. Generally we try to plot these numbers.
 
 Precision @ K. We set a rank threshold @ K, and compute the % of relevant in the top K. We ignore all documents ranked lower than K. For example,
 
-
-
 We can do the same for Recall @K.
 
-Suppose for a query (seeking 3 ground truth documents), we return 5 documents. Let $$\color{limegreen}\blacksquare$$ represent a relevant document (TP), and let $$\color{red}\blacksquare$$ represent an irrelevant document (false positive). Suppose our 5 documents are ranked as follows:
+Suppose for a query (seeking 3 ground truth documents), we return 5 documents. In an object detection setting, suppose there are three dogs in an image, and our detector predicted 5 bounding boxes. Let $$\color{limegreen}\blacksquare$$ represent a relevant document (TP), and let $$\color{red}\blacksquare$$ represent an irrelevant document (false positive). Suppose our 5 documents are ranked as follows:
 
 $$
 \color{limegreen}1\blacksquare \hspace{1mm} \color{red}2\blacksquare \hspace{1mm} \color{limegreen}3\blacksquare \hspace{1mm} \color{red}4\blacksquare \hspace{1mm} \color{limegreen}5\blacksquare
@@ -91,8 +98,8 @@ Recall can never go down (you can't subtract relevant documents you already foun
 
 How can we combine them into a single curve? Looking at two curves is challenging. We will wish to plot precision vs. recall. 
 
-
-## Average Precision
+<a name='pr-curve'></a>
+## The Precision-Recall Curve
 If we consider the rank position of each relevant document, $$K_1, K_2, \dots, K_R$$, then we can compute the Precision@K for each $$K_1, K_2, \dots, K_R$$. The average precision is the average of all P@K values. 
 
 
@@ -113,40 +120,59 @@ $$
 
 How does the monotonicity constraint work? Essentially, go to the $$R_i$$ value on the graph, and check the precision value here. Next, look as far as you would like to the right (larger values of $$R_i$$), and if precision ever gets bigger than $$P(R_i)$$, choose the bigger precision value.
 
-Historically, there were 11 standard levels of recall. In the [PASCAL VOC 2010 Paper](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf) [5], one will find the following equation
-
-$$
-AP = \frac{1}{11} \sum\limits_{R_i} \hat{P}(R_i)
-$$
-or equivalently
-
-$$
-AP = \frac{1}{11} \sum\limits_{r \in \{0,0.1,\dots,1} \hat{P}(r)
-$$
+Historically, there were 11 standard levels of recall. 
 
 
+<a name='ap'></a>
+## Average Precision
+Suppose we want a single number when tuning an algorithm. One way to convert the precision-recall curve into a single number is to take its integral. We'll use the trapezoidal rule (which you may be familiar with from numerical integration/quadrature) to computing the area under this curve.
+
+In the [PASCAL VOC 2010 Paper](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf) [5], one will find AP defined as:
+
+$$
+AP = \frac{1}{11} \sum\limits_{R_i} \hat{P}(R_i) = \frac{1}{11} \sum\limits_{r \in \{0, 0.1, \dots, 1\}} \hat{P}(r)
+$$
+
+While precision looks at a single threshold, average precision looks at *the entire ranking*.
+
+<a name='map'></a>
 ## Mean Average Precision
-
-Want a single number when tuning an algorithm. Mean average precision, is the average of precision values. Precision looks at a single threshold. Average precision looks at the entire ranking. 
-
-When performing the task of object detection, we would like to be discriminative not just about two classes
+While AP is a useful number to capture the performance of a system, it can only summarize performance for a single class/category at once. When performing the task of object detection, we would like to be discriminative not just about two classes (background and dog), but perhaps over 20 classes (PASCAL VOC) or 80 classes (COCO). Again, when tuning an algorithm, we want a single number to evaluate our system's performance *over all classes* simultaneously. Mean average precision, is the average (arithmetic mean) of average precision values.  
 
 
+Suppose for each class there are relevant documents (true positives) or ground truth object bounding boxes. Suppose for the dog class, there are 5 relevant objects, and for the cat class, there are 3 relevant objects. Call these query 1 and query 2. We compute average precision for each class/query, and then find their arithmetic mean for the mean average precision (mAP).
 
+$$
+mAP = \frac{1}{N} \sum\limits_{i=1}^N AP_i
+$$
 
+<a name='pr-at-k-impl'></a>
+## Precision@K and Recall@K Implementation
+
+An effective way to compute AP is to first count the total number of positives (ground truth items) as `npos`. Next, sort all N predictions by confidence and then create two zero-filled arrays, each of length N, corresponding to TPs and FPs, respectively. We will loop through all ranked detections -- if the detection represents a TP, we place a 1 at this rank in the TPs array. If a FP, we do the same for the FPs array instead.
+
+To compute Precision@K or Recall@K, we need only compute a cumulative sum at each rank $$K$$, and replace the FPs array with the cumulative FP sums, and the same for the TPs array.
 ```python
-# compute precision recall
 fp = np.cumsum(fp)
 tp = np.cumsum(tp)
-rec = tp / float(npos)
-# avoid divide by zero in case the first detection matches a difficult
-# ground truth
-prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
-ap = voc_ap(rec, prec, use_07_metric)
 ```
+As stated previously, recall is TP/(number of actual positives):
+```python
+rec = tp / float(npos)
+```
+Precision is TP/(number of predicted positives), and elementwise division will also do the trick. We must be careful here, however, to avoid division by zero, as some evaluation scripts ignore "difficult" ground truth items:
+```python
+prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
+```
+Now, given Recall@K and Precision@K at every rank K, we can call
+`ap = voc_ap(rec, prec, use_07_metric)`
+to find the average precision.
 
+<a name='ap-impl'></a>
+## AP Implementation
+Our next step is numerically integrating the P-R curve.
 
-Here is PASCAL VOC's AP computation from [Detectron2](https://github.com/facebookresearch/detectron2/blob/master/detectron2/evaluation/pascal_voc_evaluation.py)
+Here is PASCAL VOC's AP computation from [Detectron2](https://github.com/facebookresearch/detectron2/blob/master/detectron2/evaluation/pascal_voc_evaluation.py):
 ```python
 def voc_ap(rec, prec, use_07_metric=False):
     """Compute VOC AP given precision and recall. If use_07_metric is true, uses
@@ -238,31 +264,7 @@ def voc_eval(detpath,
     # assumes imagesetfile is a text file with each line an image name
     # cachedir caches the annotations in a pickle file
 
-    # first load gt
-    if not os.path.isdir(cachedir):
-        os.mkdir(cachedir)
-    cachefile = os.path.join(cachedir, 'annots.pkl')
-    # read list of images
-    with open(imagesetfile, 'r') as f:
-        lines = f.readlines()
-    imagenames = [x.strip() for x in lines]
-
-    if not os.path.isfile(cachefile):
-        # load annots
-        recs = {}
-        for i, imagename in enumerate(imagenames):
-            recs[imagename] = parse_rec(annopath.format(imagename))
-            if i % 100 == 0:
-                print 'Reading annotation for {:d}/{:d}'.format(
-                    i + 1, len(imagenames))
-        # save
-        print 'Saving cached annotations to {:s}'.format(cachefile)
-        with open(cachefile, 'w') as f:
-            cPickle.dump(recs, f)
-    else:
-        # load
-        with open(cachefile, 'r') as f:
-            recs = cPickle.load(f)
+    ...
 
     # extract gt objects for this class
     class_recs = {}
@@ -276,11 +278,6 @@ def voc_eval(detpath,
         class_recs[imagename] = {'bbox': bbox,
                                  'difficult': difficult,
                                  'det': det}
-
-    # read dets
-    detfile = detpath.format(classname)
-    with open(detfile, 'r') as f:
-        lines = f.readlines()
 
     splitlines = [x.strip().split(' ') for x in lines]
     image_ids = [x[0] for x in splitlines]
@@ -480,6 +477,6 @@ https://www.youtube.com/watch?v=yjCMEjoc_ZI
 
 [5] PASCAL VOC [PDF](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf).
 
+[6] Introduction to Information Retrieval. CS 276: Information Retrieval and Web Searc Lectures. Chris Manning, Pandu Nayak, Prabhakar Raghavan.
 
-
-
+[7] Christopher D. Manning, Prabhakar Raghavan and Hinrich Schütze, Introduction to Information Retrieval, Cambridge University Press. 2008. [HTML](https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html).
