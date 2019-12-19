@@ -10,7 +10,6 @@ mathjax: true
 ---
 Table of Contents:
 
-- [Accuracy Isn't Helpful](#beyond-accuracy)
 - [Recall](#recall)
 - [Precision](#precision)
 - [Trading Off Between the Two](#pr-tradeoff)
@@ -25,7 +24,8 @@ Table of Contents:
 ## Why mAP?
 Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. 
 
-## Why is Object Detection evaluated as Information Retrieval?
+## Missing Link Between Object Detection and Information Retrieval?
+In this post, you'll see that object detection is evaluated in the same way as information retrieval. Why is this? It turns out the tasks have a number of similarities.
 In Information Retrieval (IR), given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant, or it isn't).
 
 ## The Need for More Finely-Grained Measures of Accuracy
@@ -34,9 +34,7 @@ We'll suppose that we are performing binary classification: classifying objects 
 
 Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.
 
-<a name='beyond-accuracy'></a>
-## Why Isn't Accuracy Helpful?
-Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
+For both tasks, it turns out accuracy isn't a helpful metric.Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
 
 <a name='recall'></a>
 ### Recall
@@ -156,11 +154,11 @@ To compute Precision@K or Recall@K, we need only compute a cumulative sum at eac
 fp = np.cumsum(fp)
 tp = np.cumsum(tp)
 ```
-As stated previously, recall is TP/(number of actual positives):
+As stated previously, recall is TP/(number of actual positives), and elementwise division of the two arrays will give us Recall@K.
 ```python
 rec = tp / float(npos)
 ```
-Precision is TP/(number of predicted positives), and elementwise division will also do the trick. We must be careful here, however, to avoid division by zero, as some evaluation scripts ignore "difficult" ground truth items:
+Precision is TP/(number of predicted positives), and elementwise division will also do the trick to give us Precision@K. We must be careful here, however, to avoid division by zero, as some evaluation scripts ignore "difficult" ground truth items:
 ```python
 prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
 ```

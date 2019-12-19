@@ -186,3 +186,103 @@ JAMES MULTI-VIEW https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf
 
 
 
+
+
+
+2d shifts=parallax
+
+Basic idea: camera takes picture of the same scene, in two different positions, you can recover the depth
+
+depth is the mixing ingredient
+
+vision: recover the missing depth information when the iamge was acquired from the scene
+
+the camera could be moving
+
+think of two cameras collecting images at the same time. there are diffeerences in the images. per pixel shift in the scene as consequence of cameras different position in 3d space
+
+understanding that two points correspond to the same structure in the real world
+
+fix their position relative to each other, just calibrate once, known relationship
+
+or may need to calibrate them constantly, if constantly moving
+
+What is the part of the scene on the right that matches that location? Correspondence problem (finding match across)
+
+Used to use search techniques and optimization. now use deep learning. 
+
+send out two rays, just calibrate the camera bit (3d to 2d projection), then reverse it
+
+triangle constructed in this process
+
+Key computation: the matching.
+
+Depth is crucial for navigating in the world, the key to unlocking the images and using them for 3d reasoning
+
+understand shape of world, and what is in the image.
+
+The x-coordinate is the only difference, one is translated by the baseline $B$. shift in 1-dimension, by one number. 2 points will lie on the same row in both images. we know where to look.
+
+$$Z=f\frac{B}{d}$$
+
+there are some scale factors (which we get from calibration), simple reciprocal/inverse relationship
+
+now, knowing geometric relationships, how to build stereo systems. Practical details: classical stereo, 80s/90s.
+
+How do we decide two chunks of pixels are the same?
+
+Turn the search problem into just optimizing a function.
+
+Start somewhere, newton's method or gradient descent, find best match
+
+You put a box at every single pixel location.
+
+Lot of noise in these image, want to put a lot of measurments together to overcome that noise.
+
+All scanlines are epipolar lines.
+
+These lines are paralle, how do they converge? they converge at infinity.
+
+literally apply this formula row by row
+
+image normalization : image can be though of as a vector, each row, stack them. vector represents the entire image. vector space, each point in that space is an entire image. or each window of pixels could be a point.
+
+windows -- compare them as vectors
+
+inner product of two vectors, normalized correlation?
+
+good match -- vectors are the same. angle between the vectors, cosine of angle between them.
+
+Lot of complexities: images can be problematic, can contian ares quite hard to get matches (occluded).
+
+Or what about blank wall, textureless regions. Issue of aggregation. Can't look at a single white patch of pixels and tell. integrate info at other levels. look at edge of wall.
+
+Dynamic programming, used in this case. Use a single match as constraint to find other matches. get ordering constraint.
+
+sometimes blue patch is not going to happen! happens all the time. have to allow that sometime there will not be a match, and just move on to the next guy.
+ 
+ real-time stereo in late 80s from stereo matching with dynamic programming.
+
+Turns out there are quite a few problems.
+
+illusion? thin nail illusion, thin object close to the camera?
+
+slanted plane: scrunched, will have multiple matches in one location.
+
+one scanline at a time, wasnt the winning approach.
+
+matching the scannline independently isn't good -- may see weird artifacts when you look at a vertical column, 3d boundaries in scene may not make straight lines. no consistently through your scanlines.
+
+Scanline is bad as representation of the world. segemntation based stereo -- first segment the iamge into patches that are similar in their appearance, then work patch by patch and do the matching.
+
+you can also get view interpolation, synthesize new views in between the two views.
+
+Another challenge in stereo: reflections in mirror, bright objects like picture frame. What tool should we reach for to solve all of the problems in stereo?
+
+It is always the answer... Getting deep learning into stereo took a while. took longer than recognizing cats.
+
+One architetecture -- less propagation of error. fits into one model. every decision you make about how to optimize, end-to-end optimzation. best chance to drive the error down with data.
+
+
+
+
