@@ -109,15 +109,21 @@
 <p>Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the <script type="math/tex">Z</script>-axis. A figure is shown below:</p>
 
 <div class="fig figcenter fighighlight">
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+  <img src="/assets/stereo_coordinate_systems_rehg_dellaert.jpg" width="90%" />
+  <div class="figcaption">
+    Two cameras with optical centers O_L and O_R are separated by a baseline B. The z-axis extends towards the world, away from the camera.
+  </div>
+</div>
+
+<p>Now, consider just the plane spanned by the <script type="math/tex">x</script>- and <script type="math/tex">z</script>-axes, with a constant <script type="math/tex">y</script> value:</p>
+<div class="fig figcenter fighighlight">
   <img src="/assets/stereo_vision_setup.jpg" width="50%" />
-=======
-  <img src="/assets/stereo_vision_setup.png" width="50%" />
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; bbabd62b79acfce4d33cc330fc01a5e0b1e16d7f
+
   <div class="figcaption">
     Two cameras L and R are separated by a baseline b. Here the Y-axis is perpendicular to the page. f is our (horizontal) focal length.
   </div>
 </div>
+
 <p>In this figure, the world point <script type="math/tex">P=(x,z)</script> is projected into the left image as <script type="math/tex">p_l</script> and into the right image as <script type="math/tex">p_r</script>.</p>
 
 <p>By defining right triangles we can find two similar triangles: with vertices at <script type="math/tex">(0,0)-(0,z)-(x,z)</script> and <script type="math/tex">(0,0)-(0,f)-(f,x_l)</script>. Since they share the same angle <script type="math/tex">\theta</script>, then <script type="math/tex">\mbox{tan}(\theta)= \frac{\mbox{opposite}}{\mbox{adjacent}}</script> for both, meaning:</p>
@@ -192,6 +198,14 @@ each <script type="math/tex">(x_l,y_l)</script>.</li>
 
 <script type="math/tex; mode=display">E = R \mbox{ } [t]_{\times}</script>
 
+<h2 id="when-is-smoothing-a-good-idea">When is smoothing a good idea?</h2>
+
+<p>Of course smoothing should help in noisy areas of an image. It will only help to alleviate particular types of noise, however. It is not a definitive solution to obtaining better depth maps.</p>
+
+<p>Smoothing performs best on background/uniform areas: disparity values here are already similar to each other, so smoothing doesn’t have to make any drastic changes. Pixels near each other are actually supposed to have similar disparity values, so the technique makes sense in these regions. Smoothing can also help in areas of occlusion, where SAD may not be able to find any suitable match. Smoothing will curb the problems by pushing the dispairty of a pixel to be similar to that of its neighbors.</p>
+
+<p>Smoothing performs poorly in areas of fine detail, with narrow objects. It also performs poorly in areas with many edges and depth discontinuities. Smoothing algorithms penalize large disparity differences in closeby regions (which can actually occur in practice). Smoothing penalizes sharp disparity changes (corresponding to depth discontinuities).</p>
+
 <h2 id="object-detection-in-stereo">Object Detection in Stereo</h2>
 
 <p>Chen <em>et al.</em>
@@ -226,6 +240,100 @@ DEPTH http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineV
 STEREO https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
 SFM http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
 JAMES MULTI-VIEW https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf</p>
+
+<p>2d shifts=parallax</p>
+
+<p>Basic idea: camera takes picture of the same scene, in two different positions, you can recover the depth</p>
+
+<p>depth is the mixing ingredient</p>
+
+<p>vision: recover the missing depth information when the iamge was acquired from the scene</p>
+
+<p>the camera could be moving</p>
+
+<p>think of two cameras collecting images at the same time. there are diffeerences in the images. per pixel shift in the scene as consequence of cameras different position in 3d space</p>
+
+<p>understanding that two points correspond to the same structure in the real world</p>
+
+<p>fix their position relative to each other, just calibrate once, known relationship</p>
+
+<p>or may need to calibrate them constantly, if constantly moving</p>
+
+<p>What is the part of the scene on the right that matches that location? Correspondence problem (finding match across)</p>
+
+<p>Used to use search techniques and optimization. now use deep learning.</p>
+
+<p>send out two rays, just calibrate the camera bit (3d to 2d projection), then reverse it</p>
+
+<p>triangle constructed in this process</p>
+
+<p>Key computation: the matching.</p>
+
+<p>Depth is crucial for navigating in the world, the key to unlocking the images and using them for 3d reasoning</p>
+
+<p>understand shape of world, and what is in the image.</p>
+
+<p>The x-coordinate is the only difference, one is translated by the baseline $B$. shift in 1-dimension, by one number. 2 points will lie on the same row in both images. we know where to look.</p>
+
+<script type="math/tex; mode=display">Z=f\frac{B}{d}</script>
+
+<p>there are some scale factors (which we get from calibration), simple reciprocal/inverse relationship</p>
+
+<p>now, knowing geometric relationships, how to build stereo systems. Practical details: classical stereo, 80s/90s.</p>
+
+<p>How do we decide two chunks of pixels are the same?</p>
+
+<p>Turn the search problem into just optimizing a function.</p>
+
+<p>Start somewhere, newton’s method or gradient descent, find best match</p>
+
+<p>You put a box at every single pixel location.</p>
+
+<p>Lot of noise in these image, want to put a lot of measurments together to overcome that noise.</p>
+
+<p>All scanlines are epipolar lines.</p>
+
+<p>These lines are paralle, how do they converge? they converge at infinity.</p>
+
+<p>literally apply this formula row by row</p>
+
+<p>image normalization : image can be though of as a vector, each row, stack them. vector represents the entire image. vector space, each point in that space is an entire image. or each window of pixels could be a point.</p>
+
+<p>windows – compare them as vectors</p>
+
+<p>inner product of two vectors, normalized correlation?</p>
+
+<p>good match – vectors are the same. angle between the vectors, cosine of angle between them.</p>
+
+<p>Lot of complexities: images can be problematic, can contian ares quite hard to get matches (occluded).</p>
+
+<p>Or what about blank wall, textureless regions. Issue of aggregation. Can’t look at a single white patch of pixels and tell. integrate info at other levels. look at edge of wall.</p>
+
+<p>Dynamic programming, used in this case. Use a single match as constraint to find other matches. get ordering constraint.</p>
+
+<p>sometimes blue patch is not going to happen! happens all the time. have to allow that sometime there will not be a match, and just move on to the next guy.</p>
+
+<p>real-time stereo in late 80s from stereo matching with dynamic programming.</p>
+
+<p>Turns out there are quite a few problems.</p>
+
+<p>illusion? thin nail illusion, thin object close to the camera?</p>
+
+<p>slanted plane: scrunched, will have multiple matches in one location.</p>
+
+<p>one scanline at a time, wasnt the winning approach.</p>
+
+<p>matching the scannline independently isn’t good – may see weird artifacts when you look at a vertical column, 3d boundaries in scene may not make straight lines. no consistently through your scanlines.</p>
+
+<p>Scanline is bad as representation of the world. segemntation based stereo – first segment the iamge into patches that are similar in their appearance, then work patch by patch and do the matching.</p>
+
+<p>you can also get view interpolation, synthesize new views in between the two views.</p>
+
+<p>Another challenge in stereo: reflections in mirror, bright objects like picture frame. What tool should we reach for to solve all of the problems in stereo?</p>
+
+<p>It is always the answer… Getting deep learning into stereo took a while. took longer than recognizing cats.</p>
+
+<p>One architetecture – less propagation of error. fits into one model. every decision you make about how to optimize, end-to-end optimzation. best chance to drive the error down with data.</p>
 
 
   </article>
