@@ -44,7 +44,7 @@ $$
 
 ### Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)
 
-In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \\( \theta^{(k)} \\) that we cannot trust the affine approximation. We often refer to this concept as remaining within a "trust region" ([TRPO](https://arxiv.org/abs/1502.05477) is named after the same concept). Thus, we wish 
+In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \\( \theta^{(k)} \\) that we cannot trust the affine approximation. We often refer to this concept as remaining within a "trust region" (TRPO [1] is named after the same concept). Thus, we wish 
 $$
 || \theta - \theta^{(k)} ||^2
 $$
@@ -180,5 +180,7 @@ end
 ``` 
 
 ## References
+
+[1] John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel. Trust Region Policy Optimization. [PDF](https://arxiv.org/abs/1502.05477).
 
 [1] Boyd. VMLS. 
