@@ -92,6 +92,8 @@
   <h2 id="why-know-epipolar-geometry">Why know Epipolar Geometry?</h2>
 <p>Modern robotic computer vision tasks like Structure from Motion (SfM) and Simultaneous Localization and Mapping (SLAM) would not be possible without feature matching. Tools from Epipolar Geometry are an easy way to discard outliers in feature matching and are widely used.</p>
 
+<h2 id="the-direct-linear-transform-dlt">The Direct Linear Transform (DLT)</h2>
+
 <h2 id="the-fundamental-matrix">The Fundamental Matrix</h2>
 
 <p>The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x,x^{\prime}\) are 2D corresponding points in separate images. In other words,</p>
@@ -168,12 +170,17 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 
 <p>[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL <a href="http://ee263.stanford.edu/notes/low_rank_approx.pdf">http://ee263.stanford.edu/notes/low_rank_approx.pdf</a>.</p>
 
+<p>[3] Aaron Bobick, online lectures. <a href="https://www.youtube.com/watch?v=ZYLwPtfETpc&amp;list=PLQgNi_PlCHx3tO8XUz8x86r1aMER0bbu3&amp;index=46">Video</a>.</p>
 
   </article>
 
   <!-- mathjax -->
   
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
   
   
   <!-- disqus comments -->
