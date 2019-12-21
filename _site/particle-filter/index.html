@@ -91,14 +91,21 @@
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#sfmpipeline">A Basic SfM Pipeline</a></li>
-  <li><a href="#costfunctions">Cost Functions</a></li>
-  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+  <li><a href="#sfmpipeline">Particle Filter Overview</a></li>
+  <li><a href="#costfunctions">What’s Wrong With the EKF?</a></li>
+  <li><a href="#bundleadjustment">A Different Parameterization: Particles</a></li>
+  <li><a href="#placeholder">Verify Inverse Unscented Transform</a></li>
+  <li><a href="#placeholder">Matrix Square Roots</a></li>
+  <li><a href="#placeholder">UKF (Sigma Point Filter)</a></li>
+  <li><a href="#placeholder">Choosing Lambda</a></li>
+  <li><a href="#placeholder">PRO version of UKF</a></li>
+  <li><a href="#placeholder">Predict Step</a></li>
+  <li><a href="#placeholder">Sample Degeneracy</a></li>
 </ul>
 
 <p><a name="sfmpipeline"></a></p>
 
-<h2 id="particle-filter">Particle Filter</h2>
+<h2 id="particle-filter-overview">Particle Filter Overview</h2>
 
 <p>The <strong>Particle Filter</strong> is a filtering algorithm that, unlike the Kalman Filter or EKF, can represent multi-modal distributions. This is because it contains no assumptions about the form of the state distribution. It was published in 1995 [2,3] by Simon Julier, Jeffrey Uhlmann, and Hugh Durrant-Whyte at Oxford. It is often called the <strong>“Unscented Kalman Filter” (UKF)</strong> because the inventors thought “it didn’t stink” like the EKF.</p>
 
@@ -109,7 +116,7 @@
 <p>The Particle Filter addresses a number of problems with the EKF:</p>
 
 <p><strong>Problem No. 1</strong> The initial conditions (I.C.s)!
-<em>If your initial guess is wrong, the Kalman filter will tell you exactly the wrong thing. The linearization can be vastly different at different parts of the state space</em>. For example, the EKF could diverge if the residual $| \mu_{0 \mid 0} - x |$ on the initial condition is large. In fact, if $ | \mu_{t \mid t} - x_t |$ large at any time, then the EKF could diverge. This has to do with severity of non-linearity. This is the most commonly found problem.</p>
+<em>If your initial guess is wrong, the Kalman filter will tell you exactly the wrong thing. The linearization can be vastly different at different parts of the state space</em>. For example, the EKF could diverge if the residual <script type="math/tex">\| \mu_{0 \mid 0} - x \|</script> on the initial condition is large. In fact, if <script type="math/tex">\| \mu_{t \mid t} - x_t \|</script> large at any time, then the EKF could diverge. This has to do with severity of non-linearity. This is the most commonly found problem.</p>
 
 <p><strong>Problem No. 2: Covariance</strong>
 <em>In the EKF, the “covariance matrix” does not literally represent the covariance.</em> Unfortunately, the covariance matrix only literally captures the covariance in the Kalman Filter. In the EKF, it is just a matrix! We don’t know what it means! If we treat it as confidence, then it is reasonable enough. And commonly true, as long as $\mu$ is tracking $x$ pretty well. However, this estimate tends to be overconfident since we are not incorporating linearization errors! Instead, <script type="math/tex">\Sigma_{t \mid t}</script> incorporates only the noise errors <script type="math/tex">Q_t, R_t</script>. Thus, <script type="math/tex">\Sigma_{t \mid t}</script>  tends to be smaller than the true covariance matrix.</p>
@@ -147,10 +154,10 @@ We want the sample sigma points to share the same mean, covariance</p>
 
 <p>This is a matrix square root</p>
 
-<p>The index $i$ is the <script type="math/tex">i</script>‘th column in the matrix square root</p>
+<p>The index <script type="math/tex">i</script> is the <script type="math/tex">i</script>‘th column in the matrix square root</p>
 
 <p>We also have a mirror image set:<br />
-$x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$\</p>
+<script type="math/tex">x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n</script>\</p>
 
 <p>Those were the points. The weights themselves:</p>
 
@@ -159,7 +166,7 @@ $x^i = \mu - ( \sqrt{(n+\lambda) \Sigma } )_{i-n}, i =n+ 1, \dots, 2n$\</p>
 <script type="math/tex; mode=display">w^i = \frac{1}{2(n+\lambda)}, i \geq 1</script>
 
 <p>Each of these points plot points around the circle/ellipse
-Break ellipse into major and minor axes. $x_1, x_2, x_3, x_4$ at the corners of the principal axes and the parameters.</p>
+Break ellipse into major and minor axes. <script type="math/tex">x_1, x_2, x_3, x_4</script> at the corners of the principal axes and the parameters.</p>
 
 <p><script type="math/tex">n \times n</script> matrix is <script type="math/tex">\sqrt{(n+\lambda) \Sigma}</script></p>
 
@@ -285,11 +292,9 @@ Now,</p>
 
 <p>Now</p>
 
-<p>\begin{equation}
-\begin{aligned}
-\Sigma_{t+1 \mid t}^{XY} = \sum\limits_{i=0}^{2n} w^i (x_{t+1 \mid t}^i - \mu_{t+1 \mid t}) (\hat{y}<em>{t+1 \mid t}^i - \hat{y}</em>{t+1 \mid t})^T
-\end{aligned}
-\end{equation}</p>
+<script type="math/tex; mode=display">\begin{aligned}
+\Sigma_{t+1 \mid t}^{XY} = \sum\limits_{i=0}^{2n} w^i (x_{t+1 \mid t}^i - \mu_{t+1 \mid t}) (\hat{y}_{t+1 \mid t}^i - \hat{y}_{t+1 \mid t})^T
+\end{aligned}</script>
 
 <p>We are doing a fitting operation. That is why we have more sigma points than we need. Smooth out the anomalies due to any one point getting weird.</p>
 
@@ -298,9 +303,10 @@ Now,</p>
 \end{equation}</p>
 
 <p>\begin{equation}
-\mu_{t+1 \mid t+1 } = \mu_{t+1 \mid t } + \Sigma_{t+1 \mid t}^{XY} (\Sigma_{t+1 \mid t}^{YY})^{-1} (y_{t+1} - \hat{y}<em>{t+1 \mid t})
-\end{equation}
-where $y</em>{t+1}$ is the actual measurement.</p>
+\mu_{t+1 \mid t+1 } = \mu_{t+1 \mid t } + \Sigma_{t+1 \mid t}^{XY} (\Sigma_{t+1 \mid t}^{YY})^{-1} (y_{t+1} - \hat{y}_{t+1 \mid t})
+\end{equation}</p>
+
+<p>where <script type="math/tex">y_{t+1}</script> is the actual measurement.</p>
 
 <h2 id="choosing-lambda">Choosing Lambda</h2>
 
@@ -322,12 +328,13 @@ where $y</em>{t+1}$ is the actual measurement.</p>
 
 <p>The smaller <script type="math/tex">\lambda</script> is, the closer it will be to an EKF, which fits about a single-point (linearizing it there)</p>
 
-<p>Interesting value of <script type="math/tex">\lambda</script>: <script type="math/tex">\lambda=2</script>. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)
-\item Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize
-\end{itemize}
-\subsection{PRO version of UKF}
-\begin{itemize}
-\item Other Form of UKF:</p>
+<p>Interesting value of <script type="math/tex">\lambda</script>: <script type="math/tex">\lambda=2</script>. For a quadratic non-linearity, then the inverse unscented transform fits the mean and the covariance of the Gaussian, and also the Kurtosis (the 4th moment) of the Gaussian (but only for a quadratic nonlinearity)</p>
+
+<p>Fitting the Kurtosis is good! We can do it beacause the extra degrees of freedom of the sigma points overparameterize</p>
+
+<h2 id="pro-version-of-ukf">PRO version of UKF</h2>
+
+<p>Other Form of UKF:</p>
 
 <p>\begin{equation}
 \lambda = \alpha^2 ( n + k) - n
@@ -342,7 +349,7 @@ this gives us two parameters to tune</p>
 
 <script type="math/tex; mode=display">w_c^0 = \frac{\lambda}{n+\lambda} + (1 - \alpha^2 + \beta)</script>
 
-<p>where $\beta$ is another parameter</p>
+<p>where <script type="math/tex">\beta</script> is another parameter</p>
 
 <p>Hugh Durrant White, the original paper has this original form</p>
 
@@ -364,23 +371,23 @@ this gives us two parameters to tune</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{array}{lll}
-\mu = \mathbbm{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, & x_i \sim p(x), & i=1,\dots, N, i.i.d
+\mu = \mathbb{E}[X] = \int_x p(x) dx \approx \frac{1}{N} \sum\limits_{i=1}^N x_i = \bar{\mu}, & x_i \sim p(x), & i=1,\dots, N, i.i.d
 \end{array} %]]></script>
 
 <p>Then</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{array}{ll}
-\Sigma = \mathbbm{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, & x_i \sim p(x)
+\Sigma = \mathbb{E}[(X-\mu)(X-\mu)^T] = \dots \approx \frac{1}{N} \sum\limits_{i=1}^N (x_i - \bar{\mu})(x_i - \bar{\mu})^T, & x_i \sim p(x)
 \end{array} %]]></script>
 
 <p>Also,</p>
 
-<script type="math/tex; mode=display">\mathbbm{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)</script>
+<script type="math/tex; mode=display">\mathbb{E}[f(x)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x_i)</script>
 
 <p>The Law of Large numbers states that</p>
 
-<script type="math/tex; mode=display">\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbbm{E}[f(X)]</script>
+<script type="math/tex; mode=display">\frac{1}{N} \sum\limits_{i=1}^N f(x_i) \rightarrow \mathbb{E}[f(X)]</script>
 
 <p>as <script type="math/tex">N \rightarrow \infty</script></p>
 
@@ -402,19 +409,19 @@ this gives us two parameters to tune</p>
 
 <p><script type="math/tex">q(x)</script> the proposal distribution, the particles are actually from here</p>
 
-<p>We want them to be from $p(x)$ the target distribution, we wish they were from here</p>
+<p>We want them to be from <script type="math/tex">p(x)</script> the target distribution, we wish they were from here</p>
 
 <p>We use Particle Weights</p>
 
-<script type="math/tex; mode=display">\mathbbm{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx</script>
+<script type="math/tex; mode=display">\mathbb{E}_p [ f(X)] = \int_x f(x) p(x) dx = \int_x f(x) p(x) \frac{q(x)}{q(x)} dx</script>
 
-<script type="math/tex; mode=display">\mathbbm{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbbm{E}_q [ f(X) w(x) ]</script>
+<script type="math/tex; mode=display">\mathbb{E}_p [ f(X)] = \int_x f(x) w(x) q(x) dx  = \mathbb{E}_q [ f(X) w(x) ]</script>
 
-<p>Given ${x^1, \dots, x^N }$
-New set: ${ (x^1,w^1), \dots, (x^N,w^N) }$ where $w^i = w(x^i)$
+<p>Given <script type="math/tex">\{x^1, \dots, x^N \}</script>
+New set: <script type="math/tex">\{ (x^1,w^1), \dots, (x^N,w^N) \}$ where $w^i = w(x^i)</script>
 Now the expectation is</p>
 
-<script type="math/tex; mode=display">\mathbbm{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i</script>
+<script type="math/tex; mode=display">\mathbb{E}_p[f(X)] \approx \frac{1}{N} \sum\limits_{i=1}^N f(x^i) w^i</script>
 
 <p>and <script type="math/tex">w(x) = \frac{p(x)}{q(x)}</script></p>
 
@@ -590,6 +597,10 @@ Important for SLAM, because in SLAM we often want to estimate the history of the
   <!-- mathjax -->
   
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
   
   
   <!-- disqus comments -->
