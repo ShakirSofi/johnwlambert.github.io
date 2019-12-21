@@ -1,15 +1,15 @@
 ---
 layout: post
-title:  "Precision and Recall"
+comments: true
 permalink: /precision-recall/
-excerpt: " "
-mathjax: true
+title:  "Precision and Recall"
+excerpt: "implementation to calculate mAP for object detection"
 date:   2018-12-27 11:00:00
 mathjax: true
 
 ---
-Table of Contents:
 
+Table of Contents:
 - [Recall](#recall)
 - [Precision](#precision)
 - [Trading Off Between the Two](#pr-tradeoff)
@@ -24,9 +24,11 @@ Table of Contents:
 ## Why mAP?
 Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. 
 
+ranking-based retrieval performance metric
+
 ## Missing Link Between Object Detection and Information Retrieval?
 In this post, you'll see that object detection is evaluated in the same way as information retrieval. Why is this? It turns out the tasks have a number of similarities.
-In Information Retrieval (IR), given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant, or it isn't).
+In Information Retrieval (IR), given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant to the query, or it is not).
 
 ## The Need for More Finely-Grained Measures of Accuracy
 
@@ -103,9 +105,15 @@ If we consider the rank position of each relevant document, $$K_1, K_2, \dots, K
 
 One will often see metrics like Precision@0.5, meaning precision when Recall is 0.5.
 
-Generally we want to use fixed recall levels for this, e.g. 0.1, 0.2, 0.3
+$$
+Prec@K = \frac{1}{K} \sum\limits_{i=1}^K \mathbf{1} [x_i \in S_q^+]
+$$
 
-On average, over thousands of queries, precision drops as recall increases. So we wish to preserve the decreasing monotonicity. Get an upper bound on the original recall-precision numbers. Standard way to interpolate to remove the "zig-zag" nature as:
+where $$\mathbf{1}[\cdot]$$ is a binary indicator. Generally we want to use fixed recall levels for this, e.g. 0.1, 0.2, 0.3.
+
+The precision-recall curve is formally defined as $$PR(q) = \{ (Prec(i), Rec(i)), i=0, \dots, N \}$$, where Prec(i) and Rec(i) are the preciison and recall evaluated at the i-th position in the ranking [10].
+
+On average, over thousands of queries, precision drops as recall increases. So we wish to preserve the decreasing monotonicity. Get an upper bound on the original recall-precision numbers. Standard way to interpolate to remove the "zig-zag"/sawtooth nature as:
 
 $$
 \hat{P}(R) = \underset{i}{\max} \{ P_i : R_i \geq R \}
@@ -123,12 +131,36 @@ Historically, there were 11 standard levels of recall.
 
 <a name='ap'></a>
 ## Average Precision
-Suppose we want a single number when tuning an algorithm. One way to convert the precision-recall curve into a single number is to take its integral. We'll use the trapezoidal rule (which you may be familiar with from numerical integration/quadrature) to computing the area under this curve.
+Suppose we want a single number when tuning an algorithm. One way to convert the precision-recall curve into a single number is to take its integral. We'll use Riemann sums/the trapezoidal rule (which you may be familiar with from numerical integration/quadrature) to computing the area under this curve.
+
+$$
+AP = \sum\limits_{i=1}^N \mbox{Prec}(i) \Delta\mbox{Rec}(i)
+$$
 
 In the [PASCAL VOC 2010 Paper](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf) [5], one will find AP defined as:
 
 $$
 AP = \frac{1}{11} \sum\limits_{R_i} \hat{P}(R_i) = \frac{1}{11} \sum\limits_{r \in \{0, 0.1, \dots, 1\}} \hat{P}(r)
+$$
+
+A more general expression for AP is an integral, approximated as a sum:
+
+$$
+AP = \int_{0}^1 \hspace{1mm} p(r) dr \approx \sum\limits_{k=1}^n P(k) \Delta r(k)
+$$
+
+where $$k$$ is the rank in a sequence of ranked items, and $$n$$ is the number of retrieved items, P(k) is the Precission@K, and $$\Delta r(k)$$ is the change in recall from items $$k-1$$ to $$k$$, as defined in [2].
+
+Modern datasets like the Waymo Open Dataset [8] express this integral with the monotonically decreasing component:
+
+$$
+AP = 100 \int_0^1 \max \{ p(r^\prime) \mid r^\prime \geq r \} dr
+$$
+
+He et al. express AP yet another way:
+
+$$
+AP = \frac{1}{|S_q^+|} \sum\limits_{K=1}^n \mathbb{1}[x_K \in S_q^+]Prec@K
 $$
 
 While precision looks at a single threshold, average precision looks at *the entire ranking*.
@@ -162,51 +194,45 @@ Precision is TP/(number of predicted positives), and elementwise division will a
 ```python
 prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
 ```
-Now, given Recall@K and Precision@K at every rank K, we can call
-`ap = voc_ap(rec, prec, use_07_metric)`
-to find the average precision.
+Now, given Recall@K and Precision@K at every rank K, we can compute the average precision.
 
 <a name='ap-impl'></a>
 ## AP Implementation
-Our next step is numerically integrating the P-R curve.
+Our next step is numerically integrating the P-R curve. The 
 
-Here is PASCAL VOC's AP computation from [Detectron2](https://github.com/facebookresearch/detectron2/blob/master/detectron2/evaluation/pascal_voc_evaluation.py):
+The following code snippets are taken directly from the AP computation for PASCAL VOC in [Detectron2](https://github.com/facebookresearch/detectron2/blob/master/detectron2/evaluation/pascal_voc_evaluation.py). The VOC 2007 metric is an 11-point method. For 11 equally spaced cutoff values of recall $$t\in[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]$$, we will find all computed recall values in our array greater than $$t$$, and find the maximum precision at any such valid value. We then multiply it by the width of the bar (1/11), and add it to our sum.
 ```python
-def voc_ap(rec, prec, use_07_metric=False):
-    """Compute VOC AP given precision and recall. If use_07_metric is true, uses
-    the VOC 07 11-point method (default:False).
-    """
-    if use_07_metric:
-        # 11 point metric
-        ap = 0.0
-        for t in np.arange(0.0, 1.1, 0.1):
-            if np.sum(rec >= t) == 0:
-                p = 0
-            else:
-                p = np.max(prec[rec >= t])
-            ap = ap + p / 11.0
+ap = 0.0
+for t in np.arange(0.0, 1.1, 0.1):
+    if np.sum(rec >= t) == 0:
+        p = 0
     else:
-        # correct AP calculation
-        # first append sentinel values at the end
-        mrec = np.concatenate(([0.0], rec, [1.0]))
-        mpre = np.concatenate(([0.0], prec, [0.0]))
-
-        # compute the precision envelope
-        for i in range(mpre.size - 1, 0, -1):
-            mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
-
-        # to calculate area under PR curve, look for points
-        # where X axis (recall) changes value
-        i = np.where(mrec[1:] != mrec[:-1])[0]
-
-        # and sum (\Delta recall) * prec
-        ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
-    return ap
+        p = np.max(prec[rec >= t])
+    ap = ap + p / 11.0
 ```
 
+After 2012, a more "correct" version of AP calculation was used. In this version, we first remove zigzags (enforcing a strictly monotonically decreasing precisison). 
+```
+mpre = np.concatenate(([0.0], prec, [0.0]))
+# compute the precision envelope
+for i in range(mpre.size - 1, 0, -1):
+    mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
+```
+Afterwards, at every location in the staircase precision-recall curve where a step occurs, we compute the Riemann sum. Thus, instead of a crude 11-point approximation, we can compute with many more points.
+```python
+# first append sentinel values at the end
+mrec = np.concatenate(([0.0], rec, [1.0]))
+```
+We look for points where the X axis (recall) changes value
+```
+i = np.where(mrec[1:] != mrec[:-1])[0]
+```
+Now, the area under the curve is a sum of $$\Delta recall * prec$$ values:
+```
+ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
+```
 
-
-
+Let's walk through a small numerical example.
 
 
 ## Object Detection Example
@@ -454,17 +480,23 @@ def _evaluate_box_proposals(dataset_predictions, coco_api, thresholds=None, area
     }
 ```
 
+## Using AP as a Loss Function
+While maximizing AP has always been a goal of retrieval and object detection systems, AP itself had not been directly used as a loss function because it involves a non-differentiable step (sorting items by rank). 
+
+Learning with Average Precision: Training Image Retrieval
+with a Listwise Loss Revaud et al. (2019)
+
+Local Descriptors Optimized for Average Precision He
+et al. (2018)
+
+Deep Metric Learning to Rank Cakir et al. (2019)
+
 
 ## References
 
 [1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. [https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py](https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py).
 
-https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldid=793358396#Average_precision
-
-
-https://www.youtube.com/watch?v=yjCMEjoc_ZI
-
-[2] Victor Lavrenk Lecture, Univ. Edinburgh. []
+[2] Information Retrieval. Wikipedia. [Webpage](https://en.wikipedia.org/w/index.php?title=Information_retrieval&oldid=793358396#Average_precision).
 
 [3] Victor Lavrenko Lecture, Univ. Edinburgh. [Why We Can't Use Accuracy](https://www.youtube.com/watch?v=mYW0PDnuPm0&list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&index=7)
 
@@ -473,8 +505,19 @@ https://www.youtube.com/watch?v=yjCMEjoc_ZI
 [4] Victor Lavrenko Lecture, Univ. Edinburgh.[Evaluation 11: interpolated recall-precision plot](https://www.youtube.com/watch?v=yjCMEjoc_ZI&list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&index=11)
 
 
-[5] PASCAL VOC [PDF](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf).
+[5] Mark Everingham, Luc Van Gool, Christopher K. I. Williams, John Winn,
+Andrew Zisserman. The PASCAL Visual Object Classes (VOC) Challenge. IJCV 2010. [PDF](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf).
 
-[6] Introduction to Information Retrieval. CS 276: Information Retrieval and Web Searc Lectures. Chris Manning, Pandu Nayak, Prabhakar Raghavan.
+[6] Introduction to Information Retrieval. CS 276: Information Retrieval and Web Search Lectures. Chris Manning, Pandu Nayak, Prabhakar Raghavan. Stanford University.
 
 [7] Christopher D. Manning, Prabhakar Raghavan and Hinrich Schütze, Introduction to Information Retrieval, Cambridge University Press. 2008. [HTML](https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html).
+
+[8] Sun et al. Scalability in Perception for Autonomous Driving: Waymo Open Dataset. [PDF](https://arxiv.org/pdf/1912.04838.pdf).
+
+[9] K. He, Y. Lu, and S. Sclaroff. Local descriptors optimized for average precision. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2018.
+
+[10] F. Cakir, K. He, X. Xia, B. Kulis, and S. Sclaroff. Deep metric learning to rank. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2019.
+
+[11] J. Revaud, J. Almazan, R. S. Rezende, and C. R. d. Souza. Learning with average precision: Training image retrieval with a listwise loss. In The IEEE International Conference on Computer Vision (ICCV), October 2019.
+
+
