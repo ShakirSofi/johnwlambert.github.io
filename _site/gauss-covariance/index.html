@@ -110,7 +110,7 @@
 \frac{1}{\sqrt{(2\pi)^n|\Sigma_x|}}\mbox{exp}
 \Bigg\{ -\frac{1}{2} (x - \mu_x)^T \Sigma_x^{-1} (x - \mu_x) \Bigg\}</script>
 
-<p>where <script type="math/tex">n</script> is the dimension, i.e. <script type="math/tex">X \in \mathbbm{R}^n</script></p>
+<p>where <script type="math/tex">n</script> is the dimension, i.e. <script type="math/tex">X \in \mathbb{R}^n</script></p>
 
 <p>And of course in the scalar case, we see</p>
 
@@ -143,23 +143,20 @@ Convert between a standard normal, and any multivariate Gaussian</p>
 
 <p>unit (identity) covariance, so each axis decouples, compute integral over each axis separately</p>
 
-<p><strong>How to generate any Gaussian R.V. from standard normal</strong> $$X_s$?$</p>
+<p><strong>How to generate any Gaussian R.V. from standard normal</strong> <script type="math/tex">X_s</script>?</p>
 
 <script type="math/tex; mode=display">X = \Sigma_x^{1/2}X_s + \mu_x</script>
 
-<p>Can obtain by scaling by covariance matrix, and by translating by mean
-Very good for simulating
-With MATLAB, can generate scalar, unit variance, 0 mean Gaussian R.V. with \texttt{randn}
-Call \texttt{randn} $n$ times to populate $X_s$, and them multiply, then add
-And we can compute via Cholesky Decomposition (unique if positive definite)</p>
+<p>Can obtain by scaling by covariance matrix, and by translating by mean.
+Very good for simulating. With MATLAB or Python, can generate scalar, unit variance, 0 mean Gaussian R.V. with <code class="highlighter-rouge">numpy.random.randn</code>. Call <code class="highlighter-rouge">numpy.random.randn</code> <script type="math/tex">n</script> times to populate <script type="math/tex">X_s</script>, and them multiply, then add. We can compute such a matrix square root via the Cholesky Decomposition (which will be unique if <script type="math/tex">\Sigma_x</script> is positive definite):</p>
 
-<script type="math/tex; mode=display">\Sigma = \Sigma_x^{1/2}(\Sigma_x^{1/2})^T</script>
+<script type="math/tex; mode=display">\Sigma_x = \Sigma_x^{1/2}(\Sigma_x^{1/2})^T</script>
 
 <h2 id="matrix-square-roots">Matrix Square Roots</h2>
 
-<p>\item There are other possible matrix square roots
-\item \textbf{How to transform any Gaussian R.V. to the standard normal} $X_s$?
-\item Do so via rearrangement:</p>
+<p>There are other possible matrix square roots
+<strong>How to transform any Gaussian R.V. to the standard normal</strong> <script type="math/tex">X_s</script>?
+We can do so via rearrangement of the expression exactly above:</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{array}{ll}
@@ -169,7 +166,7 @@ X_s = \Sigma_x^{-1/2}(X - \mu_x), & X \sim \mathcal{N}(\mu_x, \Sigma_x)
 <p>Much easier to integrate over the form on the RHS, not LHS
 Comes from method of derived distributions
 Derived Distributions: Given <script type="math/tex">X \sim p(x)</script>, <script type="math/tex">Y=f(X)</script>, find <script type="math/tex">p(y)</script>
-Here <script type="math/tex">X = X_s</script>, and function <script type="math/tex">f</script> is the linear distribution <script type="math/tex">AX + b</script></p>
+Here <script type="math/tex">X = X_s</script>, and function <script type="math/tex">f</script> is the linear distribution <script type="math/tex">AX + b</script>.</p>
 
 <h2 id="properties-of-multivariate-gaussians">Properties of Multivariate Gaussians</h2>
 
@@ -438,6 +435,10 @@ if __name__ == '__main__':
   <!-- mathjax -->
   
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
   
   
   <!-- disqus comments -->

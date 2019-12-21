@@ -122,7 +122,7 @@
 
 <h3 id="levenberg-marquardt-algorithm-trust-region-gauss-newton-method">Levenberg-Marquardt Algorithm (Trust-Region Gauss-Newton Method)</h3>
 
-<p>In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (<a href="https://arxiv.org/abs/1502.05477">TRPO</a> is named after the same concept). Thus, we wish 
+<p>In Levenberg-Marquardt, we have add a term to the objective function to emphasize that we should not move so far from \( \theta^{(k)} \) that we cannot trust the affine approximation. We often refer to this concept as remaining within a “trust region” (TRPO [1] is named after the same concept). Thus, we wish 
 <script type="math/tex">|| \theta - \theta^{(k)} ||^2</script>
  to be small. Our new objective is:</p>
 
@@ -222,11 +222,21 @@
 
 </code></pre></div></div>
 
+<h2 id="references">References</h2>
+
+<p>[1] John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel. Trust Region Policy Optimization. <a href="https://arxiv.org/abs/1502.05477">PDF</a>.</p>
+
+<p>[1] Boyd. VMLS.</p>
+
   </article>
 
   <!-- mathjax -->
   
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
   
   
   <!-- disqus comments -->
