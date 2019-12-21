@@ -92,6 +92,11 @@ Those who use generic optimization routines to solve SfM problems will find the 
 
 [3] Sameer Agarwal, Noah Snavely, Ian Simon, Steven M. Seitz, Richard Szeliski. *Building Rome in a Day*. Communications of the ACM,Volume 54 Issue 10, October 2011. Pages 105-112. [https://grail.cs.washington.edu/rome/rome_paper.pdf](https://grail.cs.washington.edu/rome/rome_paper.pdf).
 
-[4] Luong. 1993. [PDF](https://hal.inria.fr/file/index/docid/74777/filename/RR-1894.pdf) 
+[4] Luong, Q.-T. and Faugeras, O.: 1993, Determining the fundamental matrix with planes: instability and new algorithms, Proc. IEEE Conf. Comp. Vision Patt. Recog., New York City, NY, pp. 489{494. 
+
+[5] Luong, Q.-T., Deriche, R., Faugeras, O. and Papadopoulo, T.: 1993, On determining the fundamental matrix: analysis of di erent methods and experimental results, Technical Report 1894, INRIA SophiaAntipolis. [PDF](https://hal.inria.fr/inria-00074777/document).
+
+
+
 
 

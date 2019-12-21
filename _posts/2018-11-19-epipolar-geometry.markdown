@@ -105,3 +105,4 @@ References:
 
 [2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL [http://ee263.stanford.edu/notes/low_rank_approx.pdf](http://ee263.stanford.edu/notes/low_rank_approx.pdf).
 
+[3] Aaron Bobick, online lectures. [Video](https://www.youtube.com/watch?v=ZYLwPtfETpc&list=PLQgNi_PlCHx3tO8XUz8x86r1aMER0bbu3&index=46).
