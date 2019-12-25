@@ -520,4 +520,4 @@ Andrew Zisserman. The PASCAL Visual Object Classes (VOC) Challenge. IJCV 2010. [
 
 [11] J. Revaud, J. Almazan, R. S. Rezende, and C. R. d. Souza. Learning with average precision: Training image retrieval with a listwise loss. In The IEEE International Conference on Computer Vision (ICCV), October 2019.
 
-
+[12] J. Davis and M. Goadrich. The relationship between PR and ROC curves. In ICML, 2006.
