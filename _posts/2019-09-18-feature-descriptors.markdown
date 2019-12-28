@@ -570,10 +570,10 @@ Given logits [0.1, 0.7, 0.05, 0.15], where the hard argmax would be 1, the soft 
 
 ```python
 import numpy as np
-x = np.arange(4)
-y = np.array([0.1,0.7, 0.05, 0.15])
-result = np.sum( np.exp(y * 10) * x)
-result / np.sum( np.exp(y * 10))
+y = np.arange(4)
+S = np.array([0.1,0.7, 0.05, 0.15])
+result = np.sum( np.exp(S * 10) * y)
+result / np.sum( np.exp(S * 10))
 1.007140612556097
 ```
 

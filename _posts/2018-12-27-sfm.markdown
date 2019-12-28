@@ -85,6 +85,18 @@ For example, the seminal work in SfM, "Building Rome in a Day" [3] uses Trust-Re
 Those who use generic optimization routines to solve SfM problems will find the optimization slow. This would be unwise, however, since the problem sparsity can be exploited.
 
 
+## Bundler
+
+[6] 
+
+## Schur Complement
+
+Hessian matrix H in bundle adjustment has a unique structure: Hcc and Hpp are sparse matrices with only diagonal
+elements in block units, whereas Hcp is a dense matrix. Efficient solutions that focus on this unique structure are the
+keys to developing highly precise and robust visual SLAM.
+State-of-the-art monocular SLAM methods, such as
+ORB-SLAM[21] and DSO[6], solve Equation 7 by decomposing it using the Schur complement matrix instead of directly solving it. (VITAMIN-E)
+
 ## References
 [1] Ramanan, Deva. *Structure from Motion.* [http://16720.courses.cs.cmu.edu/lec/sfm.pdf](http://16720.courses.cs.cmu.edu/lec/sfm.pdf).
 
@@ -96,6 +108,7 @@ Those who use generic optimization routines to solve SfM problems will find the 
 
 [5] Luong, Q.-T., Deriche, R., Faugeras, O. and Papadopoulo, T.: 1993, On determining the fundamental matrix: analysis of di erent methods and experimental results, Technical Report 1894, INRIA SophiaAntipolis. [PDF](https://hal.inria.fr/inria-00074777/document).
 
+[6] N. Snavely, S. Seitz, and R. Szeliski. Modeling the world from internet photo collections. IJCV, 80(2):189–210, 2008.
 
 
 
