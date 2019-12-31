@@ -2,7 +2,7 @@
 layout: post
 title:  "Stereo and Disparity"
 permalink: /stereo/
-excerpt: "focal length, similar triangles, depth "
+excerpt: "disparity maps, cost volume, MC-CNN"
 mathjax: true
 date:   2018-12-27 11:00:00
 mathjax: true
@@ -265,14 +265,6 @@ Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Schars
 ll disparity map, we will analyse the similarity error between patches. You will have to find out different patches in the image which exhibit a close-to-convex error profile, and a highly non-convex profile.
 
 
-## Simple Example on KITTI
-
-$$
-E = R \mbox{ } [t]_{\times}
-$$
-
-
-
 <a name='smoothing'></a>
 ## Smoothing
 
@@ -314,38 +306,14 @@ In stereo, as in almost all other computer vision tasks, convnets are the answer
 
 You can see how MC-CNN compares to classical approaches on the standard benchmark for stereo, which is the Middlebury Stereo Dataset and [Leaderboard](http://vision.middlebury.edu/stereo/eval3/).
 
-## Object Detection in Stereo
-
-Chen *et al.*
-3DOP (NIPS 2015) Urtasun [4]
-
-## Unsupervised Learning of Depth
-
-From 2017 [5]
-
-Let $$p_t$$ denote homogeneous coordinates in the target view. $$K$$ denotes the camera intrinsic matrix.
-
-$$
-p_s \sim K \hat{T}_{t \rightarrow s} \hat{D}_t (p_t) K^{-1} p_t
-$$
-
-
-
-
-
 
 ## References
-
-
-
-
 [1] Richard Szeliski. 
 
 [2] James Hays. [PDF](https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf).
 
 [3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. [PDF](https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf).
 
-[4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. *3D Object Proposals for Accurate Object Class Detection.*  Advances in Neural Information Processing Systems 28 (NIPS 2015). [PDF](https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection).
 
 [5] Yuri Boykov, Olga Veksler, Ramin Zabih. Fast Approximate Energy Minimization via Graph Cuts. ICCV 1999. [PDF](http://www.cs.cornell.edu/rdz/Papers/BVZ-iccv99.pdf)
 
