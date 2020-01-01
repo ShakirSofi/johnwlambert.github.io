@@ -54,10 +54,6 @@ there are some scale factors (which we get from calibration), simple reciprocal/
 now, knowing geometric relationships, how to build stereo systems. Practical details: classical stereo, 80s/90s.
 
 
-
-
-
-
 Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the $$Z$$-axis. A figure is shown below:
 
 <div class="fig figcenter fighighlight">
