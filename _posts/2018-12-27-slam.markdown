@@ -17,9 +17,22 @@ Table of Contents:
 
 ## SLAM
 
+Early efforts towards visual SLAM were solved by filtering. [5], [6]
+
+
 https://arxiv.org/pdf/1902.03747.pdf
 
-## ORBSlam
+## Keyframe-Bases SLAM
+
+Parallel Tracking and Mapping (PTAM) by Klein and Murray introduced idea of splitting camera tracking and mapping in parallel threads
+
+## ORB-SLAM
+
+## LSD-SLAM
+
+## Semi-Direct Visual Odometry (SVO)
+
+Forster et al. [4]
 
 ## GraphSLAM
 
@@ -110,9 +123,14 @@ https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial2.pdf
 
 ## References
 
-1. Tim Bailey and Hugh Durrant-Whyte. https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial2.pdf
+[1]. Tim Bailey and Hugh Durrant-Whyte. https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial2.pdf
 
-2. Tim Bailey and Hugh Durrant-Whyte. https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial1.pdf
+[2]. Tim Bailey and Hugh Durrant-Whyte. https://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial1.pdf
 
+[3].  G. Klein and D. Murray, “Parallel tracking and mapping for small AR workspaces,” in IEEE and ACM International Symposium on Mixed and Augmented Reality (ISMAR), Nara, Japan, November 2007, pp. 225–23
 
+[4].  C. Forster, M. Pizzoli, and D. Scaramuzza, “SVO: Fast semi-direct monocular visual odometry,” in Proc. IEEE Intl. Conf. on Robotics and Automation, Hong Kong, China, June 2014, pp. 15–22.
 
+[5].  A. J. Davison, I. D. Reid, N. D. Molton, and O. Stasse, “MonoSLAM: Real-time single camera SLAM,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 29, no. 6, pp. 1052–1067, 2007
+
+[6].  A. Chiuso, P. Favaro, H. Jin, and S. Soatto, “Structure from motion causally integrated over time,” IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 24, no. 4, pp. 523–535, 2002
