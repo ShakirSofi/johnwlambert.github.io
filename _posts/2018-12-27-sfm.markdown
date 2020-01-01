@@ -110,6 +110,6 @@ ORB-SLAM[21] and DSO[6], solve Equation 7 by decomposing it using the Schur comp
 
 [6] N. Snavely, S. Seitz, and R. Szeliski. Modeling the world from internet photo collections. IJCV, 80(2):189–210, 2008.
 
-
+[7] Christopher Zach. Robust Bundle Adjustment Revisited. [PDF](https://link.springer.com/content/pdf/10.1007%2F978-3-319-10602-1_50.pdf).
 
 
