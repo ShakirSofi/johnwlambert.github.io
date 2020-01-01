@@ -16,6 +16,10 @@ Modern robotic computer vision tasks like Structure from Motion (SfM) and Simult
 ## The Direct Linear Transform (DLT)
 
 
+## Normalized 8-Point Algorithm
+
+Hartley [4] proposes a simple modification to the classical 8-point algorithm to make it robust to noise. By preceding the algorithm with a very simple normalization (translation and scaling) of the coordinates of the matched points, results are obtained comparable with the best iterative algorithms.
+
 
 ## The Fundamental Matrix
 
@@ -106,3 +110,5 @@ References:
 [2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL [http://ee263.stanford.edu/notes/low_rank_approx.pdf](http://ee263.stanford.edu/notes/low_rank_approx.pdf).
 
 [3] Aaron Bobick, online lectures. [Video](https://www.youtube.com/watch?v=ZYLwPtfETpc&list=PLQgNi_PlCHx3tO8XUz8x86r1aMER0bbu3&index=46).
+
+[4] Richard I. Hartley. In Defense of the Eight-Point Algorithm. [PDF](https://www.cse.unr.edu/~bebis/CS485/Handouts/hartley.pdf).
