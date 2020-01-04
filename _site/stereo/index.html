@@ -117,7 +117,7 @@
 <p><a name="correspondence"></a></p>
 <h2 id="the-correspondence-problem">The Correspondence Problem</h2>
 
-<p>Think of two cameras collecting images at the same time. There are differences in the images. Notably, there will be a per pixel shift in the scene as a consequence of the camera’s new, different position in 3d space. However, if a large part of the scene is seen in both images, two points will correspond to the same structure in the real world.</p>
+<p>Think of two cameras collecting images at the same time. There are differences in the images. Notably, there will be a per pixel shift in the scene as a consequence of the camera’s new, different position in 3d space. However, if a large part of the scene is seen in both images, two pixel will correspond to the same structure (3D point) in the real world.</p>
 
 <p>The correspondence problem is defined as finding a match across these two images to determine, <em>What is the part of the scene on the right that matches that location?</em> Previously, the community used only search techniques and optimization to solve this problem. Today, deep learning is used. The matching process is the key computation in stereo.</p>
 
@@ -310,7 +310,7 @@ Example:
 
 <p>Note:</p>
 <ol>
-  <li>It is important for this project to follow the convention of search
+  <li>We’ll follow the convention of search
 input in left image and search target in right image</li>
   <li>If the shifted patch in the right image will go out of bounds, it is
 good to set the default cost for that pixel and disparity to be something
@@ -345,7 +345,7 @@ cost.</li>
 <p><a name="smoothing"></a></p>
 <h2 id="smoothing">Smoothing</h2>
 
-<p>One issue with the results from is that they aren’t very smooth. Pixels next to each other on the same surface can have vastly different disparities, making the results look very noisy and patchy in some areas. Intuitively, pixels next to each other should have a smooth transition in disparity(unless at an object boundary or occlusion). In this section, we try to improve our results. One way of doing this is through the use of a smoothing constraint. The smoothing method we use is called Semi-Global Matching(SGM) or Semi-Global Block Matching. Before, we picked the disparity for a pixel based on the minimum matching cost of the block using some metric(SSD or SAD). The basic idea of SGM is to penalize pixels with a disparity that’s very different than their neighbors by adding a penalty term on top of the matching cost term.</p>
+<p>One issue with the disparity maps from SSD/SAD is that they aren’t very smooth. Pixels next to each other on the same surface can have vastly different disparities, making the results look very noisy and patchy in some areas. Intuitively, pixels next to each other should have a smooth transition in disparity(unless at an object boundary or occlusion). One way to improve disparity map results is by using a smoothing constraint, such as Semi-Global Matching(SGM) or Semi-Global Block Matching. Before, we picked the disparity for a pixel based on the minimum matching cost of the block using some metric(SSD or SAD). The basic idea of SGM is to penalize pixels with a disparity that’s very different than their neighbors by adding a penalty term on top of the matching cost term.</p>
 
 <p><a name="when-smoothing"></a></p>
 <h2 id="when-is-smoothing-a-good-idea">When is smoothing a good idea?</h2>
