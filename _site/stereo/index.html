@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Stereo and Disparity</title>
-  <meta name="description" content="focal length, similar triangles, depth">
+  <meta name="description" content="disparity maps, cost volume, MC-CNN">
    <link rel="stylesheet" href="/css/main.css">
 
 
@@ -91,20 +91,48 @@
   <article class="post-content">
   <p>Table of Contents:</p>
 <ul>
-  <li><a href="#sfmpipeline">Stereo Matching</a></li>
-  <li><a href="#costfunctions">Disparity</a></li>
-  <li><a href="#bundleadjustment">Bundle Adjustment</a></li>
+  <li><a href="#stereo-overview">Stereo Vision Overview</a></li>
+  <li><a href="#correspondence">The Correspondence Problem</a></li>
+  <li><a href="#stereo-geometry">Stereo Geometry</a></li>
+  <li><a href="#disparity">Disparity</a></li>
+  <li><a href="#classical-matching">Classical Matching Techniques</a></li>
+  <li><a href="#first-algorithm">A First Stereo Algorithm</a></li>
+  <li><a href="#disparity-map">Disparity Map</a></li>
+  <li><a href="#cost-volume">Cost Volumes</a></li>
+  <li><a href="#smoothing">Smoothing</a></li>
+  <li><a href="#when-smoothing">When is smoothing a good idea?</a></li>
+  <li><a href="#stereo-challenges">Challenging Scenarios for Stereo</a></li>
+  <li><a href="#mc-cnn">MC-CNN</a></li>
 </ul>
 
-<p><a name="sfmpipeline"></a></p>
+<p><a name="stereo-overview"></a></p>
+<h2 id="stereo-vision-overview">Stereo Vision Overview</h2>
 
-<h2 id="stereo-vision-and-stereo-matching">Stereo Vision and Stereo Matching</h2>
+<p>“Stereo matching” is the task of estimating a 3D model of a scene from two or more images. The task requires finding matching pixels in the two images and converting the 2D positions of these matches into 3D depths [1]. Humans also use stereo vision, with a baseline (distance between our eyes) of 60 mm.</p>
 
-<p>“Stereo matching” is the task of estimating a 3D model of a scene from two or more images. The task requires finding matching pixels in the two images and converting the 2D positions of these matches into 3D depths [1]</p>
+<p>The basic idea is the following: a camera takes picture of the same scene, in two different positions, and we wish to recover the depth at each pixel. Depth is the missing ingredient, and the goal of computer vision here is to recover the missing depth information of the scene when and where the image was acquired. Depth is crucial for navigating in the world. It is the key to unlocking the images and using them for 3d reasoning. It allows us to understand shape of world, and what is in the image.</p>
 
-<p>Humans have stereo vision with a baseline of 60 mm.</p>
+<p>Keep in mind: the camera could be moving. We call 2d shifts “parallax”. If we fix the cameras’ position relative to each other, we can calibrate just once and operate under a known relationship. However, in other cases, we may need to calibrate them constantly, if cameras are constantly moving with respect to one another.</p>
 
-<h2 id="disparity">Disparity</h2>
+<p><a name="correspondence"></a></p>
+<h2 id="the-correspondence-problem">The Correspondence Problem</h2>
+
+<p>Think of two cameras collecting images at the same time. There are differences in the images. Notably, there will be a per pixel shift in the scene as a consequence of the camera’s new, different position in 3d space. However, if a large part of the scene is seen in both images, two points will correspond to the same structure in the real world.</p>
+
+<p>The correspondence problem is defined as finding a match across these two images to determine, <em>What is the part of the scene on the right that matches that location?</em> Previously, the community used only search techniques and optimization to solve this problem. Today, deep learning is used. The matching process is the key computation in stereo.</p>
+
+<p><a name="stereo-geometry"></a></p>
+<h2 id="stereo-geometry">Stereo Geometry</h2>
+
+<p>Consider the geometry of a standard, “narrow-baseline” stereo rig. If we send out two rays from a 3D scene point to the two camera centers, a triangle is constructed in the process. Our goal is to “reverse” this 3d to 2d projection.</p>
+
+<p>The x-coordinate is the only difference, one is translated by the baseline $B$. shift in 1-dimension, by one number. 2 points will lie on the same row in both images. we know where to look.</p>
+
+<script type="math/tex; mode=display">Z=f\frac{B}{d}</script>
+
+<p>there are some scale factors (which we get from calibration), simple reciprocal/inverse relationship</p>
+
+<p>now, knowing geometric relationships, how to build stereo systems. Practical details: classical stereo, 80s/90s.</p>
 
 <p>Consider a simple model of stereo vision: we have two cameras whose optic axes are parallel. Each camera points down the <script type="math/tex">Z</script>-axis. A figure is shown below:</p>
 
@@ -162,6 +190,9 @@ b &= (x_l - x_r) (\frac{x}{x_l}) & \text{Simplify} \\
 
 <script type="math/tex; mode=display">z = f(\frac{x}{x_l}) = f(\frac{b}{x_l - x_r})</script>
 
+<p><a name="disparity"></a></p>
+<h2 id="disparity">Disparity</h2>
+
 <p>What is our takeaway? The amount of horizontal distance between the object in Image L and image R (<em>the disparity</em> <script type="math/tex">d</script>) is inversely proportional to the distance <script type="math/tex">z</script> from the observer. This makes perfect sense. Far away objects (large distance from the observer) will move very little between the left and right image. Very closeby objects (small distance from the observer) will move quite a bit more. The focal length <script type="math/tex">f</script> and the baseline <script type="math/tex">b</script> between the cameras are just constant scaling factors.</p>
 
 <p>We made two large assumptions:</p>
@@ -172,32 +203,151 @@ b &= (x_l - x_r) (\frac{x}{x_l}) & \text{Simplify} \\
 each <script type="math/tex">(x_l,y_l)</script>.</li>
 </ol>
 
-<h2 id="the-epipolar-line-plane-and-constraint">The Epipolar Line, Plane, and Constraint</h2>
+<p><a name="classical-matching"></a></p>
+<h2 id="classical-matching-techniques">Classical Matching Techniques</h2>
 
-<p>Unfortunately, just because we know</p>
+<p>To solve the correspondence problem, we must be able to decide if two chunks of pixels (e.g. patches) are the same. How can we do so?</p>
 
-<p>how to compute for a given pixel in one image the range of possible locations the pixel might appear at in the other image, i.e., its epipolar lin</p>
+<p>One classical approach is to convert the search problem into just optimizing a function. We start somewhere, and then using Newton’s Method or Gradient Descent, we can find the best match. We will place a box at every single pixel location. There will be a lot of noise in each image, so we’ll want to put a lot of measurements together to overcome that noise.</p>
 
-<h2 id="sum-of-squared-differences">Sum of Squared-Differences</h2>
+<p>If stereo images are rectified, then all scanlines are epipolar lines. You might ask, if these epipolar lines are parallel, how do they converge? The answer is that they converge at infinity.</p>
 
-<p>The matching cost is the squared difference of intensity values at a given disparity.</p>
+<p>We’ll literally apply this formula row by row.</p>
 
-<h2 id="ssd-or-sad-is-only-the-beginning">SSD or SAD is only the beginning</h2>
+<p>To convert matching to a search or optimization problem, we’ll need a vector representation and then a matching cost. Consider that an image can be thought of as a vector, if we stack each row on top of each other. Thus, a vector represents the entire image; in vector space, each point in that space is an entire image. Alternatively, each window of pixels (patch) could be a point, in which we could compare them as vectors. Inner product, or normalized correlation are measures of similarity. If we have found a good match, then the angle between the vectors will be zero, and we can use the cosine of this angle to measure this.</p>
 
-<p>SSD/SAD suffers from… large “blobs” of disparities, can have areas of large error in textureless regions. fail in shadows</p>
+<p>Two distance measures are most common for testing patch similarity, and can serve as “matching costs”:</p>
 
-<p>MC-CNN can… show fine structures. succeed in shadows.</p>
+<p><strong>Sum of Squared-Differences (SSD)</strong> The SSD measure is sum of squared difference of pixel values in two patches. This matching cost is measured at a proposed disparity. If <script type="math/tex">A,B</script> are patches to compare, separated by disparity <script type="math/tex">d</script>, then SSD is defined as:</p>
 
-<p>Too small a window might not be able to distinguish unique features of an image, but too large a window would mean many patches would likely have many more things in common, leading to less helpful matches.</p>
+<script type="math/tex; mode=display">SSD(A, B) = \sum_{i,j}(A_{ij} - B_{ij})^2</script>
 
+<p>In this case <script type="math/tex">A</script> could be a tensor of any shape/dimensions, and <script type="math/tex">B</script> must be a tensor of the same shape as <script type="math/tex">A</script></p>
+
+<p><strong>Sum of absolute differences (SAD)</strong> Tests if two patches are similar by the <a href="https://en.wikipedia.org/wiki/Sum_of_absolute_differences">SAD</a> distance measure. <script type="math/tex">A,B</script> are defined identically as above:</p>
+
+<script type="math/tex; mode=display">SAD(A, B) = \sum_{i,j}\lvert A_{ij}-B_{ij}\lvert</script>
+
+<p>In general, absolute differences are more robust to large noise/outliers than squared differences, since outliers have less of an effect.</p>
+
+<h2 id="search-line-scan-line">Search Line (Scan Line)</h2>
+
+<p>A correspondence will lie upon an epipolar line. Unfortunately, just because we know the Fundamental matrix betwen two images, we cannot know the exact pixel location of a match without searching for it along a 1d line (range of possible locations the pixel might appear at in the other image)</p>
+
+<p>In our discussion below, we will assume that we have rectified the images, such that we can search on just a horizontal scanline.</p>
+
+<p><a name="first-algorithm"></a></p>
+<h2 id="a-first-stereo-algorithm">A First Stereo Algorithm</h2>
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/simple_stereo_algorithm_fig.jpg" width="100%" />
+
+  <div class="figcaption">
+  	Stereo image pair with horizontal scanline.
+
+  </div>
+</div>
+
+<p>Given a left image, right image, similarity function, patch size, maximum search value, this algorithm will output a “disparity map”.</p>
+
+<ol>
+  <li>Pick a patch in the left image (red block), P1.</li>
+  <li>Place the patch in the same (x,y) coordinates in the right image (red block). As this is binocular stereo, we will need to search for P1 on the left side starting from this position. Make sure you understand this point well before proceeding further.</li>
+  <li>Slide the block of candidates to the left (indicated by the different pink blocks). The search area is restricted by the parameter max_search_bound in the code. The candidates will overlap.</li>
+  <li>We will pick the candidate patch with the minimum similarity error (green block). The horizontal shift from the red block to the green block in this image is the disparity value for the centre of P1 in the left image.</li>
+</ol>
+
+<p><a name="disparity-map"></a></p>
+<h2 id="disparity-map">Disparity Map</h2>
+
+<p>Calculate the disparity value at each pixel by searching a small patch around a pixel from the left image in the right image</p>
+
+<p>Note:</p>
+<ol>
+  <li>We follow the convention of search
+input in left image and search target in right image</li>
+  <li>
+    <p>While searching for disparity value for a patch, it may happen that there
+are multiple disparity values with the minimum value of the similarity
+measure. In that case we need to pick the smallest disparity value.
+Please check the numpy’s argmin and pytorch’s argmin carefully.
+Example:
+– diparity_val – | – similarity error –
+– 0               | 5 
+– 1               | 4
+– 2               | 7
+– 3               | 4
+– 4               | 12</p>
+
+    <p>In this case we need the output to be 1 and not 3.</p>
+  </li>
+  <li>The max_search_bound is defined from the patch center.</li>
+</ol>
+
+<p>Args:</p>
+<ul>
+  <li>left_img: image from the left stereo camera. Torch tensor of shape (H,W,C).
+          C will be &gt;= 1.</li>
+  <li>right_img: image from the right stereo camera. Torch tensor of shape (H,W,C)</li>
+  <li>block_size: the size of the block to be used for searching between
+            left and right image</li>
+  <li>sim_measure_function: a function to measure similarity measure between
+                      two tensors of the same shape; returns the error value</li>
+  <li>max_search_bound: the maximum horizontal distance (in terms of pixels) 
+                  to use for searching
+  Returns:</li>
+  <li>disparity_map: The map of disparity values at each pixel.</li>
+</ul>
+
+<p><a name="cost-volume"></a></p>
 <h2 id="cost-volumes">Cost Volumes</h2>
+
+<p>Instead of taking the argmin of the similarity error profile, one will often store the tensor of error profile at each pixel location along the third dimension.</p>
+
+<p>Calculate the cost volume. Each pixel will have D=max_disparity cost values
+  associated with it. Basically for each pixel, we compute the cost of
+  different disparities and put them all into a tensor.</p>
+
+<p>Note:</p>
+<ol>
+  <li>It is important for this project to follow the convention of search
+input in left image and search target in right image</li>
+  <li>If the shifted patch in the right image will go out of bounds, it is
+good to set the default cost for that pixel and disparity to be something
+high(we recommend 255), so that when we consider costs, valid disparities will have a lower
+cost.</li>
+</ol>
+
+<p>Args:</p>
+<ul>
+  <li>left_img: image from the left stereo camera. Torch tensor of shape (H,W,C).
+          C will be 1 or 3.</li>
+  <li>right_img: image from the right stereo camera. Torch tensor of shape (H,W,C)</li>
+  <li>max_disparity:  represents the number of disparity values we will consider.
+            0 to max_disparity-1</li>
+  <li>sim_measure_function: a function to measure similarity measure between
+            two tensors of the same shape; returns the error value</li>
+  <li>block_size: the size of the block to be used for searching between
+            left and right image
+  Returns:</li>
+  <li>cost_volume: The cost volume tensor of shape (H,W,D). H,W are image
+          dimensions, and D is max_disparity. cost_volume[x,y,d] 
+          represents the similarity or cost between a patch around left[x,y]<br />
+          and a patch shifted by disparity d in the right image.</li>
+</ul>
 
 <p>Appendix B.5 and a recent survey paper on MRF inference (Szeliski, Zabih, Scharstein et al. 2008)</p>
 
-<h2 id="simple-example-on-kitti">Simple Example on KITTI</h2>
+<h2 id="error-profile">Error Profile</h2>
 
-<script type="math/tex; mode=display">E = R \mbox{ } [t]_{\times}</script>
+<p>ll disparity map, we will analyse the similarity error between patches. You will have to find out different patches in the image which exhibit a close-to-convex error profile, and a highly non-convex profile.</p>
 
+<p><a name="smoothing"></a></p>
+<h2 id="smoothing">Smoothing</h2>
+
+<p>One issue with the results from is that they aren’t very smooth. Pixels next to each other on the same surface can have vastly different disparities, making the results look very noisy and patchy in some areas. Intuitively, pixels next to each other should have a smooth transition in disparity(unless at an object boundary or occlusion). In this section, we try to improve our results. One way of doing this is through the use of a smoothing constraint. The smoothing method we use is called Semi-Global Matching(SGM) or Semi-Global Block Matching. Before, we picked the disparity for a pixel based on the minimum matching cost of the block using some metric(SSD or SAD). The basic idea of SGM is to penalize pixels with a disparity that’s very different than their neighbors by adding a penalty term on top of the matching cost term.</p>
+
+<p><a name="when-smoothing"></a></p>
 <h2 id="when-is-smoothing-a-good-idea">When is smoothing a good idea?</h2>
 
 <p>Of course smoothing should help in noisy areas of an image. It will only help to alleviate particular types of noise, however. It is not a definitive solution to obtaining better depth maps.</p>
@@ -206,134 +356,55 @@ each <script type="math/tex">(x_l,y_l)</script>.</li>
 
 <p>Smoothing performs poorly in areas of fine detail, with narrow objects. It also performs poorly in areas with many edges and depth discontinuities. Smoothing algorithms penalize large disparity differences in closeby regions (which can actually occur in practice). Smoothing penalizes sharp disparity changes (corresponding to depth discontinuities).</p>
 
-<h2 id="object-detection-in-stereo">Object Detection in Stereo</h2>
+<p><a name="stereo-challenges"></a></p>
+<h2 id="challenges">Challenges</h2>
 
-<p>Chen <em>et al.</em>
-3DOP (NIPS 2015) Urtasun [4]</p>
+<p>SSD or SAD is only the beginning. SSD/SAD suffers from… large “blobs” of disparities, can have areas of large error in textureless regions. Can fail in shadows</p>
 
-<h2 id="unsupervised-learning-of-depth">Unsupervised Learning of Depth</h2>
+<p>Too small a window might not be able to distinguish unique features of an image, but too large a window would mean many patches would likely have many more things in common, leading to less helpful matches.</p>
 
-<p>From 2017 [5]</p>
+<p>Note that the problem is far from solved with these approaches, as many complexities remain. Images can be problematic, and can contain areas where it is quite hard or impossible to obtain matches (e.g. under occlusion).</p>
 
-<p>Let <script type="math/tex">p_t</script> denote homogeneous coordinates in the target view. <script type="math/tex">K</script> denotes the camera intrinsic matrix.</p>
+<p>Consider the challenge of texture-less image regions, such as a blank wall. Here there is an issue of aggregation: one cannot look at a single white patch of pixels and tell. One must integrate info at other levels, for example by looking at the edge of wall.</p>
 
-<script type="math/tex; mode=display">p_s \sim K \hat{T}_{t \rightarrow s} \hat{D}_t (p_t) K^{-1} p_t</script>
+<p>Violations of the brightness constancy assumption (e.g. specular reflections) present another problem. These occur when light is reflected off of a mirror or glass picture frame, for example. Camera calibration errors would also cause problems.</p>
+
+<p>What tool should we reach for to solve all of the problems in stereo?</p>
+
+<p><a name="mc-cnn"></a></p>
+<h2 id="mc-cnn">MC-CNN</h2>
+
+<p>In stereo, as in almost all other computer vision tasks, convnets are the answer. However, getting deep learning into stereo took a while; for example, it took longer than recognizing cats. Our desire is for a single architecture, which will allow less propagation of error. Thus, every decision you make about how to optimize, will be end-to-end optimzation, leaving us with the best chance to drive the error down with data.</p>
+
+<p><em>Computing the Stereo Matching Cost with a Convolutional Neural Network</em> (MC-CNN) [9] by Zbontar and LeCun in 2015 introduced the idea of training a network to learn how to classify 2 patches as a positive vs. a negative match.</p>
+
+<p>You can see how MC-CNN compares to classical approaches on the standard benchmark for stereo, which is the Middlebury Stereo Dataset and <a href="http://vision.middlebury.edu/stereo/eval3/">Leaderboard</a>. At times, MC-CNN can show fine structures and succeed in shadows, when SAD and SSD cannot.</p>
 
 <h2 id="references">References</h2>
-
-<p>Computing the Stereo Matching Cost with a Convolutional Neural Network. Jure Zbontar  and Yann LeCun. <a href="https://arxiv.org/pdf/1409.4326.pdf">PDF</a>.</p>
-
-<p>[1] Richard Szeliski.</p>
+<p>[1] Richard Szeliski. Computer Vision: Algorithms and Applications.</p>
 
 <p>[2] James Hays. <a href="https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf">PDF</a>.</p>
 
 <p>[3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. <a href="https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf">PDF</a>.</p>
 
-<p>[4] X. Chen, K. Kundu, Y. Zhu, A. Berneshawi, H. Ma, S. Fidler, R. Urtasun. <em>3D Object Proposals for Accurate Object Class Detection.</em>  Advances in Neural Information Processing Systems 28 (NIPS 2015). <a href="https://papers.nips.cc/paper/5644-3d-object-proposals-for-accurate-object-class-detection">PDF</a>.</p>
+<p>[5] Yuri Boykov, Olga Veksler, Ramin Zabih. Fast Approximate Energy Minimization via Graph Cuts. ICCV 1999. <a href="http://www.cs.cornell.edu/rdz/Papers/BVZ-iccv99.pdf">PDF</a></p>
 
-<p>[5]</p>
+<p>[6] Zhou. Unsupervised Learning of Depth. <a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html">PDF</a>.</p>
 
-<p><a href="http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html">PDF</a>.</p>
+<p>[7] Heiko Hirschmuller. Stereo Processing by Semi-Global Matching
+and Mutual Information. <a href="https://pdfs.semanticscholar.org/bcd8/4d8bd864ff903e3fe5b91bed3f2eedacc324.pdf">PDF</a>.</p>
 
-<p>STEREO http://people.scs.carleton.ca/~c_shu/Courses/comp4900d/notes/simple_stereo.pdf
-DEPTH http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineVision_Chapter11.pdf
-STEREO https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
-SFM http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
-JAMES MULTI-VIEW https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf</p>
+<p>[8] Heiko Hirschmuller. Semi-Global Matching – Motivation, Development, and Applications. <a href="https://elib.dlr.de/73119/1/180Hirschmueller.pdf">PDF</a></p>
 
-<p>2d shifts=parallax</p>
+<p>[9] Computing the Stereo Matching Cost with a Convolutional Neural Network. Jure Zbontar and Yann LeCun. <a href="https://arxiv.org/pdf/1409.4326.pdf">PDF</a>.</p>
 
-<p>Basic idea: camera takes picture of the same scene, in two different positions, you can recover the depth</p>
-
-<p>depth is the mixing ingredient</p>
-
-<p>vision: recover the missing depth information when the iamge was acquired from the scene</p>
-
-<p>the camera could be moving</p>
-
-<p>think of two cameras collecting images at the same time. there are diffeerences in the images. per pixel shift in the scene as consequence of cameras different position in 3d space</p>
-
-<p>understanding that two points correspond to the same structure in the real world</p>
-
-<p>fix their position relative to each other, just calibrate once, known relationship</p>
-
-<p>or may need to calibrate them constantly, if constantly moving</p>
-
-<p>What is the part of the scene on the right that matches that location? Correspondence problem (finding match across)</p>
-
-<p>Used to use search techniques and optimization. now use deep learning.</p>
-
-<p>send out two rays, just calibrate the camera bit (3d to 2d projection), then reverse it</p>
-
-<p>triangle constructed in this process</p>
-
-<p>Key computation: the matching.</p>
-
-<p>Depth is crucial for navigating in the world, the key to unlocking the images and using them for 3d reasoning</p>
-
-<p>understand shape of world, and what is in the image.</p>
-
-<p>The x-coordinate is the only difference, one is translated by the baseline $B$. shift in 1-dimension, by one number. 2 points will lie on the same row in both images. we know where to look.</p>
-
-<script type="math/tex; mode=display">Z=f\frac{B}{d}</script>
-
-<p>there are some scale factors (which we get from calibration), simple reciprocal/inverse relationship</p>
-
-<p>now, knowing geometric relationships, how to build stereo systems. Practical details: classical stereo, 80s/90s.</p>
-
-<p>How do we decide two chunks of pixels are the same?</p>
-
-<p>Turn the search problem into just optimizing a function.</p>
-
-<p>Start somewhere, newton’s method or gradient descent, find best match</p>
-
-<p>You put a box at every single pixel location.</p>
-
-<p>Lot of noise in these image, want to put a lot of measurments together to overcome that noise.</p>
-
-<p>All scanlines are epipolar lines.</p>
-
-<p>These lines are paralle, how do they converge? they converge at infinity.</p>
-
-<p>literally apply this formula row by row</p>
-
-<p>image normalization : image can be though of as a vector, each row, stack them. vector represents the entire image. vector space, each point in that space is an entire image. or each window of pixels could be a point.</p>
-
-<p>windows – compare them as vectors</p>
-
-<p>inner product of two vectors, normalized correlation?</p>
-
-<p>good match – vectors are the same. angle between the vectors, cosine of angle between them.</p>
-
-<p>Lot of complexities: images can be problematic, can contian ares quite hard to get matches (occluded).</p>
-
-<p>Or what about blank wall, textureless regions. Issue of aggregation. Can’t look at a single white patch of pixels and tell. integrate info at other levels. look at edge of wall.</p>
-
-<p>Dynamic programming, used in this case. Use a single match as constraint to find other matches. get ordering constraint.</p>
-
-<p>sometimes blue patch is not going to happen! happens all the time. have to allow that sometime there will not be a match, and just move on to the next guy.</p>
-
-<p>real-time stereo in late 80s from stereo matching with dynamic programming.</p>
-
-<p>Turns out there are quite a few problems.</p>
-
-<p>illusion? thin nail illusion, thin object close to the camera?</p>
-
-<p>slanted plane: scrunched, will have multiple matches in one location.</p>
-
-<p>one scanline at a time, wasnt the winning approach.</p>
-
-<p>matching the scannline independently isn’t good – may see weird artifacts when you look at a vertical column, 3d boundaries in scene may not make straight lines. no consistently through your scanlines.</p>
-
-<p>Scanline is bad as representation of the world. segemntation based stereo – first segment the iamge into patches that are similar in their appearance, then work patch by patch and do the matching.</p>
-
-<p>you can also get view interpolation, synthesize new views in between the two views.</p>
-
-<p>Another challenge in stereo: reflections in mirror, bright objects like picture frame. What tool should we reach for to solve all of the problems in stereo?</p>
-
-<p>It is always the answer… Getting deep learning into stereo took a while. took longer than recognizing cats.</p>
-
-<p>One architetecture – less propagation of error. fits into one model. every decision you make about how to optimize, end-to-end optimzation. best chance to drive the error down with data.</p>
+<p>Additional Resources:
+ http://people.scs.carleton.ca/~c_shu/Courses/comp4900d/notes/simple_stereo.pdf
+ http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineVision_Chapter11.pdf
+ https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
+ http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
+ https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf
+ MRF inference (Szeliski, Zabih, Scharstein et al. 2008)</p>
 
 
   </article>

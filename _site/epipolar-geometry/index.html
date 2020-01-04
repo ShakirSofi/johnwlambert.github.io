@@ -94,6 +94,10 @@
 
 <h2 id="the-direct-linear-transform-dlt">The Direct Linear Transform (DLT)</h2>
 
+<h2 id="normalized-8-point-algorithm">Normalized 8-Point Algorithm</h2>
+
+<p>Hartley [4] proposes a simple modification to the classical 8-point algorithm to make it robust to noise. By preceding the algorithm with a very simple normalization (translation and scaling) of the coordinates of the matched points, results are obtained comparable with the best iterative algorithms.</p>
+
 <h2 id="the-fundamental-matrix">The Fundamental Matrix</h2>
 
 <p>The Fundamental matrix provides a correspondence \(x^TFx^{\prime} = 0\), where \(x,x^{\prime}\) are 2D corresponding points in separate images. In other words,</p>
@@ -171,6 +175,8 @@ Thus the eigenvector \(v\) associated with the eigenvalue \(\lambda_n\) is \(x^{
 <p>[2] S.  Boyd.   Low  rank  approximation  and  extremal  gain  problems,  2008.   URL <a href="http://ee263.stanford.edu/notes/low_rank_approx.pdf">http://ee263.stanford.edu/notes/low_rank_approx.pdf</a>.</p>
 
 <p>[3] Aaron Bobick, online lectures. <a href="https://www.youtube.com/watch?v=ZYLwPtfETpc&amp;list=PLQgNi_PlCHx3tO8XUz8x86r1aMER0bbu3&amp;index=46">Video</a>.</p>
+
+<p>[4] Richard I. Hartley. In Defense of the Eight-Point Algorithm. <a href="https://www.cse.unr.edu/~bebis/CS485/Handouts/hartley.pdf">PDF</a>.</p>
 
   </article>
 
