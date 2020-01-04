@@ -11,6 +11,33 @@ mathjax: true
 Table of Contents:
 
 
+## 
+
+
+
+Dynamic programming, used in this case. Use a single match as constraint to find other matches. get ordering constraint.
+
+sometimes blue patch is not going to happen! happens all the time. have to allow that sometime there will not be a match, and just move on to the next guy.
+ 
+real-time stereo in late 80s from stereo matching with dynamic programming.
+
+Turns out there are quite a few problems.
+
+illusion? thin nail illusion, thin object close to the camera?
+
+slanted plane: scrunched, will have multiple matches in one location.
+
+one scanline at a time, wasnt the winning approach.
+
+matching the scannline independently isn't good -- may see weird artifacts when you look at a vertical column, 3d boundaries in scene may not make straight lines. no consistently through your scanlines.
+
+Scanline is bad as representation of the world. segemntation based stereo -- first segment the iamge into patches that are similar in their appearance, then work patch by patch and do the matching.
+
+you can also get view interpolation, synthesize new views in between the two views.
+
+
+
+
 ## Simple Example on KITTI
 
 $$
