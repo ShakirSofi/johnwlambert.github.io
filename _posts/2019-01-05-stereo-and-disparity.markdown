@@ -278,12 +278,9 @@ Smoothing performs poorly in areas of fine detail, with narrow objects. It also 
 <a name='stereo-challenges'></a>
 ## Challenges
 
-SSD or SAD is only the beginning. SSD/SAD suffers from... large "blobs" of disparities, can have areas of large error in textureless regions. fail in shadows
-
-MC-CNN can... show fine structures. succeed in shadows.
+SSD or SAD is only the beginning. SSD/SAD suffers from... large "blobs" of disparities, can have areas of large error in textureless regions. Can fail in shadows
 
 Too small a window might not be able to distinguish unique features of an image, but too large a window would mean many patches would likely have many more things in common, leading to less helpful matches.
-
 
 Note that the problem is far from solved with these approaches, as many complexities remain. Images can be problematic, and can contain areas where it is quite hard or impossible to obtain matches (e.g. under occlusion).
 
@@ -300,22 +297,20 @@ In stereo, as in almost all other computer vision tasks, convnets are the answer
 
 *Computing the Stereo Matching Cost with a Convolutional Neural Network* (MC-CNN) [9] by Zbontar and LeCun in 2015 introduced the idea of training a network to learn how to classify 2 patches as a positive vs. a negative match. 
 
-You can see how MC-CNN compares to classical approaches on the standard benchmark for stereo, which is the Middlebury Stereo Dataset and [Leaderboard](http://vision.middlebury.edu/stereo/eval3/).
+You can see how MC-CNN compares to classical approaches on the standard benchmark for stereo, which is the Middlebury Stereo Dataset and [Leaderboard](http://vision.middlebury.edu/stereo/eval3/). At times, MC-CNN can show fine structures and succeed in shadows, when SAD and SSD cannot.
+
 
 
 ## References
-[1] Richard Szeliski. 
+[1] Richard Szeliski. Computer Vision: Algorithms and Applications.
 
 [2] James Hays. [PDF](https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf).
 
 [3] Rajesh Rao. Lecture 16: Stereo and 3D Vision, University of Washington. [PDF](https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf).
 
-
 [5] Yuri Boykov, Olga Veksler, Ramin Zabih. Fast Approximate Energy Minimization via Graph Cuts. ICCV 1999. [PDF](http://www.cs.cornell.edu/rdz/Papers/BVZ-iccv99.pdf)
 
-
-[6] [PDF](http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html).
-
+[6] Zhou. Unsupervised Learning of Depth. [PDF](http://openaccess.thecvf.com/content_cvpr_2017/html/Zhou_Unsupervised_Learning_of_CVPR_2017_paper.html).
 
 [7] Heiko Hirschmuller. Stereo Processing by Semi-Global Matching
 and Mutual Information. [PDF](https://pdfs.semanticscholar.org/bcd8/4d8bd864ff903e3fe5b91bed3f2eedacc324.pdf).
@@ -324,41 +319,13 @@ and Mutual Information. [PDF](https://pdfs.semanticscholar.org/bcd8/4d8bd864ff90
 
 [9] Computing the Stereo Matching Cost with a Convolutional Neural Network. Jure Zbontar and Yann LeCun. [PDF](https://arxiv.org/pdf/1409.4326.pdf).
 
-
-STEREO http://people.scs.carleton.ca/~c_shu/Courses/comp4900d/notes/simple_stereo.pdf
-DEPTH http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineVision_Chapter11.pdf
-STEREO https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
-SFM http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
-JAMES MULTI-VIEW https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf
-
-
-
-
-
-
-
-
-Dynamic programming, used in this case. Use a single match as constraint to find other matches. get ordering constraint.
-
-sometimes blue patch is not going to happen! happens all the time. have to allow that sometime there will not be a match, and just move on to the next guy.
- 
-real-time stereo in late 80s from stereo matching with dynamic programming.
-
-Turns out there are quite a few problems.
-
-illusion? thin nail illusion, thin object close to the camera?
-
-slanted plane: scrunched, will have multiple matches in one location.
-
-one scanline at a time, wasnt the winning approach.
-
-matching the scannline independently isn't good -- may see weird artifacts when you look at a vertical column, 3d boundaries in scene may not make straight lines. no consistently through your scanlines.
-
-Scanline is bad as representation of the world. segemntation based stereo -- first segment the iamge into patches that are similar in their appearance, then work patch by patch and do the matching.
-
-you can also get view interpolation, synthesize new views in between the two views.
-
-
+Additional Resources:
+ http://people.scs.carleton.ca/~c_shu/Courses/comp4900d/notes/simple_stereo.pdf
+ http://www.cse.usf.edu/~r1k/MachineVisionBook/MachineVision.files/MachineVision_Chapter11.pdf
+ https://courses.cs.washington.edu/courses/cse455/09wi/Lects/lect16.pdf
+ http://cvgl.stanford.edu/teaching/cs231a_winter1415/lecture/lecture6_affine_SFM_notes.pdf
+ https://www.cc.gatech.edu/~hays/compvision/lectures/09.pdf
+ MRF inference (Szeliski, Zabih, Scharstein et al. 2008)
 
 
 
