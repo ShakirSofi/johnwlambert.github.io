@@ -139,6 +139,17 @@ I enjoy creating teaching materials for topics related to computer vision, a fie
 
     <div class="module-header">Module 5: Geometry and Camera Calibration </div>
 
+
+    <div class="materials-item">
+      <a href="stereo/">
+        Stereo and Disparity
+      </a>
+      <div class="kw">
+          disparity maps, cost volume, MC-CNN
+      </div>
+    </div>
+
+
     <div class="materials-item">
       <a href="epipolar-geometry/">
         Epipolar Geometry and the Fundamental Matrix
