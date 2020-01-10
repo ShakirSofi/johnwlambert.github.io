@@ -112,4 +112,5 @@ ORB-SLAM[21] and DSO[6], solve Equation 7 by decomposing it using the Schur comp
 
 [7] Christopher Zach. Robust Bundle Adjustment Revisited. [PDF](https://link.springer.com/content/pdf/10.1007%2F978-3-319-10602-1_50.pdf).
 
+[8] Frank Dellaert. [Notes](http://www.cs.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A13-BundleAdjustment-handout.pdf). Slides](http://www.cs.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A13-BundleAdjustment.pdf)
 
