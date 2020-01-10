@@ -264,6 +264,10 @@ def pairwise_distances(x, y=None):
     return torch.clamp(dist, 0.0, np.inf)
 ```
 
+## GPU:
+
+[open-UCN](https://github.com/chrischoy/open-ucn/blob/master/lib/eval.py#L55)
+
 
 ## References
 
