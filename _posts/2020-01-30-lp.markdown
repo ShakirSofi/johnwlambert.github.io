@@ -14,7 +14,11 @@ Table of Contents:
 
 
 ## Basic Geometric Constructs
+A set is called a convex cone if we pick nonnegative coefficients $\theta_1, \theta_2$ and points $$x_1,x_2 \in C$$ such that
 
+$$
+\theta_1 x_1 + \theta_2 x_2 \in C
+$$
 
 ```python
 import matplotlib.pyplot as plt
@@ -28,40 +32,32 @@ def generate_pts_in_cone_2d(x1,x2,lambda1,lambda2)
 	return y
 
 x1 = np.array([1,0])
-x2 = np.array([0,1])
-lambda1 = np.random.rand(1000) * 10
-lambda2 = np.random.rand(1000) * 10
-y = generate_pts_in_cone_2d(x1,x2,lambda1,lambda2)
-plt.scatter(y[:,0], y[:,1],10, c='r', marker='.')
-plt.xlim([-5,20]); plt.ylim([-5,20]); plt.show()
-```
-
-```python
 x2 = np.array([1,1])
 
-plt.scatter(y[:,0], y[:,1],10, c='r', marker='.')
-plt.xlim([-5,20]); plt.ylim([-5,20]); plt.show()
-```
-
-```python
-lambda1 = np.absolute(np.random.randn(1000)) * 10
-lambda2 = np.absolute(np.random.randn(1000)) * 10
+lambda1 = np.absolute(np.random.randn(1000))
+lambda2 = np.absolute(np.random.randn(1000))
 y = generate_pts_in_cone_2d(x1,x2,lambda1,lambda2)
+
 plt.scatter(y[:,0], y[:,1],10, c='r', marker='.')
-plt.xlim([-5,20]); plt.ylim([-5,20]); plt.show()
+plt.scatter(   0,      0, 200, c='g', marker='.')
+plt.scatter(x1[0], x1[1], 200, c='g', marker='.')
+plt.scatter(x2[0], x2[1], 200, c='g', marker='.')
+plt.xlim([-1,5]); plt.ylim([-1,5]); plt.show()
 ```
 
-```
->>> y = np.tile(x1,(1000,1)) * lambda1.reshape(-1,1) + np.tile(x2,(1000,1)) * lambda2.reshape(-1,1)
->>> plt.scatter(y[:,0], y[:,1],10,c= 'r', marker='.'); plt.show()
-<matplotlib.collections.PathCollection object at 0x11f20b518>
->>> x1 = np.array([-1,0])
->>> x1 = np.array([-1,0])
->>> x2 = np.array([-1,-1])
->>> y = np.tile(x1,(1000,1)) * lambda1.reshape(-1,1) + np.tile(x2,(1000,1)) * lambda2.reshape(-1,1)
->>> plt.scatter(y[:,0], y[:,1],10,c= 'r', marker='.'); plt.show()
-<matplotlib.collections.PathCollection object at 0x11f272198>
-```
+<div class="fig figcenter fighighlight">
+  <img src="/assets/convex_cone_example.png" width="90%">
+  <div class="figcaption">
+    Convex cone, anchored around the origin (0,0) and withh edges passing throughh two other points -- (1,0) and (1,1).
+  </div>
+</div>
+
+## Barycentric Coordinates
+
+
+## Farkas
+
+https://people.orie.cornell.edu/dpw/orie6300/fall2008/Lectures/lec07.pdf
 
 
 There are a few different forms for an LP. We'll be able to use the dual to certify that our solution is optimal.
