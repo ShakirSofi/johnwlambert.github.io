@@ -1,0 +1,224 @@
+---
+layout: post
+comments: true
+permalink: /lp/
+title:  "Linear Programming"
+excerpt: "weak duality, Farkas' Lemma, complementary slackness"
+date:   2018-12-27 11:00:00
+mathjax: true
+
+---
+
+Table of Contents:
+- [Weak Duality](#recall)
+
+
+## Basic Geometric Constructs
+
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+def generate_pts_in_cone_2d(x1,x2,lambda1,lambda2)
+	"""
+	"""
+	y = np.tile(x1,(1000,1)) * lambda1.reshape(-1,1)
+	y += np.tile(x2,(1000,1)) * lambda2.reshape(-1,1)
+	return y
+
+x1 = np.array([1,0])
+x2 = np.array([0,1])
+lambda1 = np.random.rand(1000) * 10
+lambda2 = np.random.rand(1000) * 10
+y = generate_pts_in_cone_2d(x1,x2,lambda1,lambda2)
+plt.scatter(y[:,0], y[:,1],10, c='r', marker='.')
+plt.xlim([-5,20]); plt.ylim([-5,20]); plt.show()
+```
+
+```python
+x2 = np.array([1,1])
+
+plt.scatter(y[:,0], y[:,1],10, c='r', marker='.')
+plt.xlim([-5,20]); plt.ylim([-5,20]); plt.show()
+```
+
+```python
+lambda1 = np.absolute(np.random.randn(1000)) * 10
+lambda2 = np.absolute(np.random.randn(1000)) * 10
+y = generate_pts_in_cone_2d(x1,x2,lambda1,lambda2)
+plt.scatter(y[:,0], y[:,1],10, c='r', marker='.')
+plt.xlim([-5,20]); plt.ylim([-5,20]); plt.show()
+```
+
+```
+>>> y = np.tile(x1,(1000,1)) * lambda1.reshape(-1,1) + np.tile(x2,(1000,1)) * lambda2.reshape(-1,1)
+>>> plt.scatter(y[:,0], y[:,1],10,c= 'r', marker='.'); plt.show()
+<matplotlib.collections.PathCollection object at 0x11f20b518>
+>>> x1 = np.array([-1,0])
+>>> x1 = np.array([-1,0])
+>>> x2 = np.array([-1,-1])
+>>> y = np.tile(x1,(1000,1)) * lambda1.reshape(-1,1) + np.tile(x2,(1000,1)) * lambda2.reshape(-1,1)
+>>> plt.scatter(y[:,0], y[:,1],10,c= 'r', marker='.'); plt.show()
+<matplotlib.collections.PathCollection object at 0x11f272198>
+```
+
+
+There are a few different forms for an LP. We'll be able to use the dual to certify that our solution is optimal.
+
+## The Canonical Form
+
+The **primal** problem, with solution variable $$x \in \mathbb{R}^n$$. We wish to maximize a linear function. We have some constraints on what kind of $$x$$ we can choose, one of which is that $$x$$ is nonnegative. $$A \in \mathbb{R}^{m \times n}$$, and $$\preceq$$ denotes componentwise inequality:
+
+$$
+\begin{aligned}
+\begin{array}{ll}
+\mbox{max} & c^Tx \\
+\mbox{s.t.} & Ax \preceq b \\
+& x \succeq 0
+\end{array}
+\end{aligned}
+$$
+
+The **dual problem**, with solution variable $$y$$:
+
+$$
+\begin{aligned}
+\begin{array}{ll}
+\mbox{min} & y^Tb \\
+\mbox{s.t.} & y^TA \succeq c^T \\
+& y \succeq 0
+\end{array}
+\end{aligned}
+$$
+
+
+## Weak Duality
+**Lemma** If $$x,y$$ are feasible, then $$c^Tx \leq y^Tb$$.
+
+**Proof**: We recall that $$x \succeq 0$$, i.e. all of its entries are non-negative. Next, we recall the dual's constraints in Canonical form, $$y^TA \succeq c^T$$, which compares two column vectors with each other, at each entry. We can multiply such a column vector on the right with all non-negative scalars, and none of the inequality signs will be flipped:
+
+$$
+y^TAx \geq c^Tx
+$$
+
+Next, we recall the primal's constraints in the Canonical form, $$Ax \preceq b$$, comparing two column vectors. Since $$y$$ also has all non-negative entries, we can left multiply these column vectors with $$y^T$$ and not flip the sign of the inequalities:
+
+$$
+y^TAx \leq y^Tb
+$$
+
+At this point, we take a step back, flip the order of one inquality, and stack the inequalities next to each other to realize:
+
+$$
+c^Tx \leq y^TAx \\
+y^TAx \leq y^Tb
+$$
+
+When combined,  $$ c^Tx \leq y^TAx \leq y^Tb $$, as desired. $$\square$$
+
+
+## The Projection Theorem
+**Theorem**: If $$\mathcal{P}$$ is a non-empty closed, convex set, then:
+
+1. For any $$b$$, there is a unique minimizer for $$ f(z) = \| z - b \|^2 $$ over $$\mathcal{P}$$. We call the optimal point $$z^{\star} = \mbox{proj}_{\mathcal{P}} (b)$$.
+
+2. $$z^{\star}$$ is the projection of $$b$$ i.f.f.
+$$
+(z - z^{\star})^T (b - z) \leq 0 \hspace{7mm} \forall z \in \mathcal{P}
+$$
+
+To find the closest point in a polyhedron, take a circle around $$b$$, and dilate until it hits the boundary. It will hit the boundary in a unique place. If it hits the boundary in two places, then we could have undilated it slightly.
+
+In short the vector between $$(z^{\star},b)$$ and the vector between $$(z^{\star},z)$$ could never form an acute or right angle, but rather must always form an obtuse angle. This is because $$a \cdot b = \|a\| \|b\| \mbox{cos}(\theta_{a,b})$$, and unit vectors $$a,b$$ with an angle $$\theta_{a,b}<90$$ degrees will have dot product $$a \cdot b>0$$, those with $$\theta_{a,b}=90$$ degrees will have dot product of zero, and those with an obtuse angle $$\theta_{a,b}>90$$ degrees will have a dot product $$a \cdot b < 0$$.
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/projection_theorem.jpg" width="40%">
+  <div class="figcaption">
+    Given a point b, we seek the closest point to b inside the convex set P.
+  </div>
+</div>
+
+## The Standard Form
+
+We will now introduce the Standard Form of LP duality, which will be useful for the Farkas' Lemma. The **primal problem**, with solution variable $$x$$ which must still be nonnegative:
+
+$$
+\begin{aligned}
+\begin{array}{ll}
+\mbox{max} & c^Tx \\
+\mbox{s.t.} & Ax = b \\
+& x \succeq 0
+\end{array}
+\end{aligned}
+$$
+
+The **dual problem**, with solution variable $$y$$, which no longer needs to be nonnegative:
+
+$$
+\begin{aligned}
+\begin{array}{ll}
+\mbox{min} & y^Tb \\
+\mbox{s.t.} & y^TA \succeq c^T 
+\end{array}
+\end{aligned}
+$$
+
+## Farkas' Lemma v1
+**Lemma**: Exactly one of the following holds:
+1. \\( \exists x \mbox{ s.t. } Ax=b, \hspace{7mm} x \succeq 0\\)
+2. \\( \exists y \mbox{ s.t. } y^TA \succeq 0 \mbox{ and } y^Tb < 0 \\)
+
+**Proof**: If both (1) and (2) hold, then we will show a contradiction. Let $$c=0$$ in the Standard Form. We discover that $$y^Tb < c^Tx = 0$$, which violates weak duality, which states that $$y^Tb$$ should always be an **upper bound** on $$c^Tx$$.
+
+To complete the proof, we must show that when condition (1) doesn't hold, then (2) holds. We will use the Projection Theorem to do so. Suppose there is no $$x$$ that satisfies (1). We will construct $$y$$ that satisfies (2).
+
+Let $$p = \mbox{Proj}_{\mathcal{P}}(b)$$, $$p=Ax$$. and $$y = p-b$$.
+
+Let $$\mathcal{P}$$ be a polyhedron such that $$ \mathcal{P} = \{ Ax \mbox{ s.t. } x \succeq 0 \} $$.
+
+For all $$z \in \mathcal{P}$$: $$ \hspace{7mm} (z - p)^T(b-p) \leq 0 $$
+
+
+## Farkas' Lemma v2
+**Lemma**: Exactly one of the following holds:
+1. \\( \exists x \mbox{ s.t. } Ax \preceq b \\)
+
+2. \\( \exists y \mbox{ s.t. } y^TA = 0, \hspace{5mm} y \succeq 0, \hspace{5mm} y^Tb < 0 \\)
+
+Consider the linear system:
+
+$$
+\begin{aligned}
+\begin{bmatrix} A & -A & I \end{bmatrix} \begin{bmatrix} x^{+} \\ x^- \\ s \end{bmatrix} = b \\
+\begin{bmatrix} x^+ \\ x^- \\ s \end{bmatrix} \succeq 0
+\end{aligned}
+$$
+
+where $$I$$ is the identity matrix, where $$x^{+}$$ is the positive part of $$x$$, and where $$s$$ are slack variables.
+
+Suppose we are given a solution $$x$$ that satisfies $$Ax \preceq b$$. Let $$x^+ = \max(x,0)$$. Let $$x^- = -\min(x,0)$$. Let our slack variable be defined as $$s = b - Ax$$.
+
+$$
+x = x^+ - x^-
+$$
+
+## Farkas' Lemma v3
+**Lemma**: Exactly one of the following holds:
+- \\(y^TA \geq 0 \\)
+- \\( b^Ty < 0 \\)
+
+
+Claim 1: $$y^TA \geq 0$$
+
+
+Claim 2: $$b^Ty < 0$$
+
+
+
+## Strong Duality
+If we take two optimal solutions to the primal and dual
+
+
+
+

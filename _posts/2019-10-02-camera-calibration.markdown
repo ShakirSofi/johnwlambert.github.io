@@ -42,3 +42,21 @@ $$
 $$-R^Tt$$ 
 
 This can also be obtained via an RQ decomposition of $$KR$$, since we wish to find the product of two matrices, where the rightmost matrix is orthogonal.
+
+
+
+## Stereo Image Rectification
+
+
+- Reprojectimage planes onto a common plane parallel to the line between camera centers
+
+- Pixel motion is horizontal after this transforma7on
+
+- Two homographies(3x3 transform), one for each input image reprojection
+
+- C. Loop and Z. Zhang. Computing Rectifying Homographies for Stereo Vision. IEEE Conf. Computer Vision and PaWern Recognition (CVPR), 1999.
+
+
+
+
+
