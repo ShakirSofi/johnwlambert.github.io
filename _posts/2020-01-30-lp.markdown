@@ -14,7 +14,9 @@ Table of Contents:
 
 
 ## Basic Geometric Constructs
-A set is called a convex cone if we pick nonnegative coefficients $\theta_1, \theta_2$ and points $$x_1,x_2 \in C$$ such that
+
+### A Convex Cone
+A set is called a convex cone if we pick nonnegative coefficients $$\theta_1, \theta_2$$ and points $$x_1,x_2 \in C$$ such that
 
 $$
 \theta_1 x_1 + \theta_2 x_2 \in C
@@ -46,9 +48,68 @@ plt.xlim([-1,5]); plt.ylim([-1,5]); plt.show()
 ```
 
 <div class="fig figcenter fighighlight">
-  <img src="/assets/convex_cone_example.png" width="90%">
+  <img src="/assets/convex_cone_example.png" width="50%">
   <div class="figcaption">
-    Convex cone, anchored around the origin (0,0) and withh edges passing throughh two other points -- (1,0) and (1,1).
+    Convex cone, anchored around the origin (0,0) and with edges passing through two other points -- (1,0) and (1,1).
+  </div>
+</div>
+
+## Perspective: Convex Cone as a Linear System
+
+Consider the example above in $$\mathbb{R}^2$$, where the two edges of our convex cone each consist of a ray extending from the origin through a point. Any point $$b$$ living withiin the cone could be expressed as a weighted combinations of these two points, $$a_1, a_2$$, where the weights are $$\lambda_1, \lambda_2$$:
+
+$$
+C = \{ b: b = \lambda_1 a_1 + \lambda_2 a_2, \lambda_1 \geq 0, \lambda_2 \geq 0 \}
+$$
+
+If we stack these points (each a column vector) as the columns $$a_i \in \mathbb{R}^m$$ of a matrix $$A \in \mathbb{R}^{m \times n}$$, we can use matrix multiplication to express the mixture of columns [1]:
+
+$$
+\begin{aligned}
+A \lambda = b
+\begin{bmatrix} | & | \\ a_1 & a_2 \\ | & | \end{bmatrix} \begin{bmatrix} \lambda_1 \\ \lambda_2 \end{bmatrix} = b
+\end{aligned}
+$$
+
+where $$\lambda_1, \lambda_2$$ are scalars. If instead we were to express this as $$A^T \lambda = b$$, then we could have stacked the cone edge points as rows $$a_i \in \mathbb{R}^m$$ of $$A \in \mathbb{R}^{n \times m}$$. The coefficients of $$\lambda$$ give the coefficients of mixture.
+
+This is especially obvious when we consider $$x=e_j$$, the j'th unit vector/standard basis vector:
+
+## Geometric Interpretation of Farkas' Lemma
+
+Farkas' Lemma provides two possible alternatives [2]. Let $$A \in \mathbb{R}^{m \times n}$$ with columns $$a_i$$. We are working in m-dimensional space. In the **first alternative**, $$b \in \mathbb{R}^m$$ lies in the cone of $$A$$, which is composed of $$n$$ edges.
+
+$$
+\begin{aligned}
+Ax &= b, x \succeq 0 \\
+\begin{bmatrix} | & | & & |\\ a_1 & a_2 & \cdots & a_n \\ | & | & & | \end{bmatrix} \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{bmatrix} &= b \\
+ \sum\limits_{i=1}^n x_i a_i &= b 
+\end{aligned}
+$$
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/farkas_geometric_v1.png" width="30%">
+  <div class="figcaption">
+  	Geometric interpretation of the first alternative.
+  </div>
+</div>
+
+In the **second alternative**, there exists a hyperplane through the origin, separating the vector $$b$$ from the cone of $$A$$. In other words, there exists a vector $$y \in \mathbb{R}^m$$ such that $$y^Tb < 0$$. The cone's edge points all live on the other side of the hyperplane, such that $$y^T a_i \geq 0$$. Expressed in matrix form,
+
+$$
+\begin{aligned}
+A^Ty &\succeq 0 \\
+\begin{bmatrix} - & a_1 & - \\ - & a_2 & - \\ & \vdots & \\ - & a_n & - \end{bmatrix} \begin{bmatrix}y_1 \\ \vdots \\ y_m \end{bmatrix} &\succeq 0 \\ 
+y^T a_i &\geq 0, i = 1,\dots,n \\
+\end{aligned}
+$$
+
+In the second alternative, the angle of $$\mathbf{y}$$  with the vectors $$\mathbf{a}_i$$ is at most $$90^{\circ}$$, while the angle of $$\mathbf {y}$$  with the vector $$\mathbf{b}$$  is more than $$90^{\circ}$$.
+
+<div class="fig figcenter fighighlight">
+  <img src="/assets/farkas_geometric_v2.png" width="30%">
+  <div class="figcaption">
+    Geometric interpretation of the second alternative.
   </div>
 </div>
 
@@ -215,6 +276,13 @@ Claim 2: $$b^Ty < 0$$
 ## Strong Duality
 If we take two optimal solutions to the primal and dual
 
+## References
+
+[1] Stephen Boyd. EE 263 Course Reader [PDF](http://ee263.stanford.edu/archive/ee263_course_reader.pdf), Slide 2-29.
+
+[2] Farkas' Lemma. Wikipedia. [Link](https://en.wikipedia.org/wiki/Farkas%27_lemma).
+
+[3] L. Vandenberghe. Lecture 5 Alternatives. [PDF](http://www.seas.ucla.edu/~vandenbe/ee236a/lectures/alternatives.pdf).
 
 
 
