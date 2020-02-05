@@ -90,7 +90,7 @@ $$
 <div class="fig figcenter fighighlight">
   <img src="/assets/farkas_geometric_v1.png" width="30%">
   <div class="figcaption">
-  	Geometric interpretation of the first alternative.
+  	Geometric interpretation of the first alternative. Source: [3].
   </div>
 </div>
 
@@ -109,7 +109,7 @@ In the second alternative, the angle of $$\mathbf{y}$$  with the vectors $$\math
 <div class="fig figcenter fighighlight">
   <img src="/assets/farkas_geometric_v2.png" width="30%">
   <div class="figcaption">
-    Geometric interpretation of the second alternative.
+    Geometric interpretation of the second alternative. Source: [3].
   </div>
 </div>
 
