@@ -89,6 +89,11 @@ Those who use generic optimization routines to solve SfM problems will find the 
 
 [6] 
 
+## COLMAP
+
+
+MRF scheme. Rotation Averaging slow.
+
 ## Schur Complement
 
 Hessian matrix H in bundle adjustment has a unique structure: Hcc and Hpp are sparse matrices with only diagonal

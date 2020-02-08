@@ -390,8 +390,26 @@ any direction in the space of its degrees of freedom. Otherwise a robot is calle
 [5] Ma, Yi and Soatto, Stefano and Kosecka, Jana and Sastry, S. Shankar: An Invitation to 3-D Vision: From Images to Geometric Models. Springer Verlag (2003). [PDF](https://www.eecis.udel.edu/~cer/arv/readings/old_mkss.pdf).
 
 
+## Manifolds: SO(2)
+
+SO(2), 2x2 matrices, with determinant one, orthogonal, 1 dimensional manifold in a 4 dimensional space. (c,s) in R^2, lie algebra is the tangent space at the origin. Tangent Bundle. Can get tangent space at a single point R. every tangent space is a rotated copy of that lie algebra
 
 
+## Manifolds: 3d Lines
+
+(R, p) 
+R has 9 numbers, 3d rotation
+p is 2d in xy plane
+embedding space is R 11
+
+but 4d manifold
+
+Tangent space is TL_p, isomorphic to R4. THERE IS no lie algebra since this is not a lie group.
+
+exponential map takes us from tangent space to the manifold
+
+
+retract for any manifold takes us from tangent space to the manifold
 
 
 **Rigid Body Kinematics and Filtering**
@@ -566,4 +584,7 @@ def unit_tests():
 if __name__ == "__main__":
     unit_tests()
 ```
+
+
+
 
