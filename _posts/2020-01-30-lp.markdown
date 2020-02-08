@@ -119,6 +119,12 @@ The hyperplane normal to this vector has the vectors $$\mathbf{a}_i$$ on one sid
   </div>
 </div>
 
+Farkas Lemma is a foundational topic. Resources from: David P. Williamson (Cornell) [link](https://people.orie.cornell.edu/dpw/orie6300/fall2008/Lectures/lec07.pdf), Lieven Vandenberghe on Alternatives [link](http://www.seas.ucla.edu/~vandenbe/ee236a/lectures/alternatives.pdf), Stephen Boyd on convex sets [link](http://web.stanford.edu/class/ee364a/lectures/sets.pdf), Ankur Moitra [YouTube](https://www.youtube.com/watch?v=T1BuzVLfipY) and [transcribed notes](http://people.csail.mit.edu/moitra/docs/6854lec11.pdf), Michel X. Goemans [link](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-854j-advanced-algorithms-fall-2008/lecture-notes/lec9.pdf).
+
+"If one has two systems of linear relations, where each relation is either an linear equation (or linear equality relation) or a linear inequality relation, and exactly one of the two systems has a solution, then one says that the two given systems are each others alternative." -Kees Roos (Linear Optimization: Theorems of the Alternative).
+
+Nonlinear Programming  Cover Image Title Information Published: 1994 ISBN: 978-0-89871-341-1 eISBN: 978-1-61197-125-5 Book Code: CL10 Series: Classics in Applied Mathematics Pages: xvii + 219 Buy the Print Edition Author(s): Olvi L. Mangasarian chapter 2
+
 ## Barycentric Coordinates
 
 
