@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Precision and Recall</title>
+  <meta name="description" content="implementation to calculate mAP for object detection">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/precision-recall/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Precision and Recall</h1>
+    <p class="meta">Dec 27, 2018</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#recall">Recall</a></li>
+  <li><a href="#precision">Precision</a></li>
+  <li><a href="#pr-tradeoff">Trading Off Between the Two</a></li>
+  <li><a href="#pr-at-rank-k">Precision and Recall over Ranks</a></li>
+  <li><a href="#pr-curve">The Precision-Recall Curve</a></li>
+  <li><a href="#ap">Average Precision</a></li>
+  <li><a href="#map">Mean Average Precision (mAP)</a></li>
+  <li><a href="#pr-at-k-impl">Precision@K and Recall@K Implementation</a></li>
+  <li><a href="#ap-impl">AP Implementation</a></li>
+</ul>
+
+<h2 id="why-map">Why mAP?</h2>
+<p>Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious.</p>
+
+<p>ranking-based retrieval performance metric</p>
+
+<h2 id="missing-link-between-object-detection-and-information-retrieval">Missing Link Between Object Detection and Information Retrieval?</h2>
+<p>In this post, you’ll see that object detection is evaluated in the same way as information retrieval. Why is this? It turns out the tasks have a number of similarities.
+In Information Retrieval (IR), given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a <em>relevant document</em> with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant to the query, or it is not).</p>
+
+<h2 id="the-need-for-more-finely-grained-measures-of-accuracy">The Need for More Finely-Grained Measures of Accuracy</h2>
+
+<p>We’ll suppose that we are performing binary classification: classifying objects into different classes.</p>
+
+<p>Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.</p>
+
+<p>For both tasks, it turns out accuracy isn’t a helpful metric.Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don’t care about, and which we can ignore in precision/recall.</p>
+
+<p><a name="recall"></a></p>
+<h3 id="recall">Recall</h3>
+
+<p>Recall measures how many objects you missed. You can have very high recall by classifying everything as some class (at the expense of precision). It is a proportion to measure, <em>How much of the good stuff did we miss?</em> or <em>“how complete the results are”.</em></p>
+
+<script type="math/tex; mode=display">\mbox{Recall} = \frac{tp}{tp+fn} = \frac{tp}{\mbox{no. of actual positives}}</script>
+
+<p><a name="precision"></a></p>
+<h3 id="precision">Precision</h3>
+
+<p>Precision measures your discriminative ability. If you claimed that all of the objects you saw were of a particular class, and you were usually wrong because they belonged to a different class, you would have low precision. Your judgments can’t be considered <em>precise</em>. Precision is a proportion to measure, <em>How much junk did we give to the user?</em> or <em>“how useful the search results are”</em>.</p>
+
+<script type="math/tex; mode=display">\mbox{Precision} = \frac{tp}{tp+fp} = \frac{tp}{\mbox{no. of predicted positives}}</script>
+
+<p><a name="pr-tradeoff"></a></p>
+<h2 id="trading-off-between-the-two">Trading Off Between the Two</h2>
+<p>Since these two metrics are complementary, we must always report them together. If we return only one of these two numbers, we can make either number arbitrarily high.</p>
+
+<p>In an object detection system, we may require different amounts of overlap with the ground truth box to assert that a detection is a true positive detection. That overlap threshold may be ours to choose. As we increase the threshold, say from 0.7 to 0.9, we get higher precision, but worse recall (only making prediction if we are pretty confident). However, suppose we wish to avoid false negatives at all costs – if we are blind to a single object detection, we may collide with it and damage our robot/vehicle. In this scenario, we would probably opt for a lower threshold, perhaps 0.3. Our classifier will now have higher recall, but lower precision.</p>
+
+<p>As we vary the value of this threshold, we can actually draw a curve – a precision-recall curve.</p>
+
+<p><a name="pr-at-rank-k"></a></p>
+<h2 id="precision-and-recall-over-ranks">Precision and Recall over Ranks</h2>
+<p>So far we have discussed set-based measures (precision and recall) which are computed with unordered sets of items. However, in information retrieval and object detection, we are more interested in evaluating <em>ranked</em> retrieval results. If we perform a Google search, we wish to only have to look at the first page of results. The dominant paradigm for object detection is to use anchor boxes, which are a huge, rigid set of default bounding boxes that will shifted and stretched slightly. Every single box will have a confidence associated with it, which can be used to as a ranking. While F-measure is one way of combining recall and precision, it cannot incorporate ranking or confidence information (at many different thresholds?) into its evaluation.</p>
+
+<p>You can compute precision and recall at each ranking. Generally we try to plot these numbers.</p>
+
+<p>Precision @ K. We set a rank threshold @ K, and compute the % of relevant in the top K. We ignore all documents ranked lower than K. For example,</p>
+
+<p>We can do the same for Recall @K.</p>
+
+<p>Suppose for a query (seeking 3 ground truth documents), we return 5 documents. In an object detection setting, suppose there are three dogs in an image, and our detector predicted 5 bounding boxes. Let <script type="math/tex">\color{limegreen}\blacksquare</script> represent a relevant document (TP), and let <script type="math/tex">\color{red}\blacksquare</script> represent an irrelevant document (false positive). Suppose our 5 documents are ranked as follows:</p>
+
+<script type="math/tex; mode=display">\color{limegreen}1\blacksquare \hspace{1mm} \color{red}2\blacksquare \hspace{1mm} \color{limegreen}3\blacksquare \hspace{1mm} \color{red}4\blacksquare \hspace{1mm} \color{limegreen}5\blacksquare</script>
+
+<p>Our Prec@1 is 1/1, our Prec@2 is 1/2, Prec@3 is 2/3, our Prec@4 is 2/4, and our Prec@5 is 3/5. Our Recall@1 is 1/3, Recall@2 is 1/3, Recall@3 is 2/3, Recall@4 is 2/3, Recall@5 is 3/3.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">prec</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">recall</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">prec</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Precision'</span><span class="p">);</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">prec</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">recall</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Recall'</span><span class="p">);</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">recall</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Rank'</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">recall</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'m'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">recall</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'m'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p>Recall can never go down (you can’t subtract relevant documents you already found).</p>
+
+<p>How can we combine them into a single curve? Looking at two curves is challenging. We will wish to plot precision vs. recall.</p>
+
+<p><a name="pr-curve"></a></p>
+<h2 id="the-precision-recall-curve">The Precision-Recall Curve</h2>
+<p>If we consider the rank position of each relevant document, <script type="math/tex">K_1, K_2, \dots, K_R</script>, then we can compute the Precision@K for each <script type="math/tex">K_1, K_2, \dots, K_R</script>. The average precision is the average of all P@K values.</p>
+
+<p>One will often see metrics like Precision@0.5, meaning precision when Recall is 0.5.</p>
+
+<script type="math/tex; mode=display">Prec@K = \frac{1}{K} \sum\limits_{i=1}^K \mathbf{1} [x_i \in S_q^+]</script>
+
+<p>where <script type="math/tex">\mathbf{1}[\cdot]</script> is a binary indicator. Generally we want to use fixed recall levels for this, e.g. 0.1, 0.2, 0.3.</p>
+
+<p>The precision-recall curve is formally defined as <script type="math/tex">PR(q) = \{ (Prec(i), Rec(i)), i=0, \dots, N \}</script>, where Prec(i) and Rec(i) are the preciison and recall evaluated at the i-th position in the ranking [10].</p>
+
+<p>On average, over thousands of queries, precision drops as recall increases. So we wish to preserve the decreasing monotonicity. Get an upper bound on the original recall-precision numbers. Standard way to interpolate to remove the “zig-zag”/sawtooth nature as:</p>
+
+<script type="math/tex; mode=display">\hat{P}(R) = \underset{i}{\max} \{ P_i : R_i \geq R \}</script>
+
+<p>Alternatively, this is sometimes written as
+<script type="math/tex">\hat{P}(r) = \underset{ \tilde{r} \geq r}{\max} p(\tilde{r})</script></p>
+
+<p>How does the monotonicity constraint work? Essentially, go to the <script type="math/tex">R_i</script> value on the graph, and check the precision value here. Next, look as far as you would like to the right (larger values of <script type="math/tex">R_i</script>), and if precision ever gets bigger than <script type="math/tex">P(R_i)</script>, choose the bigger precision value.</p>
+
+<p>Historically, there were 11 standard levels of recall.</p>
+
+<p><a name="ap"></a></p>
+<h2 id="average-precision">Average Precision</h2>
+<p>Suppose we want a single number when tuning an algorithm. One way to convert the precision-recall curve into a single number is to take its integral. We’ll use Riemann sums/the trapezoidal rule (which you may be familiar with from numerical integration/quadrature) to computing the area under this curve.</p>
+
+<script type="math/tex; mode=display">AP = \sum\limits_{i=1}^N \mbox{Prec}(i) \Delta\mbox{Rec}(i)</script>
+
+<p>In the <a href="http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf">PASCAL VOC 2010 Paper</a> [5], one will find AP defined as:</p>
+
+<script type="math/tex; mode=display">AP = \frac{1}{11} \sum\limits_{R_i} \hat{P}(R_i) = \frac{1}{11} \sum\limits_{r \in \{0, 0.1, \dots, 1\}} \hat{P}(r)</script>
+
+<p>A more general expression for AP is an integral, approximated as a sum:</p>
+
+<script type="math/tex; mode=display">AP = \int_{0}^1 \hspace{1mm} p(r) dr \approx \sum\limits_{k=1}^n P(k) \Delta r(k)</script>
+
+<p>where <script type="math/tex">k</script> is the rank in a sequence of ranked items, and <script type="math/tex">n</script> is the number of retrieved items, P(k) is the Precission@K, and <script type="math/tex">\Delta r(k)</script> is the change in recall from items <script type="math/tex">k-1</script> to <script type="math/tex">k</script>, as defined in [2].</p>
+
+<p>Modern datasets like the Waymo Open Dataset [8] express this integral with the monotonically decreasing component:</p>
+
+<script type="math/tex; mode=display">AP = 100 \int_0^1 \max \{ p(r^\prime) \mid r^\prime \geq r \} dr</script>
+
+<p>He et al. express AP yet another way:</p>
+
+<script type="math/tex; mode=display">AP = \frac{1}{|S_q^+|} \sum\limits_{K=1}^n \mathbb{1}[x_K \in S_q^+]Prec@K</script>
+
+<p>While precision looks at a single threshold, average precision looks at <em>the entire ranking</em>.</p>
+
+<p><a name="map"></a></p>
+<h2 id="mean-average-precision">Mean Average Precision</h2>
+<p>While AP is a useful number to capture the performance of a system, it can only summarize performance for a single class/category at once. When performing the task of object detection, we would like to be discriminative not just about two classes (background and dog), but perhaps over 20 classes (PASCAL VOC) or 80 classes (COCO). Again, when tuning an algorithm, we want a single number to evaluate our system’s performance <em>over all classes</em> simultaneously. Mean average precision, is the average (arithmetic mean) of average precision values.</p>
+
+<p>Suppose for each class there are relevant documents (true positives) or ground truth object bounding boxes. Suppose for the dog class, there are 5 relevant objects, and for the cat class, there are 3 relevant objects. Call these query 1 and query 2. We compute average precision for each class/query, and then find their arithmetic mean for the mean average precision (mAP).</p>
+
+<script type="math/tex; mode=display">mAP = \frac{1}{N} \sum\limits_{i=1}^N AP_i</script>
+
+<p><a name="pr-at-k-impl"></a></p>
+<h2 id="precisionk-and-recallk-implementation">Precision@K and Recall@K Implementation</h2>
+
+<p>An effective way to compute AP is to first count the total number of positives (ground truth items) as <code class="highlighter-rouge">npos</code>. Next, sort all N predictions by confidence and then create two zero-filled arrays, each of length N, corresponding to TPs and FPs, respectively. We will loop through all ranked detections – if the detection represents a TP, we place a 1 at this rank in the TPs array. If a FP, we do the same for the FPs array instead.</p>
+
+<p>To compute Precision@K or Recall@K, we need only compute a cumulative sum at each rank <script type="math/tex">K</script>, and replace the FPs array with the cumulative FP sums, and the same for the TPs array.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+<span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+</code></pre></div></div>
+<p>As stated previously, recall is TP/(number of actual positives), and elementwise division of the two arrays will give us Recall@K.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rec</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">npos</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Precision is TP/(number of predicted positives), and elementwise division will also do the trick to give us Precision@K. We must be careful here, however, to avoid division by zero, as some evaluation scripts ignore “difficult” ground truth items:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">prec</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Now, given Recall@K and Precision@K at every rank K, we can compute the average precision.</p>
+
+<p><a name="ap-impl"></a></p>
+<h2 id="ap-implementation">AP Implementation</h2>
+<p>Our next step is numerically integrating the P-R curve. The</p>
+
+<p>The following code snippets are taken directly from the AP computation for PASCAL VOC in <a href="https://github.com/facebookresearch/detectron2/blob/master/detectron2/evaluation/pascal_voc_evaluation.py">Detectron2</a>. The VOC 2007 metric is an 11-point method. For 11 equally spaced cutoff values of recall <script type="math/tex">t\in[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]</script>, we will find all computed recall values in our array greater than <script type="math/tex">t</script>, and find the maximum precision at any such valid value. We then multiply it by the width of the bar (1/11), and add it to our sum.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ap</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">rec</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">prec</span><span class="p">[</span><span class="n">rec</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">])</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">ap</span> <span class="o">+</span> <span class="n">p</span> <span class="o">/</span> <span class="mf">11.0</span>
+</code></pre></div></div>
+
+<p>After 2012, a more “correct” version of AP calculation was used. In this version, we first remove zigzags (enforcing a strictly monotonically decreasing precisison).</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mpre = np.concatenate(([0.0], prec, [0.0]))
+# compute the precision envelope
+for i in range(mpre.size - 1, 0, -1):
+    mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
+</code></pre></div></div>
+<p>Afterwards, at every location in the staircase precision-recall curve where a step occurs, we compute the Riemann sum. Thus, instead of a crude 11-point approximation, we can compute with many more points.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># first append sentinel values at the end</span>
+<span class="n">mrec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">rec</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]))</span>
+</code></pre></div></div>
+<p>We look for points where the X axis (recall) changes value</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>i = np.where(mrec[1:] != mrec[:-1])[0]
+</code></pre></div></div>
+<p>Now, the area under the curve is a sum of <script type="math/tex">\Delta recall * prec</script> values:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
+</code></pre></div></div>
+
+<p>Let’s walk through a small numerical example.</p>
+
+<h2 id="object-detection-example">Object Detection Example</h2>
+<p>In order to compute average precision, we first need to be able to count our true positives and false positives. To do so, we will compute overlap (i.e. IoU). Let ovmax be the maximum det-gt overlap observed thus far. In addition, if you have more than one detection for a single ground truth object, this must be considered an error (false positive). Here is the pseudocode:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sort</span> <span class="n">detections</span> <span class="k">from</span> <span class="n">greatest</span> <span class="n">to</span> <span class="n">smallest</span> <span class="n">confidence</span>
+<span class="k">for</span> <span class="n">each</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">detections</span><span class="p">:</span>
+    <span class="n">ovmax</span> <span class="o">=</span>  <span class="o">-</span><span class="n">infinity</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="n">gt</span> <span class="ow">in</span> <span class="n">ground</span> <span class="n">truth</span> <span class="n">boxes</span><span class="p">:</span>
+        <span class="n">overlap</span> <span class="o">=</span> <span class="n">compute</span> <span class="n">overlap</span> <span class="n">between</span> <span class="n">det</span> <span class="ow">and</span> <span class="n">gt</span>
+        <span class="k">if</span> <span class="n">overlap</span> <span class="o">&gt;</span> <span class="n">ovmax</span><span class="p">:</span>
+            <span class="n">ovmax</span> <span class="o">=</span> <span class="n">overlap</span>
+            <span class="n">best_gt_idx</span> <span class="o">=</span> <span class="n">gt</span> <span class="n">index</span>
+
+    <span class="k">if</span> <span class="n">ovmax</span> <span class="o">&gt;=</span> <span class="n">minimum_overlap_threshold</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gt</span> <span class="n">bbox</span> <span class="n">already</span> <span class="n">claimed</span><span class="p">:</span>
+            <span class="n">mark</span> <span class="n">det</span> <span class="k">as</span> <span class="n">false</span> <span class="n">positive</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mark</span> <span class="n">det</span> <span class="k">as</span> <span class="n">true</span> <span class="n">positive</span>
+</code></pre></div></div>
+<p>Here is the actual code, as found in <a href="https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py">Faster R-CNN</a> or in FAIR’s <a href="https://github.com/facebookresearch/detectron2/blob/master/detectron2/evaluation/pascal_voc_evaluation.py">Detectron2</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">voc_eval</span><span class="p">(</span><span class="n">detpath</span><span class="p">,</span>
+             <span class="n">annopath</span><span class="p">,</span>
+             <span class="n">imagesetfile</span><span class="p">,</span>
+             <span class="n">classname</span><span class="p">,</span>
+             <span class="n">cachedir</span><span class="p">,</span>
+             <span class="n">ovthresh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+             <span class="n">use_07_metric</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="s">"""rec, prec, ap = voc_eval(detpath,
+                                annopath,
+                                imagesetfile,
+                                classname,
+                                [ovthresh],
+                                [use_07_metric])
+
+    Top level function that does the PASCAL VOC evaluation.
+
+    detpath: Path to detections
+        detpath.format(classname) should produce the detection results file.
+    annopath: Path to annotations
+        annopath.format(imagename) should be the xml annotations file.
+    imagesetfile: Text file containing the list of images, one image per line.
+    classname: Category name (duh)
+    cachedir: Directory for caching the annotations
+    [ovthresh]: Overlap threshold (default = 0.5)
+    [use_07_metric]: Whether to use VOC07's 11 point AP computation
+        (default False)
+    """</span>
+    <span class="c"># assumes detections are in detpath.format(classname)</span>
+    <span class="c"># assumes annotations are in annopath.format(imagename)</span>
+    <span class="c"># assumes imagesetfile is a text file with each line an image name</span>
+    <span class="c"># cachedir caches the annotations in a pickle file</span>
+
+    <span class="o">...</span>
+
+    <span class="c"># extract gt objects for this class</span>
+    <span class="n">class_recs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">npos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">imagename</span> <span class="ow">in</span> <span class="n">imagenames</span><span class="p">:</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">recs</span><span class="p">[</span><span class="n">imagename</span><span class="p">]</span> <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="s">'name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">classname</span><span class="p">]</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s">'bbox'</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">R</span><span class="p">])</span>
+        <span class="n">difficult</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s">'difficult'</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">R</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">det</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+        <span class="n">npos</span> <span class="o">=</span> <span class="n">npos</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="o">~</span><span class="n">difficult</span><span class="p">)</span>
+        <span class="n">class_recs</span><span class="p">[</span><span class="n">imagename</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">'bbox'</span><span class="p">:</span> <span class="n">bbox</span><span class="p">,</span>
+                                 <span class="s">'difficult'</span><span class="p">:</span> <span class="n">difficult</span><span class="p">,</span>
+                                 <span class="s">'det'</span><span class="p">:</span> <span class="n">det</span><span class="p">}</span>
+
+    <span class="n">splitlines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">image_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">splitlines</span><span class="p">]</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">splitlines</span><span class="p">])</span>
+    <span class="n">BB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:]]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">splitlines</span><span class="p">])</span>
+
+    <span class="c"># sort by confidence</span>
+    <span class="n">sorted_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">confidence</span><span class="p">)</span>
+    <span class="n">sorted_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="o">-</span><span class="n">confidence</span><span class="p">)</span>
+    <span class="n">BB</span> <span class="o">=</span> <span class="n">BB</span><span class="p">[</span><span class="n">sorted_ind</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">image_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">image_ids</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sorted_ind</span><span class="p">]</span>
+
+    <span class="c"># go down dets and mark TPs and FPs</span>
+    <span class="n">nd</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_ids</span><span class="p">)</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nd</span><span class="p">):</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">class_recs</span><span class="p">[</span><span class="n">image_ids</span><span class="p">[</span><span class="n">d</span><span class="p">]]</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">BB</span><span class="p">[</span><span class="n">d</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">ovmax</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="n">BBGT</span> <span class="o">=</span> <span class="n">R</span><span class="p">[</span><span class="s">'bbox'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">BBGT</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c"># compute overlaps</span>
+            <span class="c"># intersection</span>
+            <span class="n">ixmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">bb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">iymin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bb</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ixmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">bb</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">iymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">bb</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">iw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ixmax</span> <span class="o">-</span> <span class="n">ixmin</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+            <span class="n">ih</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">iymax</span> <span class="o">-</span> <span class="n">iymin</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+            <span class="n">inters</span> <span class="o">=</span> <span class="n">iw</span> <span class="o">*</span> <span class="n">ih</span>
+
+            <span class="c"># union</span>
+            <span class="n">uni</span> <span class="o">=</span> <span class="p">((</span><span class="n">bb</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">bb</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">*</span>
+                   <span class="p">(</span><span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">BBGT</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">-</span> <span class="n">inters</span><span class="p">)</span>
+
+            <span class="n">overlaps</span> <span class="o">=</span> <span class="n">inters</span> <span class="o">/</span> <span class="n">uni</span>
+            <span class="n">ovmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span>
+            <span class="n">jmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ovmax</span> <span class="o">&gt;</span> <span class="n">ovthresh</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">R</span><span class="p">[</span><span class="s">'difficult'</span><span class="p">][</span><span class="n">jmax</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">R</span><span class="p">[</span><span class="s">'det'</span><span class="p">][</span><span class="n">jmax</span><span class="p">]:</span>
+                    <span class="n">tp</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+                    <span class="n">R</span><span class="p">[</span><span class="s">'det'</span><span class="p">][</span><span class="n">jmax</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fp</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fp</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="c"># compute precision recall</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+    <span class="n">rec</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">npos</span><span class="p">)</span>
+    <span class="c"># avoid divide by zero in case the first detection matches a difficult</span>
+    <span class="c"># ground truth</span>
+    <span class="n">prec</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">voc_ap</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">use_07_metric</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rec</span><span class="p">,</span> <span class="n">prec</span><span class="p">,</span> <span class="n">ap</span>
+</code></pre></div></div>
+
+<h2 id="now-for-coco">Now for COCO:</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># inspired from Detectron:</span>
+<span class="c"># https://github.com/facebookresearch/Detectron/blob/a6a835f5b8208c45d0dce217ce9bbda915f44df7/detectron/datasets/json_dataset_evaluator.py#L255 # noqa</span>
+<span class="k">def</span> <span class="nf">_evaluate_box_proposals</span><span class="p">(</span><span class="n">dataset_predictions</span><span class="p">,</span> <span class="n">coco_api</span><span class="p">,</span> <span class="n">thresholds</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">area</span><span class="o">=</span><span class="s">"all"</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""
+    Evaluate detection proposal recall metrics. This function is a much
+    faster alternative to the official COCO API recall evaluation code. However,
+    it produces slightly different results.
+    """</span>
+    <span class="c"># Record max overlap value for each gt box</span>
+    <span class="c"># Return vector of overlap values</span>
+    <span class="n">areas</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">"all"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s">"small"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s">"medium"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s">"large"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s">"96-128"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s">"128-256"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s">"256-512"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s">"512-inf"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">area_ranges</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="mi">0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1e5</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># all</span>
+        <span class="p">[</span><span class="mi">0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">32</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># small</span>
+        <span class="p">[</span><span class="mi">32</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">96</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># medium</span>
+        <span class="p">[</span><span class="mi">96</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1e5</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># large</span>
+        <span class="p">[</span><span class="mi">96</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">128</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># 96-128</span>
+        <span class="p">[</span><span class="mi">128</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">256</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># 128-256</span>
+        <span class="p">[</span><span class="mi">256</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">512</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>  <span class="c"># 256-512</span>
+        <span class="p">[</span><span class="mi">512</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1e5</span> <span class="o">**</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="p">]</span>  <span class="c"># 512-inf</span>
+    <span class="k">assert</span> <span class="n">area</span> <span class="ow">in</span> <span class="n">areas</span><span class="p">,</span> <span class="s">"Unknown area range: {}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+    <span class="n">area_range</span> <span class="o">=</span> <span class="n">area_ranges</span><span class="p">[</span><span class="n">areas</span><span class="p">[</span><span class="n">area</span><span class="p">]]</span>
+    <span class="n">gt_overlaps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">num_pos</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">prediction_dict</span> <span class="ow">in</span> <span class="n">dataset_predictions</span><span class="p">:</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">prediction_dict</span><span class="p">[</span><span class="s">"proposals"</span><span class="p">]</span>
+
+        <span class="c"># sort predictions in descending order</span>
+        <span class="c"># TODO maybe remove this and make it explicit in the documentation</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">objectness_logits</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">descending</span><span class="o">=</span><span class="bp">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+
+        <span class="n">ann_ids</span> <span class="o">=</span> <span class="n">coco_api</span><span class="o">.</span><span class="n">getAnnIds</span><span class="p">(</span><span class="n">imgIds</span><span class="o">=</span><span class="n">prediction_dict</span><span class="p">[</span><span class="s">"image_id"</span><span class="p">])</span>
+        <span class="n">anno</span> <span class="o">=</span> <span class="n">coco_api</span><span class="o">.</span><span class="n">loadAnns</span><span class="p">(</span><span class="n">ann_ids</span><span class="p">)</span>
+        <span class="n">gt_boxes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">BoxMode</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s">"bbox"</span><span class="p">],</span> <span class="n">BoxMode</span><span class="o">.</span><span class="n">XYWH_ABS</span><span class="p">,</span> <span class="n">BoxMode</span><span class="o">.</span><span class="n">XYXY_ABS</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">anno</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="s">"iscrowd"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="n">gt_boxes</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c"># guard against no boxes</span>
+        <span class="n">gt_boxes</span> <span class="o">=</span> <span class="n">Boxes</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">)</span>
+        <span class="n">gt_areas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">([</span><span class="n">obj</span><span class="p">[</span><span class="s">"area"</span><span class="p">]</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">anno</span> <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="s">"iscrowd"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">valid_gt_inds</span> <span class="o">=</span> <span class="p">(</span><span class="n">gt_areas</span> <span class="o">&gt;=</span> <span class="n">area_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gt_areas</span> <span class="o">&lt;=</span> <span class="n">area_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">gt_boxes</span> <span class="o">=</span> <span class="n">gt_boxes</span><span class="p">[</span><span class="n">valid_gt_inds</span><span class="p">]</span>
+
+        <span class="n">num_pos</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">limit</span><span class="p">:</span>
+            <span class="n">predictions</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[:</span><span class="n">limit</span><span class="p">]</span>
+
+        <span class="n">overlaps</span> <span class="o">=</span> <span class="n">pairwise_iou</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">proposal_boxes</span><span class="p">,</span> <span class="n">gt_boxes</span><span class="p">)</span>
+
+        <span class="n">_gt_overlaps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predictions</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">gt_boxes</span><span class="p">))):</span>
+            <span class="c"># find which proposal box maximally covers each gt box</span>
+            <span class="c"># and get the iou amount of coverage for each gt box</span>
+            <span class="n">max_overlaps</span><span class="p">,</span> <span class="n">argmax_overlaps</span> <span class="o">=</span> <span class="n">overlaps</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c"># find which gt box is 'best' covered (i.e. 'best' = most iou)</span>
+            <span class="n">gt_ovr</span><span class="p">,</span> <span class="n">gt_ind</span> <span class="o">=</span> <span class="n">max_overlaps</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">gt_ovr</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+            <span class="c"># find the proposal box that covers the best covered gt box</span>
+            <span class="n">box_ind</span> <span class="o">=</span> <span class="n">argmax_overlaps</span><span class="p">[</span><span class="n">gt_ind</span><span class="p">]</span>
+            <span class="c"># record the iou coverage of this gt box</span>
+            <span class="n">_gt_overlaps</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlaps</span><span class="p">[</span><span class="n">box_ind</span><span class="p">,</span> <span class="n">gt_ind</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="n">_gt_overlaps</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">gt_ovr</span>
+            <span class="c"># mark the proposal box and the gt box as used</span>
+            <span class="n">overlaps</span><span class="p">[</span><span class="n">box_ind</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">overlaps</span><span class="p">[:,</span> <span class="n">gt_ind</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c"># append recorded iou coverage level</span>
+        <span class="n">gt_overlaps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_gt_overlaps</span><span class="p">)</span>
+    <span class="n">gt_overlaps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">gt_overlaps</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">gt_overlaps</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">gt_overlaps</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">thresholds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="mf">0.05</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.95</span> <span class="o">+</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">recalls</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">thresholds</span><span class="p">)</span>
+    <span class="c"># compute recall for each iou threshold</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thresholds</span><span class="p">):</span>
+        <span class="n">recalls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">gt_overlaps</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="nb">float</span><span class="p">()</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">num_pos</span><span class="p">)</span>
+    <span class="c"># ar = 2 * np.trapz(recalls, thresholds)</span>
+    <span class="n">ar</span> <span class="o">=</span> <span class="n">recalls</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s">"ar"</span><span class="p">:</span> <span class="n">ar</span><span class="p">,</span>
+        <span class="s">"recalls"</span><span class="p">:</span> <span class="n">recalls</span><span class="p">,</span>
+        <span class="s">"thresholds"</span><span class="p">:</span> <span class="n">thresholds</span><span class="p">,</span>
+        <span class="s">"gt_overlaps"</span><span class="p">:</span> <span class="n">gt_overlaps</span><span class="p">,</span>
+        <span class="s">"num_pos"</span><span class="p">:</span> <span class="n">num_pos</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="using-ap-as-a-loss-function">Using AP as a Loss Function</h2>
+<p>While maximizing AP has always been a goal of retrieval and object detection systems, AP itself had not been directly used as a loss function because it involves a non-differentiable step (sorting items by rank).</p>
+
+<p>Learning with Average Precision: Training Image Retrieval with a Listwise Loss Revaud et al. (2019) <a href="https://arxiv.org/pdf/1906.07589.pdf">pdf</a>.</p>
+
+<p>Local Descriptors Optimized for Average Precision He et al. (2018) <a href="https://arxiv.org/pdf/1804.05312.pdf">pdf</a>.</p>
+
+<p>Deep Metric Learning to Rank Cakir et al. (2019) <a href="https://github.com/kunhe/FastAP-metric-learning/blob/master/pytorch/FastAP_loss.py">Pytorch Code</a>.</p>
+
+<p>You can see one implementation by Revaud et al. “R2D2” <a href="https://github.com/naver/r2d2/blob/master/nets/ap_loss.py">here</a> and by Revaud et al. “Learning with Average Precision: Training Image Retrieval with a Listwise Loss” <a href="https://github.com/almazan/deep-image-retrieval/blob/master/dirtorch/loss.py">here</a>. Kun He’s code is <a href="http://cs-people.bu.edu/hekun/papers/DOAP/index.html">here</a>.</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Bharath Hariharan and Ross Girshick. Fast/er R-CNN. <a href="https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py">https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py</a>.</p>
+
+<p>[2] Information Retrieval. Wikipedia. <a href="https://en.wikipedia.org/w/index.php?title=Information_retrieval&amp;oldid=793358396#Average_precision">Webpage</a>.</p>
+
+<p>[3] Victor Lavrenko Lecture, Univ. Edinburgh. <a href="https://www.youtube.com/watch?v=mYW0PDnuPm0&amp;list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&amp;index=7">Why We Can’t Use Accuracy</a></p>
+
+<p>[3] Victor Lavrenko Lecture, Univ. Edinburgh. <a href="https://www.youtube.com/watch?v=H7oAofuZjjE&amp;list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&amp;index=10">Evaluation 10: recall and precision over ranks.</a></p>
+
+<p>[4] Victor Lavrenko Lecture, Univ. Edinburgh.<a href="https://www.youtube.com/watch?v=yjCMEjoc_ZI&amp;list=PLBv09BD7ez_6nqE9YU9bQXpjJ5jJ1Kgr9&amp;index=11">Evaluation 11: interpolated recall-precision plot</a></p>
+
+<p>[5] Mark Everingham, Luc Van Gool, Christopher K. I. Williams, John Winn,
+Andrew Zisserman. The PASCAL Visual Object Classes (VOC) Challenge. IJCV 2010. <a href="http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf">PDF</a>.</p>
+
+<p>[6] Introduction to Information Retrieval. CS 276: Information Retrieval and Web Search Lectures. Chris Manning, Pandu Nayak, Prabhakar Raghavan. Stanford University.</p>
+
+<p>[7] Christopher D. Manning, Prabhakar Raghavan and Hinrich Schütze, Introduction to Information Retrieval, Cambridge University Press. 2008. <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">HTML</a>.</p>
+
+<p>[8] Sun et al. Scalability in Perception for Autonomous Driving: Waymo Open Dataset. <a href="https://arxiv.org/pdf/1912.04838.pdf">PDF</a>.</p>
+
+<p>[9] K. He, Y. Lu, and S. Sclaroff. Local descriptors optimized for average precision. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2018.</p>
+
+<p>[10] F. Cakir, K. He, X. Xia, B. Kulis, and S. Sclaroff. Deep metric learning to rank. In The IEEE Conference on Computer Vision and Pattern Recognition (CVPR), June 2019.</p>
+
+<p>[11] J. Revaud, J. Almazan, R. S. Rezende, and C. R. d. Souza. Learning with average precision: Training image retrieval with a listwise loss. In The IEEE International Conference on Computer Vision (ICCV), October 2019.</p>
+
+<p>[12] J. Davis and M. Goadrich. The relationship between PR and ROC curves. In ICML, 2006.</p>
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+  
+  
+  <!-- disqus comments -->
+<!--  
+ <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>

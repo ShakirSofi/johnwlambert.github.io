@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Statistical Methods</title>
+  <meta name="description" content="central limit theorem (CLT), confidence intervals">
+   <link rel="stylesheet" href="/css/main.css">
+
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="http://johnwlambert.github.io/stat-methods/">
+
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/assets/css/academicons.css"/>
+
+
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">John Lambert</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+
+      <div class="trigger">
+        
+          
+          
+          <a class="page-link" href="/collaborators/">Collaborators</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          <a class="page-link" href="/publications/">Publications</a>
+          
+          
+        
+          
+          
+          <a class="page-link" href="/teaching/">Teaching</a>
+          
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1>Statistical Methods</h1>
+    <p class="meta">Feb 16, 2020</p>
+  </header>
+
+  <article class="post-content">
+  <p>Table of Contents:</p>
+<ul>
+  <li><a href="#clt">CLT</a></li>
+  <li><a href="#ci">Confidence Intervals</a></li>
+</ul>
+
+<h2 id="clt">CLT</h2>
+
+<p>Plot a histogram of all 5*100 data points.
+1000 samples from a standard Normal distribution $N(0,1)$</p>
+
+<p>For each sample (row), use the definition of the Chi-squared distribution to generate one Chi-squared random number with 5 degrees of freedom. Plot the histogram for these 100 Chi-squared random numbers.</p>
+
+<p>\begin{equation}
+\begin{aligned}
+    Z_1 \sim N(0,1) <br />
+    \dots <br />
+    Z_n \sim N(0,1) <br />
+    X = \sum\limits_{i=1}^k Z_i^2 \sim \chi^2(k)
+\end{aligned}
+\end{equation}</p>
+
+<p>Use R to directly generate 100 Chi-squared random numbers with 5 degrees of freedom. Plot using the histogram and compare the plots.</p>
+
+<p>\textit{Find empirical} $\chi_{0.05,5}^2$ \textit{from the data using quantile as well as the exact value of qchisq function, and compare them. Note that this function works with the left tail probability.}</p>
+
+<p>\textbf{We desire to find a value of $X=x, X \sim \chi^2(\nu)$ such that 5\% of the probability mass (area under curve) lies to the right of $X=x$ on its p.d.f. (CDF table for chi-squared measures from the right side). However, since the quantile function (similar to percentile) is measured from the left side, we use the 0.95 quantile or 95th percentile to find:}\</p>
+
+<p>1A.  (top left) 100 samples from simulated $\chi^2(5)$, using samples from $N(0,1)$. (top right) 100 samples from real $\chi^2(5)$.\ \textbf{Comparison:} Samples from a simulated $\chi^2(\nu)$ vs. direct $\chi^2(\nu)$ samples look extremely similar.</p>
+
+<p>Use these 100 normal random numbers and Chi-squared numbers you generated in Part a to generate 100 student’s t random numbers. Use R, to directly generate 100 t random numbers with 5 degrees of freedom. Plot the histogram and compare the plots.</p>
+
+<p>\begin{equation}
+\begin{aligned}
+    &amp; Z \sim N(0,1) <br />
+   &amp;  V \sim \chi^2(\nu) <br />
+    &amp; \frac{Z}{\sqrt{V/\nu}} \sim t(\nu)
+\end{aligned}
+\end{equation}</p>
+
+<p>\textit{Plot a histogram of all n*100 data points.}</p>
+
+<p>\subsubsection{}
+\textit{Compute the average of each sample (you should have 100 average values) and plot a histogram for Xbar values.}</p>
+
+<p>\subsubsection{}
+\textit{Repeat this procedure for various n values, namely (5, 10, 30, 50, 100), and find the minimum n whose corresponding Xbar histogram looks normal.}</p>
+
+<p>\textbf{The more samples we draw and average over, the more normal the distribution looks, which follows CLT. In addition, the CLT says that your variance is inversely proportional to # samples. This is confirmed in our plots because  variance is definitely shrinking as # samples grows.}</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import matplotlib.pyplot as plt
+import numpy as np
+import pdb
+
+def sec_1a(x_normal, x_chi_sim, x_chi_direct):
+	""" """
+	cum_sim = np.quantile(x_chi_sim, q=0.95)
+	cum_direct = np.quantile(x_chi_direct, q=0.95)
+	print(f'Cum. simulated vs. direct: {cum_sim} vs. {cum_direct}')
+
+	plt.subplot(1,3,1)
+	plt.hist(x_normal.squeeze(), range=[-5,5])
+	plt.title('1A Normal')
+
+	plt.subplot(1,3,2)
+	plt.hist(x_chi_sim, range=[-1,20])
+	plt.title('1A Chi-squared Sim.')
+
+	plt.subplot(1,3,3)
+	plt.hist(x_chi_direct, range=[-1,20])
+	plt.title('1A Chi-squared Direct')
+	plt.show()
+
+def sec_1b(x_t_direct, x_t_sim):
+	""" """
+	cum_sim = np.quantile(x_t_sim, q=0.95)
+	cum_direct = np.quantile(x_t_direct, q=0.95)
+	print(f'Cum. simulated vs. direct: {cum_sim} vs. {cum_direct}')
+
+	plt.subplot(1,2,1)
+	plt.hist(x_t_sim, bins=20, range=[-8,8])
+	plt.title('1B student t Sim.')
+
+	plt.subplot(1,2,2)
+	plt.hist(x_t_direct, bins=20, range=[-8,8])
+	plt.title('1B student t Direct')
+	plt.show()
+
+
+def sec_1c():
+	""" """
+	x_chi_1df = np.random.chisquare(df=1, size=100)
+	x_chi_5df = np.random.chisquare(df=5, size=100)
+	x_F_sim = (x_chi_1df/1) / (x_chi_5df/5)
+
+	x_F_direct = np.random.f(dfnum=1, dfden=5, size=100)
+
+	cum_sim = np.quantile(x_F_sim, q=0.95)
+	cum_direct = np.quantile(x_F_direct, q=0.95)
+	print(f'Cum. simulated vs. direct: {cum_sim} vs. {cum_direct}')
+
+	plt.subplot(1,2,1)
+	plt.hist(x_F_sim, bins=20, range=[-1,20])
+	plt.title('1C F Sim.')
+
+	plt.subplot(1,2,2)
+	plt.hist(x_F_direct, bins=20, range=[-1,20])
+	plt.title('1C F Direct')
+	plt.show()
+
+
+def part1():
+	""" """
+	x_normal = np.random.normal(loc=0.0, scale=1.0, size=(100,5))
+	x_chi_sim = (x_normal**2).sum(axis=1)
+	x_chi_direct = np.random.chisquare(df=5, size=100)
+	sec_1a(x_normal, x_chi_sim, x_chi_direct)
+
+	x_normal = np.random.normal(loc=0.0, scale=1.0, size=100)
+	x_t_direct = np.random.standard_t(df=5, size=100)
+	x_t_sim = x_normal / np.sqrt(x_chi_sim / 5)
+	sec_1b(x_t_direct, x_t_sim)
+
+	sec_1c()
+
+
+def sec_2a():
+	""" """
+	exp_lambda = 0.2
+	n_values = [5,10,30,50,100]
+	for i, n in zip(range(1,6), n_values):
+		x_exp = np.random.exponential(scale=1/exp_lambda, size=(100,n))
+		x_exp_avg = np.mean(x_exp, axis=1)
+
+		plt.subplot(2,len(n_values),i)
+		plt.hist(x_exp_avg, bins=20, range=[-1,10])
+		plt.title(f'2A Exp, n={n}')
+
+		plt.subplot(2,len(n_values),len(n_values) + i)
+		plt.hist(x_exp, bins=20, range=[-1,10])
+		plt.title(f'2A Exp, n={n}')
+
+	plt.show()
+
+
+
+def sec_2b():
+	""" """
+	n_values = [5,10,30,50,100]
+	for i, n in zip(range(1,6), n_values):
+
+		x_gamma = np.random.gamma(shape=10, scale=5, size=(100,n))
+		x_gamma_avg = np.mean(x_gamma, axis=1)
+
+		plt.subplot(2,len(n_values),i)
+		plt.hist(x_gamma_avg, bins=20, range=[25,75])
+		plt.title(f'2B Gamma, n={n}')
+
+		plt.subplot(2,len(n_values),len(n_values) + i)
+		plt.hist(x_gamma.squeeze(), bins=20, range=[0,100])
+		plt.title(f'2B Gamma, n={n}')
+
+	plt.show()
+
+
+if __name__ == '__main__':
+	#part1()
+
+	#sec_2a()
+	sec_2b()
+</code></pre></div></div>
+
+<h2 id="confidence-intervals">Confidence Intervals</h2>
+
+<p>Understanding the concept of confidence interval: Using R, generate 1000 samples of 5 standard normal random numbers.</p>
+
+<p>\begin{enumerate}[label=\emph{\alph*})]
+\item \textit{For each sample (row), find a 95\% confidence interval.}</p>
+
+<p>We should think of this as: take 5 samples, and repeat this experiment 1000 times.</p>
+
+<p>Since our samples are from $Z \sim N(\mu=0,\sigma^2=1)$, we can compute the confidence interval as:</p>
+
+<p>\begin{equation}
+\begin{aligned}
+\overline{X} - Z_{\alpha/2} \times \frac{\sigma}{\sqrt{n}} &amp;\leq \mu \leq \overline{X} + Z_{\alpha/2} \times \frac{\sigma}{\sqrt{n}} <br />
+\overline{X} - Z_{\alpha/2} \times
+\frac{1}{\sqrt{n}} &amp;\leq \mu \leq \overline{X} + Z_{\alpha/2} \times \frac{1}{\sqrt{n}} <br />
+\overline{X} - Z_{\alpha/2} \times
+\frac{1}{\sqrt{5}} &amp;\leq \mu \leq \overline{X} + Z_{\alpha/2} \times \frac{1}{\sqrt{5}} <br />
+\overline{X} - Z_{\alpha/2} \times
+0.447 &amp;\leq \mu \leq \overline{X} + Z_{\alpha/2} \times 0.447 <br />
+\overline{X} - 1.96 \times
+0.447 &amp;\leq \mu \leq \overline{X} + 1.96 \times 0.447 <br />
+\overline{X} - 0.877 &amp;\leq \mu \leq \overline{X} + 0.877 <br />
+\end{aligned}
+\end{equation}</p>
+
+<p>\item  \textit{What is the percentage of intervals that cover the true mean? What is your conclusion?}</p>
+
+<p>On average, how often does the population parameter of interest (here, $\mu=0$), belong to that interval?</p>
+
+<p>We ran 3 separate random trials of our experiment.<br />
+Percentages of intervals that cover true mean, $\mu=0$: <br />
+962 / 1000 = 96.2\%, <br />
+966 / 1000 = 96.6\%, <br />
+940 / 1000 = 94.0\%,</p>
+
+<p>Our conclusion is that (on average over several experiments), the empirical confidence interval is approximately equal to the analytical confidence interval.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">simdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">simdata</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">Xsums</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Xsums</span> <span class="o">/=</span> <span class="mi">5</span>
+<span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span> <span class="p">(</span><span class="n">Xsums</span> <span class="o">+</span> <span class="mf">0.877</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">),</span> <span class="p">(</span><span class="n">Xsums</span> <span class="o">-</span> <span class="mf">0.877</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>We also verify the percent point function (inverse of cdf –  percentiles):
+<code class="highlighter-rouge">scipy.stats.norm.ppf(0.025)</code> = -1.96
+<code class="highlighter-rouge">scipy.stats.norm.ppf(0.975)</code> = 1.96</p>
+
+  </article>
+
+  <!-- mathjax -->
+  
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+  
+  
+  <!-- disqus comments -->
+<!--  
+ <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'karpathyblog'; // required: replace example with your forum shortname
+
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+   -->
+  
+</div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <!-- <h2 class="footer-heading">John Lambert</h2> -->
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              John Lambert
+            
+          </li>
+          
+          <li><a href="mailto:johnlambert [at] gatech.edu">johnlambert [at] gatech.edu</a></li>
+          
+          
+       </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+         
+          <li>
+              <a href="https://scholar.google.com/citations?user=6GhZedEAAAAJ">
+                <i class="ai ai-google-scholar ai"></i> Google Scholar
+              </a>
+          </li>
+          
+          
+          
+          <li>
+              <a href="https://linkedin.com/in/johnwlambert">
+                <i class="fa fa-linkedin fa"></i> LinkedIn
+              </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+         <ul class="social-media-list">
+          <li>
+        <a>Ph.D. Candidate in Computer Vision.
+</a>
+         </li>
+          <li>
+        Website Design by <a href="http://www.niebles.net/">Juan Carlos Niebles, Ph.D.</a>
+        </li>
+         </ul>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+    
+
+  </body>
+
+</html>
