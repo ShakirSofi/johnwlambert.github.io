@@ -43,14 +43,15 @@ This condition can be interpreted geometrically as the requirement that the grap
 ### Known Convex and Concave Functions
 
 Convex:
-- Linear.
-- Affine. \\(f(x) = Ax+b\\), where \\(A \in \mathbb{R}^{m \times n}\\) and \\(b \in \mathbb{R}^m\\). This is the sum of a linear function and a constant.
+- Linear. A simple example is $$f^Tx$$. 
+- Affine. \\(f(x) = Ax+b\\), where \\(A \in \mathbb{R}^{m \times n}\\) and \\(b \in \mathbb{R}^m\\). This is the sum of a linear function and a constant. 
 - Exponential. \\(e^{ax}\\) is convex on \\(\mathbb{R}\\), for any \\(a \in \mathbb{R}\\).
+- Even powers \\(x^2,x^4,x^6, \dots\\) on \\(\mathbb{R}\\).
 - Powers. \\(x^a\\) is convex on \\(R_{++}\\) when \\(a \geq 1\\) or \\(a \leq 0\\).
 - Powers of absolute value. \\(\|x\|^p\\), for \\(p\geq 1\\), is convex on \\(\mathbb{R}\\).
 - Negative Entropy. \\(x \mbox{log}(x)\\) is convex on \\(\mathbb{R}_{++}\\).
-- Norms. Every norm on \\(\mathbb{R}^n\\) is convex.
-- Max function. \\(f(x) = \mbox{max} \{ x_1, \dots, x_n \} \\) is convex on \\(\mathbb{R}^n\\).
+- Norms. Every norm $$ \| \cdot \| $$ on \\(\mathbb{R}^n\\) is convex.
+- Max function. \\(f(x) = \mbox{max } \{ x_1, \dots, x_n \} \\) is convex on \\(\mathbb{R}^n\\).
 - Quadratic-over-linear function.
 - Log-sum-exp. \\(f(x) = \mbox{log }(e^{x_1}+\cdots+e^{x_n})\\) is convex on \\(\mathbb{R}^n\\).
 
@@ -60,6 +61,13 @@ Concave:
 - Geometric mean. \\(f(x) = (\prod\limits_{i=1}^n x_i)^{1/n}\\) is concave on \\(\mathbb{R}_{++}^n\\).
 
 - Log-determinant. \\(f(X) = \mbox{log } \mbox{det } X\\) is concave on \\(S_{++}^n\\)
+
+
+## Calculus of Convex Functions [3]
+Convexity-preserving operations:
+- **Taking conic combinations**. If each $$f_i(x)$$ is a convex function on $$\mathbb{R}^n$$ and $$\lambda_i \geq 0$$, then the function $$\sum\limits_i \lambda_i f_i(x)$$ is convex.
+- **Affine substitution of an argument**. If $$f(x)$$ is a convex function on $$\mathbb{R}^n$$ and $$x=Ay+b$$ is an affine mapping from $$\mathbb{R}^k \rightarrow \mathbb{R}^n$$, then the function $$g(y) = f(Ay+b)$$ is convex on $$\mathbb{R}^k$$.
+- **Taking the supremum** of a family of convex functions (it is the intersection of two epigraphs, and epigraphs are convex sets)
 
 ## Constrained Optimization Problems
 
@@ -344,4 +352,5 @@ This objective function is convex, and as long as an **appropriate closedness co
 
 2. Gordon, Geoff. CMU 10-725 Optimization Fall 2012 Lecture Slides, [Lecture 16](https://www.cs.cmu.edu/~ggordon/10725-F12/slides/16-kkt.pdf). 
 
+3. Arkadiy Nemirovski
 

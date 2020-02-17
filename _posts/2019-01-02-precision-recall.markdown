@@ -483,13 +483,13 @@ def _evaluate_box_proposals(dataset_predictions, coco_api, thresholds=None, area
 ## Using AP as a Loss Function
 While maximizing AP has always been a goal of retrieval and object detection systems, AP itself had not been directly used as a loss function because it involves a non-differentiable step (sorting items by rank). 
 
-Learning with Average Precision: Training Image Retrieval
-with a Listwise Loss Revaud et al. (2019)
+Learning with Average Precision: Training Image Retrieval with a Listwise Loss Revaud et al. (2019) [pdf](https://arxiv.org/pdf/1906.07589.pdf).
 
-Local Descriptors Optimized for Average Precision He
-et al. (2018)
+Local Descriptors Optimized for Average Precision He et al. (2018) [pdf](https://arxiv.org/pdf/1804.05312.pdf).
 
-Deep Metric Learning to Rank Cakir et al. (2019)
+Deep Metric Learning to Rank Cakir et al. (2019) [Pytorch Code](https://github.com/kunhe/FastAP-metric-learning/blob/master/pytorch/FastAP_loss.py).
+
+You can see one implementation by Revaud et al. "R2D2" [here](https://github.com/naver/r2d2/blob/master/nets/ap_loss.py) and by Revaud et al. "Learning with Average Precision: Training Image Retrieval with a Listwise Loss" [here](https://github.com/almazan/deep-image-retrieval/blob/master/dirtorch/loss.py). Kun He's code is [here](http://cs-people.bu.edu/hekun/papers/DOAP/index.html).
 
 
 ## References
