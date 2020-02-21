@@ -21,6 +21,8 @@ Now that we've covered topics from convex optimization in a very shallow manner,
 
 ## Subgradient methods
 
+What is a subgradient? It's a substitute for the gradient, when the gradient doesn't exist.
+
 ### Convexity Review
 
 To understand subgradients, first we need to review convexity. The Taylor series of a real valued function that is infinitely differentiable at a real number \\(x\\) is given by 

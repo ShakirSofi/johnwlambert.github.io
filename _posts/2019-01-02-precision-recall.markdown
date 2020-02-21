@@ -22,21 +22,19 @@ Table of Contents:
 
 
 ## Why mAP?
-Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. 
-
-ranking-based retrieval performance metric
+Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.
 
 ## Missing Link Between Object Detection and Information Retrieval?
-In this post, you'll see that object detection is evaluated in the same way as information retrieval. Why is this? It turns out the tasks have a number of similarities.
-In Information Retrieval (IR), given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And False positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant to the query, or it is not).
+In this post, you'll see that object detection is evaluated in the same way as information retrieval. Why is this? It turns out the tasks have a number of similarities. 
 
-## The Need for More Finely-Grained Measures of Accuracy
+A brief overview to the Information Retrieval (IR) task: given a user query, an IR system will retrieve documents from a corpus (predictions). We will compare this set with the documents relevant to the user (positives). Thus, a true positive is a *relevant document* with respect to a query (accurately retrieved document). False negatives are relevant documents that your system missed. And false positives are documents your system should not have retrieved. We will be focused only on binary relevance (each item is relevant to the query, or it is not).
 
-We'll suppose that we are performing binary classification: classifying objects into different classes.
+Link #1: In both object detection and IR, we discover that class imbalance makes simple *accuracy* metrics non-informative. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. Since accuracy takes into account true negatives, we need more different measures of accuracy.
 
-Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.
+Link #2: In both object detection and IR, the ranking of results matters! For example, in IR, ranking is very important for web search engines because readers seldom go past the first page of results. Accuracy, precision, recall do not take into account the ranking of results.  Thus, we desire a ranking-based performance metric.
 
-For both tasks, it turns out accuracy isn't a helpful metric.Classes are very imbalanced. You may get 99.99% accuracy for a search algorithm by predicting (or retrieving) nothing. In object detection, there are an infinite number of bounding boxes you could predict. If there is only one object (great imbalance), by predicting nothing you would have great accuracy. In IR, for any query, almost all documents in a corpus are not relevant. The true negatives (which can measure in the billions) are the things we don't care about, and which we can ignore in precision/recall.
+Link #3: Retrieval.
+
 
 <a name='recall'></a>
 ### Recall
@@ -137,7 +135,7 @@ $$
 AP = \sum\limits_{i=1}^N \mbox{Prec}(i) \Delta\mbox{Rec}(i)
 $$
 
-In the [PASCAL VOC 2010 Paper](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf) [5], one will find AP defined as:
+To obtain a high score, a method must have precision at all levels of recall, penalizing methods that retrieve only a subset of examples with high precision (e.g. side views of a car) [5]. In the [PASCAL VOC 2010 Paper](http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf) [5], one will find AP defined as:
 
 $$
 AP = \frac{1}{11} \sum\limits_{R_i} \hat{P}(R_i) = \frac{1}{11} \sum\limits_{r \in \{0, 0.1, \dots, 1\}} \hat{P}(r)
@@ -149,7 +147,7 @@ $$
 AP = \int_{0}^1 \hspace{1mm} p(r) dr \approx \sum\limits_{k=1}^n P(k) \Delta r(k)
 $$
 
-where $$k$$ is the rank in a sequence of ranked items, and $$n$$ is the number of retrieved items, P(k) is the Precission@K, and $$\Delta r(k)$$ is the change in recall from items $$k-1$$ to $$k$$, as defined in [2].
+where $$k$$ is the rank in a sequence of ranked items, and $$n$$ is the number of retrieved items, P(k) is the Precision@K, and $$\Delta r(k)$$ is the change in recall from items $$k-1$$ to $$k$$, as defined in [2].
 
 Modern datasets like the Waymo Open Dataset [8] express this integral with the monotonically decreasing component:
 
