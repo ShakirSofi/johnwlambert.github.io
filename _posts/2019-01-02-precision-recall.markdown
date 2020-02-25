@@ -22,7 +22,7 @@ Table of Contents:
 
 
 ## Why mAP?
-Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint/patch detection + description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.
+Mean Average Precision (mAP) is the standard evaluation metric in at least 3 fields (1) object detection, (2) keypoint description/patch description, and (3) information retrieval. However, its computation is often poorly explained and not immediately obvious. Mean Average Precision involves computing the area under a curve (an integral), and can actually be quite confusing.
 
 ## Missing Link Between Object Detection and Information Retrieval?
 In this post, you'll see that object detection is evaluated in the same way as information retrieval. Why is this? It turns out the tasks have a number of similarities. 

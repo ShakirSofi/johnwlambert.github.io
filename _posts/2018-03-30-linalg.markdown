@@ -664,7 +664,7 @@ These notes are an adaptation of the content taught by Dr. Reza Mahalati in Stan
 
 3. Boyd, Stephen. [Linear Dynamical Systems, (EE263) Lecture 8: Least-norm solutions of undetermined equations](https://see.stanford.edu/materials/lsoeldsee263/08-min-norm.pdf).
 
-
+4. Zwick. SVD. [PDF](https://www.math.utah.edu/~zwick/Classes/Fall2012_2270/Lectures/Lecture35_with_Examples.pdf).
 
 
 

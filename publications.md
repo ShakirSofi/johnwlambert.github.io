@@ -15,6 +15,14 @@ permalink: /publications/
 
 <table cellpadding="4">
 
+{% include paper.html
+authors="Zhuang Liu*, <b>John Lambert*</b> [*co-first authors], Ozan Sener, James Hays, Vladlen Koltun"
+title="MSeg: A Meta-dataset for Multi-domain Semantic Segmentation "
+venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+location="Seattle, Washington"
+date="June 2020"
+image="/images/MSeg_teaser.jpg"
+%}
 
 {% include paper.html
 authors="Ming-Fang Chang*, <b>John Lambert*</b>, Patsorn Sangkloy*, Jagjeet Singh* [*co-first authors], Andrew Hartnett, De Wang, Peter Carr, Simon Lucey, Deva Ramanan, James Hays"
