@@ -379,6 +379,16 @@ class PPM(nn.Module):
         return torch.cat(out, 1)
 ```
 
+After each layer:
+layer0: get 128 channels, 4x downsample in H/W
+layer1: get 256 channels, H/W constant
+layer2: get 512 channels, 2x additional downsample in H/W
+layer3: get 1024 channels, H/W constant
+layer4: get 2048 channels, H/W constant
+ppm: get 4096 channels from channel concat, H/W constant
+cls: et n_classes channels, H/W constant
+interpolate: get n_classes channels, back to input crop H/W (8x)
+aux: get n_classes channels, with 1/8 input crop H/W
 
 ```python
 class PSPNet(nn.Module):
