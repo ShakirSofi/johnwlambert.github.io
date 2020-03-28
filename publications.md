@@ -16,7 +16,7 @@ permalink: /publications/
 <table cellpadding="4">
 
 {% include paper.html
-authors="Zhuang Liu*, <b>John Lambert*</b> [*co-first authors], Ozan Sener, James Hays, Vladlen Koltun"
+authors="<b>John Lambert*</b>, Zhuang Liu*, [*co-first authors], Ozan Sener, James Hays, Vladlen Koltun"
 title="MSeg: A Meta-dataset for Multi-domain Semantic Segmentation "
 venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
 location="Seattle, Washington"
