@@ -17,7 +17,7 @@ permalink: /publications/
 
 {% include paper.html
 authors="<b>John Lambert*</b>, Zhuang Liu*, [*co-first authors], Ozan Sener, James Hays, Vladlen Koltun"
-title="MSeg: A Meta-dataset for Multi-domain Semantic Segmentation "
+title="MSeg: A Composite Dataset for Multi-domain Semantic Segmentation "
 venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
 location="Seattle, Washington"
 date="June 2020"
@@ -37,7 +37,7 @@ project="https://www.argoverse.org/"
 data="https://www.argoverse.org/data.html"
 code="https://github.com/argoai/argoverse-api"
 video="https://youtu.be/0lybuew8Lik?t=2769"
-neurips19workshop="https://slideslive.com/38922111/machine-learning-for-autonomous-driving-2"
+neurips19workshop="https://slideslive.com/38923162/argoai-challenge"
 %}
 
 {% include paper.html
