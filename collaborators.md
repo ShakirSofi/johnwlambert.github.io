@@ -11,7 +11,12 @@ permalink: /collaborators/
 * [James Hays](https://www.cc.gatech.edu/~hays/)
 * [Frank Dellaert](https://twitter.com/fdellaert?lang=en)
 * [Ozan Sener](http://ozansener.net/)
-
+* Chen Liu
+* Hemanth Chittanuru
+* Andrey Pak
+* Ayush Baid
+* Shubhangi Upasani
+* Jeevanjot Singh
 
 ## Past Collaborators
 * [Simon Lucey](https://www.ri.cmu.edu/ri-faculty/simon-lucey/)
