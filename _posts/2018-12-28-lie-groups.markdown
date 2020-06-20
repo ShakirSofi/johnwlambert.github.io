@@ -389,6 +389,8 @@ any direction in the space of its degrees of freedom. Otherwise a robot is calle
 
 [5] Ma, Yi and Soatto, Stefano and Kosecka, Jana and Sastry, S. Shankar: An Invitation to 3-D Vision: From Images to Geometric Models. Springer Verlag (2003). [PDF](https://www.eecis.udel.edu/~cer/arv/readings/old_mkss.pdf).
 
+[6] Murray et al. http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.671.7040&rep=rep1&type=pdf
+
 
 ## Manifolds: SO(2)
 
