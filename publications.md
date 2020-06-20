@@ -21,7 +21,11 @@ title="MSeg: A Composite Dataset for Multi-domain Semantic Segmentation "
 venue="IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
 location="Seattle, Washington"
 date="June 2020"
-image="/images/MSeg_teaser.jpg"
+image="https://user-images.githubusercontent.com/62491525/83895490-c094f100-a720-11ea-9f85-cf4c6b030e73.gif"
+arxiv="http://vladlen.info/papers/MSeg.pdf"
+code="https://github.com/mseg-dataset"
+data="https://github.com/mseg-dataset/mseg-api/tree/master/mseg/relabeled_data"
+video="https://youtu.be/PzBK6K5gyyo"
 %}
 
 {% include paper.html
@@ -38,6 +42,7 @@ data="https://www.argoverse.org/data.html"
 code="https://github.com/argoai/argoverse-api"
 video="https://youtu.be/0lybuew8Lik?t=2769"
 neurips19workshop="https://slideslive.com/38923162/argoai-challenge"
+cvpr20workshop="https://www.youtube.com/watch?v=Vcbj_peZT4Q&feature=youtu.be"
 %}
 
 {% include paper.html
