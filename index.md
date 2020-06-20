@@ -15,8 +15,9 @@ You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found
 
 
 ## News
+- June 2020: The CVPR 2020 WAD Argoverse competitions have concluded. Congratulations to the very impressive winners. You can see our presentation of results [here](https://www.youtube.com/watch?v=Vcbj_peZT4Q&feature=youtu.be).
 - April 2020: We are please to announce two [Argoverse](https://www.argoverse.org/tasks.html) Competitions at the [CVPR 2020 Workshop on Autonomous Driving](http://cvpr2020.wad.vision/). Argo AI is offering $5,000 in prizes for Motion Forecasting and 3D tracking methods. I've open-sourced [my 3d tracking code](https://github.com/johnwlambert/argoverse_cbgs_kf_tracker) that is currently 1st place on the [leaderboard](https://evalai.cloudcv.org/web/challenges/challenge-page/453/overview). Please consider participating! The competitions will remain open until June 10, 2020.
-- April 2020: Our [MSeg](http://vladlen.info/papers/MSeg.pdf) paper has been accepted to CVPR 2020 and took first place on [WildDash](https://wilddash.cc/benchmark/summary_tbl?hc=semantic_rob). Code will be available soon.
+- April 2020: Our [MSeg](http://vladlen.info/papers/MSeg.pdf) paper has been accepted to CVPR 2020 and took first place on [WildDash](https://wilddash.cc/benchmark/summary_tbl?hc=semantic_rob). Pretrained models available [here](https://github.com/mseg-dataset/mseg-semantic), data available [here](https://github.com/mseg-dataset/mseg-api), and a [Colab](https://colab.research.google.com/drive/1ctyBEf74uA-7R8sidi026OvNb4WlKkG1?usp=sharing) to try our demo on your own images and videos.
 
 ## Research
 Humans have an amazing ability to understand the world through their visual system but designing automated systems to perform the task continues to prove difficult. We take for granted almost everything our visual system is capable of. While great progress has been made in 2D image understanding, the real world is 3D, not 2D, so reasoning in the 2D image plane is insufficient. The 3D world is high-dimensional and challenging and has a high data requirement.
