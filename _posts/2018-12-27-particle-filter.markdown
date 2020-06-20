@@ -641,7 +641,6 @@ Important for SLAM, because in SLAM we often want to estimate the history of the
 [3] Simon Julier, Jeffrey Uhlmann, and Hugh F. Durrant-Whyte. *A New Method for the Nonlinear Transformation of Means and Covariances in Filters and Estimators*. IEEE Transactions on Automatic Control, Volume 45, No. 3. March 2000, page 477.
 
 
-
-
+[4] https://www.pdx.edu/biomedical-signal-processing-lab/sites/www.pdx.edu.biomedical-signal-processing-lab/files/ukf.wan_.chapt7_.pdf
 
 

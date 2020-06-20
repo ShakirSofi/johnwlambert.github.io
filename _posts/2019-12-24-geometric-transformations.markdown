@@ -21,6 +21,12 @@ sheer, affine, etc.
 
 ## Homography
 
+
+
+When variation in depth is comparable to distance to object then the affine transformation is not a good model.
+Here we need the homography.  [3]
+
+
 The motion of a plane can be described by a homography. This is true for a moving plane imaged by a static camera. It is true for a static plane imaged by a moving camera [2].
 
 video stabilization
@@ -64,10 +70,18 @@ Baker et al. [2] dicuss the 4pt parameterization.
 [      0
 [0 0 1]
 
+
+## Infinite Homography
+http://robots.engin.umich.edu/~rwolcott/uploads/rwolcott-2014a.pdf
+ui′= KRK−1ui.
+
+
 ## References
 
 [1] Detone, Malisiewicz, Rabinovich. Deep Image Homography Estimation.
 
 [2] Simon Baker, Ankur Datta, and Takeo Kanade. Parameterizing homographies. Technical Report CMU-RI-TR06-11, Robotics Institute, Pittsburgh, PA, March 2006.
+
+[3] Simon Lucey. http://16623.courses.cs.cmu.edu/slides/Lecture_6.pdf
 
 

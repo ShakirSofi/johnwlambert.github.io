@@ -92,6 +92,18 @@ Those who use generic optimization routines to solve SfM problems will find the 
 ## COLMAP
 
 
+## Rotation Averaging
+
+ R. Hartley, J. Trumpf, Y. Dai, and H. Li. Rotation Averaging.
+IJCV, 103(3):267–305, 2013
+
+http://users.cecs.anu.edu.au/~hongdong/rotationaveraging.pdf
+
+2 cos(|α|) = trace(R
+−1
+gt Rest)−1, i.e., we measure the minimum rotation angle required to align both rotations
+
+
 MRF scheme. Rotation Averaging slow.
 
 ## Schur Complement

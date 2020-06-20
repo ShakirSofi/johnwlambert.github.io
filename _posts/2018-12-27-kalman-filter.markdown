@@ -1047,6 +1047,9 @@ $$
 ## Practical Example: 3D Tracking with ICP
 
 
+As Optimization:
+https://colab.research.google.com/github/cvxgrp/cvxpy/blob/master/examples/notebooks/WWW/robust_kalman.ipynb
+
 
 [Argoverse Tracking Baseline](https://github.com/alliecc/argoverse_baselinetracker)
 
