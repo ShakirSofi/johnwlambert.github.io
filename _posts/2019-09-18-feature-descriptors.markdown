@@ -130,6 +130,13 @@ Can mix and match the detector: DOG for detecting blobs:
 The input image is first convolved with the Gaussian function using  = p 2 to give an image A. This is then repeated a second time with a further incremental smoothing of  = p 2 to give a new image, B, which now has an effective smoothing of  = 2. The difference of Gaussian function is obtained by subtracting image B from A, resulting in a ratio of 2=p 2 = p 2 between the two Gaussians.
 
 
+
+<img src="assets/sift_unweighted_vs_weighted_histogram.png">
+<img src="assets/sift_central_difference_derivatives.png">
+<img src="assets/sift_image_derivatives_finite_differences.png">
+<img src="assets/sift_patch_16x16.png">
+
+
 Compute image gradient magnitude and gradient orientation at every pixel
 This is norm of L2 norm of two numbers
 Arctangent, a mathematical function that is the inverse of the tangent function, atan2, arctan2
