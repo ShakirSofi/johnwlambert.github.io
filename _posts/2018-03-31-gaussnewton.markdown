@@ -184,3 +184,5 @@ end
 [1] John Schulman, Sergey Levine, Philipp Moritz, Michael I. Jordan, Pieter Abbeel. Trust Region Policy Optimization. [PDF](https://arxiv.org/abs/1502.05477).
 
 [1] Boyd. VMLS. 
+
+[3] K. Madsen, H.B. Nielsen, O. Tingleff. Methods Ffor Non-Linear Least Squares Problems. 2nd Edition, April 2004. [PDF](http://www2.imm.dtu.dk/pubdb/edoc/imm3215.pdf).
