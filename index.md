@@ -15,7 +15,8 @@ You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found
 
 
 ## News
-- June 2020: The CVPR 2020 WAD Argoverse competitions have concluded. Congratulations to the very impressive submissions from ths winners. You can watch the results presentation [here](https://www.youtube.com/watch?v=Vcbj_peZT4Q&feature=youtu.be).
+- June 2020: Watch an [excellent presentation from MachinesCanSee](https://youtu.be/lwv85fC1Ids) on our new [MSeg](http://vladlen.info/papers/MSeg.pdf), presented by Dr. Vladlen Koltun.
+- June 2020: The CVPR 2020 WAD Argoverse competitions have concluded. Congratulations to the very impressive submissions from ths winners. You can watch the results presentation [here](https://www.youtube.com/watch?v=Vcbj_peZT4Q&feature=youtu.be), or the summary presented at [ICML 20](https://slideslive.com/38930752/what-we-learned-from-argoverse-competitions).
 - April 2020: We are please to announce two [Argoverse](https://www.argoverse.org/tasks.html) Competitions at the [CVPR 2020 Workshop on Autonomous Driving](http://cvpr2020.wad.vision/). Argo AI is offering $5,000 in prizes for Motion Forecasting and 3D tracking methods. I've open-sourced [my 3d tracking code](https://github.com/johnwlambert/argoverse_cbgs_kf_tracker) that is currently 1st place on the [leaderboard](https://evalai.cloudcv.org/web/challenges/challenge-page/453/overview). Please consider participating! The competitions will remain open until June 10, 2020.
 - April 2020: Our [MSeg](http://vladlen.info/papers/MSeg.pdf) paper has been accepted to CVPR 2020 and took first place on [WildDash](https://wilddash.cc/benchmark/summary_tbl?hc=semantic_rob). Pretrained models available [here](https://github.com/mseg-dataset/mseg-semantic), data available [here](https://github.com/mseg-dataset/mseg-api), and a [Colab](https://colab.research.google.com/drive/1ctyBEf74uA-7R8sidi026OvNb4WlKkG1?usp=sharing) to try our demo on your own images and videos.
 
