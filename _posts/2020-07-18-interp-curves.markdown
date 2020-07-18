@@ -69,10 +69,10 @@ We can now apply linear interpolation, simply traversing a portion of a straight
 s = np.divide((eq_spaced_points - cumarc[tbins - 1]), chordlen[tbins - 1])
 pt = pxy[tbins - 1, :] + np.multiply((pxy[tbins, :] - pxy[tbins - 1, :]), (np.vstack([s] * 2)).T)
 ```
+<img width="569" src="https://user-images.githubusercontent.com/16724970/87857841-ad686a00-c8f7-11ea-9e6a-fe05c03a1d3e.png">
 
 
 If instead we were to apply cubic interpolation, we would solve an ODE:
-
 
 
 
