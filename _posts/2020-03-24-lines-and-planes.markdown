@@ -28,9 +28,22 @@ Cross products and determinant
 
 
 ## Point to Line Distance: Via Cross Product
+We'll use intuition about parallelograms to prove this.
 
-Area of Parallelogram $$= \| \vec{BA} \times \vec{BC} \| = \mbox{base } \cdot \mbox{ height}$$
+Area of Parallelogram $$= \| \vec{AB} \times \vec{AP} \|_2 = \mbox{base } \cdot \mbox{ height}$$, since every parallelogram can be made into a rectangle (since base and height are perpendicular).
+height of parallelogram is the distance from point to line
+base is \|AB\|_2
 
+Thus, $$= \| \vec{AB} \times \vec{AP} \|_2 = \| \vec{AB} \|_2 \cdot height $$
+$$ height = \frac{ \| \vec{AB} \times \vec{AP} \|_2  }{ \| \vec{AB} \|_2 } $$
+Thus, dist(p, AB)
+
+```python
+def point_to_line_dist(a,b,p):
+  ab = b - a
+  ap = p - a
+  return np.linalg.norm(np.cross(ap,ab)) / np.linalg.norm(ab)
+```
 
 ## Planes
 
