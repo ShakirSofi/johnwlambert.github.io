@@ -26,6 +26,12 @@ https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segm
 
 Cross products and determinant
 
+
+## Point to Line Distance: Via Cross Product
+
+Area of Parallelogram $$= \| \vec{BA} \times \vec{BC} \| = \mbox{base } \cdot \mbox{ height}$$
+
+
 ## Planes
 
 Parameterization
