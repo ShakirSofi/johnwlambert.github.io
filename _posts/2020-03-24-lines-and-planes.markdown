@@ -52,3 +52,21 @@ Parameterization
 SVD
 
 Generating points on a plane
+
+
+# Ray-Plane Intersection 
+
+$$
+\begin{aligned}
+P = O + tR\\
+Ax + By + Cz + D = 0\\
+A * P_x + B * P_y + C * P_z + D = 0\\
+A * (O_x + tR_x) + B * (O_y + tR_y) + C * (O_z + tR_z) + D = 0\\
+A * O_x + B * O_y + C * O_z + A * tR_x + B * tR_y + C * tR_z + D = 0\\
+t * (A * R_x + B * R_y + C * R_z) + A * O_x + B * O_y + C * O_z + D = 0\\
+t = -{\dfrac{A * O_x + B * O_y + C * O_z + D}{A * R_x + B * R_y + C * R_z}}\\
+t = -{\dfrac{ N(A,B,C) \cdot O + D}{N(A,B,C) \cdot R}}
+\end{aligned}
+$$
+Ref: https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+
