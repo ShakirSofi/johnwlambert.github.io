@@ -70,3 +70,30 @@ t = -{\dfrac{ N(A,B,C) \cdot O + D}{N(A,B,C) \cdot R}}
 $$
 Ref: https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
 
+# Moller-Trombore
+
+Cramer's Rule
+
+https://math.stackexchange.com/questions/1941590/how-does-cramers-rule-work
+
+I explain it here in two variables, but the principle is the same.
+
+Say you have an equation
+
+$$
+\begin{pmatrix}a&b\\c&d\end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix}=\begin{pmatrix}p\\q \end{pmatrix}
+$$
+
+Now you can see that the following holds
+
+$$
+\begin{pmatrix}a&b\\c&d\end{pmatrix}\begin{pmatrix}x&0\\y&1\end{pmatrix}=\begin{pmatrix}p&b\\q &d\end{pmatrix}
+$$
+Finally just take the determinant of this last equation; det is multiplicative so you get
+\Delta x=\Delta_1
+
+where |A| = \Delta
+and |A_1| = \Delta_1
+
+and x=\frac{\Delta_1}\Delta
+
