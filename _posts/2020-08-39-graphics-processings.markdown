@@ -83,5 +83,16 @@ size(400, 400, P2D);
 ```
 Images are loaded with the `loadImage()` function, which expect to find a file inside a folder named `data`, which is a subdirectory of the sketch folder.
 
+## Basic Shapes
+A few primitive shapes can be specified with `point(x,y)`, `line(x1,y1,x2,y2)`, `rect(x,y,width,height)`, `ellipse(x,y,width,height)`.
+```java
+point(4,5)
+line(1,2,5,2)
+rect(1,2,4,3); // top-left corner of rectangle, and then width and height
+ellipse(3,3,4,6) // x,y, width=4px, height=6px
+```
+If instead we draw a rectangle by specifying its centerpoint, we can set `rectMode(CENTER)` before our call to `rect()`. If we prefer to specify a rectangle's shape by two points (top-left and bottom-right corners), we can set `rectMode(CORNERS)`.
+
 ## References
 1. Ben Fry and Casey Reas. http://processing.org/tutorials/overview
+2. Daniel Shiffman. http://processing.org/tutorials/drawing
