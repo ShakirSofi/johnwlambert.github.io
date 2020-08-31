@@ -72,3 +72,16 @@ void mousePressed() {
   background(192, 64, 0);
 }
 ```
+
+If you want to create objects whose size is dependent on the screen, we can use the width and height variables, instead of a number:
+```java
+ellipse(width/2, height/2, 50, 50);
+```
+Different renderers may be chosen ,such as P2D, which uses OpenGL for faster rendering of two-dimensional graphics:
+```java
+size(400, 400, P2D);
+```
+Images are loaded with the `loadImage()` function, which expect to find a file inside a folder named `data`, which is a subdirectory of the sketch folder.
+
+## References
+1. Ben Fry and Casey Reas. http://processing.org/tutorials/overview
