@@ -96,6 +96,8 @@ If instead we draw a rectangle by specifying its centerpoint, we can set `rectMo
 ## Object-Oriented Programming in Processing
 
 We'll now show how to use object-oriented programming (OOP) in Processing. Suppose we wish to animate the motion of a car (modeled by a rectangle) across the screen. We'll specify 4 attributes: its color, x location, y location, and x speed.
+
+If we didn't employ OOP, we would have a bunch of variables in a main program:
 ```java
 color c = color(0);
 float x = 0;
@@ -131,6 +133,51 @@ void display() {
 }
 ```
 
+If we go the OOP way, we can specify a new class -- `Car` -- with the four attributes we discussed before. We will also define its constructor
+```java
+class Car {
+  color c;
+  float xpos;
+  float ypos;
+  float xspeed;
+ 
+  // Constructor
+  Car() {
+    c = color(255);
+    xpos = width/2;
+    ypos = height/2;
+    xspeed = 1;
+  }
+ 
+  void display() {
+    rectMode(CENTER);
+    fill(c);
+    rect(xpos,ypos,20,10);
+  }
+ 
+  void drive() {
+      xpos = xpos + xspeed;
+      if (xpos > width) {
+        xpos = 0;
+      }
+  }
+}
+
+// Step 1. Declare an object.
+Car myCar;
+
+void setup()  {    
+  // Step 2. Initialize object.
+  myCar = new Car();  
+}
+
+void draw()  {    
+  background(255);  
+  // Step 3. Call methods on the object.
+  myCar.drive();  
+  myCar.display();  
+}
+```
 
 ## References
 1. Ben Fry and Casey Reas. http://processing.org/tutorials/overview
