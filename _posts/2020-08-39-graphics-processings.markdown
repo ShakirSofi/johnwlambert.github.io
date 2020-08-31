@@ -38,7 +38,7 @@ void draw() {
   ellipse(mouseX, mouseY, 80, 80); // draws ellipse
 }
 
-```
+```java
 In another variant, we can draw lines that emanate from a single coordinate to wherever the user's mouse cursor is located:
 ```
 void draw() {
@@ -46,7 +46,7 @@ void draw() {
 }
 ```
 The screen is never cleared, so it becomes clogged with lines. To draw only a single line at a time, we can fill the background inside the `draw()` function:
-```
+```java
 void setup() {
   size(400,400);
   stroke(255);
@@ -58,3 +58,17 @@ void draw() {
 }
 ```
 Most functions will use the `setup()` and `draw()` blocks. More advnaced mouse handling can also be introduced. In the following example, the `mousePressed()` function will be called whenever the mouse is pressed.
+```
+void setup() {
+  size(400, 400);
+  stroke(255);
+}
+
+void draw() {
+  line(150, 25, mouseX, mouseY);
+}
+
+void mousePressed() {
+  background(192, 64, 0);
+}
+```
