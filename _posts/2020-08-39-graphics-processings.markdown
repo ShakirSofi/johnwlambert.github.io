@@ -162,7 +162,9 @@ class Car {
       }
   }
 }
-
+```
+We'll now use this class we just defined. In the `draw()` method, we'll have access to our `myCar` variable.
+```java
 // Step 1. Declare an object.
 Car myCar;
 
@@ -179,8 +181,12 @@ void draw()  {
 }
 ```
 
+## Curves
+
+
+
 ## References
 1. Ben Fry and Casey Reas. http://processing.org/tutorials/overview
 2. Daniel Shiffman. http://processing.org/tutorials/drawing
 3. Daniel Shiffman. https://processing.org/tutorials/objects/
-4. 
+4. J. David Eisenberg. http://processing.org/tutorials/curves
