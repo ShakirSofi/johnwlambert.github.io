@@ -1,1 +1,172 @@
 
+---
+layout: post
+comments: true
+permalink: /mst/
+title:  "Minimum Spanning Trees"
+excerpt: "Union-Find, Kruskal's, Prim's, Boruvka's, Yao's Algorithms"
+date:   2020-09-12 11:00:00
+mathjax: true
+---
+
+
+```python
+from typing import List
+
+# Tree of a given connected, undirected and weighted graph 
+
+"""
+Ref:
+https://cppsecrets.com/users/1032115979910410511011497115116111103105505149484957575564103109971051084699111109/Python-Implementation-of-Boruvkas-Minimum-Spanning-tree.php
+"""
+
+# -1 represents an uninitialized value
+UNINIT_FLAG = -1
+
+class Graph: 
+	""" Class to represent a graph. Includes Union-Find utilities
+
+	Edges are represented by 0-indexed integers.
+	"""
+	def __init__(self, num_vertices: int) -> None: 
+		self.V = num_vertices # number of vertices 
+		self.edges = [] # default dictionary to store graph 
+
+	def addEdge(self, u: int, v: int, w: float) -> None:
+		""" add an edge to graph """
+		self.edges.append([u,v,w])
+
+	def find(self, parent: List[int], i: int) -> int: 
+		"""
+		A utility function to find set of an element i
+		(uses path compression technique)
+		
+		Args:
+			parent: list with parent for each node stored at that node's index
+			i: node to query its parent for
+		"""
+		if parent[i] == i: 
+			return i 
+		return self.find(parent, parent[i]) 
+
+	def union(self, parent: List[int], rank: List[int], x: int, y: int) -> None:
+		"""
+		A function that does union of two sets of x and y
+		(uses union by rank). Updates ranks and parents in place by ref.
+
+		Args:
+			parent: list with parent for each node stored at that node's index
+			rank: list of ranks per set
+			x: leader of set 1
+			y: leader of set 2
+		"""
+		xroot = self.find(parent, x) 
+		yroot = self.find(parent, y) 
+
+		if xroot == yroot:
+			return
+
+		# Attach smaller rank tree under root of high rank tree 
+		# (Union by Rank) 
+		if rank[xroot] > rank[yroot]:
+			parent[yroot] = xroot
+		else:
+			# means that rank[xroot] <= rank[yroot]
+			parent[xroot] = yroot
+			
+			if rank[xroot] == rank[yroot]:
+				#If ranks are same, then make one as root and increment
+				# its rank by one
+				rank[yroot] += 1
+
+	def boruvkaMST(self):
+		"""
+		The main function to construct MST using Kruskal's algorithm
+		
+		Initialize a forest T of n one-vertex trees.
+		While T has more than one connected component:
+			pick the lightest edge out of each such components
+			add it to the tree
+			Union the components connected by those edges
+		"""
+		# Initially there are V different trees. 
+		# Finally there will be one tree that will be MST 
+		numTrees = self.V 
+		MSTweight = 0
+
+		# Create V subsets with single elements 
+		# Each node is its own parent at the beginning
+		parent = list(range(self.V))
+		rank = [1] * self.V
+
+		# An array to store index of the cheapest edge of 
+		# subset. It store [u,v,w] for each component 
+		# Mark all initially as un-initialized.
+		cheapest = [UNINIT_FLAG] * self.V
+
+		# While T has more than one component
+		# Keep combining components (or sets) until all 
+		# components are not combined into single MST 
+		while numTrees > 1:
+			print("Starting new round of Boruvka...")
+			# Traverse through all edges and update
+			# cheapest of every component
+			for i in range(len(self.edges)):
+
+				# Find components (or sets) of two corners 
+				# of current edge 
+				u,v,w = self.edges[i]
+				# Find the index for each set's leader
+				set1 = self.find(parent, u)
+				set2 = self.find(parent, v)
+
+				# If two corners of current edge belong to
+				# same set, ignore current edge. Else check if
+				# current edge is closer to previous
+				# cheapest edges of set1 and set2
+				if set1 != set2:
+					if cheapest[set1] == UNINIT_FLAG or cheapest[set1][2] > w: 
+						cheapest[set1] = [u,v,w]  
+
+					if cheapest[set2] == UNINIT_FLAG or cheapest[set2][2] > w: 
+						cheapest[set2] = [u,v,w] 
+
+			pdb.set_trace()
+			# Consider the above picked cheapest edges and add them 
+			# to MST
+			# for each component whose cheapest edge is initialized
+			for node in range(self.V): 
+
+				#Check if cheapest for current set exists
+				# Add its cheapest edge to T
+				if cheapest[node] != -1: 
+					u,v,w = cheapest[node] 
+					set1 = self.find(parent, u)
+					set2 = self.find(parent, v)
+
+					if set1 != set2:
+						MSTweight += w
+						self.union(parent, rank, set1, set2)
+						print (f"\tEdge {u}-{v} with weight {w} included in MST") 
+						numTrees = numTrees - 1
+
+			#reset array w/ cheapest edge per node before next round
+			cheapest = [-1] * self.V
+
+		print ("Weight of MST is %d" % MSTweight) 
+
+
+def test_boruvka1():
+	""" """
+	g = Graph(5)
+	g.addEdge(0,1,1)
+	g.addEdge(0,2,3)
+	g.addEdge(1,2,5)
+	g.addEdge(1,4,4)
+	g.addEdge(2,4,7)
+	g.addEdge(3,4,11)
+	g.addEdge(2,3,2)
+
+	pdb.set_trace()
+	g.boruvkaMST()
+  ```
