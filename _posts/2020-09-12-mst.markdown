@@ -12,7 +12,12 @@ mathjax: true
 ## Minimum Spanning Tree (MST)
 To find the tree of a given connected, undirected and weighted graph 
 
-## 
+## Boruvka's Algorithm
+
+1. Note that each round will take O(|V| + |E|).
+
+2. The number of rounds is at most $$\log_2(n)$$.
+
 Modification of the implementation [here](https://cppsecrets.com/users/1032115979910410511011497115116111103105505149484957575564103109971051084699111109/Python-Implementation-of-Boruvkas-Minimum-Spanning-tree.php)
 
 ```python
