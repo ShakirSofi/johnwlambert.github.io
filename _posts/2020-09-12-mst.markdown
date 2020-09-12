@@ -16,7 +16,11 @@ To find the tree of a given connected, undirected and weighted graph
 
 1. Note that each round will take O(|V| + |E|).
 
-2. The number of rounds is at most $$\log_2(n)$$.
+2. The number of rounds is at most $$\log_2(V)$$, because each round reduces the number of components by 2. We start with $$|V|$$ components.
+Why?
+
+**Running Time**: Boruvka's running time is $$O((|E|+|V|)\log|V|)$$ = O(|E| \log|V| + |V| \log|V|)$$. We just keep on saying $$O(|E| \log|V|)$$ since $$|E|$$ can be at worse $$V^2$$ so the $$V\logV$$ is ignored because we care about the bigger term for big-O.
+
 
 Modification of the implementation [here](https://cppsecrets.com/users/1032115979910410511011497115116111103105505149484957575564103109971051084699111109/Python-Implementation-of-Boruvkas-Minimum-Spanning-tree.php)
 
