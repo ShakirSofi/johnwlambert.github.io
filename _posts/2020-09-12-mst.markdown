@@ -182,6 +182,6 @@ def test_boruvka1():
 
 
 ## References
-1. Andrew Yao. *An O(|E| log log |V|) Algorithm for Finding Minimum Spanning Trees.* Infomration Processing Letters, 1975.
-2. 
+1. Andrew Yao. *An O(|E| log log |V|) Algorithm for Finding Minimum Spanning Trees.* Information Processing Letters, 1975. [PDF](https://www.sciencedirect.com/science/article/abs/pii/0020019075900563?via%3Dihub)
+2. Jaroslav Nešetřil, EvaMilková, HelenaNešetřilová. *Otakar Borůvka on minimum spanning tree problem Translation of both the 1926 papers, comments, history.* [PDF](https://doi.org/10.1016%2FS0012-365X%2800%2900224-7)
 
