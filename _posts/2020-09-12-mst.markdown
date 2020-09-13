@@ -179,9 +179,25 @@ def test_boruvka1():
   ```
 
 ## Yao's Algorithm
+In 1975, Andy Yao [1] introduced an $$O(|E|\log \log |V|)$$ algorithm for the MST problem.
+
+First partition the set of edges incident with each node $$v$$ into $$k$$ levels.
+
+This can be done in O(E \log k) time by repeatedly applying the linear median-finding algorithm, FastSelect (which finds the k'th smallest element in an unsorted array).
+
+$$O(|E| \log k + \frac{|E|}{k} \log |V|)$$ which is $$O(|E| \log \log |V|)$$ if we choose $$k$$ to be $$\log|V|$$.
+
+## Yao Implementation
+Consider 3 sets: $$T$$, $$VS$$, and $$ES$$. 
+1. $$T$$ is used to collect edges of the final spanning tree.
+2. $$VS$$ contains the vertex sets corresponding to the connected compoetnts of the spanning tree found so far.
+3. $$ES$$ contains, for each vertex set $$W$$ in $$VS$$, an edge set $$E(W)$$.
+
+Initialize $$VS = \{ \{ v \} \mid v \in V \}$$. The algorithm uses an integer parameter $$k$$.
+Initialize $$ES = \{ \{ all the edges incident upon v\} for v \in V \} $$.
 
 
 ## References
-1. Andrew Yao. *An O(|E| log log |V|) Algorithm for Finding Minimum Spanning Trees.* Information Processing Letters, 1975. [PDF](https://www.sciencedirect.com/science/article/abs/pii/0020019075900563?via%3Dihub)
-2. Jaroslav Nešetřil, EvaMilková, HelenaNešetřilová. *Otakar Borůvka on minimum spanning tree problem Translation of both the 1926 papers, comments, history.* [PDF](https://doi.org/10.1016%2FS0012-365X%2800%2900224-7)
+1. Jaroslav Nešetřil, Eva Milková, Helena Nešetřilová. *Otakar Borůvka on minimum spanning tree problem Translation of both the 1926 papers, comments, history.* [PDF](https://doi.org/10.1016%2FS0012-365X%2800%2900224-7)
+2. Andrew Yao. *An O(|E| log log |V|) Algorithm for Finding Minimum Spanning Trees.* Information Processing Letters, 1975. [PDF](https://www.sciencedirect.com/science/article/abs/pii/0020019075900563?via%3Dihub)
 
