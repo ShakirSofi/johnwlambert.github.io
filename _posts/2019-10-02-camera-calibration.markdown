@@ -57,6 +57,24 @@ This can also be obtained via an RQ decomposition of $$KR$$, since we wish to fi
 - C. Loop and Z. Zhang. Computing Rectifying Homographies for Stereo Vision. IEEE Conf. Computer Vision and PaWern Recognition (CVPR), 1999.
 
 
+## Essential Matrix
+
+
+$$
+Eij = RTi (Ti − Tj )Rj 
+$$
+
+$$
+Fij = K−Ti EijK−1j = Vi(Ti − Tj )VTj
+$$
+where $$Ti = [ti]×.$$
+
+Kasten19iccv
+
+## References
+
+Yoni Kasten, Amnon Geifman, Meirav Galun, Ronen Basri. *Algebraic Characterization of Essential Matrices and Their Averaging in Multiview Settings*. ICCV 2019. [PDF](https://openaccess.thecvf.com/content_ICCV_2019/papers/Kasten_Algebraic_Characterization_of_Essential_Matrices_and_Their_Averaging_in_Multiview_ICCV_2019_paper.pdf)
+
 
 
 
