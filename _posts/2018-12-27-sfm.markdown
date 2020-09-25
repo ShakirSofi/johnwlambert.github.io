@@ -131,3 +131,5 @@ ORB-SLAM[21] and DSO[6], solve Equation 7 by decomposing it using the Schur comp
 
 [8] Frank Dellaert. [Notes](http://www.cs.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A13-BundleAdjustment-handout.pdf). Slides](http://www.cs.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A13-BundleAdjustment.pdf)
 
+[9] Kris Kitani. http://www.cs.cmu.edu/~16385/s17/Slides/11.4_Triangulation.pdf
+
