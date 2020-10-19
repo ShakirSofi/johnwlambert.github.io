@@ -114,6 +114,8 @@ keys to developing highly precise and robust visual SLAM.
 State-of-the-art monocular SLAM methods, such as
 ORB-SLAM[21] and DSO[6], solve Equation 7 by decomposing it using the Schur complement matrix instead of directly solving it. (VITAMIN-E)
 
+## Rodrigues' Vector
+
 ## References
 [1] Ramanan, Deva. *Structure from Motion.* [http://16720.courses.cs.cmu.edu/lec/sfm.pdf](http://16720.courses.cs.cmu.edu/lec/sfm.pdf).
 
