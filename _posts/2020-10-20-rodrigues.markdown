@@ -38,6 +38,8 @@ def Rodrigues(v: np.ndarray, k: np.ndarray, theta: float):
 	v_rot = Rodrigues(v,k,theta)
 ```
 
+Install Mayavi per instructions [here](https://docs.enthought.com/mayavi/mayavi/installation.html).
+
 ## More Derivations
 
 \end{itemize}
