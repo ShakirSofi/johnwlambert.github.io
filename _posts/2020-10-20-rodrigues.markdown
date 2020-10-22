@@ -1211,9 +1211,7 @@ if __name__ == '__main__':
 	#test_get_ngon_points()
 
 	#plot_ngon_mayavi()
-
-
-
-
-
 ```
+
+## References
+1. https://www.microsoft.com/en-us/research/wp-content/uploads/2016/12/Computation-of-rotation-minimizing-frames.pdf, implemented [here](https://math.stackexchange.com/questions/2843307/getting-consistent-normals-along-a-3d-bezier-curve)
