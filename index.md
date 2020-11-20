@@ -2,7 +2,7 @@
 layout: default
 ---
 
-|![](/images/john-huntington-gardens_compressed_250px.png) | Ph.D. Candidate<br>[School of Interactive Computing](https://www.ic.gatech.edu/)<br>[Georgia Institute of Technology](https://www.gatech.edu/) | 
+|![](/images/john-huntington-gardens_compressed_250px.png) | Ph.D. Candidate, [School of Interactive Computing](https://www.ic.gatech.edu/), [Georgia Institute of Technology](https://www.gatech.edu/) | 
 
 ## Bio
 
