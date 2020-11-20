@@ -15,7 +15,7 @@ You can reach me at johnlambert AT gatech DOT edu. Some of my code can be [found
 
 
 ## News
-- November 2020: I gave an invited talk at the [ROS World 2020](https://roscon.ros.org/world/2020/#program) virtual conference, discussing our MSeg work from CVPR. Our lightweight 480p MSeg model can run at 25 fps in Pytorch.
+- November 2020: I gave an invited talk at the [ROS World 2020](https://roscon.ros.org/world/2020/#program) virtual conference, discussing our MSeg work from CVPR. A recording is available [here](https://vimeo.com/showcase/7812155/video/480600107). Our lightweight 480p MSeg model can run at 25 fps in Pytorch.
 - August 2020: We are the runner-up in the 2020 Robust Vision Challenge (semantic segmentation track), without training on four of the seven RVC test datasets (zero-shot, cross-dataset generalization). See our talk at the ECCV 2020 RVC workshop [here](https://youtu.be/TiEmlvRhiCI?list=PLeCNfJWZKqxtnyuQ-HUrBMj4PNQsimccH&t=3560).
 - June 2020: Watch an [excellent presentation from MachinesCanSee](https://youtu.be/lwv85fC1Ids) on our recent [MSeg](http://vladlen.info/papers/MSeg.pdf) work, presented by Dr. Vladlen Koltun.
 - June 2020: The CVPR 2020 WAD Argoverse competitions have concluded. Congratulations to the very impressive submissions from ths winners. You can watch the results presentation [here](https://www.youtube.com/watch?v=Vcbj_peZT4Q&feature=youtu.be), or the summary presented at [ICML 2020](https://slideslive.com/38930752/what-we-learned-from-argoverse-competitions).
